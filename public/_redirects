@@ -1,5 +1,1 @@
-/test     /test/              301
-/test/*   /test/index.html    200
-/styleguidd /styleguide       301
-/styleguide /index.html       200
-/*        /index.html         200
+/*   /index.html   200
