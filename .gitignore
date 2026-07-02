@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+.worktrees/
+coverage/
+.DS_Store
+*.log
+dev-server-log.txt
+tsc-*.txt
+build-*.txt
+.env*
+!.env.example

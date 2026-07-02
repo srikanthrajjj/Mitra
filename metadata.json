@@ -1,0 +1,6 @@
+{
+  "name": "Mitra AI Architect",
+  "description": "An AI Architect for building intelligent ServiceNow solutions from idea to deployment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
