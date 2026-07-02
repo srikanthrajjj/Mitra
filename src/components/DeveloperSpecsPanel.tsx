@@ -7,6 +7,13 @@ import {
   Folder, HelpCircle, Key, LogOut, ChevronDown, Plus, Pencil, Trash2,
   Mic, Image
 } from 'lucide-react';
+import { DevComponentsList } from './dev/DevComponentsList';
+import {
+  DEV_COMPONENT_SHOWCASES,
+  DEV_COMPONENTS,
+  type DevComponentId,
+  isDevComponentId,
+} from './dev/components';
 import { Solution, Theme } from '../types';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/src/components/ui/scroll-area';
@@ -25,6 +32,8 @@ interface DeveloperSpecsPanelProps {
 
 type Section =
   | 'overview'
+  | 'components'
+  | DevComponentId
   | 'colors'
   | 'typography'
   | 'spacing'
@@ -38,6 +47,7 @@ type Section =
 
 const NAV_SECTIONS: { id: Section; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: 'overview',    label: 'Overview',    icon: Sparkles },
+  { id: 'components',  label: 'Components',  icon: Layers },
   { id: 'colors',      label: 'Colors',      icon: Palette },
   { id: 'typography',  label: 'Typography',  icon: Type },
   { id: 'spacing',     label: 'Spacing',     icon: LayoutGrid },
@@ -902,14 +912,33 @@ function IconsSection() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function DeveloperSpecsPanel({ isOpen, onClose }: DeveloperSpecsPanelProps) {
+export function DeveloperSpecsPanel({ isOpen, onClose, theme }: DeveloperSpecsPanelProps) {
   const [activeSection, setActiveSection] = useState<Section>('overview');
 
   if (!isOpen) return null;
 
   const renderSection = () => {
+    if (isDevComponentId(activeSection)) {
+      const Showcase = DEV_COMPONENT_SHOWCASES[activeSection];
+      return (
+        <div className="space-y-6">
+          <button
+            type="button"
+            onClick={() => setActiveSection('components')}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-brand-green cursor-pointer"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to components
+          </button>
+          <Showcase theme={theme} />
+        </div>
+      );
+    }
+
     switch (activeSection) {
       case 'overview':   return <OverviewSection />;
+      case 'components':
+        return <DevComponentsList onSelect={(id) => setActiveSection(id)} />;
       case 'colors':     return <ColorsSection />;
       case 'typography': return <TypographySection />;
       case 'spacing':    return <SpacingSection />;
@@ -979,9 +1008,25 @@ export function DeveloperSpecsPanel({ isOpen, onClose }: DeveloperSpecsPanelProp
         {/* Topbar */}
         <div className="flex h-[52px] shrink-0 items-center justify-between border-b border-border/60 bg-[#0a0e12] px-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="text-foreground font-medium">
-              {NAV_SECTIONS.find((s) => s.id === activeSection)?.label}
-            </span>
+            {isDevComponentId(activeSection) ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection('components')}
+                  className="transition-colors hover:text-foreground cursor-pointer"
+                >
+                  Components
+                </button>
+                <ChevronRight className="h-3.5 w-3.5" />
+                <span className="text-foreground font-medium">
+                  {DEV_COMPONENTS.find((c) => c.id === activeSection)?.name}
+                </span>
+              </>
+            ) : (
+              <span className="text-foreground font-medium">
+                {NAV_SECTIONS.find((s) => s.id === activeSection)?.label}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="text-[10px] gap-1 border-brand-green/20 text-brand-green/80">

@@ -1,0 +1,96 @@
+/* Chat message row + bubbles (from ChatView.tsx) */
+
+@keyframes chat-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mitra-chat-message {
+  display: flex;
+  gap: 1rem;
+  max-width: 48rem;
+  animation: chat-message-in 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mitra-chat-message--user {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.mitra-chat-message--assistant {
+  margin-right: auto;
+}
+
+.mitra-chat-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mitra-chat-avatar--user-dark {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #32d74b;
+}
+
+.mitra-chat-avatar--user-light {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+.mitra-chat-avatar--assistant {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.mitra-chat-bubble-wrap {
+  max-width: 85%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mitra-chat-bubble {
+  word-break: break-word;
+}
+
+.mitra-chat-bubble--user-dark {
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.8);
+  color: #f8fafc;
+  font-weight: 500;
+}
+
+.mitra-chat-bubble--user-light {
+  padding: 0.75rem 1.25rem;
+  border-radius: 20px;
+  border-top-right-radius: 4px;
+  border: 1px solid rgba(167, 243, 208, 0.6);
+  background: #ecfdf5;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.mitra-chat-bubble--assistant-dark {
+  color: #e2e8f0;
+}
+
+.mitra-chat-bubble--assistant-light {
+  color: #1e293b;
+}

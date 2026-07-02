@@ -1,0 +1,58 @@
+/* Extracted from src/index.css — streaming text + cursor */
+
+@keyframes stream-cursor-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes stream-body-soften {
+  from { opacity: 0.92; }
+  to { opacity: 1; }
+}
+
+.stream-smooth-text {
+  display: inline;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.stream-smooth-text--active .stream-smooth-text__body {
+  display: inline;
+  animation: stream-body-soften 320ms ease-out;
+}
+
+.stream-smooth-text__body {
+  white-space: pre-wrap;
+}
+
+.stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 0.125rem;
+  vertical-align: -0.1em;
+  border-radius: 9999px;
+  animation: stream-cursor-breathe 2.2s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.stream-cursor--dark {
+  background: rgba(50, 215, 75, 0.8);
+}
+
+.stream-cursor--light {
+  background: rgba(16, 185, 129, 0.9);
+}
+
+.chat-response-text {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.chat-response-text--dark {
+  color: #e2e8f0;
+}
+
+.chat-response-text--light {
+  color: #1e293b;
+}

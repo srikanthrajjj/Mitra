@@ -1,0 +1,139 @@
+/* Mitra chat loader — standalone CSS for /dev and copy-paste use */
+
+@keyframes mitra-chat-loader-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mitra-chat-loader-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes mitra-chat-loader-phrase-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mitra-chat-loader {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  animation: mitra-chat-loader-enter 320ms ease-out;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mitra-chat-loader--dark {
+  background: rgba(2, 6, 23, 0.4);
+  color: rgba(148, 163, 184, 0.95);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.03);
+}
+
+.mitra-chat-loader--light {
+  background: rgba(236, 253, 245, 0.2);
+  color: rgba(100, 116, 139, 0.95);
+  border-color: rgba(167, 243, 208, 0.4);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.01);
+}
+
+.mitra-chat-loader--compact {
+  max-width: 190px;
+  padding: 8px;
+}
+
+.mitra-chat-loader__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mitra-chat-loader__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mitra-chat-loader__pulse {
+  position: relative;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+}
+
+.mitra-chat-loader__pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.6);
+  animation: mitra-chat-loader-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.mitra-chat-loader__pulse-dot {
+  position: relative;
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.9);
+}
+
+.mitra-chat-loader__phrase {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.mitra-chat-loader__phrase--fading {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.mitra-chat-loader__phrase--enter {
+  animation: mitra-chat-loader-phrase-in 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mitra-chat-loader__track {
+  width: 100%;
+  height: 2px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.1);
+  overflow: hidden;
+}
+
+.mitra-chat-loader__fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.9);
+  width: 0%;
+  transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
