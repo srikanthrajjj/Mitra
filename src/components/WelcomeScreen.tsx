@@ -25,14 +25,14 @@ export default function WelcomeScreen({ onSignIn, onExploreGuest }: WelcomeScree
         <div className="flex flex-col items-center gap-3 w-full max-w-xs animate-welcome-in welcome-delay-3">
           <button
             onClick={onSignIn}
-            className="w-full py-3 px-6 rounded-md text-[14px] font-bold btn-dark-primary transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            className="w-full py-3 px-6 text-[14px] font-bold btn-cta transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           >
             Sign in as
           </button>
 
           <button
             onClick={onExploreGuest}
-            className="w-full py-3 px-6 rounded-md text-[14px] font-semibold text-illuminate-muted border border-white/[0.06] bg-mitra-bg/80 hover:bg-mitra-surface hover:text-illuminate-text hover:border-white/[0.1] transition-all duration-300 cursor-pointer"
+            className="w-full py-3 px-6 text-[14px] font-semibold btn-secondary transition-all duration-300 cursor-pointer"
           >
             Explore as guest
           </button>

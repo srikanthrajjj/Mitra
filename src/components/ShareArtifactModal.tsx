@@ -219,12 +219,7 @@ export function ShareArtifactModal({
                 type="button"
                 onClick={handleSend}
                 disabled={!email.trim()}
-                className={cn(
-                  'inline-flex h-9 w-full items-center justify-center rounded-md text-sm font-semibold transition-all disabled:pointer-events-none disabled:opacity-50',
-                  isDark
-                    ? 'btn-dark-primary active:scale-[0.98]'
-                    : 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
-                )}
+                className="btn-cta inline-flex h-9 w-full items-center justify-center text-sm transition-all disabled:pointer-events-none disabled:opacity-50"
               >
                 Send to {personaLabel.split(' ')[0]}
               </button>
@@ -265,12 +260,7 @@ export function ShareArtifactModal({
                     <button
                       type="button"
                       onClick={handleCopy}
-                      className={cn(
-                        'inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md border text-xs font-medium transition-colors',
-                        isDark
-                          ? 'border-white/[0.08] bg-transparent text-slate-200 hover:bg-neutral-800'
-                          : 'border-input bg-background hover:bg-accent',
-                      )}
+                      className="btn-secondary inline-flex h-8 flex-1 items-center justify-center gap-1.5 text-xs transition-colors"
                     >
                       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                       {copied ? 'Copied' : 'Copy link'}
@@ -279,10 +269,7 @@ export function ShareArtifactModal({
                       <button
                         type="button"
                         onClick={() => onPreviewGuest(pendingReviewId)}
-                        className={cn(
-                          'inline-flex h-8 flex-1 items-center justify-center rounded-md text-xs font-semibold transition-all',
-                          isDark ? 'btn-dark-primary' : 'bg-primary text-primary-foreground hover:bg-primary/90',
-                        )}
+                        className="btn-cta inline-flex h-8 flex-1 items-center justify-center text-xs transition-all"
                       >
                         Review (same tab)
                       </button>

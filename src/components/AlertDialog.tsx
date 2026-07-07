@@ -100,11 +100,7 @@ export default function AlertDialog({
           <button
             type="button"
             onClick={onCancel}
-            className={`p-1.5 rounded-lg border transition-colors shrink-0 ${
-              isDark
-                ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-            }`}
+            className="btn-secondary p-1.5 shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -118,24 +114,17 @@ export default function AlertDialog({
           <button
             type="button"
             onClick={onCancel}
-            className={`px-4 py-2 rounded-xl text-[13px] font-medium border transition-colors ${
-              isDark
-                ? 'border-white/[0.08] text-slate-300 hover:bg-mitra-highlight hover:text-white'
-                : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
+            className="btn-secondary px-4 py-2 text-[13px]"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-xl text-[13px] font-semibold border transition-colors ${
-              variant === 'danger'
-                ? isDark
-                  ? 'bg-red-500/15 border-red-500/30 text-red-300 hover:bg-red-500/25'
-                  : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
-                : 'btn-dark-primary'
-            }`}
+            className={cn(
+              'px-4 py-2 text-[13px] font-semibold transition-colors',
+              variant === 'danger' ? 'btn-danger' : 'btn-cta',
+            )}
           >
             {confirmLabel}
           </button>

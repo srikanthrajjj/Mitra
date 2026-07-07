@@ -69,10 +69,7 @@ export function EmailNotificationPreview({
       <button
         type="button"
         onClick={handleReview}
-        className={cn(
-          'mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-md text-sm font-semibold transition-all',
-          isDark ? 'btn-dark-primary active:scale-[0.98]' : 'bg-primary text-primary-foreground hover:bg-primary/90',
-        )}
+        className="btn-cta mt-4 inline-flex h-9 w-full items-center justify-center gap-2 text-sm transition-all"
       >
         Review
         <ExternalLink className="h-3.5 w-3.5 opacity-80" />

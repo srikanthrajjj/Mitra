@@ -63,9 +63,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
           <button 
             type="button"
             onClick={onClose}
-            className={`p-1 rounded-lg border ${
-              isDark ? 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900' : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-            }`}
+            className="btn-secondary p-1.5"
           >
             <X className="w-4.5 h-4.5" />
           </button>
@@ -176,21 +174,13 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
             <button
               type="button"
               onClick={onClose}
-              className={`cursor-pointer px-4.5 py-2 text-xs font-semibold border rounded-xl transition-all hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98] ${
-                isDark 
-                  ? 'bg-neutral-900 border-neutral-800/80 text-slate-400 hover:bg-neutral-800 hover:text-white shadow-[0_2px_4px_rgba(0,0,0,0.3)]' 
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-[0_2px_4px_rgba(0,0,0,0.02)]'
-              }`}
+              className="btn-secondary cursor-pointer px-4 py-2 text-xs transition-all hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className={`cursor-pointer px-5 py-2.5 font-bold text-xs rounded-xl flex items-center gap-1.5 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] transition-all ${
-                isDark
-                  ? 'btn-dark-primary'
-                  : 'bg-brand-green text-[#030d0a] hover:bg-brand-green-hover shadow-[0_4px_12px_rgba(25,175,0,0.2)]'
-              }`}
+              className="btn-cta cursor-pointer px-5 py-2.5 text-xs flex items-center gap-1.5 hover:-translate-y-0.5 active:translate-y-0 transition-all"
             >
               Draft Solution Architecture
             </button>

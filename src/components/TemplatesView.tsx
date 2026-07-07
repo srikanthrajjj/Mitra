@@ -143,11 +143,7 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
                 <button
                   type="button"
                   onClick={() => onUseTemplate(tpl)}
-                  className={`w-full py-2.5 rounded-lg text-[13px] font-semibold flex items-center justify-center gap-1.5 transition-colors duration-200 ${
-                    isDark
-                      ? 'bg-brand-green text-slate-950 hover:bg-brand-green-hover'
-                      : 'bg-brand-green text-slate-950 hover:bg-brand-green-hover'
-                  }`}
+                  className="btn-cta w-full py-2.5 text-[13px] flex items-center justify-center gap-1.5 transition-colors duration-200"
                 >
                   Use template
                   <ArrowRight className="w-3.5 h-3.5" />

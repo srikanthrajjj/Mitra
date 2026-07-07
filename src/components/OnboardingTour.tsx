@@ -266,11 +266,7 @@ export default function OnboardingTour({ theme, isOpen, onClose }: OnboardingTou
               {stepIndex > 0 && (
                 <button
                   onClick={handleBack}
-                  className={`cursor-pointer px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-all duration-200 ${
-                    isDark
-                      ? 'border-white/[0.06] bg-white/[0.02] text-slate-400 hover:bg-white/[0.05] hover:text-illuminate-text'
-                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                  }`}
+                  className="btn-secondary cursor-pointer px-4 py-2 text-xs flex items-center gap-1.5 transition-all duration-200"
                 >
                   <ArrowLeft className="w-3 h-3" />
                   Back
@@ -279,11 +275,7 @@ export default function OnboardingTour({ theme, isOpen, onClose }: OnboardingTou
 
               <button
                 onClick={handleNext}
-                className={`cursor-pointer px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
-                  isDark
-                    ? 'btn-dark-primary'
-                    : 'bg-brand-green text-[#030d0a] hover:bg-brand-green-hover'
-                }`}
+                className="btn-cta cursor-pointer px-4 py-2 text-xs flex items-center gap-1.5 transition-all duration-200"
               >
                 {stepIndex === steps.length - 1 ? (
                   'Finish'

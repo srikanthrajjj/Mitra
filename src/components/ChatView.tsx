@@ -1093,7 +1093,7 @@ export default function ChatView({
                     disabled={!inputValue.trim()}
                     className={`w-7.5 h-7.5 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${
                       inputValue.trim()
-                        ? 'bg-brand-green hover:bg-brand-green-hover hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(50,215,75,0.45)] cursor-pointer'
+                        ? 'bg-brand-green hover:bg-brand-green-hover hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(0,255,102,0.45)] cursor-pointer'
                         : isDark
                           ? 'bg-muted text-muted-foreground opacity-40 cursor-not-allowed'
                           : 'bg-slate-200 text-slate-455 opacity-40 cursor-not-allowed'

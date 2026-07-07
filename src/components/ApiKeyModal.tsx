@@ -96,11 +96,7 @@ export default function ApiKeyModal({
           <button
             type="button"
             onClick={onClose}
-            className={`p-1.5 rounded-lg border transition-colors ${
-              isDark
-                ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-            }`}
+            className="btn-secondary p-1.5 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -206,12 +202,8 @@ export default function ApiKeyModal({
                 <button
                   type="submit"
                   disabled={!personalKey.trim() || savedSuccess}
-                  className={`flex-1 h-10 rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
-                    savedSuccess
-                      ? 'bg-brand-green text-[#030d0a]'
-                      : isDark
-                        ? 'btn-dark-primary active:scale-[0.98]'
-                        : 'bg-brand-green text-[#030d0a] hover:bg-brand-green-hover active:scale-[0.98]'
+                  className={`btn-cta flex-1 h-10 text-[13px] flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                    savedSuccess ? '' : 'active:scale-[0.98]'
                   }`}
                 >
                   {savedSuccess ? (
@@ -227,11 +219,7 @@ export default function ApiKeyModal({
                   <button
                     type="button"
                     onClick={handleRemovePersonal}
-                    className={`h-10 px-3 rounded-xl border text-[13px] font-medium flex items-center gap-1.5 transition-colors ${
-                      isDark
-                        ? 'border-red-500/25 text-red-400 hover:bg-red-500/10'
-                        : 'border-red-200 text-red-600 hover:bg-red-50'
-                    }`}
+                    className="btn-danger h-10 px-3 text-[13px] flex items-center gap-1.5 transition-colors"
                     title="Remove personal key and use Mitra private API only"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -260,11 +248,7 @@ export default function ApiKeyModal({
           <button
             type="button"
             onClick={onClose}
-            className={`w-full h-10 rounded-xl border text-[13px] font-semibold transition-all ${
-              isDark
-                ? 'border-neutral-800 text-slate-300 hover:bg-neutral-900 hover:text-white'
-                : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800'
-            }`}
+            className="btn-secondary w-full h-10 text-[13px] transition-all"
           >
             Close
           </button>

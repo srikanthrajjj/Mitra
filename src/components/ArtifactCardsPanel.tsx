@@ -43,7 +43,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
@@ -366,20 +365,32 @@ function DeliverableRow({
               <MoreVertical className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="left" className={cn(theme, 'w-44')}>
+          <DropdownMenuContent
+            align="end"
+            side="left"
+            className={cn(
+              theme,
+              'w-48 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
+              isDark
+                ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
+            )}
+          >
             <DropdownMenuItem
               disabled={!canShare}
               onClick={onShare}
-              className="text-xs"
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
             >
-              <Share2 className="h-3.5 w-3.5" />
-              {shareLabel}
+              <Share2 className="h-4 w-4 opacity-70" />
+              <span>{shareLabel}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onSelect} className="text-xs">
-              <Eye className="h-3.5 w-3.5" />
-              View details
+            <DropdownMenuItem
+              onClick={onSelect}
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+            >
+              <Eye className="h-4 w-4 opacity-70" />
+              <span>View details</span>
             </DropdownMenuItem>
-
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

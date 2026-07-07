@@ -224,7 +224,7 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
           <button
             type="button"
             onClick={handleAddClick}
-            className="bg-[#10b981] hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="btn-cta px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Add Credentials</span>
@@ -263,7 +263,7 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
               </button>
               <button
                 type="button"
-                className="text-emerald-500 hover:text-emerald-600 cursor-pointer transition-colors p-0.5 rounded"
+                className="text-brand-green hover:text-brand-green-hover cursor-pointer transition-colors p-0.5 rounded"
                 title="API keys"
               >
                 <Key className="h-3.5 w-3.5" />
@@ -300,7 +300,7 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     {conn.tag && (
-                      <span className="bg-[#10b981] text-white text-[11px] font-bold px-2 py-0.5 rounded tracking-wide">
+                      <span className="bg-brand-green text-[#030d0a] text-[11px] font-bold px-2 py-0.5 rounded tracking-wide">
                         {conn.tag}
                       </span>
                     )}
@@ -310,11 +310,11 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     <div className="flex items-center gap-1.5">
                       <span className={cn(
                         'w-1.5 h-1.5 rounded-full shrink-0',
-                        conn.active ? 'bg-[#10b981]' : 'bg-slate-400'
+                        conn.active ? 'bg-brand-green' : 'bg-slate-400'
                       )} />
                       <span className={cn(
                         'text-xs font-semibold',
-                        conn.active ? 'text-[#10b981]' : 'text-slate-400'
+                        conn.active ? 'text-brand-green' : 'text-slate-400'
                       )}>
                         Active
                       </span>
@@ -335,21 +335,21 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                         align="end"
                         className={cn(
                           theme,
-                          'w-32 p-1 rounded-lg border shadow-lg backdrop-blur-md transition-all duration-150',
+                          'w-36 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
                           isDark
-                            ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100'
-                            : 'bg-white border-zinc-200 text-zinc-800'
+                            ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                            : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
                         )}
                       >
                         <DropdownMenuItem
                           onClick={() => handleEditClick(conn)}
-                          className="cursor-pointer text-xs rounded px-2 py-1.5 gap-2 focus:bg-emerald-500/10 focus:text-emerald-500 transition-colors"
+                          className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
                         >
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(conn.id)}
-                          className="cursor-pointer text-xs rounded px-2 py-1.5 gap-2 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
+                          className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
                         >
                           <span>Remove</span>
                         </DropdownMenuItem>
@@ -371,7 +371,7 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                       href={conn.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-xs text-[#10b981] hover:underline font-mono"
+                      className="text-xs text-brand-green hover:underline font-mono"
                     >
                       {conn.url}
                     </a>
@@ -437,8 +437,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   />
                 </div>
@@ -456,8 +456,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all resize-none',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   />
                 </div>
@@ -475,8 +475,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   />
                 </div>
@@ -492,8 +492,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all cursor-pointer',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   >
                     <option value="" disabled>Select status</option>
@@ -514,8 +514,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all cursor-pointer',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   >
                     <option value="" disabled>Select authentication type</option>
@@ -538,8 +538,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100 font-mono' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800 font-mono'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100 font-mono' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800 font-mono'
                     )}
                   />
                 </div>
@@ -558,8 +558,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   />
                 </div>
@@ -578,8 +578,8 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-[#10b981] text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-[#10b981] text-zinc-800'
+                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
+                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
                     )}
                   />
                 </div>
@@ -591,18 +591,13 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className={cn(
-                    'px-4 py-2 text-xs font-semibold rounded-lg border transition-colors cursor-pointer',
-                    isDark 
-                      ? 'border-zinc-850 text-zinc-300 hover:bg-zinc-800/60 bg-transparent' 
-                      : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50 bg-white'
-                  )}
+                  className="btn-secondary px-4 py-2 text-xs cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#10b981] hover:bg-emerald-600 text-white transition-colors cursor-pointer"
+                  className="btn-cta px-4 py-2 text-xs font-semibold cursor-pointer"
                 >
                   Save
                 </button>

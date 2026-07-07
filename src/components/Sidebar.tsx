@@ -236,14 +236,14 @@ export default function Sidebar({
                     <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
                     <DropdownMenuItem
                       onClick={() => setActiveTab('settings')}
-                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-emerald-500/10 focus:text-emerald-400 dark:focus:text-emerald-400 transition-colors"
+                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
                     >
                       <Settings className="h-4 w-4 opacity-70" />
                       <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={onOpenTour}
-                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-emerald-500/10 focus:text-emerald-400 dark:focus:text-emerald-400 transition-colors"
+                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
                     >
                       <HelpCircle className="h-4 w-4 opacity-70" />
                       <span>Restart guide tour</span>
@@ -432,14 +432,14 @@ export default function Sidebar({
             <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
             <DropdownMenuItem
               onClick={() => setActiveTab('settings')}
-              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-emerald-500/10 focus:text-emerald-400 dark:focus:text-emerald-400 transition-colors"
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
             >
               <Settings className="h-4 w-4 opacity-70" />
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={onOpenTour}
-              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-emerald-500/10 focus:text-emerald-400 dark:focus:text-emerald-400 transition-colors"
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
             >
               <HelpCircle className="h-4 w-4 opacity-70" />
               <span>Restart guide tour</span>
