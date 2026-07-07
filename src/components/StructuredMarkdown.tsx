@@ -12,39 +12,7 @@ import {
 } from './ChatResponseCards';
 import { parseResponseContent, type ResponseBlock } from '../utils/responseParser';
 import { simplifyResponseText } from '../utils/simplifyResponseText';
-
-function parseInlineMarkdown(text: string, isDark: boolean): React.ReactNode {
-  const parts: React.ReactNode[] = [];
-  const regex = /(\*\*([^*]+)\*\*|`([^`]+)`)/g;
-  let lastIndex = 0;
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    if (match[0].startsWith('**')) {
-      parts.push(
-        <strong key={match.index} className={`font-medium ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-          {match[2]}
-        </strong>,
-      );
-    } else {
-      parts.push(
-        <code
-          key={match.index}
-          className={`px-1 rounded font-mono text-[11px] ${
-            isDark ? 'text-brand-green/90' : 'text-emerald-700'
-          }`}
-        >
-          {match[3]}
-        </code>,
-      );
-    }
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return parts.length > 0 ? parts : text;
-}
+import { parseInlineMarkdown } from '../utils/markdownInline';
 
 interface StructuredMarkdownProps {
   text: string;
@@ -84,7 +52,7 @@ function renderBlock(
   switch (block.type) {
     case 'title':
       return (
-        <p className={`text-[14px] font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+        <p className="text-[14px] font-semibold text-slate-900 dark:text-slate-100">
           {parseInlineMarkdown(block.text, isDark)}
         </p>
       );
@@ -192,7 +160,7 @@ function renderBlock(
 
     case 'paragraph':
       return (
-        <p className={`text-[13px] leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className="text-[13px] leading-relaxed text-slate-700 dark:text-slate-400">
           {parseInlineMarkdown(block.text, isDark)}
         </p>
       );

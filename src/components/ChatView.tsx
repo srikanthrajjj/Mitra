@@ -121,24 +121,12 @@ function SnRecordUpdateShell({
   isDark: boolean;
 }) {
   return (
-    <div
-      className={`sn-record-update rounded-xl border overflow-hidden ${
-        isDark
-          ? 'border-amber-500/25 bg-amber-500/[0.04]'
-          : 'border-amber-300/70 bg-amber-50/80'
-      }`}
-    >
-      <div
-        className={`flex items-center gap-2 px-3.5 py-2 border-b text-[11px] font-semibold uppercase tracking-wide ${
-          isDark
-            ? 'border-amber-500/20 bg-amber-500/[0.08] text-amber-300/90'
-            : 'border-amber-200 bg-amber-100/60 text-amber-800'
-        }`}
-      >
-        <ClipboardList className="w-3.5 h-3.5 shrink-0" />
+    <div className="sn-record-update overflow-hidden rounded-xl border border-amber-300/80 bg-amber-50 dark:border-amber-500/25 dark:bg-amber-500/[0.06]">
+      <div className="flex items-center gap-2 border-b border-amber-200 bg-amber-100/70 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wide text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/[0.08] dark:text-amber-200/90">
+        <ClipboardList className="h-3.5 w-3.5 shrink-0" />
         <span>ServiceNow · Record updated</span>
       </div>
-      <div className="px-3.5 py-3">{children}</div>
+      <div className={`px-3.5 py-3 ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{children}</div>
     </div>
   );
 }
@@ -447,12 +435,12 @@ export default function ChatView({
         <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center border-b border-border px-4 md:px-8 ${
           isDark ? 'bg-sidebar' : 'bg-sidebar/80'
         }`}>
-          <h1
-            className="min-w-0 truncate font-display text-[12px] font-bold tracking-tight text-foreground"
+          <h2
+            className="min-w-0 truncate text-[12px] font-bold tracking-tight text-foreground"
             title={chatTitle}
           >
             {chatTitle}
-          </h1>
+          </h2>
         </div>
       )}
       <div
@@ -1001,8 +989,8 @@ export default function ChatView({
                 className="absolute inset-0 rounded-2xl pointer-events-none"
                 style={{
                   background: isDark
-                    ? 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0, 201, 160, 0.03), transparent 70%)'
-                    : 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(50, 215, 75, 0.06), transparent 70%)',
+                    ? 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255, 255, 255, 0.02), transparent 70%)'
+                    : 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(50, 215, 75, 0.04), transparent 70%)',
                 }}
                 aria-hidden
               />

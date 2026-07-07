@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { parseInlineMarkdown } from '../utils/markdownInline';
 
 export function stripMarkdownLabel(text: string): string {
   return text.replace(/\*\*|`|_/g, '').trim();
@@ -171,20 +172,14 @@ export function DataTable({
   isDark: boolean;
 }) {
   return (
-    <div
-      className={`overflow-x-auto rounded-lg border ${
-        isDark ? 'border-white/[0.06] bg-white/[0.015]' : 'border-slate-200 bg-slate-50/50'
-      }`}
-    >
+    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white/80 dark:border-white/[0.06] dark:bg-white/[0.015]">
       <table className="w-full text-left text-[12px]">
         <thead>
-          <tr className={isDark ? 'border-b border-white/[0.06]' : 'border-b border-slate-200'}>
+          <tr className="border-b border-slate-200 dark:border-white/[0.06]">
             {headers.map((h, i) => (
               <th
                 key={i}
-                className={`px-3 py-1.5 font-medium whitespace-nowrap ${
-                  isDark ? 'text-slate-500' : 'text-slate-400'
-                }`}
+                className="whitespace-nowrap px-3 py-1.5 font-semibold text-slate-600 dark:text-slate-400"
               >
                 {h}
               </th>
@@ -195,11 +190,14 @@ export function DataTable({
           {rows.map((row, ri) => (
             <tr
               key={ri}
-              className={isDark ? 'border-b border-white/[0.04] last:border-0' : 'border-b border-slate-100 last:border-0'}
+              className="border-b border-slate-100 last:border-0 dark:border-white/[0.04]"
             >
               {row.map((cell, ci) => (
-                <td key={ci} className={`px-3 py-1.5 align-top ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-                  {cell}
+                <td
+                  key={ci}
+                  className="px-3 py-1.5 align-top text-slate-800 dark:text-slate-200"
+                >
+                  {parseInlineMarkdown(cell, isDark)}
                 </td>
               ))}
             </tr>

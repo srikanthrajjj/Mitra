@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { UNTITLED_FOLDER_NAME, type ProjectFolder } from '../data/folders';
 import { cn } from '@/lib/utils';
 
 interface SearchDialogProps {
@@ -12,6 +13,7 @@ interface SearchDialogProps {
   isOpen: boolean;
   onClose: () => void;
   solutions: Solution[];
+  folders: ProjectFolder[];
   onSelectSolution: (id: string) => void;
   onNewChat: (folderId?: string, initialMessage?: string) => string;
   onNavigate: (tab: string) => void;
@@ -25,10 +27,21 @@ interface SearchResultItem {
   type: 'chat' | 'command';
   title: string;
   subtitle?: string;
+  projectName?: string;
   icon: any;
   action: () => void;
   isStarred?: boolean;
   solId?: string;
+}
+
+function resolveProjectName(
+  folderId: string | undefined,
+  folders: ProjectFolder[],
+): string | undefined {
+  if (!folderId) return undefined;
+  const folder = folders.find((f) => f.id === folderId);
+  if (!folder || folder.name === UNTITLED_FOLDER_NAME) return undefined;
+  return folder.name;
 }
 
 export function SearchDialog({
@@ -36,6 +49,7 @@ export function SearchDialog({
   isOpen,
   onClose,
   solutions,
+  folders,
   onSelectSolution,
   onNewChat,
   onNavigate,
@@ -80,6 +94,8 @@ export function SearchDialog({
 
     // 1. Filter chat/solution threads
     const matchedSolutions = solutions.filter((sol) => {
+      const projectName = resolveProjectName(sol.folderId, folders) ?? '';
+
       // Category filter matching
       if (category === 'starred' && !sol.isFavorite) return false;
       if (category !== 'all' && category !== 'starred') {
@@ -93,16 +109,19 @@ export function SearchDialog({
       if (!normalizedQuery) return true;
       return (
         sol.name.toLowerCase().includes(normalizedQuery) ||
-        sol.description.toLowerCase().includes(normalizedQuery)
+        sol.description.toLowerCase().includes(normalizedQuery) ||
+        projectName.toLowerCase().includes(normalizedQuery)
       );
     });
 
     matchedSolutions.forEach((sol) => {
+      const projectName = resolveProjectName(sol.folderId, folders);
       results.push({
         id: `chat-${sol.id}`,
         type: 'chat',
         title: sol.name,
         subtitle: sol.description,
+        projectName,
         icon: MessageSquare,
         isStarred: sol.isFavorite,
         solId: sol.id,
@@ -152,7 +171,7 @@ export function SearchDialog({
     }
 
     return results;
-  }, [solutions, query, category, onSelectSolution, onNewChat, onNavigate, onClose]);
+  }, [solutions, folders, query, category, onSelectSolution, onNewChat, onNavigate, onClose]);
 
   // Keep selected index within bounds
   useEffect(() => {
@@ -294,9 +313,32 @@ export function SearchDialog({
                         )}>
                           {item.title}
                         </div>
-                        {item.subtitle && (
-                          <div className="text-[10.5px] text-muted-foreground/75 truncate mt-0.5 leading-normal">
-                            {item.subtitle}
+                        {(item.projectName || item.subtitle) && (
+                          <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[10.5px] leading-normal">
+                            {item.projectName && (
+                              <span
+                                className={cn(
+                                  'inline-flex max-w-[9.5rem] shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium',
+                                  active
+                                    ? isDark
+                                      ? 'border-neutral-700 bg-neutral-800/80 text-slate-300'
+                                      : 'border-slate-200 bg-white text-slate-600'
+                                    : 'border-border/50 bg-muted/20 text-muted-foreground/90',
+                                )}
+                                title={item.projectName}
+                              >
+                                <Folder className="h-2.5 w-2.5 shrink-0 opacity-70" />
+                                <span className="truncate">{item.projectName}</span>
+                              </span>
+                            )}
+                            {item.projectName && item.subtitle && (
+                              <span className="shrink-0 text-muted-foreground/30">·</span>
+                            )}
+                            {item.subtitle && (
+                              <span className="truncate text-muted-foreground/75">
+                                {item.subtitle}
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>

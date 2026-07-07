@@ -2748,6 +2748,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         solutions={visibleSolutions}
+        folders={folders}
         onSelectSolution={handleSelectSolution}
         onNewChat={handleNewChat}
         onNavigate={setActiveTab}

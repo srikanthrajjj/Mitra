@@ -384,9 +384,7 @@ export default function Sidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-2 flex flex-row items-center gap-1">
-        <div className="flex-1">
-          {/* Profile Card with Dropdown */}
+      <SidebarFooter className="border-t border-sidebar-border p-2">
         <DropdownMenu>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -455,18 +453,6 @@ export default function Sidebar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 shrink-0 rounded-xl text-muted-foreground hover:text-foreground"
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          title="Toggle theme"
-          aria-label="Toggle theme"
-        >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
       </SidebarFooter>
         </>
       )}

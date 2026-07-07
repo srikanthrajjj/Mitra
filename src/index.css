@@ -52,12 +52,12 @@
   --color-emerald-700: #00993c;
   --color-emerald-950: #001a0a;
 
-  --color-mitra-bg: #06080a;
-  --color-mitra-sidebar: #0a0e12;
-  --color-mitra-surface: #10161c;
-  --color-mitra-border: #1c242c;
-  --color-mitra-highlight: #141a20;
-  --color-mitra-input: #0c1014;
+  --color-mitra-bg: #0a0a0a;
+  --color-mitra-sidebar: #111111;
+  --color-mitra-surface: #171717;
+  --color-mitra-border: #262626;
+  --color-mitra-highlight: #1a1a1a;
+  --color-mitra-input: #0f0f0f;
 
   --color-illuminate-text: #d4d4d4;
   --color-illuminate-muted: #737373;
@@ -100,32 +100,32 @@ h6,
 /* Semantic tokens — dark default on :root, light overrides on .light (html) */
 :root {
   --radius: 0.625rem;
-  --background: 210 18% 8%;
-  --foreground: 210 15% 92%;
-  --card: 210 16% 13%;
-  --card-foreground: 210 15% 92%;
-  --popover: 210 15% 16%;
-  --popover-foreground: 210 15% 92%;
+  --background: 0 0% 7%;
+  --foreground: 0 0% 92%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 92%;
+  --popover: 0 0% 13%;
+  --popover-foreground: 0 0% 92%;
   --primary: 140 100% 50%;
   --primary-foreground: 150 80% 5%;
-  --secondary: 210 14% 16%;
-  --secondary-foreground: 210 15% 92%;
-  --muted: 210 14% 16%;
-  --muted-foreground: 210 10% 58%;
-  --accent: 210 14% 18%;
-  --accent-foreground: 210 15% 92%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 92%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 58%;
+  --accent: 0 0% 16%;
+  --accent-foreground: 0 0% 92%;
   --destructive: 0 62% 50%;
-  --destructive-foreground: 210 15% 92%;
-  --border: 210 12% 24%;
-  --input: 210 14% 14%;
+  --destructive-foreground: 0 0% 92%;
+  --border: 0 0% 22%;
+  --input: 0 0% 12%;
   --ring: 140 100% 50%;
-  --sidebar: 210 16% 11%;
-  --sidebar-foreground: 210 15% 92%;
+  --sidebar: 0 0% 9%;
+  --sidebar-foreground: 0 0% 92%;
   --sidebar-primary: 140 100% 50%;
   --sidebar-primary-foreground: 150 80% 5%;
-  --sidebar-accent: 210 14% 16%;
-  --sidebar-accent-foreground: 210 15% 92%;
-  --sidebar-border: 210 12% 22%;
+  --sidebar-accent: 0 0% 14%;
+  --sidebar-accent-foreground: 0 0% 92%;
+  --sidebar-border: 0 0% 20%;
   --sidebar-ring: 140 100% 50%;
 }
 
@@ -264,19 +264,19 @@ html, body, div, textarea, pre, select {
   will-change: transform, filter;
 }
 
-/* Dark-theme primary button ΓÇö mitra blue surface, subtle neon edge */
+/* Dark-theme primary button — neutral charcoal surface */
 .btn-dark-primary {
-  background: linear-gradient(180deg, #141a20 0%, #10161c 100%);
+  background: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   color: #d4d4d4;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .btn-dark-primary:hover {
-  background: linear-gradient(180deg, #1a2228 0%, #141a20 100%);
-  border-color: rgba(0, 201, 160, 0.18);
+  background: linear-gradient(180deg, #222222 0%, #1a1a1a 100%);
+  border-color: rgba(255, 255, 255, 0.1);
   color: #f0f0f0;
-  box-shadow: 0 4px 14px rgba(0, 201, 160, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .btn-dark-primary:active {
@@ -487,10 +487,16 @@ button.rounded-full {
 
 .bg-dark-canvas {
   background:
-    radial-gradient(ellipse 80% 45% at 50% -5%, rgba(0, 201, 160, 0.04) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 85% 75%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
-    radial-gradient(ellipse 35% 25% at 8% 60%, rgba(0, 201, 160, 0.02) 0%, transparent 45%),
-    #06080a;
+    radial-gradient(ellipse 40% 30% at 85% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 25% at 8% 60%, rgba(255, 255, 255, 0.015) 0%, transparent 45%),
+    #0a0a0a;
+}
+
+.dark .bg-dark-canvas {
+  background:
+    radial-gradient(ellipse 40% 30% at 85% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 25% at 8% 60%, rgba(255, 255, 255, 0.015) 0%, transparent 45%),
+    #0a0a0a;
 }
 
 .dark {
@@ -937,6 +943,34 @@ button.rounded-full {
   z-index: 0;
 }
 
+.dark .vr-bg-rays {
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 32%),
+    linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.012) 50%, transparent 60%);
+}
+
+.dark .vr-bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 24px 48px, rgba(255, 255, 255, 0.28), transparent),
+    radial-gradient(1px 1px at 96px 160px, rgba(255, 255, 255, 0.18), transparent),
+    radial-gradient(1.5px 1.5px at 200px 90px, rgba(255, 255, 255, 0.16), transparent),
+    radial-gradient(1px 1px at 320px 220px, rgba(255, 255, 255, 0.15), transparent);
+}
+
+.dark .vr-bg-grid {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+}
+
+.dark .vr-glass-surface {
+  background: rgba(20, 20, 20, 0.55);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
 .vr-bg-rays {
   position: absolute;
   inset: 0;
@@ -1170,6 +1204,31 @@ button.rounded-full {
   color: #1e293b;
 }
 
+/* ServiceNow record card — enforce readable contrast in light mode */
+.light .sn-record-update {
+  color: #1e293b;
+}
+
+.light .sn-record-update .chat-response-text,
+.light .sn-record-update p,
+.light .sn-record-update td,
+.light .sn-record-update th,
+.light .sn-record-update strong {
+  color: inherit;
+}
+
+.light .sn-record-update th {
+  color: #475569;
+}
+
+.light .sn-record-update td {
+  color: #1e293b;
+}
+
+.light .sn-record-update strong {
+  color: #0f172a;
+}
+
 /* Ambient streaming — soft reveal, not jumpy */
 @keyframes stream-cursor-breathe {
   0%, 100% {
@@ -1309,10 +1368,10 @@ button.rounded-full {
 .mitra-thinking-shell--dark {
   background: linear-gradient(
     90deg,
-    hsl(210 18% 10% / 0.92) 0%,
+    hsl(0 0% 10% / 0.92) 0%,
     hsl(135 66% 52% / 0.1) 25%,
-    hsl(210 18% 10% / 0.92) 50%,
-    hsl(135 40% 8% / 0.88) 100%
+    hsl(0 0% 10% / 0.92) 50%,
+    hsl(0 0% 8% / 0.88) 100%
   );
   background-size: 200% 100%;
   animation: mitra-thinking-glowing-pulse 2s ease-in-out infinite, mitra-thinking-shimmer 3.5s infinite linear;
@@ -1379,7 +1438,7 @@ button.rounded-full {
 }
 
 .mitra-thinking-phrase--dark {
-  color: hsl(210 15% 88%);
+  color: hsl(0 0% 88%);
 }
 
 .mitra-thinking-phrase--light {
@@ -1596,8 +1655,8 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc {
-  background: hsl(220 12% 18%);
-  color: hsl(210 20% 92%);
+  background: hsl(0 0% 16%);
+  color: hsl(0 0% 92%);
   border-color: hsl(var(--border) / 0.5);
 }
 
@@ -1612,7 +1671,7 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc .artifact-doc-preview-paper__header {
-  border-bottom-color: hsl(220 10% 26%);
+  border-bottom-color: hsl(0 0% 24%);
 }
 
 .artifact-doc-preview-paper--pdf .artifact-doc-preview-paper__header {
@@ -1633,7 +1692,7 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc .artifact-doc-preview-subtitle {
-  color: hsl(210 12% 62%);
+  color: hsl(0 0% 62%);
 }
 
 .artifact-doc-preview-paper--pdf .artifact-doc-preview-subtitle {
@@ -1648,7 +1707,7 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc .artifact-doc-preview-filename {
-  color: hsl(210 10% 58%);
+  color: hsl(0 0% 58%);
 }
 
 .artifact-doc-preview-paper--pdf .artifact-doc-preview-filename {
@@ -1664,7 +1723,7 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc .artifact-doc-preview-paper__body .divide-y > div {
-  border-color: hsl(220 10% 28%);
+  border-color: hsl(0 0% 24%);
 }
 
 .artifact-doc-preview-paper--pdf .artifact-doc-preview-paper__body .divide-y > div {
@@ -1676,7 +1735,7 @@ button.rounded-full {
 }
 
 .dark .artifact-doc-preview-paper--doc .artifact-doc-preview-paper__body .text-muted-foreground {
-  color: hsl(210 12% 72%) !important;
+  color: hsl(0 0% 72%) !important;
 }
 
 .artifact-doc-preview-paper--pdf .artifact-doc-preview-paper__body .text-muted-foreground {
