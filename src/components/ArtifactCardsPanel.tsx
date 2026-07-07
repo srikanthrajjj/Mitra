@@ -113,7 +113,7 @@ function PanelTabBar({
 
   return (
     <div
-      className="artifact-panel-tabs flex gap-0.5 rounded-lg border border-border/60 p-0.5"
+      className="artifact-panel-tabs flex min-w-0 w-full gap-0.5 rounded-lg border border-border/60 p-0.5"
       role="tablist"
       aria-label="Artifact panel sections"
     >
@@ -129,7 +129,7 @@ function PanelTabBar({
             id={`artifact-panel-tab-${id}`}
             onClick={() => onTabChange(id)}
             className={cn(
-              'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors',
+              'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-[10px] font-medium transition-colors',
               selected
                 ? isDark
                   ? 'bg-white/[0.08] text-foreground shadow-sm'
@@ -138,9 +138,9 @@ function PanelTabBar({
             )}
           >
             <Icon className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
-            {label}
+            <span className="truncate">{label}</span>
             {count != null && count > 0 && (
-              <span className="text-[9px] tabular-nums text-muted-foreground/70">({count})</span>
+              <span className="shrink-0 text-[9px] tabular-nums text-muted-foreground/70">({count})</span>
             )}
           </button>
         );
@@ -165,13 +165,15 @@ function PanelHeader({
   return (
     <div className="artifact-panel shrink-0 flex flex-col border-b border-border">
       {/* Top toolbar row matching 52px header line exactly */}
-      <div className="flex min-w-0 h-[52px] items-center justify-between gap-2 pl-3 pr-5 w-full">
-        <PanelTabBar
+      <div className="flex min-w-0 h-[52px] items-center justify-between gap-1.5 pl-3 pr-3 w-full">
+        <div className="min-w-0 flex-1">
+          <PanelTabBar
           activeTab={activeTab}
           artifactCount={count}
           isDark={isDark}
           onTabChange={onTabChange}
         />
+        </div>
         {onCollapse && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -314,30 +316,26 @@ function DeliverableRow({
               className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/70"
             />
             <div className="min-w-0 flex-1 overflow-hidden">
-              <div className="flex min-w-0 items-center gap-1">
-                <p
-                  className="artifact-row-title min-w-0 flex-1 truncate font-medium text-foreground"
-                  title={artifact.name}
-                >
-                  {artifact.name}
-                </p>
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <ArtifactFormatBadge format={artifact.artifactFormat} isDark={isDark} />
-                  <ArtifactStatusBadge status={artifact.status} isDark={isDark} />
-                </div>
+              <p
+                className="artifact-row-title truncate font-medium text-foreground"
+                title={artifact.name}
+              >
+                {artifact.name}
+              </p>
+
+              <div className="mt-1 flex flex-wrap items-center gap-1">
+                <ArtifactFormatBadge format={artifact.artifactFormat} isDark={isDark} />
+                <ArtifactStatusBadge status={artifact.status} isDark={isDark} />
+                <BuildStageChip stage={artifact.buildStage} isDark={isDark} />
+                {hasConflict && <ConflictBadge isDark={isDark} />}
               </div>
 
               <p
-                className="artifact-row-filing sn-mono mt-0.5 truncate text-muted-foreground/70"
+                className="artifact-row-filing sn-mono mt-1 truncate text-muted-foreground/70"
                 title={artifact.filingName}
               >
                 {artifact.filingName}
               </p>
-
-              <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1">
-                <BuildStageChip stage={artifact.buildStage} isDark={isDark} />
-                {hasConflict && <ConflictBadge isDark={isDark} />}
-              </div>
 
               <p className="artifact-row-meta sn-meta mt-1 truncate" title={repoPath}>
                 {[
@@ -526,6 +524,7 @@ export function ArtifactCardsPanel({
 
   return (
     <motion.aside
+      style={{ width: panelWidth, maxWidth: panelWidth }}
       className={cn(
         'artifact-panel relative box-border hidden shrink-0 overflow-hidden border-l xl:flex xl:min-h-0 xl:flex-col',
         isDark ? 'border-border bg-sidebar' : 'border-border bg-sidebar/80',
@@ -614,7 +613,7 @@ export function ArtifactCardsPanel({
                 {displayArtifacts.length === 0 ? (
                   <EmptyArtifactsPlaceholder isGenerating={isGenerating} />
                 ) : (
-                  <ScrollArea className="min-w-0 flex-1">
+                  <ScrollArea className="min-w-0 flex-1 overflow-x-hidden">
                     <div className="min-w-0 pr-1">
                       <AnimatePresence initial={false}>
                         {displayArtifacts.map((artifact, index) => {

@@ -22,9 +22,9 @@ export const LEFT_SIDEBAR_MAX_WIDTH = 400;
 export const ARTIFACT_PANEL_WIDTH_KEY = 'mitra_artifact_panel_width';
 export const ARTIFACT_PANEL_COLLAPSED_KEY = 'mitra_artifact_panel_collapsed';
 export const ARTIFACT_PANEL_COLLAPSED_WIDTH = 44;
-export const ARTIFACT_PANEL_DEFAULT_WIDTH = 280;
-export const ARTIFACT_PANEL_MIN_WIDTH = 280;
-export const ARTIFACT_PANEL_MAX_WIDTH = 480;
+export const ARTIFACT_PANEL_DEFAULT_WIDTH = 360;
+export const ARTIFACT_PANEL_MIN_WIDTH = 320;
+export const ARTIFACT_PANEL_MAX_WIDTH = 500;
 
 const MIN_CENTER_COLUMN_WIDTH = 320;
 

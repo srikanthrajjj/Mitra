@@ -393,11 +393,11 @@ export function ArchitectSidebar({
       </SidebarGroup>
 
       {/* Recents and Pinned list direct render without folders */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
+      <div className="mt-4 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
-            <div className="text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-3 mb-1 mt-1 flex items-center gap-1.5">
+            <div className="text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-3 mb-1 flex items-center gap-1.5">
               <Pin className="h-3 w-3 rotate-[30deg] fill-current text-emerald-500" /> Pinned
             </div>
             {pinnedSolutions.map((sol) => renderSolutionRow(sol))}

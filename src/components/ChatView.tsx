@@ -444,22 +444,15 @@ export default function ChatView({
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-transparent relative">
       {activeSolution && (
-        <div className={`sticky top-0 z-20 shrink-0 border-b px-4 md:px-8 h-[52px] flex items-center justify-between gap-3 ${
-          isDark ? 'border-white/[0.06] bg-card/80 backdrop-blur-sm' : 'border-slate-200 bg-white/90 backdrop-blur-sm'
+        <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center border-b border-border px-4 md:px-8 ${
+          isDark ? 'bg-sidebar' : 'bg-sidebar/80'
         }`}>
           <h1
-            className={`min-w-0 truncate text-[calc(0.875rem*0.7)] font-medium tracking-tight ${
-              isDark ? 'text-slate-100' : 'text-slate-900'
-            }`}
+            className="min-w-0 truncate font-display text-[12px] font-bold tracking-tight text-foreground"
             title={chatTitle}
           >
             {chatTitle}
           </h1>
-          {isGeneratingMessage && (
-            <span className={`shrink-0 text-[11px] ${isDark ? 'text-primary/80' : 'text-emerald-600'}`}>
-              Thinking…
-            </span>
-          )}
         </div>
       )}
       <div
