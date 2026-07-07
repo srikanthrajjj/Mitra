@@ -12,8 +12,6 @@ import { isDarkTheme } from '../utils/theme';
 import { USER_DISPLAY_NAME, USER_INITIALS } from '../constants/user';
 import { MitraLogo } from './MitraLogo';
 import { ASSISTANT_LABEL } from '../constants/organization';
-import { getPhaseLabel } from '../utils/phaseEngine';
-import { PhaseChip } from '../utils/artifactDisplay';
 import StarterPromptsList from './StarterPromptsList';
 import { ColdStartEntryChips } from './ColdStartEntryChips';
 import { DiscoveryAppSuggestionChips } from './DiscoveryAppSuggestionChips';
@@ -378,6 +376,9 @@ export default function ChatView({
   );
   const showInviteGlow = !inputValue.trim() && !isGeneratingMessage;
   const isHrTicketingWorkspace = activeSolution?.id === 'hr-ticketing';
+  const chatTitle = activeSolution
+    ? activeSolution.blueprint.title || activeSolution.name
+    : '';
 
   const streamSignature = messages.map((m) => m.text.length).join('|');
 
@@ -442,20 +443,21 @@ export default function ChatView({
 
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-transparent relative">
-      {activeSolution?.phaseProgress && !isEmptyChat && (
-        <div className={`shrink-0 border-b px-4 md:px-8 h-[52px] flex items-center justify-between gap-2 ${
-          isDark ? 'border-white/[0.06] bg-card/30' : 'border-slate-200 bg-white/80'
+      {activeSolution && (
+        <div className={`sticky top-0 z-20 shrink-0 border-b px-4 md:px-8 h-[52px] flex items-center justify-between gap-3 ${
+          isDark ? 'border-white/[0.06] bg-card/80 backdrop-blur-sm' : 'border-slate-200 bg-white/90 backdrop-blur-sm'
         }`}>
-          <div className="flex items-center gap-2">
-            <PhaseChip phase={activeSolution.phaseProgress.currentPhase} isDark={isDark} />
-            <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              {getPhaseLabel(activeSolution.phaseProgress.currentPhase)} · one question per turn
-            </span>
-          </div>
-          {appVersion === 'v3' && (
-            <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-[#00ff66] border border-emerald-500/25 animate-pulse font-mono flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff66] shrink-0" />
-              v3 Engine: Agentic Reasoner
+          <h1
+            className={`min-w-0 truncate text-[calc(0.875rem*0.7)] font-medium tracking-tight ${
+              isDark ? 'text-slate-100' : 'text-slate-900'
+            }`}
+            title={chatTitle}
+          >
+            {chatTitle}
+          </h1>
+          {isGeneratingMessage && (
+            <span className={`shrink-0 text-[11px] ${isDark ? 'text-primary/80' : 'text-emerald-600'}`}>
+              Thinking…
             </span>
           )}
         </div>

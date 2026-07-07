@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
-  ArrowRight, ChevronDown, ChevronRight, Quote, Shield, Lock, FileCheck, Mail,
+  ArrowRight, ChevronDown, ChevronRight, Quote, Shield, Mail,
 } from 'lucide-react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { LandingHeroChatDemo } from '../LandingHeroChatDemo';
 import { Button } from '../ui/button';
+import Threads from '../ui/Threads';
 import { cn } from '@/lib/utils';
-import { LandingKpiStrip } from './LandingAnimatedKpi';
-import { LandingRecVideo } from './LandingRecVideo';
 import { LandingLifecycleTimeline } from './LandingLifecycleTimeline';
 import { LandingIntentJourney } from './LandingIntentJourney';
 import { LandingEcosystemOrbit } from './LandingEcosystemOrbit';
@@ -26,7 +26,6 @@ import {
   SECURITY_SECTION,
   SECURITY_ITEMS,
   FINAL_CTA,
-  FOOTER,
 } from './echelonLandingData';
 
 interface LandingNavProps {
@@ -176,16 +175,8 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
 
 export function LandingHowItWorks() {
   return (
-    <section id="how-it-works" className="landing-echelon-dark relative overflow-hidden px-6 py-16 md:py-24">
-      <div className="landing-echelon-dark-grid absolute inset-0 pointer-events-none" aria-hidden />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(0,255,102,0.08),transparent_65%)]"
-        aria-hidden
-      />
+    <section id="how-it-works" className="relative overflow-hidden bg-[#050608] px-6 py-18 md:py-26">
       <div className="relative z-10 mx-auto max-w-6xl text-center">
-        <LandingKpiStrip theme="dark" />
-        <LandingRecVideo />
-
         <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-16">
           {LIFECYCLE_SECTION.eyebrow}
         </p>
@@ -371,69 +362,63 @@ interface LandingFinalCtaProps {
 
 export function LandingFinalCta({ onGetStarted }: LandingFinalCtaProps) {
   return (
-    <section id="cta" className="border-t border-white/[0.04] bg-[#06080a] px-6 py-24 text-center">
-      <h2 className="mx-auto max-w-3xl font-display text-2xl font-medium text-white md:text-4xl lg:text-5xl">
-        {FINAL_CTA.title}
-      </h2>
-      <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-white/45 md:text-base">{FINAL_CTA.subtitle}</p>
-      <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <Button size="lg" className="btn-liquid-primary h-12 rounded-full px-8" onClick={onGetStarted}>
-          {FINAL_CTA.primaryCta}
-        </Button>
-        <button
-          type="button"
-          onClick={onGetStarted}
-          className="inline-flex h-12 items-center rounded-full border border-white/20 px-8 text-sm font-semibold text-white hover:border-white/35"
+    <section id="cta" className="relative z-10 overflow-hidden border-t border-white/[0.04] bg-[#040608] px-6 py-20 md:py-24">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_36%_28%_at_50%_78%,rgba(139,234,60,0.08),transparent_74%)]"
+        aria-hidden
+      />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] opacity-[0.08]" aria-hidden>
+        <Threads color={[0.545, 0.918, 0.235]} amplitude={0.5} distance={0} enableMouseInteraction={false} />
+      </div>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] bg-gradient-to-t from-[#040608] via-transparent to-[#040608]/90"
+        aria-hidden
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="relative mx-auto max-w-3xl text-center"
+      >
+        <motion.h2
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto font-display text-3xl font-medium leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[3.9rem]"
         >
-          {FINAL_CTA.secondaryCta}
-        </button>
-      </div>
+          Ready to implement faster?
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/45 md:text-base"
+        >
+          Let IlluminAIte turn your ServiceNow requirements into deployment-ready delivery.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-8 flex items-center justify-center"
+        >
+          <Button
+            size="lg"
+            className="h-12 min-w-[170px] rounded-full bg-white px-8 text-sm font-semibold text-black shadow-[0_10px_35px_rgba(255,255,255,0.08)] hover:bg-white/95"
+            onClick={onGetStarted}
+          >
+            Get Started
+          </Button>
+        </motion.div>
+      </motion.div>
     </section>
-  );
-}
-
-interface LandingFooterProps {
-  onGetStarted: () => void;
-}
-
-export function LandingFooter({ onGetStarted }: LandingFooterProps) {
-  return (
-    <footer className="border-t border-white/[0.04] bg-[#020304] px-6 py-14">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <IlluminaiteLogo className="h-[22px] w-auto opacity-80" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/35">{FOOTER.tagline}</p>
-          </div>
-          <div className="md:col-span-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--landing-accent)]/70">Platform</h4>
-            <ul className="mt-4 space-y-2 text-sm text-white/40">
-              <li><button type="button" onClick={onGetStarted} className="transition-colors hover:text-white">{HERO.primaryCta}</button></li>
-              <li>{HERO.secondaryCta}</li>
-              <li>ServiceNow Studio</li>
-            </ul>
-          </div>
-          <div className="md:col-span-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--landing-accent)]/70">Resources</h4>
-            <ul className="mt-4 space-y-2 text-sm text-white/40">
-              <li>About IlluminAIte</li>
-              <li>Contact Us</li>
-              <li>Privacy & Terms</li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-16 select-none text-center">
-          <span className="text-[10vw] font-black uppercase tracking-tighter text-white/[0.03]">ILLUMINAITE</span>
-        </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/[0.04] pt-6 text-xs text-white/30 md:flex-row">
-          <span>© 2026 IlluminAIte. All rights reserved.</span>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" /> Security</span>
-            <span className="flex items-center gap-1.5"><FileCheck className="h-3 w-3" /> Privacy</span>
-          </div>
-        </div>
-      </div>
-    </footer>
   );
 }
 
@@ -441,4 +426,4 @@ export function LandingFooter({ onGetStarted }: LandingFooterProps) {
 export const LandingTestimonials = LandingIndustrySolutions;
 export const LandingFrustrations = LandingAiAgents;
 export const LandingTeamRoles = LandingCapabilities;
-export const LandingLifecycle = LandingLandscape;
+export { LandingFooterReveal as LandingFooter } from './LandingFooterReveal';

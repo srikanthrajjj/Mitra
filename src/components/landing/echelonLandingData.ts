@@ -1,11 +1,16 @@
 import {
+  ClipboardList,
+  Cog,
   Box,
   Bot,
+  FileText,
   RefreshCw,
+  Rocket,
   Settings,
   ShieldCheck,
   Sparkles,
   type LucideIcon,
+  Workflow,
 } from 'lucide-react';
 import { ECOSYSTEM_MODULES } from './ecosystem/ecosystemLayout';
 
@@ -74,7 +79,7 @@ export const LIFECYCLE_STEPS = [
     desc: 'Capture structured requirements',
     detail:
       'AI captures workshop conversations and converts them into build-ready user stories, acceptance criteria, and scope boundaries.',
-    iconSrc: new URL('../../../assets/Icons/define.svg', import.meta.url).href,
+    icon: ClipboardList,
   },
   {
     num: '02',
@@ -82,7 +87,7 @@ export const LIFECYCLE_STEPS = [
     desc: 'Configure & build on platform',
     detail:
       'Mitra configures tables, flows, catalog items, and integrations on ServiceNow — aligned to your standards and industry patterns.',
-    iconSrc: new URL('../../../assets/Icons/design-develop.svg', import.meta.url).href,
+    icon: Cog,
   },
   {
     num: '03',
@@ -90,7 +95,7 @@ export const LIFECYCLE_STEPS = [
     desc: 'Validate with integrated testing',
     detail:
       'Automated Test Framework coverage validates catalog items, flows, and scoped apps before anything reaches production.',
-    iconSrc: new URL('../../../assets/Icons/test.svg', import.meta.url).href,
+    icon: Workflow,
   },
   {
     num: '04',
@@ -98,7 +103,7 @@ export const LIFECYCLE_STEPS = [
     desc: 'Auto-generate training materials',
     detail:
       'Documentation and training materials are generated alongside the build — always aligned to what was actually deployed.',
-    iconSrc: new URL('../../../assets/Icons/document.svg', import.meta.url).href,
+    icon: FileText,
   },
   {
     num: '05',
@@ -106,7 +111,7 @@ export const LIFECYCLE_STEPS = [
     desc: 'Deploy with confidence and monitor adoption',
     detail:
       'Promote update sets through governed environments, monitor adoption, and keep improving with AI-driven recommendations.',
-    iconSrc: new URL('../../../assets/Icons/deploy.svg', import.meta.url).href,
+    icon: Rocket,
   },
 ];
 

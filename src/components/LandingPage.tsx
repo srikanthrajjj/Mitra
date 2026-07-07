@@ -6,9 +6,9 @@ import {
   LandingPlatformSection,
   LandingInstanceDemo,
   LandingFinalCta,
-  LandingFooter,
 } from './landing/EchelonLandingSections';
 import { LandingAnimatedBeam } from './landing/LandingAnimatedBeam';
+import { LandingFooterReveal } from './landing/LandingFooterReveal';
 
 interface LandingPageProps {
   version?: 'v2' | 'v3';
@@ -25,6 +25,7 @@ export default function LandingPage({
 }: LandingPageProps) {
   return (
     <div className="landing-page landing-echelon overflow-x-hidden bg-[#030508] text-white antialiased selection:bg-[#00ff66]/25 selection:text-white">
+      <div className="relative z-10">
       <div className="relative flex min-h-screen flex-col">
         <div className="landing-echelon-hero-bg absolute inset-0 overflow-hidden" aria-hidden>
           {version !== 'v3' && (
@@ -65,7 +66,8 @@ export default function LandingPage({
       <LandingAnimatedBeam />
       <LandingInstanceDemo onGetStarted={onGetStarted} />
       <LandingFinalCta onGetStarted={onGetStarted} />
-      <LandingFooter onGetStarted={onGetStarted} />
+      </div>
+      <LandingFooterReveal onGetStarted={onGetStarted} />
     </div>
   );
 }

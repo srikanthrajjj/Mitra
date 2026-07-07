@@ -360,6 +360,14 @@ export default function App() {
     );
   }, []);
 
+  const handleTogglePin = useCallback((solutionId: string) => {
+    setSolutions((prev) =>
+      prev.map((sol) =>
+        sol.id === solutionId ? { ...sol, isPinned: !sol.isPinned } : sol
+      )
+    );
+  }, []);
+
   const [folders, setFolders] = useState<ProjectFolder[]>([]);
   const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
   const [activeSolutionId, setActiveSolutionId] = useState<string>('');
@@ -2322,6 +2330,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           theme={resolvedTheme}
           setTheme={setThemePreference}
           onToggleFavorite={handleToggleFavorite}
+          onTogglePin={handleTogglePin}
           onOpenSearch={() => setIsSearchOpen(true)}
           activeTab={activeTab}
           setActiveTab={setActiveTab}

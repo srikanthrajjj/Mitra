@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent, type TouchEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type TouchEvent as ReactTouchEvent } from 'react';
 
 export type PanelResizeEdge = 'left' | 'right';
 
@@ -198,7 +198,7 @@ export function useResizablePanel(
   }, [clamp]);
 
   const handleResizeStart = useCallback(
-    (e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
+    (e: ReactMouseEvent<HTMLDivElement> | ReactTouchEvent<HTMLDivElement>) => {
       e.preventDefault();
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       startResize(clientX);

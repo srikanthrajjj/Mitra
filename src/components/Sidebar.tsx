@@ -45,6 +45,7 @@ interface SidebarProps {
   theme: ResolvedTheme;
   setTheme: (theme: Theme) => void;
   onToggleFavorite: (id: string) => void;
+  onTogglePin?: (id: string) => void;
   onOpenSearch?: () => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -92,6 +93,7 @@ export default function Sidebar({
   theme,
   setTheme,
   onToggleFavorite,
+  onTogglePin,
   onOpenSearch,
   activeTab,
   setActiveTab,
@@ -337,6 +339,7 @@ export default function Sidebar({
             onRenamingComplete={onRenamingComplete}
             statusOverrides={statusOverrides}
             onToggleFavorite={onToggleFavorite}
+            onTogglePin={onTogglePin}
             onOpenSearch={onOpenSearch}
             generatingSolutionId={generatingSolutionId}
           />

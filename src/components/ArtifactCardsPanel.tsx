@@ -33,7 +33,6 @@ import {
   BuildStageChip,
   ConflictBadge,
   hasArtifactConflict,
-  PhaseChip,
 } from '../utils/artifactDisplay';
 import { getArtifactRepositoryPath, sortArtifactsByStage } from '../utils/artifactFiling';
 import { getRevealedArtifacts } from '../utils/artifactReveal';
@@ -606,25 +605,11 @@ export function ArtifactCardsPanel({
                 aria-labelledby="artifact-panel-tab-artifacts"
                 className="flex min-h-0 flex-1 flex-col overflow-hidden"
               >
-                {/* Project title and phase badge block inside the artifacts panel body */}
-                <div className="py-2.5 pl-3.5 pr-5 border-b border-border/40 shrink-0">
-                  <p
-                    className="artifact-row-title min-w-0 truncate font-medium text-foreground text-[13px]"
-                    title={solutionTitle}
-                  >
-                    {solutionTitle}
+                {isGenerating && (
+                  <p className="artifact-row-meta shrink-0 border-b border-border/40 px-3.5 py-2 text-primary/75">
+                    Generating next deliverable…
                   </p>
-
-                  {isGenerating && (
-                    <p className="artifact-row-meta mt-1 text-primary/75">Generating next deliverable…</p>
-                  )}
-
-                  {phaseProgress && (
-                    <div className="mt-1.5">
-                      <PhaseChip phase={phaseProgress.currentPhase} isDark={isDark} />
-                    </div>
-                  )}
-                </div>
+                )}
 
                 {displayArtifacts.length === 0 ? (
                   <EmptyArtifactsPlaceholder isGenerating={isGenerating} />

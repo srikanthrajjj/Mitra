@@ -43,6 +43,39 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
       url: 'https://dev202951.service-now.com',
       username: 'admin',
       updatedAt: '11 days ago',
+    },
+    {
+      id: 'conn-2',
+      name: 'Staging Instance',
+      description: 'Pre-production staging environment for integration testing',
+      tag: 'STAGE',
+      active: true,
+      authType: 'OAuth 2.0',
+      url: 'https://staging-sn.service-now.com',
+      username: 'svc_staging',
+      updatedAt: '3 days ago',
+    },
+    {
+      id: 'conn-3',
+      name: 'QA Automation',
+      description: 'Automated QA test runner instance',
+      tag: 'QA',
+      active: false,
+      authType: 'Basic Authentication',
+      url: 'https://qa-auto.service-now.com',
+      username: 'qa_bot',
+      updatedAt: '5 hours ago',
+    },
+    {
+      id: 'conn-4',
+      name: 'Production Sync',
+      description: 'Live production ServiceNow sync channel',
+      tag: 'PROD',
+      active: true,
+      authType: 'OAuth 2.0',
+      url: 'https://prod.service-now.com',
+      username: 'svc_prod_sync',
+      updatedAt: '2 days ago',
     }
   ]);
 
@@ -240,7 +273,7 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
         </div>
 
         {/* Connections List/Grid */}
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {connections.length === 0 ? (
             <div className={cn(
               'border rounded-2xl p-10 text-center flex flex-col items-center justify-center',

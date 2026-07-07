@@ -389,6 +389,7 @@ export interface Solution {
   isBranch?: boolean;
   isLoading?: boolean;
   isFavorite?: boolean;
+  isPinned?: boolean;
   /** Set when the last generation attempt failed without a usable response */
   generationError?: boolean;
 }
