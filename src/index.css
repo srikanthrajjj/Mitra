@@ -499,13 +499,14 @@ html, body, div, textarea, pre, select {
 .welcome-delay-2 { animation-delay: 0.55s; }
 .welcome-delay-3 { animation-delay: 0.95s; }
 
-/* Pill buttons app-wide — use .btn-square for rare square controls */
+/* Tighter button corners app-wide — CTAs use .btn-cta / .btn-secondary / .btn-danger for pills */
 button {
-  border-radius: var(--radius-button);
+  border-radius: 6px;
 }
 
-button.btn-square,
-button.rounded-none {
+button.rounded-xl,
+button.rounded-2xl,
+button.rounded-lg {
   border-radius: 6px;
 }
 
@@ -513,7 +514,7 @@ button.rounded-full,
 button.btn-cta,
 button.btn-secondary,
 button.btn-danger {
-  border-radius: var(--radius-button);
+  border-radius: 9999px !important;
 }
 
 /* Untitled UI inspired container panels */

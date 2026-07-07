@@ -96,7 +96,11 @@ export default function ApiKeyModal({
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary p-1.5 transition-colors"
+            className={`p-1.5 rounded-lg border transition-colors ${
+              isDark
+                ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
+                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+            }`}
           >
             <X className="w-4 h-4" />
           </button>

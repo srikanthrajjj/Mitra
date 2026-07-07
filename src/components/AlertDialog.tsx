@@ -100,7 +100,11 @@ export default function AlertDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="btn-secondary p-1.5 shrink-0"
+            className={`p-1.5 rounded-lg border transition-colors shrink-0 ${
+              isDark
+                ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
+                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+            }`}
           >
             <X className="w-4 h-4" />
           </button>

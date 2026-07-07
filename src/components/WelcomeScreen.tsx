@@ -32,7 +32,7 @@ export default function WelcomeScreen({ onSignIn, onExploreGuest }: WelcomeScree
 
           <button
             onClick={onExploreGuest}
-            className="w-full py-3 px-6 text-[14px] font-semibold btn-secondary transition-all duration-300 cursor-pointer"
+            className="w-full py-3 px-6 rounded-md text-[14px] font-semibold text-illuminate-muted border border-white/[0.06] bg-mitra-bg/80 hover:bg-mitra-surface hover:text-illuminate-text hover:border-white/[0.1] transition-all duration-300 cursor-pointer"
           >
             Explore as guest
           </button>

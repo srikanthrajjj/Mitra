@@ -255,7 +255,7 @@ export function DesignFeedbackWidget({
                   <Button type="button" variant="ghost" size="sm" onClick={close}>
                     Cancel
                   </Button>
-                  <Button type="submit" size="sm" disabled={!text.trim() || submitting}>
+                  <Button type="submit" variant="cta" size="sm" disabled={!text.trim() || submitting}>
                     Submit
                   </Button>
                 </div>

@@ -134,10 +134,8 @@ export default function ProjectsView({
             </button>
             <button
               onClick={() => onNewChat(currentFolderId)}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                isDark
-                  ? 'text-brand-green bg-brand-green/15 hover:bg-brand-green/25'
-                  : 'text-[#030d0a] bg-brand-green hover:bg-brand-green-hover'
+              className={`p-1.5 rounded transition-colors cursor-pointer ${
+                isDark ? 'text-slate-500 hover:text-illuminate-text hover:bg-mitra-highlight border border-transparent' : 'text-[#030d0a] bg-brand-green hover:bg-brand-green-hover'
               }`}
               title="New thread"
             >

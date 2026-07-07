@@ -1167,6 +1167,7 @@ export function StyleguideView({ theme, activeSolution, onBack }: StyleguideView
               <div className="space-y-6">
                 <PreviewSurface label="Buttons">
                   <div className="flex flex-wrap items-center gap-3">
+                    <Button variant="cta">CTA</Button>
                     <Button>Primary</Button>
                     <Button variant="secondary">Secondary</Button>
                     <Button variant="outline">Outline</Button>

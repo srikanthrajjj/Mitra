@@ -63,7 +63,9 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
           <button 
             type="button"
             onClick={onClose}
-            className="btn-secondary p-1.5"
+            className={`p-1 rounded-lg border ${
+              isDark ? 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900' : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+            }`}
           >
             <X className="w-4.5 h-4.5" />
           </button>
