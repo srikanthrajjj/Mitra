@@ -4,9 +4,9 @@ import { ChatLoaderShowcase } from './ChatLoaderShowcase';
 export const chatLoaderEntry: DevComponentEntry = {
   meta: {
     id: 'chat-loader',
-    name: 'Chat Loader',
-    description: 'Animated thinking indicator with cycling status text and progress bar.',
-    tags: ['chat', 'loader', 'status'],
+    name: 'Thinking Status',
+    description: 'Four thinking indicator variations: grid dots (production), typing dots, shimmer label, and glow pulse.',
+    tags: ['chat', 'loader', 'status', 'thinking'],
   },
   Showcase: ChatLoaderShowcase,
 };

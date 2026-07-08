@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils';
 
 export type MitraThinkingContext = 'default' | 'architect' | 'businessOwner';
 
-const THINKING_STEPS: Record<MitraThinkingContext, readonly string[]> = {
+/** Kept for dev snippets / future status copy — not shown in the simple grid UI */
+export const THINKING_STEPS: Record<MitraThinkingContext, readonly string[]> = {
   default: [
     'Reviewing requirements',
     'Analyzing dependencies',
@@ -29,6 +30,30 @@ const THINKING_STEPS: Record<MitraThinkingContext, readonly string[]> = {
   ],
 };
 
+const GRID_DOT_COUNT = 8;
+const GRID_DOT_INTERVAL_MS = 260;
+
+function useSnakeDotIndex() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    let index = 0;
+    let direction = 1;
+
+    const intervalId = window.setInterval(() => {
+      if (index === GRID_DOT_COUNT - 1) direction = -1;
+      else if (index === 0) direction = 1;
+
+      index += direction;
+      setActiveIndex(index);
+    }, GRID_DOT_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return activeIndex;
+}
+
 interface MitraThinkingIndicatorProps {
   theme: Theme;
   context?: MitraThinkingContext;
@@ -38,73 +63,54 @@ interface MitraThinkingIndicatorProps {
 
 export default function MitraThinkingIndicator({
   theme,
-  context = 'default',
+  context: _context = 'default',
   compact = false,
   className,
 }: MitraThinkingIndicatorProps) {
   const isDark = isDarkTheme(theme);
-  const steps = THINKING_STEPS[context];
-  const [index, setIndex] = useState(0);
-  const [fading, setFading] = useState(false);
-
-  useEffect(() => {
-    setIndex(0);
-    setFading(false);
-  }, [context]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setFading(true);
-      window.setTimeout(() => {
-        setIndex((current) => (current < steps.length - 1 ? current + 1 : current));
-        setFading(false);
-      }, 220);
-    }, 1600);
-
-    return () => window.clearInterval(intervalId);
-  }, [steps.length]);
-
-  const currentPhrase = steps[index];
-  const progressPercent = Math.min(100, Math.round(((index + 1) / steps.length) * 100));
+  const activeIndex = useSnakeDotIndex();
+  const label = compact ? 'Thinking…' : 'Thinking about your request';
 
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border font-sans select-none backdrop-blur-md transition-all duration-300 w-full',
-        isDark 
-          ? 'bg-slate-950/40 border-emerald-500/10 text-slate-400 shadow-[0_0_20px_rgba(16,185,129,0.03)]' 
-          : 'bg-emerald-50/20 border-emerald-200/40 text-slate-500 shadow-[0_0_15px_rgba(16,185,129,0.01)]',
-        compact ? 'p-2 max-w-[190px]' : 'p-2.5 max-w-[240px]',
-        className
+        'inline-flex items-center gap-2.5 select-none font-sans',
+        className,
       )}
       role="status"
       aria-live="polite"
+      aria-label={label}
     >
-      <div className="space-y-2">
-        {/* Row with pulsing indicator and small step text */}
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500/90" />
-          </span>
-          <p
+      <div
+        className="grid shrink-0 grid-cols-4 gap-[3px]"
+        style={{ gridTemplateRows: 'repeat(2, 5px)' }}
+        aria-hidden="true"
+      >
+        {Array.from({ length: GRID_DOT_COUNT }, (_, i) => (
+          <span
+            key={i}
             className={cn(
-              'text-[10px] font-mono leading-none truncate transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
-              fading ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0',
+              'h-[5px] w-[5px] rounded-full transition-all duration-200 ease-in-out',
+              isDark ? 'bg-white' : 'bg-slate-900',
+              i === activeIndex
+                ? cn(
+                    'scale-[1.15] opacity-100',
+                    isDark ? 'shadow-[0_0_6px_rgba(255,255,255,0.35)]' : 'shadow-[0_0_4px_rgba(15,23,42,0.2)]',
+                  )
+                : 'scale-[0.82] opacity-[0.14]',
             )}
-          >
-            {currentPhrase}...
-          </p>
-        </div>
-
-        {/* Small subtle progress bar */}
-        <div className="relative w-full h-0.5 rounded-full bg-emerald-500/10 overflow-hidden">
-          <div 
-            className="absolute top-0 left-0 h-full rounded-full bg-emerald-500/90 transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{ width: `${progressPercent}%` }}
           />
-        </div>
+        ))}
       </div>
+      <span
+        className={cn(
+          'text-[13px] font-normal leading-none',
+          compact ? 'text-[12px]' : 'text-[13px]',
+          isDark ? 'text-zinc-300' : 'text-slate-600',
+        )}
+      >
+        {label}
+      </span>
     </div>
   );
 }

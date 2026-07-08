@@ -1,4 +1,5 @@
 import chatLoaderCss from './chat-loader.css?raw';
+import thinkingVariationsCss from './thinking-variations.css?raw';
 
 export const CHAT_LOADER_STEPS = [
   'Parsing functional rules',
@@ -8,68 +9,85 @@ export const CHAT_LOADER_STEPS = [
   'Assembling blueprint',
 ] as const;
 
-export const CHAT_LOADER_HTML = `<!-- Mitra chat loader (dark) -->
-<div
-  class="mitra-chat-loader mitra-chat-loader--dark"
-  role="status"
-  aria-live="polite"
-  aria-label="Mitra is thinking"
-  data-mitra-chat-loader
-  data-steps='["Parsing functional rules","Checking API schemas","Mapping scope tables","Checking best practices","Assembling blueprint"]'
->
-  <div class="mitra-chat-loader__body">
-    <div class="mitra-chat-loader__row">
-      <span class="mitra-chat-loader__pulse" aria-hidden="true">
-        <span class="mitra-chat-loader__pulse-ring"></span>
-        <span class="mitra-chat-loader__pulse-dot"></span>
-      </span>
-      <p class="mitra-chat-loader__phrase mitra-chat-loader__phrase--enter" data-mitra-chat-loader-phrase>
-        Parsing functional rules...
-      </p>
-    </div>
-    <div class="mitra-chat-loader__track" aria-hidden="true">
-      <div class="mitra-chat-loader__fill" data-mitra-chat-loader-progress style="width: 20%"></div>
-    </div>
+export const THINKING_SNIPPETS_HTML = `<!-- Grid dots (production) -->
+<div class="mitra-think mitra-think--grid mitra-think--dark" role="status" aria-live="polite" aria-label="Thinking about your request">
+  <div class="mitra-think__grid" aria-hidden="true">
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
+    <span class="mitra-think__grid-dot"></span>
   </div>
+  <span class="mitra-think__grid-label">Thinking about your request</span>
+</div>
+
+<!-- 2. Typing dots -->
+<div class="mitra-think mitra-think--dots mitra-think--dark" role="status" aria-live="polite">
+  <span class="mitra-think__dots-label">Mitra is thinking</span>
+  <span class="mitra-think__dots" aria-hidden="true">
+    <span class="mitra-think__dot"></span>
+    <span class="mitra-think__dot"></span>
+    <span class="mitra-think__dot"></span>
+  </span>
+</div>
+
+<!-- 3. Shimmer label -->
+<div class="mitra-think mitra-think--shimmer mitra-think--dark" role="status" aria-live="polite">
+  <span class="mitra-think__shimmer-dot" aria-hidden="true"></span>
+  <p class="mitra-think__shimmer-text">Reviewing your request...</p>
+</div>
+
+<!-- 4. Glow pulse -->
+<div class="mitra-think mitra-think--glow mitra-think--dark" role="status" aria-live="polite" aria-label="Thinking">
+  <span class="mitra-think__glow-orb-wrap" aria-hidden="true">
+    <span class="mitra-think__glow-halo"></span>
+    <span class="mitra-think__glow-orb"></span>
+  </span>
+  <span class="mitra-think__glow-label">Thinking</span>
 </div>`;
 
-export const CHAT_LOADER_CSS = chatLoaderCss;
+export const THINKING_SNIPPETS_CSS = `${chatLoaderCss}\n\n${thinkingVariationsCss}`;
 
-export const CHAT_LOADER_JS = `// Minimal cycle logic for vanilla HTML usage
-(function initMitraChatLoaders() {
-  document.querySelectorAll('[data-mitra-chat-loader]').forEach((root) => {
-    const phraseEl = root.querySelector('[data-mitra-chat-loader-phrase]');
-    const progressEl = root.querySelector('[data-mitra-chat-loader-progress]');
-    if (!phraseEl || !progressEl) return;
+export const THINKING_SNIPPETS_JS = `// Snake scan — one dot at a time, ping-pong forward / reverse
+const DOT_COUNT = 8;
+const STEP_MS = 260;
+let index = 0;
+let direction = 1;
 
-    const steps = JSON.parse(root.getAttribute('data-steps') || '[]');
-    if (!steps.length) return;
+setInterval(() => {
+  if (index === DOT_COUNT - 1) direction = -1;
+  else if (index === 0) direction = 1;
+  index += direction;
 
-    let index = 0;
-
-    const tick = () => {
-      phraseEl.classList.add('mitra-chat-loader__phrase--fading');
-      window.setTimeout(() => {
-        index = Math.min(index + 1, steps.length - 1);
-        phraseEl.textContent = steps[index] + '...';
-        phraseEl.classList.remove('mitra-chat-loader__phrase--fading');
-        phraseEl.classList.add('mitra-chat-loader__phrase--enter');
-        progressEl.style.width = Math.round(((index + 1) / steps.length) * 100) + '%';
-      }, 220);
-    };
-
-    window.setInterval(tick, 1600);
+  document.querySelectorAll('.mitra-think__grid-dot').forEach((el, i) => {
+    el.classList.toggle('mitra-think__grid-dot--active', i === index);
   });
-})();`;
+}, STEP_MS);`;
 
-export const CHAT_LOADER_REACT = `import MitraThinkingIndicator from './components/MitraThinkingIndicator';
+export const THINKING_SNIPPETS_REACT = `import MitraThinkingIndicator from './components/MitraThinkingIndicator';
+import {
+  PhaseStreamThinking,
+  TypingDotsThinking,
+  ShimmerThinking,
+  GlowPulseThinking,
+} from './components/dev/components/chat-loader/ThinkingVariations';
 
-// In a chat bubble while the model is streaming:
-<MitraThinkingIndicator
-  theme={theme}
-  context="architect"
-  compact={false}
-/>
+// Production — grid snake scan
+<MitraThinkingIndicator theme={theme} context="architect" />
 
-// Contexts: 'default' | 'architect' | 'businessOwner'
-// compact: smaller card for inline chat rows`;
+// Dev variations (pick by use case):
+<PhaseStreamThinking theme="dark" />   {/* same as production grid dots */}
+<TypingDotsThinking theme="dark" />    {/* short wait, pre-stream */}
+<ShimmerThinking theme="dark" />       {/* background / low-attention */}
+<GlowPulseThinking theme="dark" />     {/* minimal breathing orb */}
+
+// Contexts on MitraThinkingIndicator: 'default' | 'architect' | 'businessOwner'`;
+
+// Legacy exports for backwards compatibility
+export const CHAT_LOADER_HTML = THINKING_SNIPPETS_HTML;
+export const CHAT_LOADER_CSS = THINKING_SNIPPETS_CSS;
+export const CHAT_LOADER_JS = THINKING_SNIPPETS_JS;
+export const CHAT_LOADER_REACT = THINKING_SNIPPETS_REACT;

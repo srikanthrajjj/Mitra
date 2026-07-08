@@ -1,112 +1,99 @@
-import { useEffect, useState } from 'react';
-import MitraThinkingIndicator from '../../../MitraThinkingIndicator';
 import { DevShowcaseShell } from '../../shared/DevShowcaseShell';
 import {
-  CHAT_LOADER_CSS,
-  CHAT_LOADER_HTML,
-  CHAT_LOADER_JS,
-  CHAT_LOADER_REACT,
-  CHAT_LOADER_STEPS,
+  THINKING_SNIPPETS_CSS,
+  THINKING_SNIPPETS_HTML,
+  THINKING_SNIPPETS_JS,
+  THINKING_SNIPPETS_REACT,
 } from './snippets';
 import { Theme } from '../../../../types';
-import { cn } from '@/lib/utils';
+import {
+  PhaseStreamThinking,
+  TypingDotsThinking,
+  ShimmerThinking,
+  GlowPulseThinking,
+} from './ThinkingVariations';
 import './chat-loader.css';
+import './thinking-variations.css';
 
-function VanillaChatLoaderPreview({ theme }: { theme: 'dark' | 'light' }) {
-  const [index, setIndex] = useState(0);
-  const [fading, setFading] = useState(false);
-
-  useEffect(() => {
-    setIndex(0);
-    setFading(false);
-  }, [theme]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setFading(true);
-      window.setTimeout(() => {
-        setIndex((current) => Math.min(current + 1, CHAT_LOADER_STEPS.length - 1));
-        setFading(false);
-      }, 220);
-    }, 1600);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
-
-  const progress = Math.min(100, Math.round(((index + 1) / CHAT_LOADER_STEPS.length) * 100));
-
-  return (
-    <div
-      className={cn(
-        'mitra-chat-loader',
-        theme === 'dark' ? 'mitra-chat-loader--dark' : 'mitra-chat-loader--light',
-      )}
-      role="status"
-      aria-live="polite"
-      aria-label="Mitra is thinking"
-    >
-      <div className="mitra-chat-loader__body">
-        <div className="mitra-chat-loader__row">
-          <span className="mitra-chat-loader__pulse" aria-hidden="true">
-            <span className="mitra-chat-loader__pulse-ring" />
-            <span className="mitra-chat-loader__pulse-dot" />
-          </span>
-          <p
-            className={cn(
-              'mitra-chat-loader__phrase',
-              !fading && 'mitra-chat-loader__phrase--enter',
-              fading && 'mitra-chat-loader__phrase--fading',
-            )}
-          >
-            {CHAT_LOADER_STEPS[index]}...
-          </p>
-        </div>
-        <div className="mitra-chat-loader__track" aria-hidden="true">
-          <div className="mitra-chat-loader__fill" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
-    </div>
-  );
-}
+const VARIATION_NOTES = [
+  {
+    name: 'Grid dots',
+    source: '4×2 snake scan — forward then reverse (production)',
+    use: 'Default in chat — one dot at a time, slow ping-pong through the grid.',
+  },
+  {
+    name: 'Typing dots',
+    source: 'Typing indicator (Slack, iMessage)',
+    use: 'Short waits under ~3s before streaming starts.',
+  },
+  {
+    name: 'Shimmer label',
+    source: 'Living breadcrumb (background tasks)',
+    use: 'Low-attention states — drafting, sorting, background sync.',
+  },
+  {
+    name: 'Glow pulse',
+    source: 'Single breathing orb (minimal calm)',
+    use: 'Quietest option — one soft pulse, no grid or bouncing dots.',
+  },
+] as const;
 
 export function ChatLoaderShowcase({ theme }: { theme?: Theme }) {
   return (
     <DevShowcaseShell
-      title="Chat Loader"
-      description="Animated thinking indicator used while Mitra processes a request. Includes a pulsing status dot, cycling phrase, and progress bar."
+      title="Thinking Status"
+      description='Four Mitra bot thinking indicators researched from 2025–2026 AI chat UX patterns. Each uses role="status" and aria-live="polite" for accessibility.'
       notes={
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
-            Use <code className="rounded bg-muted px-1 font-mono text-xs">context=&quot;architect&quot;</code> in chat views.
-          </li>
-          <li>
-            Vanilla CSS lives in{' '}
-            <code className="rounded bg-muted px-1 font-mono text-xs">src/components/dev/components/chat-loader/chat-loader.css</code>.
-          </li>
-          {theme ? (
+        <div className="space-y-4">
+          <p>
+            Patterns sourced from{' '}
+            <span className="text-foreground">Smashing Magazine (AI transparency)</span>,{' '}
+            <span className="text-foreground">uxpatterns.dev (AI loading states)</span>, and{' '}
+            <span className="text-foreground">aiuxdesign.guide (typing &amp; streaming)</span>.
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            {VARIATION_NOTES.map((item) => (
+              <li key={item.name}>
+                <strong className="text-foreground">{item.name}</strong> — {item.source}.{' '}
+                <span className="text-muted-foreground">{item.use}</span>
+              </li>
+            ))}
             <li>
-              Current app theme: <span className="font-mono text-foreground">{theme}</span>
+              Production component:{' '}
+              <code className="rounded bg-muted px-1 font-mono text-xs">MitraThinkingIndicator</code>{' '}
+              (maps to <em>Grid dots</em>).
             </li>
-          ) : null}
-        </ul>
+            {theme ? (
+              <li>
+                Current app theme: <span className="font-mono text-foreground">{theme}</span>
+              </li>
+            ) : null}
+          </ul>
+        </div>
       }
       previews={[
         {
-          label: 'Vanilla HTML + CSS',
-          content: (previewTheme) => <VanillaChatLoaderPreview theme={previewTheme} />,
+          label: '1 · Grid dots',
+          content: (previewTheme) => <PhaseStreamThinking theme={previewTheme} />,
         },
         {
-          label: 'React component (MitraThinkingIndicator)',
-          content: (previewTheme) => (
-            <MitraThinkingIndicator theme={previewTheme === 'dark' ? 'dark' : 'light'} context="architect" />
-          ),
+          label: '2 · Typing dots',
+          content: (previewTheme) => <TypingDotsThinking theme={previewTheme} />,
+        },
+        {
+          label: '3 · Shimmer label',
+          content: (previewTheme) => <ShimmerThinking theme={previewTheme} />,
+        },
+        {
+          label: '4 · Glow pulse',
+          content: (previewTheme) => <GlowPulseThinking theme={previewTheme} />,
         },
       ]}
       snippets={{
-        html: CHAT_LOADER_HTML,
-        css: CHAT_LOADER_CSS,
-        js: CHAT_LOADER_JS,
-        react: CHAT_LOADER_REACT,
+        html: THINKING_SNIPPETS_HTML,
+        css: THINKING_SNIPPETS_CSS,
+        js: THINKING_SNIPPETS_JS,
+        react: THINKING_SNIPPETS_REACT,
       }}
     />
   );
