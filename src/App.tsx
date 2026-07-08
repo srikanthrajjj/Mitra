@@ -2537,6 +2537,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 if (!text.trim()) return;
                 handleNewChat(undefined, text);
               }}
+              isServerConnected={isServerConnected}
             />
           )}
 

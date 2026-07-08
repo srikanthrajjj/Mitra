@@ -27,6 +27,7 @@ interface HomeViewProps {
   theme: ResolvedTheme;
   onSelectAction: (actionType: HomeActionType) => void;
   onSendMessage: (text: string) => void;
+  isServerConnected?: boolean;
 }
 
 export default function HomeView({
@@ -34,9 +35,11 @@ export default function HomeView({
   theme,
   onSelectAction,
   onSendMessage,
+  isServerConnected = true,
 }: HomeViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
+  const [composerMode, setComposerMode] = useState<'plan' | 'build'>('plan');
   const [isFocused, setIsFocused] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [useLocalOnly, setUseLocalOnly] = useState(() => isDemoMode());
@@ -220,7 +223,11 @@ export default function HomeView({
                   onKeyDown={handleKeyDown}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
-                  placeholder="How can I help you today?"
+                  placeholder={
+                    composerMode === 'plan'
+                      ? 'Plan the workflow, architecture, or implementation approach…'
+                      : 'Describe what you want to build…'
+                  }
                   rows={1}
                   className="min-h-[38px] w-full max-h-[200px] resize-none border-none bg-transparent px-2 pt-1 text-[13.5px] font-medium leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                 />
@@ -267,6 +274,45 @@ export default function HomeView({
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputRef.current?.click()}>
                       <Paperclip className="h-4 w-4" />
                     </Button>
+                    <div className="flex items-center gap-1 rounded-full border border-border/60 px-1 py-0.5">
+                      {(['plan', 'build'] as const).map((mode) => {
+                        const active = composerMode === mode;
+                        return (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() => setComposerMode(mode)}
+                            className={cn(
+                              'rounded-full px-2 py-0.5 text-[10px] font-medium capitalize transition-colors',
+                              active
+                                ? isDark
+                                  ? 'bg-white/[0.08] text-slate-100'
+                                  : 'bg-slate-200 text-slate-900'
+                                : isDark
+                                  ? 'text-slate-500 hover:text-slate-300'
+                                  : 'text-slate-400 hover:text-slate-700',
+                            )}
+                            aria-pressed={active}
+                          >
+                            {mode}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 text-[10px] ${
+                        isDark ? 'text-slate-500' : 'text-slate-400'
+                      }`}
+                      aria-label={isServerConnected ? 'Connected' : 'Offline'}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1">

@@ -1123,7 +1123,7 @@ export default function ChatView({
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
-                <div className="hidden sm:flex items-center gap-1 rounded-full border border-border/60 px-1 py-0.5">
+                <div className="flex items-center gap-1 rounded-full border border-border/60 px-1 py-0.5">
                   {(['plan', 'build'] as const).map((mode) => {
                     const active = composerMode === mode;
                     return (
@@ -1148,7 +1148,7 @@ export default function ChatView({
                   })}
                 </div>
                 <div
-                  className={`hidden sm:inline-flex items-center gap-1 text-[10px] ${
+                  className={`inline-flex items-center gap-1 text-[10px] ${
                     isDark ? 'text-slate-500' : 'text-slate-400'
                   }`}
                   aria-label={isServerConnected ? 'Connected' : 'Offline'}
