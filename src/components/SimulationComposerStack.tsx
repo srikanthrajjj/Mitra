@@ -8,6 +8,7 @@ interface SimulationComposerStackProps {
   /** Classes for the front input card (border, glow, bg handled by parent) */
   cardClassName?: string;
   inputId?: string;
+  dataTour?: string;
   children: React.ReactNode;
 }
 
@@ -18,6 +19,7 @@ export default function SimulationComposerStack({
   theme,
   cardClassName = '',
   inputId,
+  dataTour = 'composer',
   children,
 }: SimulationComposerStackProps) {
   const isDark = isDarkTheme(theme);
@@ -61,13 +63,20 @@ export default function SimulationComposerStack({
       {/* Front layer — subtle idle stroke; gradient intensifies on hover/focus */}
       <div
         id={inputId}
+        data-tour={dataTour}
         className={`relative z-10 mt-3 rounded-2xl p-px transition-all duration-300 ${
           isDark
             ? 'bg-gradient-to-r from-white/[0.07] via-white/[0.05] to-white/[0.07] hover:from-emerald-500/20 hover:via-white/[0.08] hover:to-indigo-500/18 focus-within:p-[1.5px] focus-within:from-emerald-500/75 focus-within:via-teal-500/60 focus-within:to-indigo-500/70 focus-within:animate-gradient-stroke focus-within:shadow-md'
             : 'bg-gradient-to-r from-slate-300/50 via-slate-200/40 to-slate-300/50 hover:from-emerald-400/25 hover:via-slate-200/50 hover:to-indigo-400/20 focus-within:p-[1.5px] focus-within:from-emerald-500/70 focus-within:via-teal-400/55 focus-within:to-indigo-500/65 focus-within:animate-gradient-stroke focus-within:shadow-md'
         }`}
       >
-        <div className={`rounded-[14px] overflow-hidden ${cleanCardClassName}`}>
+        <div
+          className={`rounded-[14px] overflow-hidden shadow-[0_8px_24px_-14px_rgba(15,23,42,0.16),0_2px_8px_rgba(15,23,42,0.05)] ${cleanCardClassName} ${
+            isDark
+              ? 'shadow-[0_10px_30px_-18px_rgba(0,0,0,0.55),0_1px_0_rgba(255,255,255,0.04)_inset]'
+              : 'shadow-[0_10px_28px_-18px_rgba(15,23,42,0.14),0_1px_0_rgba(255,255,255,0.9)_inset]'
+          }`}
+        >
           {children}
         </div>
       </div>

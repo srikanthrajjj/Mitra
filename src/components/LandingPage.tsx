@@ -1,4 +1,5 @@
 import LightRays from './LightRays';
+import { motion } from 'motion/react';
 import {
   LandingNav,
   LandingHeroEchelon,
@@ -9,6 +10,25 @@ import {
 } from './landing/EchelonLandingSections';
 import { LandingAnimatedBeam } from './landing/LandingAnimatedBeam';
 import { LandingFooterReveal } from './landing/LandingFooterReveal';
+
+function LandingScrollReveal({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 interface LandingPageProps {
   version?: 'v2' | 'v3';
@@ -58,14 +78,26 @@ export default function LandingPage({
           onGetStarted={onGetStarted}
           onSignIn={onSignIn}
         />
-        <LandingHeroEchelon onGetStarted={onGetStarted} />
+        <LandingScrollReveal>
+          <LandingHeroEchelon onGetStarted={onGetStarted} />
+        </LandingScrollReveal>
       </div>
 
-      <LandingHowItWorks />
-      <LandingPlatformSection />
-      <LandingAnimatedBeam />
-      <LandingInstanceDemo onGetStarted={onGetStarted} />
-      <LandingFinalCta onGetStarted={onGetStarted} />
+      <LandingScrollReveal delay={0.04}>
+        <LandingHowItWorks />
+      </LandingScrollReveal>
+      <LandingScrollReveal delay={0.06}>
+        <LandingPlatformSection />
+      </LandingScrollReveal>
+      <LandingScrollReveal delay={0.08}>
+        <LandingAnimatedBeam />
+      </LandingScrollReveal>
+      <LandingScrollReveal delay={0.1}>
+        <LandingInstanceDemo onGetStarted={onGetStarted} />
+      </LandingScrollReveal>
+      <LandingScrollReveal delay={0.12}>
+        <LandingFinalCta onGetStarted={onGetStarted} />
+      </LandingScrollReveal>
       </div>
       <LandingFooterReveal onGetStarted={onGetStarted} />
     </div>

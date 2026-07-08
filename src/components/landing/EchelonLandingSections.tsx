@@ -138,7 +138,7 @@ interface LandingHeroEchelonProps {
 
 export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
   return (
-    <section className="landing-echelon-hero relative flex flex-1 flex-col items-center justify-center px-6 pb-12 pt-2 text-center md:pb-16">
+    <section className="landing-echelon-hero relative flex min-h-[calc(100vh-88px)] flex-1 flex-col items-center justify-center px-6 pb-14 pt-8 text-center md:min-h-[calc(100vh-96px)] md:pb-18 md:pt-10">
       <h1 className="mx-auto max-w-4xl font-display text-[2rem] font-medium leading-[1.15] tracking-tight text-white md:text-[2.75rem] lg:text-[3.25rem]">
         {HERO.title}
       </h1>

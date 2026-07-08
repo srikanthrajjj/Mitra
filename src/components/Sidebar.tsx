@@ -213,6 +213,7 @@ export default function Sidebar({
                       size="icon"
                       className="h-8 w-8"
                       aria-label="Account menu"
+                      data-tour="profile"
                     >
                       <Avatar className="h-7 w-7 rounded-md">
                         <AvatarFallback className="rounded-md bg-muted text-[10px] font-medium text-muted-foreground">
@@ -386,37 +387,29 @@ export default function Sidebar({
 
       <SidebarFooter className="border-t border-sidebar-border p-2">
         <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="mx-1 my-1 w-[calc(100%-0.5rem)] rounded-xl border border-sidebar-border p-3 bg-sidebar-accent/30 flex items-center gap-3 text-left transition-colors hover:bg-sidebar-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-                  aria-label="Account menu"
-                >
-                  <Avatar className="h-9 w-9 rounded-full shrink-0">
-                    <AvatarFallback className="rounded-full bg-emerald-500/10 text-emerald-600 font-semibold text-xs">
-                      {userRole === 'architect' ? 'RC' : USER_INITIALS}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-semibold text-foreground">
-                      {userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME}
-                    </div>
-                    <div className="truncate text-[10.5px] text-muted-foreground">
-                      {userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]}
-                    </div>
-                  </div>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <div className="flex flex-col gap-0.5">
-                <span>Account menu</span>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              data-tour="profile"
+              className="mx-1 my-1 w-[calc(100%-0.5rem)] rounded-xl p-3 flex items-center gap-3 text-left transition-colors hover:bg-sidebar-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              aria-label="Account menu"
+            >
+              <Avatar className="h-9 w-9 rounded-full shrink-0">
+                <AvatarFallback className="rounded-full bg-emerald-500/10 text-emerald-600 font-semibold text-xs">
+                  {userRole === 'architect' ? 'RC' : USER_INITIALS}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[13px] font-semibold text-foreground">
+                  {userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME}
+                </div>
+                <div className="truncate text-[10.5px] text-muted-foreground">
+                  {userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]}
+                </div>
               </div>
-            </TooltipContent>
-          </Tooltip>
+              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
           <DropdownMenuContent
             side="top"
             align="start"

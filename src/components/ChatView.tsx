@@ -156,6 +156,25 @@ function StreamingCursor({ isDark }: { isDark: boolean }) {
   );
 }
 
+function formatThoughtDuration(durationMs?: number) {
+  const seconds = Math.max(1, Math.round((durationMs ?? 4000) / 1000));
+  return `Thought for ${seconds}s`;
+}
+
+function ThoughtDurationBadge({ isDark, durationMs }: { isDark: boolean; durationMs?: number }) {
+  return (
+    <div
+      className={cn(
+        'mb-1 inline-flex items-center gap-1.5 text-[11px]',
+        isDark ? 'text-slate-500' : 'text-slate-500',
+      )}
+    >
+      <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+      <span>{formatThoughtDuration(durationMs)}</span>
+    </div>
+  );
+}
+
 
 function choiceIcon(choice: string) {
   const key = choice.toLowerCase();
@@ -539,41 +558,43 @@ export default function ChatView({
                 isStreamingThisMessage && !msg.text.trim() && !hasTodos;
               const todosAnimating =
                 isStreamingThisMessage && hasTodos && !msg.text.trim();
+              const showAssistantAvatar = !isMitra || isSnUpdate || showThinkingOnly;
               const isAnySelected = msg.selectedChoice !== undefined;
               return (
                 <div 
                   key={msg.id || i}
                   ref={isLastMessage ? lastMessageRef : undefined}
-                  className={`group relative flex gap-4 max-w-3xl scroll-mt-8 chat-message-entry ${isMitra ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
+                  className={`group relative flex ${showAssistantAvatar ? 'gap-4' : 'gap-0'} max-w-3xl scroll-mt-8 chat-message-entry ${isMitra ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
                 >
-                  {/* Avatar Icon */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
-                    isStreamingThisMessage 
-                      ? isDark
-                          ? 'bg-brand-green/5 border border-brand-green/20 text-brand-green'
-                          : 'bg-emerald-50 border border-emerald-200 text-emerald-600'
-                      : isMitra 
-                        ? isSnUpdate
-                          ? isDark
-                            ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
-                            : 'bg-amber-50 border border-amber-200 text-amber-700'
-                          : 'bg-transparent border-transparent'
-                        : isDark
-                          ? 'bg-mitra-surface border border-white/[0.08] text-brand-green'
-                          : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-                  }`}>
-                    {isMitra ? (
-                      isSnUpdate ? (
-                        <ClipboardList className="w-4 h-4" />
+                  {showAssistantAvatar && (
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                      isStreamingThisMessage 
+                        ? isDark
+                            ? 'bg-brand-green/5 border border-brand-green/20 text-brand-green'
+                            : 'bg-emerald-50 border border-emerald-200 text-emerald-600'
+                        : isMitra 
+                          ? isSnUpdate
+                            ? isDark
+                              ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                              : 'bg-amber-50 border border-amber-200 text-amber-700'
+                            : 'bg-transparent border-transparent'
+                          : isDark
+                            ? 'bg-mitra-surface border border-white/[0.08] text-brand-green'
+                            : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                    }`}>
+                      {isMitra ? (
+                        isSnUpdate ? (
+                          <ClipboardList className="w-4 h-4" />
+                        ) : (
+                          <MitraLogo
+                            className="h-5.5 w-5.5 opacity-90"
+                          />
+                        )
                       ) : (
-                        <MitraLogo
-                          className="h-5.5 w-5.5 opacity-90"
-                        />
-                      )
-                    ) : (
-                      <span className="text-[10px] font-bold font-display tracking-wide">{USER_INITIALS}</span>
-                    )}
-                  </div>
+                        <span className="text-[10px] font-bold font-display tracking-wide">{USER_INITIALS}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Message Bubble Wrapper */}
                   <div className="max-w-[85%] relative flex flex-col items-start">
@@ -590,6 +611,12 @@ export default function ChatView({
                     }`}>
                       {isMitra ? (
                         <>
+                          {!showThinkingOnly && !isStreamingThisMessage && (
+                            <ThoughtDurationBadge
+                              isDark={isDark}
+                              durationMs={msg.thoughtDurationMs}
+                            />
+                          )}
                           {hasTodos && (
                             <div
                               className={cn(
@@ -1041,10 +1068,6 @@ export default function ChatView({
                 >
                   <Plus className={`w-4 h-4 transition-transform duration-250 ${moreOptionsOpen ? 'rotate-45 text-brand-green' : ''}`} />
                 </button>
-              </div>
-
-              {/* Right Side elements */}
-              <div className="flex items-center gap-2">
                 {/* File Attachment Button */}
                 <button
                   type="button"
@@ -1059,7 +1082,10 @@ export default function ChatView({
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
+              </div>
 
+              {/* Right Side elements */}
+              <div className="flex items-center gap-2">
                 {/* Mic icon button */}
                 <button
                   type="button"

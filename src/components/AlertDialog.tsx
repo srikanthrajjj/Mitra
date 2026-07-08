@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { AlertTriangle, Info, X } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { cn } from '@/lib/utils';
 
 export interface AlertDialogProps {
   theme: Theme;

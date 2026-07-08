@@ -264,12 +264,12 @@ export default function HomeView({
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </div>
-
-                  <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputRef.current?.click()}>
                       <Paperclip className="h-4 w-4" />
                     </Button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <Mic className="h-4 w-4" />
                     </Button>

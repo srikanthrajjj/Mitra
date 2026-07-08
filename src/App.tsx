@@ -461,6 +461,31 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
   const [isTourOpen, setIsTourOpen] = useState<boolean>(false);
+
+  const handleTourPrepareStep = useCallback((step: import('./constants/onboardingTour').OnboardingTourStep) => {
+    if (step.requiresExpandedSidebar) {
+      setLeftSidebarCollapsed(false);
+      try {
+        localStorage.setItem(LEFT_SIDEBAR_COLLAPSED_KEY, 'false');
+      } catch {
+        /* ignore storage errors */
+      }
+    }
+    if (step.requiredTab) {
+      setActiveTab(step.requiredTab);
+    }
+  }, [setActiveTab]);
+
+  const handleOpenTour = useCallback(() => {
+    setActiveTab('dashboard');
+    setLeftSidebarCollapsed(false);
+    try {
+      localStorage.setItem(LEFT_SIDEBAR_COLLAPSED_KEY, 'false');
+    } catch {
+      /* ignore storage errors */
+    }
+    setIsTourOpen(true);
+  }, [setActiveTab]);
   const [whatsNewOpen, setWhatsNewOpen] = useState<boolean>(false);
   const DEFAULT_MODEL = 'gemini-2.5-flash';
   const [welcomeComplete, setWelcomeComplete] = useState<boolean>(() => {
@@ -556,6 +581,8 @@ export default function App() {
       setSimulationAlertOpen(true);
     }
     if (localStorage.getItem('mitra_tour_completed') !== 'true') {
+      setActiveTab('dashboard');
+      setLeftSidebarCollapsed(false);
       setIsTourOpen(true);
     }
     // WhatsNew modal removed
@@ -628,6 +655,8 @@ export default function App() {
     if (!welcomeComplete) return;
     const completed = localStorage.getItem('mitra_tour_completed');
     if (completed !== 'true') {
+      setActiveTab('dashboard');
+      setLeftSidebarCollapsed(false);
       setIsTourOpen(true);
     }
   }, [welcomeComplete]);
@@ -1537,6 +1566,7 @@ export default function App() {
     const targetChatHistory = targetSol.chatHistory;
     const isFirstUserMessage = !targetChatHistory.some((m) => m.sender === 'user');
     const aiMessageId = `msg-ai-${Date.now()}`;
+    const generationStartedAt = Date.now();
 
     const pendingAiMessage: ChatMessage = {
       id: aiMessageId,
@@ -1626,6 +1656,7 @@ export default function App() {
                   ...m,
                   text: condenseResponse(m.text),
                   choices: condenseChoices(m.choices),
+                  thoughtDurationMs: Date.now() - generationStartedAt,
                 }
               : m,
           );
@@ -2338,7 +2369,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           onToggleDevMode={handleToggleDevMode}
           onOpenNewSolutionModal={handleNewSolution}
           onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
-          onOpenTour={() => setIsTourOpen(true)}
+          onOpenTour={handleOpenTour}
           userRole={userRole}
           onRoleChange={handleRoleChange}
           onSelectStakeholderReview={handleSelectStakeholderReview}
@@ -2792,6 +2823,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
         theme={resolvedTheme}
         isOpen={isTourOpen}
         onClose={() => setIsTourOpen(false)}
+        onPrepareStep={handleTourPrepareStep}
       />
 
       <SimulationAlertModal

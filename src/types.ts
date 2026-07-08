@@ -263,6 +263,7 @@ export interface ChatMessage {
   sender: 'user' | 'mitra';
   text: string;
   timestamp: Date;
+  thoughtDurationMs?: number;
   status?: 'sending' | 'sent';
   codeSample?: string;
   mermaidChart?: string;

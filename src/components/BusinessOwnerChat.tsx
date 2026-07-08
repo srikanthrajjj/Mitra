@@ -1,4 +1,4 @@
-import { ArrowUp, MessageSquare, Upload } from 'lucide-react';
+import { ArrowUp, Lightbulb, MessageSquare, Upload } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Button } from '@/src/components/ui/button';
@@ -12,6 +12,12 @@ interface ChatBubble {
   id: string;
   sender: 'user' | 'mitra';
   text: string;
+  thoughtDurationMs?: number;
+}
+
+function formatThoughtDuration(durationMs?: number) {
+  const seconds = Math.max(1, Math.round((durationMs ?? 4000) / 1000));
+  return `Thought for ${seconds}s`;
 }
 
 interface BusinessOwnerEntryTabsProps {
@@ -94,22 +100,30 @@ export function BusinessOwnerChatThread({
           key={msg.id}
           className={cn('flex gap-3', msg.sender === 'user' ? 'justify-end' : 'justify-start')}
         >
-          {msg.sender === 'mitra' && (
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-transparent">
-              <MitraLogo className="h-5 w-5 opacity-90" />
-            </div>
-          )}
-          <div
-            className={cn(
-              'max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed',
-              msg.sender === 'user'
-                ? 'bg-primary text-primary-foreground'
-                : isDark
-                  ? 'bg-card/80 text-foreground border border-border/50'
-                  : 'bg-white text-foreground border border-slate-200 shadow-sm',
+          <div className="flex max-w-[85%] flex-col items-start">
+            {msg.sender === 'mitra' && (
+              <div
+                className={cn(
+                  'mb-1 inline-flex items-center gap-1.5 pl-1 text-[11px]',
+                  isDark ? 'text-slate-500' : 'text-slate-500',
+                )}
+              >
+                <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+                <span>{formatThoughtDuration(msg.thoughtDurationMs)}</span>
+              </div>
             )}
-          >
-            {msg.sender === 'mitra' ? parseBold(msg.text) : msg.text}
+            <div
+              className={cn(
+                'w-full rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed',
+                msg.sender === 'user'
+                  ? 'bg-primary text-primary-foreground'
+                  : isDark
+                    ? 'bg-card/80 text-foreground border border-border/50'
+                    : 'bg-white text-foreground border border-slate-200 shadow-sm',
+              )}
+            >
+              {msg.sender === 'mitra' ? parseBold(msg.text) : msg.text}
+            </div>
           </div>
         </div>
       ))}

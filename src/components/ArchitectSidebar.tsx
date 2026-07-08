@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ComponentType, type Ref } from 'react';
 import {
-  Folder,
-  Link2,
-  Plus,
   Star,
-  Search,
-  MessageSquare,
   MoreVertical,
-  Pin,
-  type LucideIcon,
+  ChevronDown,
 } from 'lucide-react';
+import {
+  SearchIcon as AnimatedSearchIcon,
+  PlusIcon as AnimatedPlusIcon,
+  FolderIcon as AnimatedFolderIcon,
+  LinkIcon as AnimatedLinkIcon,
+  StarIcon as AnimatedStarIcon,
+} from '@animateicons/react/lucide';
+import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
 import { deriveConversationStatus } from '../utils/conversationStatus';
 import { ProjectFolder } from '../data/folders';
@@ -56,12 +58,34 @@ interface ArchitectSidebarProps {
 type NavItemConfig = {
   id: string;
   label: string;
-  icon: LucideIcon;
+  icon: ComponentType<{ className?: string; size?: number; ref?: Ref<IconHandle> }>;
   tab?: string;
   action?: () => void;
   badge?: number;
-  iconFilled?: boolean;
 };
+
+function AnimatedSidebarNavIcon({
+  Icon,
+  className,
+  animate,
+}: {
+  Icon: ComponentType<{ className?: string; size?: number; ref?: Ref<IconHandle> }>;
+  className?: string;
+  animate: boolean;
+}) {
+  const iconRef = useRef<IconHandle>(null);
+
+  useEffect(() => {
+    if (animate) {
+      iconRef.current?.startAnimation();
+      return;
+    }
+
+    iconRef.current?.stopAnimation();
+  }, [animate]);
+
+  return <Icon ref={iconRef} size={16} className={className} />;
+}
 
 export function ArchitectSidebar({
   theme,
@@ -83,6 +107,9 @@ export function ArchitectSidebar({
   const isDark = isDarkTheme(theme);
   const [editingSolutionId, setEditingSolutionId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [pinnedOpen, setPinnedOpen] = useState(true);
+  const [recentsOpen, setRecentsOpen] = useState(true);
+  const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -115,12 +142,12 @@ export function ArchitectSidebar({
           onNavigate('projects');
         }}
         className={cn(
-          'group flex w-full items-center justify-between gap-2 rounded-r-lg px-3 py-2.5 text-[12.5px] leading-tight font-medium transition-all duration-200 select-none border-l-2',
+          'group flex w-full items-center justify-between gap-2 rounded-r-lg px-3 py-1.75 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none border-l-2',
           isEditing ? 'cursor-default' : 'cursor-pointer',
           active
             ? isDark
-              ? 'bg-emerald-500/10 text-emerald-400 font-semibold border-emerald-500'
-              : 'bg-emerald-50 text-emerald-700 font-semibold border-emerald-500'
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500'
+              : 'bg-emerald-50 text-emerald-700 border-emerald-500'
             : isDark
               ? 'text-slate-400 border-transparent hover:bg-emerald-500/5 hover:text-emerald-400'
               : 'text-slate-600 border-transparent hover:bg-emerald-50/55 hover:text-emerald-700',
@@ -143,7 +170,7 @@ export function ArchitectSidebar({
             }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "flex-1 min-w-0 font-medium px-1 py-0.5 rounded border outline-none text-[12px]",
+              "flex-1 min-w-0 px-1 py-0.5 rounded border outline-none text-[11.25px]",
               isDark
                 ? 'bg-zinc-800 border-white/[0.06] text-zinc-100 focus:border-brand-green/25'
                 : 'bg-white border-emerald-200 text-slate-800 focus:border-brand-green'
@@ -288,19 +315,17 @@ export function ArchitectSidebar({
     );
   };
 
-  const projectCount = solutions.length; // Badge count of projects/solutions in the system
-
   const navItems: NavItemConfig[] = [
     {
       id: 'search',
       label: 'Search',
-      icon: Search,
+      icon: AnimatedSearchIcon,
       action: onOpenSearch,
     },
     {
       id: 'new-chat',
       label: 'New Chat',
-      icon: Plus,
+      icon: AnimatedPlusIcon,
       action: () => {
         onNewChat();
         onNavigate('projects');
@@ -309,16 +334,15 @@ export function ArchitectSidebar({
     {
       id: 'projects',
       label: 'Projects',
-      icon: Folder,
+      icon: AnimatedFolderIcon,
       tab: 'projects',
     },
-    { id: 'connections', label: 'Connections', icon: Link2, tab: 'connections' },
+    { id: 'connections', label: 'Connections', icon: AnimatedLinkIcon, tab: 'connections' },
     {
       id: 'favourites',
       label: 'Favourites',
-      icon: Star,
+      icon: AnimatedStarIcon,
       tab: 'favourites',
-      iconFilled: true,
     },
   ];
 
@@ -352,7 +376,7 @@ export function ArchitectSidebar({
   const recentSolutions = solutions.filter((sol) => !sol.isPinned);
 
   return (
-    <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
       <SidebarGroup className="shrink-0 px-2 pt-3 pb-2">
         <SidebarGroupContent className="space-y-0.5">
           {navItems.map((item) => {
@@ -363,6 +387,8 @@ export function ArchitectSidebar({
                 key={item.id}
                 type="button"
                 onClick={() => handleNavClick(item)}
+                onMouseEnter={() => setHoveredNavItemId(item.id)}
+                onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
                   'architect-nav-item flex w-full items-center gap-3 rounded-r-lg px-3 py-2.5 text-[13px] font-medium leading-none transition-all duration-200 cursor-pointer border-l-2',
                   active
@@ -374,10 +400,11 @@ export function ArchitectSidebar({
                       : 'text-slate-600 border-transparent hover:bg-emerald-50/55 hover:text-emerald-700',
                 )}
               >
-                <Icon
+                <AnimatedSidebarNavIcon
+                  Icon={Icon}
+                  animate={hoveredNavItemId === item.id}
                   className={cn(
                     'h-[16px] w-[16px] shrink-0 stroke-[1.8]',
-                    item.iconFilled && active && 'fill-current',
                   )}
                 />
                 <span className="flex-1 text-left">{item.label}</span>
@@ -392,32 +419,63 @@ export function ArchitectSidebar({
         </SidebarGroupContent>
       </SidebarGroup>
 
+      <div className="mx-3 h-px shrink-0 bg-slate-200/60 dark:bg-white/[0.06]" />
+
       {/* Recents and Pinned list direct render without folders */}
-      <div className="mt-4 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
-            <div className="text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-3 mb-1 flex items-center gap-1.5">
-              <Pin className="h-3 w-3 rotate-[30deg] fill-current text-emerald-500" /> Pinned
-            </div>
-            {pinnedSolutions.map((sol) => renderSolutionRow(sol))}
-            {/* Divider */}
-            <div className="h-px bg-white/[0.04] dark:bg-white/[0.04] bg-slate-200/50 mx-3 mt-1 shrink-0" />
+            <button
+              type="button"
+              onClick={() => setPinnedOpen((open) => !open)}
+              className="mb-1 flex w-full items-center gap-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+              aria-expanded={pinnedOpen}
+            >
+              <ChevronDown
+                className={cn(
+                  'h-3 w-3 shrink-0 transition-transform duration-200',
+                  !pinnedOpen && '-rotate-90',
+                )}
+              />
+              <span>Pinned</span>
+            </button>
+            {pinnedOpen ? (
+              <>
+                {pinnedSolutions.map((sol) => renderSolutionRow(sol))}
+              </>
+            ) : null}
           </div>
         )}
 
         {/* Recents section */}
         <div className="flex flex-col flex-1 space-y-0.5 pb-2">
-          <div className="text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-3 mb-1 mt-1">
-            Recents
-          </div>
-          {recentSolutions.length === 0 ? (
-            <p className="text-[11px] text-muted-foreground/50 px-3 py-2">
-              No recent chats
-            </p>
-          ) : (
-            recentSolutions.map((sol) => renderSolutionRow(sol))
+          {pinnedSolutions.length > 0 && (
+            <div className="mx-3 mb-2 mt-1 h-px shrink-0 bg-slate-200/50 dark:bg-white/[0.05]" />
           )}
+          <button
+            type="button"
+            onClick={() => setRecentsOpen((open) => !open)}
+            className="mb-1 mt-1 flex w-full items-center gap-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+            aria-expanded={recentsOpen}
+          >
+            <ChevronDown
+              className={cn(
+                'h-3 w-3 shrink-0 transition-transform duration-200',
+                !recentsOpen && '-rotate-90',
+              )}
+            />
+            <span>Recents</span>
+          </button>
+          {recentsOpen ? (
+            recentSolutions.length === 0 ? (
+              <p className="px-3 py-2 text-[11px] text-muted-foreground/50">
+                No recent chats
+              </p>
+            ) : (
+              recentSolutions.map((sol) => renderSolutionRow(sol))
+            )
+          ) : null}
         </div>
       </div>
     </div>

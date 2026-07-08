@@ -72,7 +72,7 @@ export default function HomeActionCards({
   const isDark = isDarkTheme(theme);
 
   return (
-    <div id="tour-actions" className="mx-auto w-full max-w-2xl space-y-6 text-center">
+    <div id="tour-actions" data-tour="quick-start" className="mx-auto w-full max-w-2xl space-y-6 text-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
         {HOME_ACTIONS.map((action) => {
           const Icon = action.icon;
