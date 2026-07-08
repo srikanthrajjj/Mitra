@@ -34,6 +34,9 @@ interface ChatViewProps {
   onStopGeneration?: () => void;
   onChoiceSelect?: (messageId: string, choice: string) => void;
   onNavigate?: (tab: string) => void;
+  onShareProject?: () => void;
+  projectCollaboratorCount?: number;
+  isServerConnected?: boolean;
 }
 
 function parseInlineMarkdown(text: string, isDark: boolean = true) {
@@ -212,9 +215,13 @@ export default function ChatView({
   onStopGeneration,
   onChoiceSelect,
   onNavigate,
+  onShareProject,
+  projectCollaboratorCount = 0,
+  isServerConnected = true,
 }: ChatViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
+  const [composerMode, setComposerMode] = useState<'plan' | 'build'>('plan');
   const [isFocused, setIsFocused] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [useLocalOnly, setUseLocalOnly] = useState(() => isDemoMode());
@@ -386,6 +393,13 @@ export default function ChatView({
   const chatTitle = activeSolution
     ? activeSolution.blueprint.title || activeSolution.name
     : '';
+  const composerPlaceholder = isGeneratingMessage
+    ? 'Mitra is thinking…'
+    : composerMode === 'plan'
+      ? 'Plan the workflow, architecture, or implementation approach…'
+      : isEmptyChat
+        ? 'Describe what you want to build…'
+        : 'What should Mitra build next?';
 
   const streamSignature = messages.map((m) => m.text.length).join('|');
 
@@ -451,7 +465,7 @@ export default function ChatView({
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-transparent relative">
       {activeSolution && (
-        <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center border-b border-border px-4 md:px-8 ${
+        <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center justify-between gap-3 border-b border-border px-4 md:px-8 ${
           isDark ? 'bg-sidebar' : 'bg-sidebar/80'
         }`}>
           <h2
@@ -460,6 +474,33 @@ export default function ChatView({
           >
             {chatTitle}
           </h2>
+          {onShareProject && (
+            <button
+              type="button"
+              onClick={onShareProject}
+              className={cn(
+                'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors',
+                isDark
+                  ? 'border-white/[0.08] text-slate-300 hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-white'
+                  : 'border-border text-slate-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
+              )}
+              title="Share project"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Share
+              {projectCollaboratorCount > 0 && (
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px]',
+                    isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                  )}
+                >
+                  <Users className="h-2.5 w-2.5" />
+                  {projectCollaboratorCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       )}
       <div
@@ -1041,7 +1082,7 @@ export default function ChatView({
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={isGeneratingMessage ? 'Mitra is thinking…' : isEmptyChat ? 'Describe your ServiceNow requirement…' : 'How can I help you today?'}
+              placeholder={composerPlaceholder}
               disabled={isGeneratingMessage}
               rows={1}
               className={`w-full bg-transparent outline-none border-none resize-none text-[13.5px] leading-relaxed font-sans px-2 pt-1 font-medium min-h-[38px] max-h-[200px] ${
@@ -1082,6 +1123,44 @@ export default function ChatView({
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
+                <div className="hidden sm:flex items-center gap-1 rounded-full border border-border/60 px-1 py-0.5">
+                  {(['plan', 'build'] as const).map((mode) => {
+                    const active = composerMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setComposerMode(mode)}
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize transition-colors ${
+                          active
+                            ? isDark
+                              ? 'bg-white/[0.08] text-slate-100'
+                              : 'bg-slate-200 text-slate-900'
+                            : isDark
+                              ? 'text-slate-500 hover:text-slate-300'
+                              : 'text-slate-400 hover:text-slate-700'
+                        }`}
+                        aria-pressed={active}
+                      >
+                        {mode}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div
+                  className={`hidden sm:inline-flex items-center gap-1 text-[10px] ${
+                    isDark ? 'text-slate-500' : 'text-slate-400'
+                  }`}
+                  aria-label={isServerConnected ? 'Connected' : 'Offline'}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
+                </div>
               </div>
 
               {/* Right Side elements */}

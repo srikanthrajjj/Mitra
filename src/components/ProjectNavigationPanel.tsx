@@ -9,6 +9,7 @@ import { ProjectFolder } from '../data/folders';
 import { getArtifactsWithStatuses } from '../data/solutionArtifacts';
 import {
   ArtifactStatus,
+  ProjectCollaborator,
   Solution,
   SolutionArtifact,
   Theme,
@@ -37,8 +38,10 @@ interface ProjectNavigationPanelProps {
   activeSolutionId?: string;
   statusOverrides?: Record<string, ArtifactStatus>;
   dynamicArtifactsBySolution?: Record<string, SolutionArtifact[]>;
+  projectCollaborators?: ProjectCollaborator[];
   onSelectSolution: (solutionId: string) => void;
   onSelectArtifact?: (artifactId: string, solutionId: string) => void;
+  onShareProject?: (solutionId: string) => void;
   compact?: boolean;
   variant?: 'table' | 'browser' | 'full';
 }
@@ -167,8 +170,10 @@ export function ProjectNavigationPanel({
   activeSolutionId,
   statusOverrides = {},
   dynamicArtifactsBySolution = {},
+  projectCollaborators = [],
   onSelectSolution,
   onSelectArtifact,
+  onShareProject,
   compact = false,
   variant = 'full',
 }: ProjectNavigationPanelProps) {
@@ -233,8 +238,10 @@ export function ProjectNavigationPanel({
         activeSolutionId={activeSolutionId}
         statusOverrides={statusOverrides}
         dynamicArtifactsBySolution={dynamicArtifactsBySolution}
+        projectCollaborators={projectCollaborators}
         onSelectSolution={onSelectSolution}
         onSelectArtifact={onSelectArtifact}
+        onShareProject={onShareProject}
       />
     );
   }

@@ -22,7 +22,7 @@ import AlertDialog from './components/AlertDialog';
 import SimulationAlertModal from './components/SimulationAlertModal';
 import { enrichBlueprintStudio } from './utils/studioHelpers';
 import VrBackground from './components/VrBackground';
-import { Solution, Theme, ResolvedTheme, ServiceTemplate, ChatMessage, TableField, UserRole, ArtifactStatus, StakeholderReview, SolutionArtifact, AdminChecklistItem, DeveloperComment, DeveloperCommentSeverity, SharePermission, PhaseProgress, RequirementsDocument, StakeholderSectionComment, BusinessOwnerSubmission } from './types';
+import { Solution, Theme, ResolvedTheme, ServiceTemplate, ChatMessage, TableField, UserRole, ArtifactStatus, StakeholderReview, SolutionArtifact, AdminChecklistItem, DeveloperComment, DeveloperCommentSeverity, SharePermission, ProjectCollaborator, ProjectSharePermission, PhaseProgress, RequirementsDocument, StakeholderSectionComment, BusinessOwnerSubmission } from './types';
 import { INITIAL_SOLUTIONS } from './data/solutions';
 import { readUserRole, persistUserRole } from './constants/role';
 import { ArtifactView } from './components/ArtifactView';
@@ -31,6 +31,7 @@ import { SecurityReviewView } from './components/SecurityReviewView';
 import { SponsorReviewView } from './components/SponsorReviewView';
 import { ArtifactCardsPanel } from './components/ArtifactCardsPanel';
 import { ShareArtifactModal } from './components/ShareArtifactModal';
+import { ShareProjectModal } from './components/ShareProjectModal';
 import { CenterToast, type CenterToastData } from './components/CenterToast';
 import { DesignFeedbackWidget } from './components/DesignFeedbackWidget';
 import { WhatsNewModal, readWhatsNewDismissed } from './components/WhatsNewModal';
@@ -108,6 +109,11 @@ import {
   threadTitleFromMessage, nextUntitledFolderName, SEED_PROJECT_FOLDERS,
 } from './data/folders';
 import type { ProjectFolder } from './data/folders';
+import {
+  getCollaboratorsForSolution,
+  loadProjectCollaborators,
+  persistProjectCollaborators,
+} from './data/projectShares';
 import { getMitraResponse } from './utils/aiResponseHelper';
 import {
   approvalReceivedEvent,
@@ -336,6 +342,10 @@ export default function App() {
     Record<string, SolutionArtifact[]>
   >({});
   const [shareArtifactTarget, setShareArtifactTarget] = useState<SolutionArtifact | null>(null);
+  const [shareProjectTargetId, setShareProjectTargetId] = useState<string | null>(null);
+  const [projectCollaborators, setProjectCollaborators] = useState<ProjectCollaborator[]>(() =>
+    loadProjectCollaborators(),
+  );
   const [lastShareReviewId, setLastShareReviewId] = useState<string | null>(null);
   const [guestReviewId, setGuestReviewId] = useState<string | null>(() => parseGuestReviewFromHash());
   const [adminChecklist, setAdminChecklist] = useState<AdminChecklistItem[]>(() =>
@@ -379,6 +389,9 @@ export default function App() {
   const [artifactPanelCollapsed, setArtifactPanelCollapsed] = useState(readArtifactPanelCollapsed);
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(readLeftSidebarCollapsed);
   const [autoApprove, setAutoApprove] = useState(readAutoApprove);
+  const [isServerConnected, setIsServerConnected] = useState(
+    () => (typeof navigator !== 'undefined' ? navigator.onLine : true),
+  );
 
   const handleToggleArtifactPanelCollapse = useCallback(() => {
     setArtifactPanelCollapsed((prev) => {
@@ -407,6 +420,18 @@ export default function App() {
   const handleAutoApproveChange = useCallback((value: boolean) => {
     setAutoApprove(value);
     persistAutoApprove(value);
+  }, []);
+
+  useEffect(() => {
+    const syncConnectionState = () => setIsServerConnected(navigator.onLine);
+
+    window.addEventListener('online', syncConnectionState);
+    window.addEventListener('offline', syncConnectionState);
+
+    return () => {
+      window.removeEventListener('online', syncConnectionState);
+      window.removeEventListener('offline', syncConnectionState);
+    };
   }, []);
 
   type GenerationSession = {
@@ -696,6 +721,10 @@ export default function App() {
       localStorage.setItem('mitra_solutions', JSON.stringify(solutions));
     }
   }, [solutions]);
+
+  useEffect(() => {
+    persistProjectCollaborators(projectCollaborators);
+  }, [projectCollaborators]);
 
   
   // Header Interactive Panels
@@ -1245,6 +1274,53 @@ export default function App() {
     setShareArtifactTarget(artifact);
     setLastShareReviewId(null);
   };
+
+  const handleShareProject = useCallback((solutionId: string) => {
+    setShareProjectTargetId(solutionId);
+  }, []);
+
+  const handleInviteProjectCollaborator = useCallback(
+    ({ email, permission }: { email: string; permission: ProjectSharePermission }) => {
+      if (!shareProjectTargetId) return;
+      const solution = solutions.find((s) => s.id === shareProjectTargetId);
+      if (!solution) return;
+
+      const collaborator: ProjectCollaborator = {
+        id: `collab-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        solutionId: shareProjectTargetId,
+        email,
+        name: recipientNameFromEmail(email),
+        permission,
+        invitedAt: new Date().toISOString(),
+        invitedBy: ARCHITECT_DISPLAY_NAME,
+        status: 'pending',
+      };
+
+      setProjectCollaborators((prev) => [...prev, collaborator]);
+      showCenterToast(
+        `Invite sent to ${email} with ${permission} access.`,
+        `Shared ${solution.blueprint.title || solution.name}`,
+      );
+      pushNotification(
+        `${ARCHITECT_DISPLAY_NAME} invited ${email} to collaborate on ${solution.blueprint.title || solution.name}`,
+      );
+    },
+    [shareProjectTargetId, solutions],
+  );
+
+  const handleRemoveProjectCollaborator = useCallback(
+    (collaboratorId: string) => {
+      const removed = projectCollaborators.find((c) => c.id === collaboratorId);
+      setProjectCollaborators((prev) => prev.filter((c) => c.id !== collaboratorId));
+      if (removed) {
+        showCenterToast(
+          `${removed.email} no longer has access to this project.`,
+          'Collaborator removed',
+        );
+      }
+    },
+    [projectCollaborators],
+  );
 
   const handleUpdateRequirementsSection = useCallback(
     (artifactId: string, sectionId: string, body: string) => {
@@ -2350,7 +2426,6 @@ Pick a step below and I'll continue building — data model, scripts, and update
     <div className={`h-screen w-full flex relative ${
       `${resolvedTheme} bg-background text-foreground`
     } ${highContrast ? 'high-contrast' : ''} ${fontSizeLevel > 0 ? `font-size-level-${fontSizeLevel}` : ''} font-sans overflow-hidden`}>
-      
       <div
         className={`relative shrink-0 ${isLeftSidebarResizing ? 'select-none' : ''}`}
         style={{ width: effectiveLeftSidebarWidth }}
@@ -2572,8 +2647,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
                       activeSolutionId={activeSolutionId}
                       statusOverrides={artifactStatusOverrides}
                       dynamicArtifactsBySolution={dynamicArtifactsBySolution}
+                      projectCollaborators={projectCollaborators}
                       onSelectSolution={handleSelectSolution}
                       onSelectArtifact={handleArtifactPanelSelect}
+                      onShareProject={handleShareProject}
                       variant="browser"
                     />
                   </div>
@@ -2597,6 +2674,9 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   onStopGeneration={stopGeneration}
                   onChoiceSelect={handleChoiceSelect}
                   onNavigate={setActiveTab}
+                  onShareProject={() => handleShareProject(activeSolutionId)}
+                  projectCollaboratorCount={getCollaboratorsForSolution(projectCollaborators, activeSolutionId).length}
+                  isServerConnected={isServerConnected}
                 />
               </div>
               <ArtifactCardsPanel
@@ -2806,6 +2886,24 @@ Pick a step below and I'll continue building — data model, scripts, and update
         onPreviewGuest={handlePreviewGuest}
         pendingReviewId={lastShareReviewId}
         defaultAutoApprove={autoApprove}
+      />
+
+      <ShareProjectModal
+        theme={resolvedTheme}
+        isOpen={!!shareProjectTargetId}
+        solution={
+          shareProjectTargetId
+            ? visibleSolutions.find((s) => s.id === shareProjectTargetId) ?? null
+            : null
+        }
+        collaborators={
+          shareProjectTargetId
+            ? getCollaboratorsForSolution(projectCollaborators, shareProjectTargetId)
+            : []
+        }
+        onClose={() => setShareProjectTargetId(null)}
+        onInvite={handleInviteProjectCollaborator}
+        onRemove={handleRemoveProjectCollaborator}
       />
 
       <ApiKeyModal

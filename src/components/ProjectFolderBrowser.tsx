@@ -6,11 +6,14 @@ import {
   LayoutGrid,
   List,
   MessageSquare,
+  Share2,
+  Users,
 } from 'lucide-react';
 import { ProjectFolder } from '../data/folders';
 import { getArtifactsWithStatuses } from '../data/solutionArtifacts';
 import {
   ArtifactStatus,
+  ProjectCollaborator,
   Solution,
   SolutionArtifact,
   Theme,
@@ -42,8 +45,10 @@ export interface ProjectFolderBrowserProps {
   activeSolutionId?: string;
   statusOverrides?: Record<string, ArtifactStatus>;
   dynamicArtifactsBySolution?: Record<string, SolutionArtifact[]>;
+  projectCollaborators?: ProjectCollaborator[];
   onSelectSolution: (solutionId: string) => void;
   onSelectArtifact?: (artifactId: string, solutionId: string) => void;
+  onShareProject?: (solutionId: string) => void;
 }
 
 function formatDateLabel(value?: string, fallback = 'Recently updated'): string {
@@ -98,8 +103,10 @@ export function ProjectFolderBrowser({
   activeSolutionId,
   statusOverrides = {},
   dynamicArtifactsBySolution = {},
+  projectCollaborators = [],
   onSelectSolution,
   onSelectArtifact,
+  onShareProject,
 }: ProjectFolderBrowserProps) {
   const isDark = isDarkTheme(theme);
   const [path, setPath] = useState<BrowserLevel>({ kind: 'root' });
@@ -502,11 +509,47 @@ export function ProjectFolderBrowser({
     return `${projectArtifacts.length + 1} items`;
   })();
 
+  const shareableSolutionId =
+    path.kind === 'project' ? path.solutionId : undefined;
+  const shareableSolution = shareableSolutionId
+    ? solutions.find((s) => s.id === shareableSolutionId)
+    : undefined;
+  const collaboratorCount = shareableSolutionId
+    ? projectCollaborators.filter((c) => c.solutionId === shareableSolutionId).length
+    : 0;
+
   return (
     <div className="box-folder-browser flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {breadcrumb}
         <div className="flex items-center gap-3">
+          {shareableSolution && onShareProject && (
+            <button
+              type="button"
+              onClick={() => onShareProject(shareableSolution.id)}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                isDark
+                  ? 'border-white/[0.08] text-slate-300 hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-white'
+                  : 'border-border text-slate-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
+              )}
+              title="Share project"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Share
+              {collaboratorCount > 0 && (
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px]',
+                    isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                  )}
+                >
+                  <Users className="h-2.5 w-2.5" />
+                  {collaboratorCount}
+                </span>
+              )}
+            </button>
+          )}
           <span className="text-xs text-muted-foreground">{itemCountLabel}</span>
           {viewToggle}
         </div>

@@ -274,15 +274,17 @@ export default function Sidebar({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="truncate text-[15px] font-semibold tracking-tight text-sidebar-foreground/90">
-                Mitra
-              </span>
-              {version === 'v3' && (
-                <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[#00ff66] border border-emerald-500/20 animate-pulse font-mono leading-none">
-                  v3 Beta
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="truncate text-[15px] font-semibold tracking-tight text-sidebar-foreground/90">
+                  Mitra
                 </span>
-              )}
+                {version === 'v3' && (
+                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[#00ff66] border border-emerald-500/20 animate-pulse font-mono leading-none">
+                    v3 Beta
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-0.5">

@@ -41,6 +41,20 @@ export type FolderStatus =
 
 export type SharePermission = 'view' | 'comment' | 'approve';
 
+/** Project-level access when sharing a solution from the Projects tab */
+export type ProjectSharePermission = 'view' | 'edit';
+
+export interface ProjectCollaborator {
+  id: string;
+  solutionId: string;
+  email: string;
+  name?: string;
+  permission: ProjectSharePermission;
+  invitedAt: string;
+  invitedBy: string;
+  status: 'pending' | 'active';
+}
+
 export type ArtifactType =
   | 'requirements_doc'
   | 'user_stories'
