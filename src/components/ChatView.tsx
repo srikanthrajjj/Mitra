@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Send, Bot, Sparkles, Terminal, Copy, Check, Paperclip, Plus, ArrowLeft,
+  Send, Bot, Sparkles, Copy, Check, Paperclip, ArrowLeft,
   Building2, DollarSign, Factory, Cpu, Layers, Settings, ShieldAlert, Heart,
-  Code, FileText, BarChart3, Lightbulb, Eye, Users, ArrowUp, Search, MessageSquare, 
+  Code, FileText, BarChart3, Lightbulb, Users, ArrowUp, Search, MessageSquare, 
   ArrowUpFromLine, Wand2, ArrowRight, Mic, Zap, Square, ClipboardList, Share2,
   ThumbsUp, ThumbsDown, Volume2
 } from 'lucide-react';
@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils';
 import { isDarkTheme } from '../utils/theme';
 import { USER_DISPLAY_NAME, USER_INITIALS } from '../constants/user';
 import { MitraLogo } from './MitraLogo';
-import { ASSISTANT_LABEL } from '../constants/organization';
 import StarterPromptsList from './StarterPromptsList';
 import { ColdStartEntryChips } from './ColdStartEntryChips';
 import { DiscoveryAppSuggestionChips } from './DiscoveryAppSuggestionChips';
@@ -19,8 +18,17 @@ import {
   shouldShowDiscoveryAppSuggestions,
 } from '../constants/discoverySuggestions';
 import StructuredMarkdown from './StructuredMarkdown';
-import { isDemoMode, setDemoMode } from '../utils/demoMode';
 import SimulationComposerStack from './SimulationComposerStack';
+import { ComposerModeSelect } from './ComposerModeSelect';
+import { ComposerInstanceSelect } from './ComposerInstanceSelect';
+import {
+  loadSelectedInstanceId,
+  persistSelectedInstanceId,
+} from '../data/serviceNowInstances';
+import {
+  ComposerModeId,
+  getComposerModePlaceholder,
+} from '../constants/composerModes';
 import MitraThinkingIndicator from './MitraThinkingIndicator';
 import { MitraTodos } from './MitraTodos';
 import { SmoothStreamingText } from './SmoothStreamingText';
@@ -221,17 +229,14 @@ export default function ChatView({
 }: ChatViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
-  const [composerMode, setComposerMode] = useState<'plan' | 'build'>('plan');
+  const [composerMode, setComposerMode] = useState<ComposerModeId>('plan');
   const [isFocused, setIsFocused] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [useLocalOnly, setUseLocalOnly] = useState(() => isDemoMode());
+  const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
-  const optionsRef = useRef<HTMLDivElement>(null);
 
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
@@ -297,22 +302,9 @@ export default function ChatView({
     }
   }, [inputValue]);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
-        setMoreOptionsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const toggleEngine = () => {
-    const newVal = !useLocalOnly;
-    setUseLocalOnly(newVal);
-    setDemoMode(newVal);
+  const handleSelectInstance = (instanceId: string) => {
+    setSelectedInstanceId(instanceId);
+    persistSelectedInstanceId(instanceId);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -395,11 +387,10 @@ export default function ChatView({
     : '';
   const composerPlaceholder = isGeneratingMessage
     ? 'Mitra is thinking…'
-    : composerMode === 'plan'
-      ? 'Plan the workflow, architecture, or implementation approach…'
-      : isEmptyChat
-        ? 'Describe what you want to build…'
-        : 'What should Mitra build next?';
+    : getComposerModePlaceholder(
+        composerMode,
+        isEmptyChat ? 'Describe your ServiceNow requirement…' : 'What should Mitra do next?',
+      );
 
   const streamSignature = messages.map((m) => m.text.length).join('|');
 
@@ -913,131 +904,11 @@ export default function ChatView({
       {/* Composer — pinned below scroll area so responses stay visible above */}
       <div className="shrink-0 px-4 pt-2 pb-4 z-20 relative border-t border-transparent">
         <div className="max-w-3xl mx-auto w-full relative z-20">
-          {/* Floating More Options Popover */}
-          {moreOptionsOpen && (
-            <div 
-              ref={optionsRef}
-              className={`absolute bottom-full left-3 mb-2 p-1.5 rounded-2xl border shadow-xl flex flex-col gap-1 w-[240px] z-50 animate-fade-in ${
-                isDark ? 'bg-popover border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.4)]' : 'bg-white border-slate-200 text-slate-700 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'
-              }`}
-            >
-              <div className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border-b mb-1 ${
-                isDark ? 'text-muted-foreground border-border/70' : 'text-slate-400 border-slate-100'
-              }`}>
-                {ASSISTANT_LABEL}
-              </div>
-
-              {/* Option 1: Create Incident */}
-              <button
-                type="button"
-                onClick={() => {
-                  setInputValue('Create a new incident ticket regarding ');
-                  setMoreOptionsOpen(false);
-                }}
-                className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-muted text-foreground hover:text-foreground' : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                }`}
-              >
-                <ShieldAlert className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs font-semibold">Create Incident</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5 leading-normal">Submit a new incident ticket</div>
-                </div>
-              </button>
-
-              {/* Option 2: Check Ticket Status */}
-              <button
-                type="button"
-                onClick={() => {
-                  setInputValue('Check status of ticket ');
-                  setMoreOptionsOpen(false);
-                }}
-                className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-muted text-foreground hover:text-foreground' : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                }`}
-              >
-                <Eye className="w-4 h-4 text-brand-green mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs font-semibold">Check Ticket Status</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5 leading-normal">Retrieve active ticket update</div>
-                </div>
-              </button>
-
-              {/* Option 3: Search Knowledge Base */}
-              <button
-                type="button"
-                onClick={() => {
-                  setInputValue('Search knowledge base articles for ');
-                  setMoreOptionsOpen(false);
-                }}
-                className={`w-full flex items-start gap-2.5 p-2 rounded-xl text-left transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-muted text-foreground hover:text-foreground' : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                }`}
-              >
-                <FileText className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs font-semibold">Search Knowledge Articles</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5 leading-normal">Query self-service solutions</div>
-                </div>
-              </button>
-
-              <div className={`border-t my-1 ${isDark ? 'border-border/70' : 'border-slate-100'}`} />
-
-              {/* Option 4: Command Console */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!inputValue.startsWith('/')) {
-                    setInputValue('/' + inputValue);
-                  }
-                  setMoreOptionsOpen(false);
-                }}
-                className={`w-full flex items-center gap-2.5 p-2 rounded-xl text-left text-xs font-semibold transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-muted text-foreground hover:text-foreground' : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                }`}
-              >
-                <Terminal className="w-4 h-4 text-slate-400 shrink-0" />
-                <span>Command Console</span>
-              </button>
-
-              {/* Option 5: Toggle AI Engine */}
-              <button
-                type="button"
-                onClick={() => {
-                  toggleEngine();
-                  setMoreOptionsOpen(false);
-                }}
-                className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-semibold transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-muted text-foreground hover:text-foreground' : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Sparkles className="w-4 h-4 text-brand-green shrink-0" />
-                  <span>AI Engine</span>
-                </div>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                  useLocalOnly 
-                    ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
-                    : 'bg-emerald-500/10 text-brand-green border border-emerald-500/20'
-                }`}>
-                  {useLocalOnly ? 'Demo' : 'Live API'}
-                </span>
-              </button>
-            </div>
-          )}
-
           <SimulationComposerStack
             theme={theme}
             inputId="tour-input-bar"
-            cardClassName={`transition-colors duration-300 overflow-visible ${
-              inputValue.trim().length > 0
-                ? 'input-active-glow' + (isDark ? '' : ' light')
-                : showInviteGlow
-                  ? 'input-invite-glow' + (isDark ? '' : ' light')
-                  : isDark
-                    ? 'border-border hover:border-border/80'
-                    : 'border-[#eaecf0]/60 hover:border-emerald-300'
-            } ${
+            isActive={isFocused || inputValue.trim().length > 0}
+            cardClassName={`transition-colors duration-200 overflow-visible ${
               inputValue.trim().length > 0
                 ? isDark
                   ? 'bg-mitra-input'
@@ -1047,8 +918,8 @@ export default function ChatView({
                     ? 'vr-glass-surface'
                     : 'bg-white'
                   : isDark
-                    ? 'vr-glass-surface hover:bg-mitra-highlight/30'
-                    : 'bg-[#f3f4f6] hover:bg-[#eef2f6]'
+                    ? 'vr-glass-surface'
+                    : 'bg-[#f3f4f6]'
             }`}
           >
             <div className="flex flex-col p-3 relative overflow-visible">
@@ -1091,25 +962,49 @@ export default function ChatView({
             />
 
             {/* Bottom Actions Row */}
-            <div className="flex items-center justify-between mt-2 pt-2 px-1">
-              {/* Left Side elements */}
-              <div className="flex items-center gap-2">
-                {/* Plus options button */}
+            <div className="mt-2 grid grid-cols-3 items-center pt-2 px-1">
+              <div className="flex items-center gap-2 justify-self-start">
+                <ComposerInstanceSelect
+                  theme={theme}
+                  value={selectedInstanceId}
+                  onChange={handleSelectInstance}
+                  disabled={isGeneratingMessage}
+                />
+                <ComposerModeSelect
+                  theme={theme}
+                  value={composerMode}
+                  onChange={setComposerMode}
+                  disabled={isGeneratingMessage}
+                />
+              </div>
+
+              <div
+                className={`inline-flex items-center justify-center gap-1 justify-self-center text-[10px] ${
+                  isDark ? 'text-slate-500' : 'text-slate-400'
+                }`}
+                aria-label={isServerConnected ? 'Connected' : 'Offline'}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
+                  }`}
+                  aria-hidden="true"
+                />
+                <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
+              </div>
+
+              <div className="flex items-center gap-2 justify-self-end">
                 <button
                   type="button"
-                  onClick={() => setMoreOptionsOpen(!moreOptionsOpen)}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    moreOptionsOpen
-                      ? isDark ? 'bg-muted text-foreground' : 'bg-slate-200 text-slate-800'
-                      : isDark 
-                        ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
-                        : 'text-slate-555 hover:text-slate-800 hover:bg-slate-200'
+                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                    isDark 
+                      ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
+                      : 'text-slate-555 hover:text-slate-800 hover:bg-slate-200'
                   }`}
-                  title="More Actions"
+                  title="Voice Input"
                 >
-                  <Plus className={`w-4 h-4 transition-transform duration-250 ${moreOptionsOpen ? 'rotate-45 text-brand-green' : ''}`} />
+                  <Mic className="w-4 h-4" />
                 </button>
-                {/* File Attachment Button */}
                 <button
                   type="button"
                   disabled={isGeneratingMessage}
@@ -1122,60 +1017,6 @@ export default function ChatView({
                   title="Attach Document"
                 >
                   <Paperclip className="w-4 h-4" />
-                </button>
-                <div className="flex items-center gap-1 rounded-full border border-border/60 px-1 py-0.5">
-                  {(['plan', 'build'] as const).map((mode) => {
-                    const active = composerMode === mode;
-                    return (
-                      <button
-                        key={mode}
-                        type="button"
-                        onClick={() => setComposerMode(mode)}
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize transition-colors ${
-                          active
-                            ? isDark
-                              ? 'bg-white/[0.08] text-slate-100'
-                              : 'bg-slate-200 text-slate-900'
-                            : isDark
-                              ? 'text-slate-500 hover:text-slate-300'
-                              : 'text-slate-400 hover:text-slate-700'
-                        }`}
-                        aria-pressed={active}
-                      >
-                        {mode}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div
-                  className={`inline-flex items-center gap-1 text-[10px] ${
-                    isDark ? 'text-slate-500' : 'text-slate-400'
-                  }`}
-                  aria-label={isServerConnected ? 'Connected' : 'Offline'}
-                >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
-                    }`}
-                    aria-hidden="true"
-                  />
-                  <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
-                </div>
-              </div>
-
-              {/* Right Side elements */}
-              <div className="flex items-center gap-2">
-                {/* Mic icon button */}
-                <button
-                  type="button"
-                  className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                    isDark 
-                      ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
-                      : 'text-slate-555 hover:text-slate-800 hover:bg-slate-200'
-                  }`}
-                  title="Voice Input"
-                >
-                  <Mic className="w-4 h-4" />
                 </button>
 
                 {isGeneratingMessage ? (

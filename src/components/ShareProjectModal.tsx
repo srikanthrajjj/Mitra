@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Mail, Trash2, UserPlus, Users, X } from 'lucide-react';
+import { Trash2, UserPlus, Users, X } from 'lucide-react';
 import { ProjectCollaborator, ProjectSharePermission, Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { ARCHITECT_DISPLAY_NAME } from '../constants/role';
-import { USER_DISPLAY_NAME } from '../constants/user';
+import { USER_DISPLAY_NAME, USER_EMAIL } from '../constants/user';
+import { getAvailableTeamMembers } from '../data/internalTeamMembers';
+import { SelectNative } from '@/src/components/ui/select-native';
 import { cn } from '@/lib/utils';
 
 interface ShareProjectModalProps {
@@ -13,7 +15,7 @@ interface ShareProjectModalProps {
   solution: Solution | null;
   collaborators: ProjectCollaborator[];
   onClose: () => void;
-  onInvite: (params: { email: string; permission: ProjectSharePermission }) => void;
+  onAddMember: (params: { memberId: string; permission: ProjectSharePermission }) => void;
   onRemove: (collaboratorId: string) => void;
 }
 
@@ -35,7 +37,7 @@ function initialsFromEmail(email: string, name?: string): string {
   return local.slice(0, 2).toUpperCase();
 }
 
-function formatInvitedAt(value: string): string {
+function formatAddedAt(value: string): string {
   try {
     return new Intl.DateTimeFormat(undefined, {
       month: 'short',
@@ -52,21 +54,32 @@ export function ShareProjectModal({
   solution,
   collaborators,
   onClose,
-  onInvite,
+  onAddMember,
   onRemove,
 }: ShareProjectModalProps) {
   const isDark = isDarkTheme(theme);
-  const [email, setEmail] = useState('');
+  const [selectedMemberId, setSelectedMemberId] = useState('');
   const [permission, setPermission] = useState<ProjectSharePermission>('view');
-  const [inviteError, setInviteError] = useState('');
+  const [addError, setAddError] = useState('');
+
+  const availableMembers = useMemo(
+    () => getAvailableTeamMembers(collaborators, USER_EMAIL),
+    [collaborators],
+  );
 
   useEffect(() => {
     if (!isOpen) {
-      setEmail('');
+      setSelectedMemberId('');
       setPermission('view');
-      setInviteError('');
+      setAddError('');
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!availableMembers.some((member) => member.id === selectedMemberId)) {
+      setSelectedMemberId('');
+    }
+  }, [availableMembers, selectedMemberId]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -80,25 +93,16 @@ export function ShareProjectModal({
   if (!isOpen || !solution) return null;
 
   const projectTitle = solution.blueprint.title || solution.name;
-  const normalizedEmail = email.trim().toLowerCase();
-  const alreadyInvited = collaborators.some(
-    (c) => c.email.toLowerCase() === normalizedEmail,
-  );
 
-  const handleInvite = () => {
-    if (!normalizedEmail) return;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      setInviteError('Enter a valid email address.');
+  const handleAddMember = () => {
+    if (!selectedMemberId) {
+      setAddError('Select a team member to share with.');
       return;
     }
-    if (alreadyInvited) {
-      setInviteError('This user already has access.');
-      return;
-    }
-    onInvite({ email: normalizedEmail, permission });
-    setEmail('');
+    onAddMember({ memberId: selectedMemberId, permission });
+    setSelectedMemberId('');
     setPermission('view');
-    setInviteError('');
+    setAddError('');
   };
 
   return createPortal(
@@ -123,7 +127,7 @@ export function ShareProjectModal({
                   {projectTitle}
                 </h2>
                 <p className={cn('mt-1 text-xs', isDark ? 'text-slate-400' : 'text-slate-500')}>
-                  Invite teammates to collaborate on this project.
+                  Share with teammates already on this instance.
                 </p>
               </div>
               <button
@@ -141,33 +145,35 @@ export function ShareProjectModal({
 
           <div className="flex-1 space-y-5 overflow-y-auto p-6 pt-4">
             <div className="space-y-3">
-              <label className={cn('block text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}>
-                Invite by email
+              <label
+                htmlFor="share-team-member"
+                className={cn('block text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}
+              >
+                Team member
               </label>
-              <div className="relative">
-                <Mail className={cn('pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2', isDark ? 'text-slate-500' : 'text-slate-400')} />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (inviteError) setInviteError('');
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleInvite();
-                    }
-                  }}
-                  placeholder="colleague@company.com"
-                  className={cn(
-                    'h-9 w-full rounded-md border pl-8 pr-3 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring',
-                    isDark
-                      ? 'border-border bg-mitra-input text-foreground placeholder:text-muted-foreground focus:border-brand-green/40'
-                      : 'border-input bg-background text-slate-900 placeholder:text-slate-400',
-                  )}
-                />
-              </div>
+              <SelectNative
+                id="share-team-member"
+                value={selectedMemberId}
+                onChange={(e) => {
+                  setSelectedMemberId(e.target.value);
+                  if (addError) setAddError('');
+                }}
+                disabled={availableMembers.length === 0}
+                className={cn(
+                  isDark
+                    ? 'border-border bg-mitra-input text-foreground focus-visible:ring-brand-green/30'
+                    : 'border-input bg-background text-slate-900',
+                )}
+              >
+                <option value="" disabled>
+                  {availableMembers.length === 0 ? 'All team members already added' : 'Select a team member'}
+                </option>
+                {availableMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name} · {member.role}
+                  </option>
+                ))}
+              </SelectNative>
 
               <div className="grid grid-cols-2 gap-2">
                 {PERMISSIONS.map((p) => (
@@ -192,18 +198,18 @@ export function ShareProjectModal({
                 ))}
               </div>
 
-              {inviteError && (
-                <p className="text-[11px] text-destructive">{inviteError}</p>
+              {addError && (
+                <p className="text-[11px] text-destructive">{addError}</p>
               )}
 
               <button
                 type="button"
-                onClick={handleInvite}
-                disabled={!normalizedEmail || alreadyInvited}
+                onClick={handleAddMember}
+                disabled={!selectedMemberId || availableMembers.length === 0}
                 className="btn-cta inline-flex h-9 w-full items-center justify-center gap-1.5 text-sm transition-all disabled:pointer-events-none disabled:opacity-50"
               >
                 <UserPlus className="h-3.5 w-3.5" />
-                Send invite
+                Add to project
               </button>
             </div>
 
@@ -250,7 +256,7 @@ export function ShareProjectModal({
 
                 {collaborators.length === 0 ? (
                   <p className={cn('py-3 text-center text-[11px]', isDark ? 'text-slate-500' : 'text-slate-400')}>
-                    No collaborators yet. Invite someone above.
+                    No collaborators yet. Add a team member above.
                   </p>
                 ) : (
                   collaborators.map((collab) => (
@@ -276,8 +282,7 @@ export function ShareProjectModal({
                         <p className={cn('truncate text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>
                           {collab.name ? collab.email : ''}
                           {collab.name ? ' · ' : ''}
-                          Invited {formatInvitedAt(collab.invitedAt)}
-                          {collab.status === 'pending' ? ' · Pending' : ''}
+                          Added {formatAddedAt(collab.invitedAt)}
                         </p>
                       </div>
                       <span
@@ -297,7 +302,7 @@ export function ShareProjectModal({
                             ? 'text-slate-400 hover:bg-destructive/15 hover:text-destructive'
                             : 'text-slate-500 hover:bg-red-50 hover:text-red-600',
                         )}
-                        aria-label={`Remove ${collab.email}`}
+                        aria-label={`Remove ${collab.name || collab.email}`}
                         title="Remove access"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

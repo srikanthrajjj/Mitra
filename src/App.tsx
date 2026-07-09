@@ -114,6 +114,7 @@ import {
   loadProjectCollaborators,
   persistProjectCollaborators,
 } from './data/projectShares';
+import { getInternalTeamMember } from './data/internalTeamMembers';
 import { getMitraResponse } from './utils/aiResponseHelper';
 import {
   approvalReceivedEvent,
@@ -1280,29 +1281,30 @@ export default function App() {
   }, []);
 
   const handleInviteProjectCollaborator = useCallback(
-    ({ email, permission }: { email: string; permission: ProjectSharePermission }) => {
+    ({ memberId, permission }: { memberId: string; permission: ProjectSharePermission }) => {
       if (!shareProjectTargetId) return;
       const solution = solutions.find((s) => s.id === shareProjectTargetId);
-      if (!solution) return;
+      const member = getInternalTeamMember(memberId);
+      if (!solution || !member) return;
 
       const collaborator: ProjectCollaborator = {
         id: `collab-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         solutionId: shareProjectTargetId,
-        email,
-        name: recipientNameFromEmail(email),
+        email: member.email,
+        name: member.name,
         permission,
         invitedAt: new Date().toISOString(),
         invitedBy: ARCHITECT_DISPLAY_NAME,
-        status: 'pending',
+        status: 'active',
       };
 
       setProjectCollaborators((prev) => [...prev, collaborator]);
       showCenterToast(
-        `Invite sent to ${email} with ${permission} access.`,
+        `${member.name} now has ${permission} access.`,
         `Shared ${solution.blueprint.title || solution.name}`,
       );
       pushNotification(
-        `${ARCHITECT_DISPLAY_NAME} invited ${email} to collaborate on ${solution.blueprint.title || solution.name}`,
+        `${ARCHITECT_DISPLAY_NAME} shared ${solution.blueprint.title || solution.name} with ${member.name}`,
       );
     },
     [shareProjectTargetId, solutions],
@@ -2903,7 +2905,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
             : []
         }
         onClose={() => setShareProjectTargetId(null)}
-        onInvite={handleInviteProjectCollaborator}
+        onAddMember={handleInviteProjectCollaborator}
         onRemove={handleRemoveProjectCollaborator}
       />
 
