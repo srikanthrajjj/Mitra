@@ -27,6 +27,7 @@ interface HomeViewProps {
   onSelectAction: (actionType: HomeActionType) => void;
   onSendMessage: (text: string) => void;
   isServerConnected?: boolean;
+  onCreateConnection?: () => void;
 }
 
 export default function HomeView({
@@ -35,6 +36,7 @@ export default function HomeView({
   onSelectAction,
   onSendMessage,
   isServerConnected = true,
+  onCreateConnection,
 }: HomeViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
@@ -228,6 +230,7 @@ export default function HomeView({
                       theme={theme}
                       value={selectedInstanceId}
                       onChange={handleSelectInstance}
+                      onCreateConnection={onCreateConnection}
                     />
                     <ComposerModeSelect
                       theme={theme}

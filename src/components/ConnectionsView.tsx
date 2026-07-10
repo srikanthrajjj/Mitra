@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 
 interface ConnectionsViewProps {
   theme: Theme;
+  createConnectionNonce?: number;
 }
 
 interface ConnectionData {
@@ -28,7 +29,7 @@ interface ConnectionData {
   updatedAt: string;
 }
 
-export default function ConnectionsView({ theme }: ConnectionsViewProps) {
+export default function ConnectionsView({ theme, createConnectionNonce = 0 }: ConnectionsViewProps) {
   const isDark = isDarkTheme(theme);
 
   // Initial connections seed matching the screenshot
@@ -151,6 +152,11 @@ export default function ConnectionsView({ theme }: ConnectionsViewProps) {
     setFormPassword('');
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    if (!createConnectionNonce) return;
+    handleAddClick();
+  }, [createConnectionNonce]);
 
   // Open "Edit Connection" Modal
   const handleEditClick = (conn: ConnectionData) => {

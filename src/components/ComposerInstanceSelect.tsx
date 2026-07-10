@@ -22,6 +22,7 @@ interface ComposerInstanceSelectProps {
   instances?: ServiceNowInstance[];
   value: string;
   onChange: (instanceId: string) => void;
+  onCreateConnection?: () => void;
   disabled?: boolean;
 }
 
@@ -30,6 +31,7 @@ export function ComposerInstanceSelect({
   instances = SERVICE_NOW_INSTANCES,
   value,
   onChange,
+  onCreateConnection,
   disabled = false,
 }: ComposerInstanceSelectProps) {
   const isDark = isDarkTheme(theme);
@@ -174,6 +176,26 @@ export function ComposerInstanceSelect({
             </DropdownMenuItem>
           );
         })}
+        {onCreateConnection && (
+          <>
+            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+            <DropdownMenuItem
+              onClick={() => {
+                setOpen(false);
+                onCreateConnection();
+              }}
+              className={cn(
+                'cursor-pointer rounded-lg px-2.5 py-2 text-xs font-medium outline-none',
+                isDark
+                  ? 'text-brand-green focus:bg-brand-green/10 focus:text-brand-green'
+                  : 'text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700',
+              )}
+            >
+              <Plus className="mr-2 h-3.5 w-3.5" />
+              Create connection
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

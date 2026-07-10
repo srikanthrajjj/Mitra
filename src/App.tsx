@@ -347,6 +347,7 @@ export default function App() {
   const [projectCollaborators, setProjectCollaborators] = useState<ProjectCollaborator[]>(() =>
     loadProjectCollaborators(),
   );
+  const [createConnectionNonce, setCreateConnectionNonce] = useState(0);
   const [lastShareReviewId, setLastShareReviewId] = useState<string | null>(null);
   const [guestReviewId, setGuestReviewId] = useState<string | null>(() => parseGuestReviewFromHash());
   const [adminChecklist, setAdminChecklist] = useState<AdminChecklistItem[]>(() =>
@@ -1279,6 +1280,11 @@ export default function App() {
   const handleShareProject = useCallback((solutionId: string) => {
     setShareProjectTargetId(solutionId);
   }, []);
+
+  const handleOpenCreateConnection = useCallback(() => {
+    setCreateConnectionNonce((nonce) => nonce + 1);
+    setActiveTab('connections');
+  }, [setActiveTab]);
 
   const handleInviteProjectCollaborator = useCallback(
     ({ memberId, permission }: { memberId: string; permission: ProjectSharePermission }) => {
@@ -2540,6 +2546,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 handleNewChat(undefined, text);
               }}
               isServerConnected={isServerConnected}
+              onCreateConnection={handleOpenCreateConnection}
             />
           )}
 
@@ -2677,6 +2684,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   onStopGeneration={stopGeneration}
                   onChoiceSelect={handleChoiceSelect}
                   onNavigate={setActiveTab}
+                  onCreateConnection={handleOpenCreateConnection}
                   onShareProject={() => handleShareProject(activeSolutionId)}
                   projectCollaboratorCount={getCollaboratorsForSolution(projectCollaborators, activeSolutionId).length}
                   isServerConnected={isServerConnected}
@@ -2745,6 +2753,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           {activeTab === 'connections' && (
             <ConnectionsView 
               theme={resolvedTheme}
+              createConnectionNonce={createConnectionNonce}
             />
           )}
 

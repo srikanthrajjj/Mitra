@@ -42,6 +42,7 @@ interface ChatViewProps {
   onStopGeneration?: () => void;
   onChoiceSelect?: (messageId: string, choice: string) => void;
   onNavigate?: (tab: string) => void;
+  onCreateConnection?: () => void;
   onShareProject?: () => void;
   projectCollaboratorCount?: number;
   isServerConnected?: boolean;
@@ -223,6 +224,7 @@ export default function ChatView({
   onStopGeneration,
   onChoiceSelect,
   onNavigate,
+  onCreateConnection,
   onShareProject,
   projectCollaboratorCount = 0,
   isServerConnected = true,
@@ -968,6 +970,7 @@ export default function ChatView({
                   theme={theme}
                   value={selectedInstanceId}
                   onChange={handleSelectInstance}
+                  onCreateConnection={onCreateConnection}
                   disabled={isGeneratingMessage}
                 />
                 <ComposerModeSelect
