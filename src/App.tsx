@@ -10,6 +10,8 @@ import { TooltipProvider } from './components/ui/tooltip';
 import ChatView from './components/ChatView';
 import HomeView from './components/HomeView';
 import ProjectNavigationPanel from './components/ProjectNavigationPanel';
+import ProjectsView from './components/ProjectsView';
+import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
 import { SearchView } from './components/SearchView';
@@ -2647,24 +2649,13 @@ Pick a step below and I'll continue building — data model, scripts, and update
           {activeTab === 'projects' && (
             <div className="flex min-h-0 min-w-0 w-full flex-1 overflow-hidden">
               {!activeSolution ? (
-                <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
-                  <div className="mx-auto w-full max-w-5xl">
-                    <ProjectNavigationPanel
-                      theme={resolvedTheme}
-                      userRole={userRole}
-                      folders={folders}
-                      solutions={visibleSolutions}
-                      activeSolutionId={activeSolutionId}
-                      statusOverrides={artifactStatusOverrides}
-                      dynamicArtifactsBySolution={dynamicArtifactsBySolution}
-                      projectCollaborators={projectCollaborators}
-                      onSelectSolution={handleSelectSolution}
-                      onSelectArtifact={handleArtifactPanelSelect}
-                      onShareProject={handleShareProject}
-                      variant="browser"
-                    />
-                  </div>
-                </div>
+                <ProjectsView
+                  theme={resolvedTheme}
+                  solutions={visibleSolutions}
+                  activeSolutionId={activeSolutionId}
+                  onSelectSolution={handleSelectSolution}
+                  onNewProject={() => setIsNewModalOpen(true)}
+                />
               ) : (
                 <>
               <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -2878,11 +2869,45 @@ Pick a step below and I'll continue building — data model, scripts, and update
         onToggleFavorite={handleToggleFavorite}
       />
 
-      <NewSolutionModal 
+      <NewProjectModal
         theme={resolvedTheme}
         isOpen={isNewModalOpen}
         onClose={() => setIsNewModalOpen(false)}
-        onCreateSolution={handleCreateSolution}
+        onCreateProject={(data) => {
+          const newId = `sol-${Date.now()}`;
+          const initialAiMessage: ChatMessage = {
+            id: `initial-ai-${Date.now()}`,
+            sender: 'mitra',
+            text: `Hello! I've created your new project: **${data.name}**.\n\n${data.description ? `**Description:** ${data.description}\n\n` : ''}Describe what you'd like to build and I'll help you get started!`,
+            timestamp: new Date(),
+          };
+
+          const newSolution: Solution = {
+            id: newId,
+            name: data.name,
+            description: data.description || 'New project',
+            createdAt: 'Just now',
+            active: true,
+            blueprint: enrichBlueprintStudio({
+              id: `bp-${newId}`,
+              title: data.name,
+              description: data.description || 'New project',
+              status: 'not_started',
+              discoveredRequirements: [],
+              architectureSteps: [],
+              tables: [],
+            }),
+            chatHistory: [initialAiMessage],
+          };
+
+          setSolutions((prev) => [
+            newSolution,
+            ...prev.map((sol) => ({ ...sol, active: false })),
+          ]);
+          setActiveSolutionId(newId);
+          setSelectedSidebarId(newId);
+          setActiveTab('projects');
+        }}
       />
 
       <ShareArtifactModal

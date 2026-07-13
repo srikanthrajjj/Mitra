@@ -1,255 +1,172 @@
-import React, { useState, useMemo } from 'react';
-import {
-  Search, X, Folder, FolderPlus, Plus, ChevronRight,
-  MessageSquare, MoreHorizontal, ArrowLeft,
-} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Search, Plus, FolderOpen } from 'lucide-react';
 import { Solution, Theme } from '../types';
-import { ConversationStatusDot } from './ConversationStatusDot';
-import { deriveConversationStatus } from '../utils/conversationStatus';
 import { isDarkTheme } from '../utils/theme';
-import { ProjectFolder, getSolutionFolderId } from '../data/folders';
+import { cn } from '@/lib/utils';
+
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  building: { label: 'Building', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
+  in_review: { label: 'In Review', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
+  ready_to_deploy: { label: 'Ready', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
+  deployed: { label: 'Active', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
+};
+
+type Filter = 'all' | 'mine' | 'shared';
 
 interface ProjectsViewProps {
   theme: Theme;
-  folders: ProjectFolder[];
   solutions: Solution[];
-  activeSolutionId: string;
+  activeSolutionId?: string;
   onSelectSolution: (solutionId: string) => void;
-  onCreateFolder: () => void;
-  onNewChat: (folderId?: string) => void;
-  generatingSolutionId?: string | null;
+  onNewProject: () => void;
 }
 
 export default function ProjectsView({
   theme,
-  folders,
   solutions,
   activeSolutionId,
   onSelectSolution,
-  onCreateFolder,
-  onNewChat,
-  generatingSolutionId = null,
+  onNewProject,
 }: ProjectsViewProps) {
   const isDark = isDarkTheme(theme);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
 
-  const filteredSolutions = useMemo(
-    () =>
-      solutions.filter(
-        (sol) =>
-          sol.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          sol.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
-    [solutions, searchQuery]
-  );
-
-  const getFolderSolutions = (folderId: string) =>
-    filteredSolutions.filter(
-      (sol) =>
-        sol.folderId === folderId
-    );
-
-  const currentFolder = currentFolderId
-    ? folders.find((f) => f.id === currentFolderId)
-    : null;
-
-  const folderContents = currentFolderId ? getFolderSolutions(currentFolderId) : [];
-
-  const visibleFolders = folders.filter((folder) => {
-    if (!searchQuery) return true;
-    const items = getFolderSolutions(folder.id);
-    return items.length > 0 || folder.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
-
-  const openFolder = (folderId: string) => {
-    setCurrentFolderId(folderId);
-    setSearchQuery('');
-  };
-
-  const goToRoot = () => {
-    setCurrentFolderId(null);
-    setSearchQuery('');
-  };
-
-  const handleSelectThread = (solutionId: string) => {
-    const sol = solutions.find((s) => s.id === solutionId);
-    if (sol) {
-      setCurrentFolderId(getSolutionFolderId(sol.folderId));
+  const filtered = useMemo(() => {
+    let list = solutions;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q),
+      );
     }
-    onSelectSolution(solutionId);
-  };
-
-  const rowHover = isDark ? 'hover:bg-mitra-highlight/70' : 'hover:bg-emerald-50/80';
-  const divider = isDark ? 'border-white/[0.06]' : 'border-slate-200';
+    return list;
+  }, [solutions, search]);
 
   return (
-    <div
-      className={`w-[300px] xl:w-[340px] shrink-0 flex flex-col h-full border-r overflow-hidden ${
-        isDark ? 'bg-mitra-sidebar border-white/[0.06]' : 'bg-white border-slate-200'
-      }`}
-    >
-      {/* Toolbar */}
-      <div className={`shrink-0 px-4 py-4 border-b ${divider}`}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5 min-w-0">
-            {currentFolder ? (
-              <>
-                <button
-                  onClick={goToRoot}
-                  className={`p-1 rounded transition-colors cursor-pointer shrink-0 ${
-                    isDark ? 'text-slate-400 hover:text-white hover:bg-mitra-highlight' : 'text-slate-500 hover:bg-slate-100'
-                  }`}
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                </button>
-                <nav className="flex items-center gap-0.5 text-[12px] min-w-0">
-                  <button
-                    onClick={goToRoot}
-                    className={`truncate cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
-                  >
-                    Folders
-                  </button>
-                  <ChevronRight className={`w-3 h-3 shrink-0 ${isDark ? 'text-slate-600' : 'text-slate-400'}`} />
-                  <span className={`font-semibold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {currentFolder?.name}
-                  </span>
-                </nav>
-              </>
-            ) : (
-              <h2 className={`text-[15px] font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Folders
-              </h2>
-            )}
-          </div>
-          <div className="flex items-center gap-0.5 shrink-0">
-            <button
-              onClick={onCreateFolder}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${
-                isDark ? 'text-slate-500 hover:text-slate-200 hover:bg-mitra-highlight' : 'text-slate-400 hover:bg-slate-100'
-              }`}
-              title="New folder"
-            >
-              <FolderPlus className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => onNewChat(currentFolderId)}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${
-                isDark ? 'text-slate-500 hover:text-illuminate-text hover:bg-mitra-highlight border border-transparent' : 'text-[#030d0a] bg-brand-green hover:bg-brand-green-hover'
-              }`}
-              title="New thread"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
+    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
+      <div className="mx-auto w-full max-w-3xl">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            Projects
+          </h1>
+          <button
+            type="button"
+            onClick={onNewProject}
+            className="btn-cta cursor-pointer flex items-center gap-2 px-4 py-2 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <Plus className="h-4 w-4" />
+            New Project
+          </button>
         </div>
 
-        <div className="relative">
-          <Search className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-8 pr-8 py-1.5 rounded-md text-[12px] outline-none border ${
+            placeholder="Search projects..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={cn(
+              'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
               isDark
-                ? 'bg-mitra-input border-white/[0.06] text-illuminate-text placeholder:text-illuminate-muted'
-                : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
-            }`}
+                ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
+                : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-emerald-300',
+            )}
           />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer">
-              <X className={`w-3 h-3 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
-            </button>
-          )}
         </div>
-      </div>
 
-      {/* Column header */}
-      <div className={`shrink-0 px-4 py-2 border-b ${divider}`}>
-        <div className={`text-[10px] font-semibold uppercase tracking-wide ${
-          isDark ? 'text-slate-500' : 'text-slate-400'
-        }`}>
-          {currentFolder ? 'Threads' : 'Name'}
-        </div>
-      </div>
-
-      {/* List */}
-      <div className="flex-1 overflow-y-auto">
-        {!currentFolder ? (
-          visibleFolders.length === 0 ? (
-            <div className={`py-12 text-center text-[12px] px-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-              No folders found
-            </div>
-          ) : (
-            <div className={`divide-y ${divider}`}>
-              {visibleFolders.map((folder) => {
-                const items = getFolderSolutions(folder.id);
-                return (
-                  <button
-                    key={folder.id}
-                    onClick={() => openFolder(folder.id)}
-                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors cursor-pointer group ${rowHover}`}
-                  >
-                    <Folder className={`w-4 h-4 shrink-0 ${isDark ? 'text-brand-green/80' : 'text-emerald-600'}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className={`truncate text-[12.5px] font-medium ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                        {folder.name}
-                      </div>
-                      <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {items.length} {items.length === 1 ? 'thread' : 'threads'}
-                      </div>
-                    </div>
-                    <ChevronRight className={`w-3.5 h-3.5 shrink-0 opacity-0 group-hover:opacity-100 ${
-                      isDark ? 'text-slate-500' : 'text-slate-400'
-                    }`} />
-                  </button>
-                );
-              })}
-            </div>
-          )
-        ) : folderContents.length === 0 ? (
-          <div className={`py-12 text-center px-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-            <p className="text-[12px] mb-2">Empty folder</p>
+        {/* Filter pills */}
+        <div className="mb-6 flex gap-2">
+          {(['all', 'mine', 'shared'] as const).map((f) => (
             <button
-              onClick={() => onNewChat(currentFolderId)}
-              className={`text-[11px] cursor-pointer ${isDark ? 'text-brand-green' : 'text-emerald-600'}`}
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={cn(
+                'rounded-full px-4 py-1.5 text-xs font-medium transition-all',
+                filter === f
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : isDark
+                    ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800',
+              )}
             >
-              + New thread
+              {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : 'Shared'}
+            </button>
+          ))}
+        </div>
+
+        {/* Project list */}
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div
+              className={cn(
+                'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl',
+                isDark ? 'bg-white/[0.06]' : 'bg-slate-100',
+              )}
+            >
+              <FolderOpen className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <p className={`mb-1 text-sm font-medium ${isDark ? 'text-white/70' : 'text-slate-600'}`}>
+              No projects yet
+            </p>
+            <p className={`mb-5 text-xs ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
+              Create your first project to get started.
+            </p>
+            <button
+              type="button"
+              onClick={onNewProject}
+              className="btn-cta cursor-pointer flex items-center gap-2 px-5 py-2.5 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <Plus className="h-4 w-4" />
+              New Project
             </button>
           </div>
         ) : (
-          <div className={`divide-y ${divider}`}>
-            {folderContents.map((sol) => {
-              const isSelected = activeSolutionId === sol.id;
-              const conversationStatus = deriveConversationStatus(sol, { generatingSolutionId });
+          <div className="flex flex-col gap-2">
+            {filtered.map((sol) => {
+              const status = sol.projectStatus ?? (sol.blueprint?.status === 'discovering' ? 'building' : 'building');
+              const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.building;
+              const isActive = sol.id === activeSolutionId;
               return (
                 <button
                   key={sol.id}
-                  onClick={() => handleSelectThread(sol.id)}
-                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors cursor-pointer group ${
-                    isSelected
-                      ? isDark ? 'bg-mitra-highlight border-l-2 border-l-brand-green' : 'bg-emerald-50 border-l-2 border-l-brand-green'
-                      : rowHover
-                  }`}
+                  type="button"
+                  onClick={() => onSelectSolution(sol.id)}
+                  className={cn(
+                    'w-full rounded-xl border px-4 py-3.5 text-left transition-all',
+                    isActive
+                      ? isDark
+                        ? 'border-primary/30 bg-primary/[0.06]'
+                        : 'border-emerald-200 bg-emerald-50/60'
+                      : isDark
+                        ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]'
+                        : 'border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/60',
+                  )}
                 >
-                  <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className={`truncate text-[12.5px] font-medium flex items-center gap-1.5 ${
-                      isSelected
-                        ? isDark ? 'text-white' : 'text-slate-900'
-                        : isDark ? 'text-slate-300' : 'text-slate-700'
-                    }`}>
-                      <ConversationStatusDot status={conversationStatus} />
-                      <span className="truncate">{sol.name}</span>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {sol.name}
+                      </p>
+                      <p className={`mt-0.5 truncate text-xs ${isDark ? 'text-white/50' : 'text-slate-400'}`}>
+                        {sol.description || 'No description'}
+                      </p>
                     </div>
-                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                      {sol.timeLabel || sol.createdAt}
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className={`whitespace-nowrap text-[11px] ${isDark ? 'text-white/35' : 'text-slate-400'}`}>
+                        {sol.timeLabel || sol.createdAt}
+                      </span>
+                      <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${config.color}`}>
+                        {config.label}
+                      </span>
                     </div>
                   </div>
-                  <MoreHorizontal className={`w-3.5 h-3.5 shrink-0 opacity-0 group-hover:opacity-100 ${
-                    isDark ? 'text-slate-500' : 'text-slate-400'
-                  }`} />
                 </button>
               );
             })}
