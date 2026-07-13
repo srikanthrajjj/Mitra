@@ -11,6 +11,7 @@ import ChatView from './components/ChatView';
 import HomeView from './components/HomeView';
 import ProjectNavigationPanel from './components/ProjectNavigationPanel';
 import ProjectsView from './components/ProjectsView';
+import ProjectDetailView from './components/ProjectDetailView';
 import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
@@ -2657,55 +2658,15 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   onNewProject={() => setIsNewModalOpen(true)}
                 />
               ) : (
-                <>
-              <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-                <ChatView
-                  appVersion={appVersion}
+                <ProjectDetailView
                   theme={resolvedTheme}
-                  activeSolution={activeSolution}
-                  onSendMessage={(text) => {
-                    if (!text.trim()) return;
-                    if (!activeSolution) {
-                      handleNewChat(focusedFolderId || undefined, text);
-                    } else {
-                      handleSendMessage(text);
-                    }
+                  solution={activeSolution}
+                  onBack={() => {
+                    setActiveSolutionId('');
+                    setSelectedSidebarId('');
+                    setSelectedArtifactId(null);
                   }}
-                  isGeneratingMessage={isGeneratingMessage}
-                  onStopGeneration={stopGeneration}
-                  onChoiceSelect={handleChoiceSelect}
-                  onNavigate={setActiveTab}
-                  onCreateConnection={handleOpenCreateConnection}
-                  onShareProject={() => handleShareProject(activeSolutionId)}
-                  projectCollaboratorCount={getCollaboratorsForSolution(projectCollaborators, activeSolutionId).length}
-                  isServerConnected={isServerConnected}
                 />
-              </div>
-              <ArtifactCardsPanel
-                solutionId={activeSolutionId || null}
-                statusOverrides={artifactStatusOverrides}
-                dynamicArtifactsBySolution={dynamicArtifactsBySolution}
-                solutions={visibleSolutions}
-                selectedArtifactId={selectedArtifactId}
-                isGenerating={isGeneratingMessage}
-                mitraTurnCount={mitraTurnCount}
-                conversationStarted={conversationStarted}
-                blueprintStage={activeSolution?.blueprint.buildStage}
-                phaseProgress={activeSolution?.phaseProgress}
-                developerComments={developerComments}
-                theme={resolvedTheme}
-                width={artifactPanelWidth}
-                collapsed={artifactPanelCollapsed}
-                isResizing={isArtifactPanelResizing}
-                onResizeStart={handleArtifactPanelResizeStart}
-                onToggleCollapse={handleToggleArtifactPanelCollapse}
-                onSelectArtifact={handleArtifactPanelSelect}
-                onShareArtifact={handleShareArtifact}
-                stakeholderReviews={stakeholderReviews}
-                businessOwnerSubmissions={businessOwnerSubmissions}
-                adminChecklist={adminChecklist}
-              />
-                </>
               )}
             </div>
           )}
