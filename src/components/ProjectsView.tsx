@@ -1,5 +1,16 @@
 import { useMemo, useState } from 'react';
-import { Search, Plus, FolderOpen, LayoutGrid, List, ExternalLink } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  FolderOpen,
+  LayoutGrid,
+  List,
+  ExternalLink,
+  FileText,
+  GitBranch,
+  MessageSquare,
+  Clock,
+} from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
@@ -13,6 +24,42 @@ interface ProjectsViewProps {
   activeSolutionId?: string;
   onSelectSolution: (solutionId: string) => void;
   onNewProject: () => void;
+}
+
+const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
+  not_started: { label: 'Not started', dot: 'bg-muted-foreground/40' },
+  discovering: { label: 'Discovering', dot: 'bg-amber-400/70' },
+  designing: { label: 'Designing', dot: 'bg-amber-400/70' },
+  generating: { label: 'Generating', dot: 'bg-brand-green/70' },
+  completed: { label: 'Completed', dot: 'bg-brand-green' },
+};
+
+function getStats(sol: Solution) {
+  return {
+    requirements: sol.blueprint.discoveredRequirements?.length ?? 0,
+    architecture: sol.blueprint.architectureSteps?.length ?? 0,
+    messages: sol.chatHistory.filter((m) => m.sender === 'user').length,
+  };
+}
+
+function getLastUpdated(sol: Solution): string {
+  const last = sol.chatHistory[sol.chatHistory.length - 1];
+  const raw = last?.timestamp || sol.createdAt;
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  return sol.timeLabel || String(raw);
+}
+
+function MetaItem({ icon: Icon, value, label }: { icon: typeof FileText; value: number; label: string }) {
+  return (
+    <span className="flex items-center gap-1 text-muted-foreground" title={`${value} ${label}`}>
+      <Icon className="h-3 w-3 shrink-0 opacity-70" />
+      <span className="tabular-nums">{value}</span>
+      <span className="hidden sm:inline">{label}</span>
+    </span>
+  );
 }
 
 export default function ProjectsView({
@@ -160,6 +207,8 @@ export default function ProjectsView({
           <div className="flex flex-col gap-2">
             {filtered.map((sol) => {
               const isActive = sol.id === activeSolutionId;
+              const stats = getStats(sol);
+              const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
               return (
                 <button
                   key={sol.id}
@@ -177,18 +226,30 @@ export default function ProjectsView({
                   )}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                      {sol.name}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                        {sol.name}
+                      </p>
+                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+                        {status.label}
+                      </span>
+                    </div>
                     <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
                       {sol.description || 'No description'}
                     </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
+                      <MetaItem icon={FileText} value={stats.requirements} label="reqs" />
+                      <MetaItem icon={GitBranch} value={stats.architecture} label="steps" />
+                      <MetaItem icon={MessageSquare} value={stats.messages} label="msgs" />
+                    </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className={`whitespace-nowrap text-[10px] font-medium ${isDark ? 'text-white/35' : 'text-muted-foreground'}`}>
-                      {sol.timeLabel || sol.createdAt}
-                    </span>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
                     <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
+                      <Clock className="h-3 w-3 opacity-70" />
+                      {getLastUpdated(sol)}
+                    </span>
                   </div>
                 </button>
               );
@@ -199,6 +260,8 @@ export default function ProjectsView({
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((sol) => {
               const isActive = sol.id === activeSolutionId;
+              const stats = getStats(sol);
+              const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
               return (
                 <div
                   key={sol.id}
@@ -216,20 +279,41 @@ export default function ProjectsView({
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className={cn(
-                        'text-sm font-semibold truncate flex-1',
-                        isDark ? 'text-white' : 'text-foreground',
-                      )}>
-                        {sol.name}
-                      </h3>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <h3 className={cn(
+                          'text-sm font-semibold truncate flex-1',
+                          isDark ? 'text-white' : 'text-foreground',
+                        )}>
+                          {sol.name}
+                        </h3>
+                      </div>
                       <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
                       {sol.description || 'No description'}
                     </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+                        {status.label}
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <FileText className="h-3 w-3 opacity-70" />
+                        <span className="tabular-nums">{stats.requirements}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <GitBranch className="h-3 w-3 opacity-70" />
+                        <span className="tabular-nums">{stats.architecture}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <MessageSquare className="h-3 w-3 opacity-70" />
+                        <span className="tabular-nums">{stats.messages}</span>
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-4 font-medium">
-                    {sol.timeLabel || sol.createdAt}
+                  <div className="mt-4 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                    <Clock className="h-3 w-3 opacity-70" />
+                    Updated {getLastUpdated(sol)}
                   </div>
                 </div>
               );
