@@ -11,7 +11,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   deployed: { label: 'Active', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
 };
 
-type Filter = 'all' | 'mine' | 'shared';
+type Filter = 'all' | 'mine' | 'shared' | 'organisational';
 
 interface ProjectsViewProps {
   theme: Theme;
@@ -82,7 +82,7 @@ export default function ProjectsView({
 
         {/* Filter pills */}
         <div className="mb-6 flex gap-2">
-          {(['all', 'mine', 'shared'] as const).map((f) => (
+          {(['all', 'mine', 'shared', 'organisational'] as const).map((f) => (
             <button
               key={f}
               type="button"
@@ -96,7 +96,7 @@ export default function ProjectsView({
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800',
               )}
             >
-              {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : 'Shared'}
+              {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : f === 'shared' ? 'Shared' : 'Organisational'}
             </button>
           ))}
         </div>
