@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { MessageSquarePlus, X, Sun, Moon } from 'lucide-react';
+import { MessageSquarePlus, X, Sun, Moon, Code } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ResolvedTheme, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -22,6 +22,7 @@ interface DesignFeedbackWidgetProps {
   activeTab?: string;
   userRole?: string;
   onSubmitted?: (message: string, title?: string) => void;
+  onOpenDevSpecs?: () => void;
 }
 
 export function DesignFeedbackWidget({
@@ -30,6 +31,7 @@ export function DesignFeedbackWidget({
   activeTab,
   userRole,
   onSubmitted,
+  onOpenDevSpecs,
 }: DesignFeedbackWidgetProps) {
   const [open, setOpen] = useState(false);
   const [panelMode, setPanelMode] = useState<PanelMode>('submit');
@@ -264,6 +266,23 @@ export function DesignFeedbackWidget({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {onOpenDevSpecs && (
+        <button
+          type="button"
+          onClick={onOpenDevSpecs}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium shadow-lg transition-all',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
+            isDark
+              ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
+              : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
+          )}
+        >
+          <Code className="h-4 w-4 shrink-0 opacity-80" />
+          <span>Dev Specs</span>
+        </button>
+      )}
 
       <button
         type="button"

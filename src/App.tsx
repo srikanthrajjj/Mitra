@@ -2965,6 +2965,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
         activeTab={activeTab}
         userRole={userRole}
         onSubmitted={showCenterToast}
+        onOpenDevSpecs={() => setActiveTab('dev-specs')}
       />
 
 
