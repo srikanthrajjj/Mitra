@@ -5,7 +5,6 @@ import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  building: { label: 'Building', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
   in_review: { label: 'In Review', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
   ready_to_deploy: { label: 'Ready', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
   deployed: { label: 'Active', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
@@ -23,8 +22,8 @@ interface ProjectsViewProps {
 }
 
 function getStatus(sol: Solution) {
-  const status = sol.projectStatus ?? (sol.blueprint?.status === 'discovering' ? 'building' : 'building');
-  return STATUS_CONFIG[status] ?? STATUS_CONFIG.building;
+  const status = sol.projectStatus ?? (sol.blueprint?.status === 'completed' ? 'deployed' : 'in_review');
+  return STATUS_CONFIG[status] ?? STATUS_CONFIG.in_review;
 }
 
 export default function ProjectsView({
