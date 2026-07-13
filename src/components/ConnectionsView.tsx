@@ -385,9 +385,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                             setHistoryConnection(conn);
                             setHistoryModalOpen(true);
                           }}
-                          className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+                          className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors whitespace-nowrap"
                         >
-                          <History className="h-3.5 w-3.5" />
                           <span>Connection History</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
