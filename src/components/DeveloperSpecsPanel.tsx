@@ -227,9 +227,81 @@ function ColorsSection() {
           ))}
         </div>
       </div>
+
+      <div>
+        <h3 className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-4">Color Shades</h3>
+        <p className="text-xs text-muted-foreground mb-5">8-shade scales for Primary, Secondary, and Dark. Use these Tailwind classes for consistent shading across the UI.</p>
+        <div className="space-y-8">
+          {shadePalettes.map((palette) => (
+            <div key={palette.name}>
+              <p className="text-sm font-semibold text-foreground mb-3">{palette.label} <span className="text-muted-foreground font-normal text-xs">({palette.note})</span></p>
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                {palette.shades.map((shade) => (
+                  <div key={shade.token} className="rounded-lg overflow-hidden border border-border bg-card">
+                    <div className="h-12 w-full" style={{ backgroundColor: shade.hsl }} />
+                    <div className="p-2 space-y-0.5">
+                      <p className="text-[10px] font-mono font-semibold text-foreground leading-tight">{shade.token}</p>
+                      <p className="text-[9px] font-mono text-brand-green/70 leading-tight">{shade.hsl}</p>
+                      <p className="text-[9px] text-muted-foreground leading-tight">{shade.tailwind}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
+
+const shadePalettes = [
+  {
+    name: 'primary',
+    label: 'Primary',
+    note: 'Green accent scale ~140° hue',
+    shades: [
+      { token: 'primary-50',   hsl: 'hsl(140 60% 97%)',  tailwind: 'bg-primary-50',   usage: 'Ultra-light tints' },
+      { token: 'primary-100',  hsl: 'hsl(140 60% 93%)',  tailwind: 'bg-primary-100',  usage: 'Light backgrounds' },
+      { token: 'primary-200',  hsl: 'hsl(140 60% 85%)',  tailwind: 'bg-primary-200',  usage: 'Soft accents' },
+      { token: 'primary-300',  hsl: 'hsl(140 80% 70%)',  tailwind: 'bg-primary-300',  usage: 'Medium-light' },
+      { token: 'primary-400',  hsl: 'hsl(140 90% 58%)',  tailwind: 'bg-primary-400',  usage: 'Icons, indicators' },
+      { token: 'primary-500',  hsl: 'hsl(140 100% 50%)', tailwind: 'bg-primary-500',  usage: 'Base primary' },
+      { token: 'primary-600',  hsl: 'hsl(140 100% 40%)', tailwind: 'bg-primary-600',  usage: 'Hover / active' },
+      { token: 'primary-700',  hsl: 'hsl(140 100% 28%)', tailwind: 'bg-primary-700',  usage: 'Deepest green' },
+    ],
+  },
+  {
+    name: 'secondary',
+    label: 'Secondary',
+    note: 'Neutral gray scale ~210° hue',
+    shades: [
+      { token: 'secondary-50',   hsl: 'hsl(210 40% 98%)',  tailwind: 'bg-secondary-50',   usage: 'Near-white' },
+      { token: 'secondary-100',  hsl: 'hsl(210 40% 96%)',  tailwind: 'bg-secondary-100',  usage: 'Card backgrounds' },
+      { token: 'secondary-200',  hsl: 'hsl(210 30% 90%)',  tailwind: 'bg-secondary-200',  usage: 'Borders, dividers' },
+      { token: 'secondary-300',  hsl: 'hsl(210 20% 80%)',  tailwind: 'bg-secondary-300',  usage: 'Muted borders' },
+      { token: 'secondary-400',  hsl: 'hsl(210 15% 60%)',  tailwind: 'bg-secondary-400',  usage: 'Muted text' },
+      { token: 'secondary-500',  hsl: 'hsl(210 15% 40%)',  tailwind: 'bg-secondary-500',  usage: 'Mid-tone text' },
+      { token: 'secondary-600',  hsl: 'hsl(210 20% 25%)',  tailwind: 'bg-secondary-600',  usage: 'Dark surfaces' },
+      { token: 'secondary-700',  hsl: 'hsl(210 30% 14%)',  tailwind: 'bg-secondary-700',  usage: 'Darkest gray' },
+    ],
+  },
+  {
+    name: 'dark',
+    label: 'Dark',
+    note: 'Neutral black scale 0° hue',
+    shades: [
+      { token: 'dark-50',   hsl: 'hsl(0 0% 22%)', tailwind: 'bg-dark-50',   usage: 'Lightest dark' },
+      { token: 'dark-100',  hsl: 'hsl(0 0% 20%)', tailwind: 'bg-dark-100',  usage: 'Dark borders' },
+      { token: 'dark-200',  hsl: 'hsl(0 0% 17%)', tailwind: 'bg-dark-200',  usage: 'Raised surfaces' },
+      { token: 'dark-300',  hsl: 'hsl(0 0% 14%)', tailwind: 'bg-dark-300',  usage: 'Card surfaces' },
+      { token: 'dark-400',  hsl: 'hsl(0 0% 12%)', tailwind: 'bg-dark-400',  usage: 'Sidebar bg' },
+      { token: 'dark-500',  hsl: 'hsl(0 0% 9%)',  tailwind: 'bg-dark-500',  usage: 'Main sidebar' },
+      { token: 'dark-600',  hsl: 'hsl(0 0% 7%)',  tailwind: 'bg-dark-600',  usage: 'App background' },
+      { token: 'dark-700',  hsl: 'hsl(0 0% 4%)',  tailwind: 'bg-dark-700',  usage: 'Deepest black' },
+    ],
+  },
+];
 
 function TypographySection() {
   return (
