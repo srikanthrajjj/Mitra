@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { 
-  Plus, X, Edit, Key, MoreHorizontal, HelpCircle
+  Plus, X, Edit, Key, MoreHorizontal, HelpCircle, History, CheckCircle2, XCircle, AlertTriangle
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -27,6 +27,14 @@ interface ConnectionData {
   url: string;
   username: string;
   updatedAt: string;
+}
+
+interface ConnectionHistoryEvent {
+  id: string;
+  connectionId: string;
+  type: 'connected' | 'disconnected' | 'failed' | 'tested';
+  message: string;
+  timestamp: string;
 }
 
 export default function ConnectionsView({ theme, createConnectionNonce = 0 }: ConnectionsViewProps) {
@@ -80,6 +88,23 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
     }
   ]);
 
+  const [connectionHistory] = useState<ConnectionHistoryEvent[]>([
+    { id: 'hist-1', connectionId: 'conn-1', type: 'connected', message: 'Successfully connected to POC RAVI instance', timestamp: '2 hours ago' },
+    { id: 'hist-2', connectionId: 'conn-1', type: 'tested', message: 'Connection test passed — API responded in 120ms', timestamp: '2 hours ago' },
+    { id: 'hist-3', connectionId: 'conn-1', type: 'disconnected', message: 'Session expired after 30 minutes of inactivity', timestamp: '1 day ago' },
+    { id: 'hist-4', connectionId: 'conn-1', type: 'connected', message: 'Successfully connected to POC RAVI instance', timestamp: '1 day ago' },
+    { id: 'hist-5', connectionId: 'conn-1', type: 'failed', message: 'Authentication failed — invalid credentials', timestamp: '3 days ago' },
+    { id: 'hist-6', connectionId: 'conn-2', type: 'connected', message: 'Successfully connected to Staging Instance', timestamp: '3 days ago' },
+    { id: 'hist-7', connectionId: 'conn-2', type: 'tested', message: 'Connection test passed — API responded in 85ms', timestamp: '3 days ago' },
+    { id: 'hist-8', connectionId: 'conn-2', type: 'connected', message: 'OAuth token refreshed successfully', timestamp: '5 days ago' },
+    { id: 'hist-9', connectionId: 'conn-3', type: 'connected', message: 'Successfully connected to QA Automation', timestamp: '5 hours ago' },
+    { id: 'hist-10', connectionId: 'conn-3', type: 'failed', message: 'Connection timed out after 30s', timestamp: '2 days ago' },
+    { id: 'hist-11', connectionId: 'conn-3', type: 'disconnected', message: 'Manual disconnect by user', timestamp: '4 days ago' },
+    { id: 'hist-12', connectionId: 'conn-4', type: 'connected', message: 'Successfully connected to Production Sync', timestamp: '2 days ago' },
+    { id: 'hist-13', connectionId: 'conn-4', type: 'tested', message: 'Connection test passed — API responded in 45ms', timestamp: '2 days ago' },
+    { id: 'hist-14', connectionId: 'conn-4', type: 'connected', message: 'OAuth token refreshed automatically', timestamp: '6 days ago' },
+  ]);
+
   // Project title and title editing
   const [projectTitle, setProjectTitle] = useState('Advance Solution Demo 19');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -88,6 +113,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
   // Modal open/close state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingConnection, setEditingConnection] = useState<ConnectionData | null>(null);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyConnection, setHistoryConnection] = useState<ConnectionData | null>(null);
 
   // Form states
   const [formName, setFormName] = useState('');
@@ -354,6 +381,16 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                          onClick={() => {
+                            setHistoryConnection(conn);
+                            setHistoryModalOpen(true);
+                          }}
+                          className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+                        >
+                          <History className="h-3.5 w-3.5" />
+                          <span>Connection History</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           onClick={() => handleDeleteClick(conn.id)}
                           className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
                         >
@@ -610,6 +647,90 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Connection History Modal */}
+      {historyModalOpen && historyConnection && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div
+            ref={modalRef}
+            className={cn(
+              'w-full max-w-[560px] max-h-[85vh] rounded-xl shadow-xl flex flex-col overflow-hidden border',
+              isDark ? 'bg-[#18181b] border-zinc-800' : 'bg-white border-zinc-200'
+            )}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80">
+              <div>
+                <h2 className={cn('text-base font-bold', isDark ? 'text-zinc-100' : 'text-zinc-900')}>
+                  Connection History
+                </h2>
+                <p className={cn('text-xs mt-0.5', isDark ? 'text-zinc-400' : 'text-zinc-500')}>
+                  {historyConnection.name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryModalOpen(false)}
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer transition-colors"
+                aria-label="Close dialog"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {connectionHistory.filter((h) => h.connectionId === historyConnection.id).length === 0 ? (
+                <p className={cn('text-xs text-center py-8', isDark ? 'text-zinc-500' : 'text-zinc-400')}>
+                  No history events yet.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {connectionHistory
+                    .filter((h) => h.connectionId === historyConnection.id)
+                    .map((event) => {
+                      const Icon = event.type === 'connected' ? CheckCircle2
+                        : event.type === 'failed' ? XCircle
+                        : event.type === 'disconnected' ? AlertTriangle
+                        : History;
+                      const iconColor = event.type === 'connected' ? 'text-emerald-500'
+                        : event.type === 'failed' ? 'text-rose-500'
+                        : event.type === 'disconnected' ? 'text-amber-500'
+                        : 'text-blue-500';
+                      return (
+                        <div
+                          key={event.id}
+                          className={cn(
+                            'flex items-start gap-3 rounded-lg px-3 py-2.5',
+                            isDark ? 'bg-white/[0.03]' : 'bg-slate-50',
+                          )}
+                        >
+                          <Icon className={cn('h-4 w-4 shrink-0 mt-0.5', iconColor)} />
+                          <div className="min-w-0 flex-1">
+                            <p className={cn('text-xs leading-relaxed', isDark ? 'text-zinc-200' : 'text-zinc-700')}>
+                              {event.message}
+                            </p>
+                            <p className={cn('text-[10px] mt-1', isDark ? 'text-zinc-500' : 'text-zinc-400')}>
+                              {event.timestamp}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setHistoryModalOpen(false)}
+                className="btn-secondary px-4 py-2 text-xs cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
