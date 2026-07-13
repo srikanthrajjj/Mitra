@@ -1,14 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Search, Plus, FolderOpen, LayoutGrid, List } from 'lucide-react';
+import { Search, Plus, FolderOpen, LayoutGrid, List, ExternalLink } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
-
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  in_review: { label: 'In Review', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-  ready_to_deploy: { label: 'Ready', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
-  deployed: { label: 'Active', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
-};
 
 type Filter = 'all' | 'mine' | 'shared' | 'organisational';
 type ViewMode = 'list' | 'grid';
@@ -19,11 +13,6 @@ interface ProjectsViewProps {
   activeSolutionId?: string;
   onSelectSolution: (solutionId: string) => void;
   onNewProject: () => void;
-}
-
-function getStatus(sol: Solution) {
-  const status = sol.projectStatus ?? (sol.blueprint?.status === 'completed' ? 'deployed' : 'in_review');
-  return STATUS_CONFIG[status] ?? STATUS_CONFIG.in_review;
 }
 
 export default function ProjectsView({
@@ -53,7 +42,7 @@ export default function ProjectsView({
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
-      <div className={cn('mx-auto w-full', viewMode === 'grid' ? 'max-w-5xl' : 'max-w-3xl')}>
+      <div className={cn('mx-auto w-full', viewMode === 'grid' ? 'max-w-6xl' : 'max-w-3xl')}>
         {/* Header */}
         <div className="mb-8 flex items-center justify-between gap-4">
           <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -170,7 +159,6 @@ export default function ProjectsView({
           /* List view */
           <div className="flex flex-col gap-2">
             {filtered.map((sol) => {
-              const config = getStatus(sol);
               const isActive = sol.id === activeSolutionId;
               return (
                 <button
@@ -178,33 +166,29 @@ export default function ProjectsView({
                   type="button"
                   onClick={() => onSelectSolution(sol.id)}
                   className={cn(
-                    'w-full rounded-xl border px-4 py-3.5 text-left transition-all',
+                    'group relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
                     isActive
                       ? isDark
                         ? 'border-primary/30 bg-primary/[0.06]'
                         : 'border-emerald-200 bg-emerald-50/60'
                       : isDark
-                        ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]'
-                        : 'border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/60',
+                        ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
+                        : 'bg-white hover:bg-slate-50/50 border-slate-200 text-slate-800 hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                   )}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {sol.name}
-                      </p>
-                      <p className={`mt-0.5 truncate text-xs ${isDark ? 'text-white/50' : 'text-slate-400'}`}>
-                        {sol.description || 'No description'}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className={`whitespace-nowrap text-[11px] ${isDark ? 'text-white/35' : 'text-slate-400'}`}>
-                        {sol.timeLabel || sol.createdAt}
-                      </span>
-                      <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${config.color}`}>
-                        {config.label}
-                      </span>
-                    </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {sol.name}
+                    </p>
+                    <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
+                      {sol.description || 'No description'}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className={`whitespace-nowrap text-[10px] font-medium ${isDark ? 'text-white/35' : 'text-slate-400'}`}>
+                      {sol.timeLabel || sol.createdAt}
+                    </span>
+                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </button>
               );
@@ -212,49 +196,42 @@ export default function ProjectsView({
           </div>
         ) : (
           /* Grid / Card view */
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((sol) => {
-              const config = getStatus(sol);
               const isActive = sol.id === activeSolutionId;
               return (
-                <button
+                <div
                   key={sol.id}
-                  type="button"
                   onClick={() => onSelectSolution(sol.id)}
                   className={cn(
-                    'group flex flex-col rounded-2xl border p-5 text-left transition-all',
+                    'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
                     isActive
                       ? isDark
                         ? 'border-primary/30 bg-primary/[0.06]'
                         : 'border-emerald-200 bg-emerald-50/60'
                       : isDark
-                        ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.05] hover:shadow-lg hover:shadow-black/10'
-                        : 'border-slate-100 bg-white hover:border-slate-200 hover:shadow-lg hover:shadow-slate-200/60',
+                        ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
+                        : 'bg-white hover:bg-slate-50/50 border-slate-200 text-slate-800 hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                   )}
                 >
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${config.color}`}>
-                      {config.label}
-                    </span>
-                    <span className={`whitespace-nowrap text-[11px] ${isDark ? 'text-white/35' : 'text-slate-400'}`}>
-                      {sol.timeLabel || sol.createdAt}
-                    </span>
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className={cn(
+                        'text-sm font-semibold truncate flex-1',
+                        isDark ? 'text-white' : 'text-slate-900',
+                      )}>
+                        {sol.name}
+                      </h3>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
+                      {sol.description || 'No description'}
+                    </p>
                   </div>
-                  <p className={`mb-1 truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {sol.name}
-                  </p>
-                  <p className={`line-clamp-2 text-xs leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-400'}`}>
-                    {sol.description || 'No description'}
-                  </p>
-                  <div className={cn(
-                    'mt-auto pt-4 text-xs font-medium transition-all',
-                    isDark
-                      ? 'text-white/30 group-hover:text-primary/80'
-                      : 'text-slate-300 group-hover:text-emerald-600',
-                  )}>
-                    Open project →
+                  <div className="text-[10px] text-slate-400 mt-4 font-medium">
+                    {sol.timeLabel || sol.createdAt}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
