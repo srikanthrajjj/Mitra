@@ -131,8 +131,8 @@ function PanelTabBar({
               'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-[10px] font-medium transition-colors',
               selected
                 ? isDark
-                  ? 'bg-white/[0.08] text-foreground shadow-sm'
-                  : 'bg-white text-foreground shadow-sm'
+                  ? 'bg-brand-green/10 text-foreground shadow-sm'
+                  : 'bg-card text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -372,8 +372,8 @@ function DeliverableRow({
               theme,
               'w-48 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
               isDark
-                ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
+                ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
             )}
           >
             <DropdownMenuItem

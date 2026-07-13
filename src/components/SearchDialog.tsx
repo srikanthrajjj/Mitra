@@ -211,8 +211,8 @@ export function SearchDialog({
         className={cn(
           "w-full max-w-2xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[65vh] animate-fade-in",
           isDark
-            ? "bg-neutral-950 border-neutral-800 text-foreground"
-            : "bg-white border-slate-200 text-slate-800"
+            ? "bg-mitra-bg border-mitra-border text-foreground"
+            : "bg-card border-border text-foreground"
         )}
       >
         {/* Top Input Bar */}
@@ -254,7 +254,7 @@ export function SearchDialog({
                 category === cat
                   ? isDark
                     ? "bg-brand-green/12 text-brand-green border border-brand-green/20"
-                    : "bg-emerald-50 text-emerald-700 border border-emerald-200/50"
+                    : "bg-muted text-brand-green border border-brand-green/50"
                   : "text-muted-foreground hover:text-foreground border border-transparent"
               )}
             >
@@ -284,8 +284,8 @@ export function SearchDialog({
                       "group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-all cursor-pointer select-none border border-transparent",
                       active
                         ? isDark
-                          ? "bg-neutral-900 border-neutral-800 text-white"
-                          : "bg-slate-100 border-slate-200 text-slate-900"
+                          ? "bg-mitra-surface border-mitra-border text-foreground"
+                          : "bg-muted border-border text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -294,8 +294,8 @@ export function SearchDialog({
                         "p-1.5 rounded-lg shrink-0 border",
                         active
                           ? isDark
-                            ? "bg-neutral-950 border-neutral-800 text-brand-green"
-                            : "bg-white border-slate-300 text-emerald-600"
+                            ? "bg-mitra-bg border-mitra-border text-brand-green"
+                            : "bg-card border-border text-brand-green"
                           : "bg-muted/30 border-transparent text-muted-foreground/60"
                       )}>
                         <ItemIcon className="h-4 w-4" />
@@ -305,11 +305,11 @@ export function SearchDialog({
                           "text-[13px] font-semibold truncate",
                           active
                             ? isDark
-                              ? "text-white"
-                              : "text-slate-900"
+                              ? "text-foreground"
+                              : "text-foreground"
                             : isDark
-                              ? "text-slate-300"
-                              : "text-slate-700"
+                              ? "text-muted-foreground"
+                              : "text-foreground"
                         )}>
                           {item.title}
                         </div>
@@ -321,8 +321,8 @@ export function SearchDialog({
                                   'inline-flex max-w-[9.5rem] shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium',
                                   active
                                     ? isDark
-                                      ? 'border-neutral-700 bg-neutral-800/80 text-slate-300'
-                                      : 'border-slate-200 bg-white text-slate-600'
+                                      ? 'border-mitra-border bg-mitra-surface/80 text-foreground'
+                                      : 'border-border bg-card text-muted-foreground'
                                     : 'border-border/50 bg-muted/20 text-muted-foreground/90',
                                 )}
                                 title={item.projectName}
@@ -353,15 +353,15 @@ export function SearchDialog({
                           className={cn(
                             "p-1 rounded transition-colors cursor-pointer",
                             item.isStarred
-                              ? "text-emerald-500 hover:bg-muted/40"
-                              : "text-muted-foreground/30 hover:text-emerald-500 hover:bg-muted/40 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              ? "text-brand-green hover:bg-muted/40"
+                              : "text-muted-foreground/30 hover:text-brand-green hover:bg-muted/40 opacity-0 group-hover:opacity-100 focus:opacity-100"
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (item.solId) onToggleFavorite(item.solId);
                           }}
                         >
-                          <Star className={cn("h-3.5 w-3.5", item.isStarred && "fill-emerald-500 text-emerald-500")} />
+                          <Star className={cn("h-3.5 w-3.5", item.isStarred && "fill-brand-green text-brand-green")} />
                         </button>
                       )}
                       

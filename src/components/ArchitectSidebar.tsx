@@ -146,11 +146,11 @@ export function ArchitectSidebar({
           isEditing ? 'cursor-default' : 'cursor-pointer',
           active
             ? isDark
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500'
-              : 'bg-emerald-50 text-emerald-700 border-emerald-500'
+              ? 'bg-brand-green/10 text-brand-green border-brand-green'
+              : 'bg-muted text-brand-green border-brand-green'
             : isDark
-              ? 'text-slate-400 border-transparent hover:bg-emerald-500/5 hover:text-emerald-400'
-              : 'text-slate-600 border-transparent hover:bg-emerald-50/55 hover:text-emerald-700',
+              ? 'text-muted-foreground border-transparent hover:bg-brand-green/5 hover:text-brand-green'
+              : 'text-muted-foreground border-transparent hover:bg-accent/55 hover:text-brand-green',
         )}
       >
         {isEditing ? (
@@ -172,8 +172,8 @@ export function ArchitectSidebar({
             className={cn(
               "flex-1 min-w-0 px-1 py-0.5 rounded border outline-none text-[11.25px]",
               isDark
-                ? 'bg-zinc-800 border-white/[0.06] text-zinc-100 focus:border-brand-green/25'
-                : 'bg-white border-emerald-200 text-slate-800 focus:border-brand-green'
+                ? 'bg-mitra-surface border-white/[0.06] text-foreground focus:border-brand-green/25'
+                : 'bg-card border-border text-foreground focus:border-brand-green'
             )}
           />
         ) : (
@@ -223,7 +223,7 @@ export function ArchitectSidebar({
                 <DropdownMenuContent
                   align="end"
                   className={cn(
-                    isDark ? 'dark bg-zinc-900 border-zinc-800 text-zinc-100' : 'light bg-white border-slate-200 text-slate-900',
+                    isDark ? 'dark bg-mitra-sidebar border-mitra-border text-foreground' : 'light bg-card border-mitra-border text-foreground',
                     'w-40'
                   )}
                   onClick={(e) => e.stopPropagation()}
@@ -234,7 +234,7 @@ export function ArchitectSidebar({
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent
                       className={cn(
-                        isDark ? 'dark bg-zinc-900 border-zinc-800 text-zinc-100' : 'light bg-white border-slate-200 text-slate-900',
+                        isDark ? 'dark bg-mitra-surface border-mitra-border text-foreground' : 'light bg-card border-mitra-border text-foreground',
                         'w-48'
                       )}
                       onClick={(e) => e.stopPropagation()}
@@ -249,7 +249,7 @@ export function ArchitectSidebar({
                             key={folder.id}
                             className={cn(
                               "cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground",
-                              sol.folderId === folder.id && "font-semibold text-emerald-500"
+                              sol.folderId === folder.id && "font-semibold text-brand-green"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -262,7 +262,7 @@ export function ArchitectSidebar({
                       )}
                       {sol.folderId && (
                         <>
-                          <DropdownMenuSeparator className={isDark ? 'bg-zinc-800' : 'bg-slate-100'} />
+                          <DropdownMenuSeparator className={isDark ? 'bg-mitra-surface' : 'bg-muted'} />
                           <DropdownMenuItem
                             className="cursor-pointer text-[12.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
                             onClick={(e) => {
@@ -393,11 +393,11 @@ export function ArchitectSidebar({
                   'architect-nav-item flex w-full items-center gap-3 rounded-r-lg px-3 py-2.5 text-[13px] font-medium leading-none transition-all duration-200 cursor-pointer border-l-2',
                   active
                     ? isDark
-                      ? 'bg-emerald-500/10 text-emerald-400 font-semibold border-emerald-500'
-                      : 'bg-emerald-50 text-emerald-700 font-semibold border-emerald-500'
+                      ? 'bg-brand-green/10 text-brand-green font-semibold border-brand-green'
+                      : 'bg-muted text-brand-green font-semibold border-brand-green'
                     : isDark
-                      ? 'text-slate-400 border-transparent hover:bg-emerald-500/5 hover:text-emerald-400'
-                      : 'text-slate-600 border-transparent hover:bg-emerald-50/55 hover:text-emerald-700',
+                      ? 'text-muted-foreground border-transparent hover:bg-brand-green/5 hover:text-brand-green'
+              : 'text-muted-foreground border-transparent hover:bg-accent/55 hover:text-brand-green',
                 )}
               >
                 <AnimatedSidebarNavIcon
@@ -419,7 +419,7 @@ export function ArchitectSidebar({
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <div className="mx-3 h-px shrink-0 bg-slate-200/60 dark:bg-white/[0.06]" />
+      <div className="mx-3 h-px shrink-0 bg-border/60 dark:bg-white/[0.06]" />
 
       {/* Recents and Pinned list direct render without folders */}
       <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
@@ -451,7 +451,7 @@ export function ArchitectSidebar({
         {/* Recents section */}
         <div className="flex flex-col flex-1 space-y-0.5 pb-2">
           {pinnedSolutions.length > 0 && (
-            <div className="mx-3 mb-2 mt-1 h-px shrink-0 bg-slate-200/50 dark:bg-white/[0.05]" />
+            <div className="mx-3 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
           )}
           <button
             type="button"

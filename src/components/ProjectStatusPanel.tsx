@@ -37,7 +37,7 @@ function StepNode({ status, isDark }: { status: WorkflowStepStatus; isDark: bool
           'workflow-stepper-node workflow-stepper-node--complete flex h-5 w-5 items-center justify-center rounded-full border',
           isDark
             ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-            : 'border-emerald-300 bg-emerald-50 text-emerald-600',
+            : 'border-border bg-muted text-emerald-600',
         )}
       >
         <Check className="h-3 w-3 stroke-[3]" aria-hidden />
@@ -60,7 +60,7 @@ function StepNode({ status, isDark }: { status: WorkflowStepStatus; isDark: bool
             'workflow-stepper-node workflow-stepper-node--active relative flex h-5 w-5 items-center justify-center rounded-full border',
             isDark
               ? 'border-brand-green/40 bg-brand-green/15 text-brand-green'
-              : 'border-emerald-400 bg-emerald-50 text-emerald-700',
+              : 'border-border bg-muted text-brand-green',
           )}
         >
           <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
@@ -88,7 +88,7 @@ function StepNode({ status, isDark }: { status: WorkflowStepStatus; isDark: bool
     <div
       className={cn(
         'workflow-stepper-node workflow-stepper-node--pending flex h-4 w-4 items-center justify-center rounded-full border',
-        isDark ? 'border-white/12 bg-transparent' : 'border-slate-300 bg-slate-100',
+        isDark ? 'border-white/12 bg-transparent' : 'border-border bg-muted',
       )}
     >
       <Circle className="h-1.5 w-1.5 fill-current text-muted-foreground/35" aria-hidden />
@@ -119,7 +119,7 @@ function WorkflowStepRow({
                 : 'bg-emerald-300/70'
               : isDark
                 ? 'bg-white/[0.06]'
-                : 'bg-slate-200',
+                : 'bg-muted',
           )}
           aria-hidden
         />
@@ -137,10 +137,10 @@ function WorkflowStepRow({
               isActive
                 ? isDark
                   ? 'border-brand-green/25 bg-brand-green/10 text-brand-green'
-                  : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-border bg-muted text-brand-green'
                 : isDark
                   ? 'border-white/[0.06] bg-white/[0.03] text-muted-foreground'
-                  : 'border-slate-200 bg-slate-50 text-slate-600',
+                  : 'border-border bg-muted text-muted-foreground',
             )}
           >
             {PERSONA_ICONS[step.personaRole]}

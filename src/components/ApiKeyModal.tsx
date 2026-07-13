@@ -81,15 +81,15 @@ export default function ApiKeyModal({
         className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
           isDark
             ? 'glass-panel-dark border-white/[0.08] shadow-[0_24px_60px_rgba(0,0,0,0.55)]'
-            : 'bg-white border-slate-200 shadow-[0_24px_60px_rgba(0,0,0,0.12)]'
+            : 'bg-mitra-surface border-mitra-border shadow-[0_24px_60px_rgba(0,0,0,0.12)]'
         }`}
       >
         <div className="absolute -top-12 -left-12 w-28 h-28 bg-emerald-500/10 blur-xl rounded-full pointer-events-none" />
 
-        <div className="flex items-center justify-between border-b border-slate-800/20 pb-4 mb-5">
+        <div className="flex items-center justify-between border-b border-mitra-border pb-4 mb-5">
           <div className="flex items-center gap-2">
             <Key className="w-5 h-5 text-brand-green" />
-            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>
+            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-foreground'}`}>
               API access
             </h2>
           </div>
@@ -99,7 +99,7 @@ export default function ApiKeyModal({
             className={`p-1.5 rounded-lg border transition-colors ${
               isDark
                 ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                : 'border-mitra-border text-muted-foreground hover:text-foreground hover:bg-mitra-bg'
             }`}
           >
             <X className="w-4 h-4" />
@@ -112,7 +112,7 @@ export default function ApiKeyModal({
             <div className="flex items-center justify-between gap-2">
               <label
                 className={`text-xs font-semibold uppercase tracking-wider ${
-                  isDark ? 'text-slate-400' : 'text-slate-600'
+                  isDark ? 'text-slate-400' : 'text-muted-foreground'
                 }`}
               >
                 Mitra API (private)
@@ -121,20 +121,20 @@ export default function ApiKeyModal({
                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                   isDark
                     ? 'text-brand-green border-brand-green/30 bg-brand-green/10'
-                    : 'text-emerald-700 border-emerald-200 bg-emerald-50'
+                    : 'text-brand-green border-border bg-muted'
                 }`}
               >
                 Active
               </span>
             </div>
-            <p className={`text-[11px] leading-relaxed ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+            <p className={`text-[11px] leading-relaxed ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
               This workspace uses a private hosted API key. It cannot be viewed, copied, or exported.
             </p>
             <div
               className={`flex items-center gap-3 h-11 px-4 rounded-xl border select-none ${
                 isDark
                   ? 'bg-mitra-surface/40 border-white/[0.06] text-slate-500'
-                  : 'bg-slate-100 border-slate-200 text-slate-400'
+                  : 'bg-mitra-surface border-mitra-border text-muted-foreground'
               }`}
               aria-hidden
             >
@@ -142,7 +142,7 @@ export default function ApiKeyModal({
               <span className="font-mono text-[13px] tracking-widest flex-1">
                 ••••••••••••••••••••••••
               </span>
-              <span className={`text-[10px] font-medium ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>
+              <span className={`text-[10px] font-medium ${isDark ? 'text-slate-600' : 'text-muted-foreground'}`}>
                 Hidden
               </span>
             </div>
@@ -152,12 +152,12 @@ export default function ApiKeyModal({
           <section className="space-y-2 pt-1 border-t border-white/[0.06]">
             <label
               className={`text-xs font-semibold uppercase tracking-wider ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
+                isDark ? 'text-slate-400' : 'text-muted-foreground'
               }`}
             >
               Your personal API key (optional)
             </label>
-            <p className={`text-[11px] leading-relaxed ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+            <p className={`text-[11px] leading-relaxed ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
               Add your own Gemini key to route requests through your Google account. Your key is stored only on this
               device and is never shown again after saving.
             </p>
@@ -167,7 +167,7 @@ export default function ApiKeyModal({
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[12px] ${
                   isDark
                     ? 'bg-brand-green/10 border-brand-green/25 text-brand-green'
-                    : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-muted border-border text-brand-green'
                 }`}
               >
                 <CheckCircle className="w-3.5 h-3.5 shrink-0" />
@@ -187,14 +187,14 @@ export default function ApiKeyModal({
                   className={`w-full h-11 pl-4 pr-10 rounded-xl border outline-none text-[13.5px] transition-all duration-200 ${
                     isDark
                       ? 'bg-mitra-input border-white/[0.06] text-illuminate-text placeholder:text-illuminate-muted focus:border-brand-green/40 focus:bg-mitra-surface'
-                      : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-brand-green'
+                      : 'bg-mitra-surface border-mitra-border text-foreground placeholder:text-muted-foreground focus:border-brand-green'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
                   className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors ${
-                    isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
+                    isDark ? 'text-slate-500 hover:text-slate-300' : 'text-muted-foreground hover:text-foreground'
                   }`}
                   title={showKey ? 'Hide key' : 'Show key while typing'}
                 >
@@ -238,7 +238,7 @@ export default function ApiKeyModal({
             className={`p-3.5 rounded-xl border text-[11.5px] leading-relaxed flex gap-3 ${
               isDark
                 ? 'bg-mitra-surface/60 border-white/[0.06] text-illuminate-muted'
-                : 'bg-slate-50 border-slate-200 text-slate-600'
+                : 'bg-mitra-surface border-mitra-border text-muted-foreground'
             }`}
           >
             <Shield className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />

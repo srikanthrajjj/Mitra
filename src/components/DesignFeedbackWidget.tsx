@@ -131,7 +131,7 @@ export function DesignFeedbackWidget({
               'w-[min(100vw-3rem,360px)] rounded-2xl border p-4 shadow-xl',
               isDark
                 ? 'glass-panel-dark border-border bg-card/95 shadow-[0_16px_48px_rgba(0,0,0,0.4)] backdrop-blur-md'
-                : 'border-slate-200 bg-white shadow-[0_16px_48px_rgba(0,0,0,0.12)]',
+                : 'border-border bg-card shadow-[0_16px_48px_rgba(0,0,0,0.12)]',
             )}
           >
             <div className="mb-3 flex items-start justify-between gap-2">
@@ -139,7 +139,7 @@ export function DesignFeedbackWidget({
                 <p
                   className={cn(
                     'text-sm font-semibold leading-snug',
-                    isDark ? 'text-foreground' : 'text-slate-900',
+                    isDark ? 'text-foreground' : 'text-foreground',
                   )}
                 >
                   Design feedback
@@ -156,7 +156,7 @@ export function DesignFeedbackWidget({
                   'shrink-0 rounded-lg p-1 transition-colors',
                   isDark
                     ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700',
+                    : 'text-muted-foreground hover:bg-accent hover:text-slate-700',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -171,26 +171,26 @@ export function DesignFeedbackWidget({
                   className={cn(
                     'flex-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
                     panelMode === 'submit'
-                      ? isDark
-                        ? 'bg-muted text-foreground'
-                        : 'bg-slate-100 text-slate-900'
-                      : 'text-muted-foreground hover:text-foreground',
-                  )}
-                >
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPanelMode('recent');
-                    refreshRecentEntries();
-                  }}
-                  className={cn(
-                    'flex-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
-                    panelMode === 'recent'
-                      ? isDark
-                        ? 'bg-muted text-foreground'
-                        : 'bg-slate-100 text-slate-900'
+                        ? isDark
+                          ? 'bg-muted text-foreground'
+                          : 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    Submit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPanelMode('recent');
+                      refreshRecentEntries();
+                    }}
+                    className={cn(
+                      'flex-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
+                      panelMode === 'recent'
+                        ? isDark
+                          ? 'bg-muted text-foreground'
+                          : 'bg-muted text-foreground'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
@@ -209,7 +209,7 @@ export function DesignFeedbackWidget({
                       key={entry.id}
                       className={cn(
                         'rounded-xl border px-3 py-2.5',
-                        isDark ? 'border-border/60 bg-background/50' : 'border-slate-200 bg-slate-50',
+                        isDark ? 'border-border/60 bg-background/50' : 'border-border bg-muted',
                       )}
                     >
                       <p className="text-sm leading-relaxed text-foreground">{entry.text}</p>
@@ -249,7 +249,7 @@ export function DesignFeedbackWidget({
                     'placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/40',
                     isDark
                       ? 'border-border bg-background/80 text-foreground'
-                      : 'border-slate-200 bg-slate-50 text-slate-900',
+                      : 'border-border bg-muted text-foreground',
                   )}
                 />
 
@@ -276,7 +276,7 @@ export function DesignFeedbackWidget({
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
             isDark
               ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-              : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
+              : 'border-border bg-card text-foreground hover:bg-accent',
           )}
         >
           <Code className="h-4 w-4 shrink-0 opacity-80" />
@@ -294,7 +294,7 @@ export function DesignFeedbackWidget({
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
           isDark
             ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-            : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
+            : 'border-border bg-card text-foreground hover:bg-accent',
           open && 'ring-2 ring-ring/30',
         )}
       >
@@ -312,7 +312,7 @@ export function DesignFeedbackWidget({
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
           isDark
             ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-            : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
+            : 'border-border bg-card text-foreground hover:bg-accent',
         )}
       >
         {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

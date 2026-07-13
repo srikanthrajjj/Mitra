@@ -44,7 +44,7 @@ export default function LandingPage({
   onSignIn,
 }: LandingPageProps) {
   return (
-    <div className="landing-page landing-echelon overflow-x-hidden bg-[#030508] text-white antialiased selection:bg-[#00ff66]/25 selection:text-white">
+    <div className="landing-page landing-echelon overflow-x-hidden bg-[#030508] text-white antialiased selection:bg-[#4FCF36]/25 selection:text-white">
       <div className="relative z-10">
       <div className="relative flex min-h-screen flex-col">
         <div className="landing-echelon-hero-bg absolute inset-0 overflow-hidden" aria-hidden>
@@ -52,7 +52,7 @@ export default function LandingPage({
             <LightRays
               className="landing-hero-light-rays opacity-60"
               raysOrigin="top-center"
-              raysColor="#00ff66"
+              raysColor="#4FCF36"
               raysSpeed={1}
               lightSpread={1.2}
               rayLength={2.8}
@@ -69,7 +69,7 @@ export default function LandingPage({
         </div>
 
         {version === 'v3' && (
-          <div className="relative z-50 border-b border-[#00ff66]/15 bg-[#00ff66]/5 py-2 text-center text-[11px] font-semibold uppercase tracking-wider text-[#00ff66]">
+          <div className="relative z-50 border-b border-[#4FCF36]/15 bg-[#4FCF36]/5 py-2 text-center text-[11px] font-semibold uppercase tracking-wider text-[#4FCF36]">
             Previewing v3 — launching soon
           </div>
         )}

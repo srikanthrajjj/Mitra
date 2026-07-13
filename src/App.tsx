@@ -9,9 +9,9 @@ import { SidebarInset, SidebarProvider } from './components/ui/sidebar';
 import { TooltipProvider } from './components/ui/tooltip';
 import ChatView from './components/ChatView';
 import HomeView from './components/HomeView';
-import ProjectNavigationPanel from './components/ProjectNavigationPanel';
+
 import ProjectsView from './components/ProjectsView';
-import ProjectDetailView from './components/ProjectDetailView';
+
 import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
@@ -33,6 +33,7 @@ import { StakeholderReviewView } from './components/StakeholderReviewView';
 import { SecurityReviewView } from './components/SecurityReviewView';
 import { SponsorReviewView } from './components/SponsorReviewView';
 import { ArtifactCardsPanel } from './components/ArtifactCardsPanel';
+import RightSidebar from './components/RightSidebar';
 import { ShareArtifactModal } from './components/ShareArtifactModal';
 import { ShareProjectModal } from './components/ShareProjectModal';
 import { CenterToast, type CenterToastData } from './components/CenterToast';
@@ -2658,15 +2659,35 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   onNewProject={() => setIsNewModalOpen(true)}
                 />
               ) : (
-                <ProjectDetailView
-                  theme={resolvedTheme}
-                  solution={activeSolution}
-                  onBack={() => {
-                    setActiveSolutionId('');
-                    setSelectedSidebarId('');
-                    setSelectedArtifactId(null);
-                  }}
-                />
+                <>
+                  <ChatView
+                    theme={resolvedTheme}
+                    activeSolution={activeSolution}
+                    onSendMessage={(text) => handleSendMessage(text)}
+                    isGeneratingMessage={isGeneratingMessage}
+                    onStopGeneration={stopGeneration}
+                    onChoiceSelect={handleChoiceSelect}
+                    onNavigate={setActiveTab}
+                    onShareProject={() => handleShareProject(activeSolution.id)}
+                    isServerConnected={isServerConnected}
+                  />
+                  {showArtifactPanel && (
+                    <RightSidebar
+                      blueprint={activeSolution.blueprint}
+                      isGeneratingMessage={isGeneratingMessage}
+                      chatHistory={activeSolution.chatHistory}
+                      artifacts={findSolutionArtifacts(
+                        activeSolution.id,
+                        artifactStatusOverrides,
+                        dynamicArtifactsBySolution,
+                        solutions,
+                      )}
+                      isCollapsed={artifactPanelCollapsed}
+                      onToggleCollapse={handleToggleArtifactPanelCollapse}
+                      onShareArtifact={handleShareArtifact}
+                    />
+                  )}
+                </>
               )}
             </div>
           )}
@@ -2731,7 +2752,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 <div className="mx-auto w-full max-w-6xl">
                   <h1 className={cn(
                     "text-2xl font-display font-semibold tracking-tight mb-6",
-                    isDarkTheme(resolvedTheme) ? "text-white" : "text-slate-900"
+                    isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
                   )}>
                     Favorites
                   </h1>
@@ -2747,14 +2768,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
                           "group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer",
                           isDarkTheme(resolvedTheme)
                             ? "bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30"
-                            : "bg-white hover:bg-slate-50/50 border-slate-200 text-slate-800 hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                            : "bg-card hover:bg-accent border-border text-foreground hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
                         )}
                       >
                         <div>
                           <div className="flex items-start justify-between gap-3">
                             <h3 className={cn(
                               "text-sm font-semibold truncate flex-1",
-                              isDarkTheme(resolvedTheme) ? "text-white" : "text-slate-900"
+                              isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
                             )}>
                               {sol.name}
                             </h3>
@@ -2790,7 +2811,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                             {sol.description}
                           </p>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-4 font-medium">
+                        <div className="text-[10px] text-muted-foreground mt-4 font-medium">
                           {sol.timeLabel || sol.createdAt}
                         </div>
                       </div>
@@ -2805,10 +2826,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 }`}>
                   <Star className="w-8 h-8 fill-amber-500 text-amber-500" />
                 </div>
-                <h2 className={`text-xl font-display font-bold mb-2 ${isDarkTheme(resolvedTheme) ? 'text-white' : 'text-slate-900'}`}>
+                <h2 className={`text-xl font-display font-bold mb-2 ${isDarkTheme(resolvedTheme) ? 'text-white' : 'text-foreground'}`}>
                   No Favourites Added Yet
                 </h2>
-                <p className="text-sm text-slate-500 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Bookmark or star your most frequently used blueprints, configurations, or custom incident templates to access them quickly here.
                 </p>
               </div>

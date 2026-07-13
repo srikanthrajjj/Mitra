@@ -32,9 +32,7 @@ function CopyBtn({ text, isDark }: { text: string; isDark: boolean }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className={`p-1 rounded transition-colors ${
-        isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700'
-      }`}
+      className={`p-1 rounded transition-colors text-muted-foreground hover:text-foreground`}
     >
       {copied ? <Check className="w-3 h-3 text-brand-green" /> : <Copy className="w-3 h-3" />}
     </button>
@@ -54,17 +52,17 @@ function StudioStepper({ stage, isDark }: { stage: string; isDark: boolean }) {
               title={step.label}
               className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium whitespace-nowrap shrink-0 ${
                 done
-                  ? isDark ? 'text-brand-green/80' : 'text-emerald-600'
+                  ? isDark ? 'text-brand-green/80' : 'text-brand-green'
                   : active
-                    ? isDark ? 'bg-brand-green/12 text-brand-green border border-brand-green/25' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : isDark ? 'text-slate-600' : 'text-slate-400'
+                    ? isDark ? 'bg-brand-green/12 text-brand-green border border-brand-green/25' : 'bg-brand-green/10 text-brand-green border border-brand-green/30'
+                    : 'text-muted-foreground'
               }`}
             >
               {done ? <Check className="w-2.5 h-2.5" /> : <span className="w-2.5 text-center">{i + 1}</span>}
               <span className="hidden sm:inline">{step.label}</span>
             </div>
             {i < STUDIO_STEPS.length - 1 && (
-              <span className={`text-[8px] shrink-0 ${isDark ? 'text-slate-700' : 'text-slate-300'}`}>›</span>
+              <span className={`text-[8px] shrink-0 text-muted-foreground`}>›</span>
             )}
           </React.Fragment>
         );
@@ -76,21 +74,21 @@ function StudioStepper({ stage, isDark }: { stage: string; isDark: boolean }) {
 function FormPreview({ table, isDark }: { table: ServiceNowTable; isDark: boolean }) {
   const fields = table.fields.slice(0, 8);
   return (
-    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
-      <div className={`px-3 py-2 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-slate-50 border-slate-200'}`}>
-        <span className={`text-[11px] font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-border'}`}>
+      <div className={`px-3 py-2 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-muted border-border'}`}>
+        <span className={`text-[11px] font-semibold text-foreground`}>
           {table.label} — Default
         </span>
-        <span className={`text-[9px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{table.name}</span>
+        <span className={`text-[9px] font-mono text-muted-foreground`}>{table.name}</span>
       </div>
       <div className="p-3 grid grid-cols-2 gap-x-4 gap-y-2.5">
         {fields.map((f) => (
           <div key={f.name} className="space-y-0.5">
-            <label className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <label className={`text-[10px] font-medium text-muted-foreground`}>
               {f.label}{f.mandatory ? ' *' : ''}
             </label>
             <div className={`h-7 rounded border px-2 flex items-center text-[11px] font-mono ${
-              isDark ? 'border-white/[0.08] bg-white/[0.02] text-slate-500' : 'border-slate-200 bg-white text-slate-400'
+              isDark ? 'border-white/[0.08] bg-white/[0.02] text-muted-foreground' : 'border-border bg-card text-muted-foreground'
             }`}>
               {f.type === 'Reference' ? '🔍 ' : ''}{f.type}
             </div>
@@ -104,20 +102,20 @@ function FormPreview({ table, isDark }: { table: ServiceNowTable; isDark: boolea
 function ListPreview({ table, isDark }: { table: ServiceNowTable; isDark: boolean }) {
   const cols = ['Number', ...table.fields.slice(0, 4).map((f) => f.label), 'Updated'];
   return (
-    <div className={`rounded-lg border overflow-x-auto ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
+    <div className={`rounded-lg border overflow-x-auto ${isDark ? 'border-white/[0.08]' : 'border-border'}`}>
       <table className="w-full text-left text-[10px]">
         <thead>
-          <tr className={isDark ? 'bg-white/[0.04] border-b border-white/[0.06]' : 'bg-slate-50 border-b border-slate-200'}>
+          <tr className={isDark ? 'bg-white/[0.04] border-b border-white/[0.06]' : 'bg-muted border-b border-border'}>
             {cols.map((c) => (
-              <th key={c} className={`px-2 py-1.5 font-semibold whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{c}</th>
+              <th key={c} className={`px-2 py-1.5 font-semibold whitespace-nowrap text-muted-foreground`}>{c}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {[1, 2, 3].map((row) => (
-            <tr key={row} className={isDark ? 'border-b border-white/[0.04]' : 'border-b border-slate-100'}>
+            <tr key={row} className={isDark ? 'border-b border-white/[0.04]' : 'border-b border-border'}>
               {cols.map((c, i) => (
-                <td key={c} className={`px-2 py-1.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                <td key={c} className={`px-2 py-1.5 text-muted-foreground`}>
                   {i === 0 ? `${table.name.toUpperCase().slice(0, 3)}000${row}` : '—'}
                 </td>
               ))}
@@ -150,7 +148,7 @@ export default function ServiceNowStudio({
 
   const shell = isDark
     ? 'border-white/[0.06] bg-[#0a0a0a]/90'
-    : 'border-slate-200 bg-slate-50/90';
+    : 'border-border bg-muted/90';
 
   const tabs: { id: StudioTab; label: string; icon: React.ElementType }[] = [
     { id: 'overview', label: 'App', icon: LayoutGrid },
@@ -174,24 +172,24 @@ export default function ServiceNowStudio({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onToggleCollapse(); }}
-          className={`p-1.5 rounded-md ${isDark ? 'text-slate-500 hover:text-brand-green' : 'text-slate-400 hover:text-emerald-600'}`}
+          className={`p-1.5 rounded-md text-muted-foreground hover:text-brand-green`}
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
         <div className="flex-1 flex flex-col items-center justify-center gap-2 py-2">
-          <Box className={`w-4 h-4 ${isDark ? 'text-brand-green/60' : 'text-emerald-500'}`} />
+          <Box className={`w-4 h-4 ${isDark ? 'text-brand-green/60' : 'text-brand-green'}`} />
           {STUDIO_STEPS.map((s, i) => (
             <div
               key={s.id}
               className={`w-1.5 h-1.5 rounded-full ${
                 i <= idx
-                  ? isDark ? 'bg-brand-green/50' : 'bg-emerald-400'
-                  : isDark ? 'bg-white/10' : 'bg-slate-300'
+                  ? isDark ? 'bg-brand-green/50' : 'bg-brand-green'
+                  : isDark ? 'bg-white/10' : 'bg-muted'
               }`}
             />
           ))}
         </div>
-        <span className={`text-[8px] font-mono ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>
+        <span className={`text-[8px] font-mono text-muted-foreground`}>
           {idx + 1}/7
         </span>
       </div>
@@ -203,9 +201,9 @@ export default function ServiceNowStudio({
       <div className={`relative w-full lg:w-[400px] xl:w-[440px] shrink-0 h-full border-l flex flex-col ${shell}`}>
         <StudioChrome isDark={isDark} onCollapse={onToggleCollapse} scope="—" appName="ServiceNow Studio" />
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-          <Database className={`w-10 h-10 mb-3 ${isDark ? 'text-slate-700' : 'text-slate-300'}`} />
-          <p className={`text-[13px] font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>No application yet</p>
-          <p className={`text-[11px] ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>
+          <Database className={`w-10 h-10 mb-3 text-muted-foreground`} />
+          <p className={`text-[13px] font-medium mb-1 text-muted-foreground`}>No application yet</p>
+          <p className={`text-[11px] text-muted-foreground`}>
             Start a chat to create a scoped ServiceNow app — tables, forms, and scripts will appear here live.
           </p>
         </div>
@@ -229,11 +227,11 @@ export default function ServiceNowStudio({
         version={app.version}
       />
 
-      <div className={`px-3 py-2 border-b shrink-0 ${isDark ? 'border-white/[0.06]' : 'border-slate-200'}`}>
+      <div className={`px-3 py-2 border-b shrink-0 ${isDark ? 'border-white/[0.06]' : 'border-border'}`}>
         <StudioStepper stage={blueprint.buildStage ?? 'scope'} isDark={isDark} />
       </div>
 
-      <div className={`flex gap-0.5 px-2 py-1.5 border-b overflow-x-auto shrink-0 ${isDark ? 'border-white/[0.06]' : 'border-slate-200'}`}>
+      <div className={`flex gap-0.5 px-2 py-1.5 border-b overflow-x-auto shrink-0 ${isDark ? 'border-white/[0.06]' : 'border-border'}`}>
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -241,8 +239,8 @@ export default function ServiceNowStudio({
             onClick={() => setTab(id)}
             className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium whitespace-nowrap transition-colors ${
               tab === id
-                ? isDark ? 'bg-white/[0.08] text-slate-100' : 'bg-white text-slate-800 shadow-sm'
-                : isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-500 hover:text-slate-700'
+                ? isDark ? 'bg-white/[0.08] text-foreground' : 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Icon className="w-3 h-3" />
@@ -254,7 +252,7 @@ export default function ServiceNowStudio({
       <div className="flex-1 overflow-y-auto p-3 min-h-0">
         {isGeneratingMessage && (
           <div className={`flex items-center gap-2 mb-3 px-2.5 py-1.5 rounded-lg text-[11px] ${
-            isDark ? 'bg-brand-green/8 text-brand-green border border-brand-green/15' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            isDark ? 'bg-brand-green/8 text-brand-green border border-brand-green/15' : 'bg-brand-green/10 text-brand-green border border-brand-green/30'
           }`}>
             <Loader2 className="w-3 h-3 animate-spin" />
             Building application artifacts…
@@ -263,29 +261,29 @@ export default function ServiceNowStudio({
 
         {tab === 'overview' && (
           <div className="space-y-3">
-            <div className={`rounded-xl border p-3 ${isDark ? 'border-white/[0.08] bg-white/[0.02]' : 'border-slate-200 bg-white'}`}>
+            <div className={`rounded-xl border p-3 ${isDark ? 'border-white/[0.08] bg-white/[0.02]' : 'border-border bg-card'}`}>
               <div className="flex items-start gap-2.5 mb-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isDark ? 'bg-brand-green/10 text-brand-green' : 'bg-emerald-100 text-emerald-700'}`}>
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isDark ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-green/20 text-brand-green'}`}>
                   <Box className="w-4.5 h-4.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className={`text-[13px] font-semibold truncate ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{app.name}</h3>
-                  <p className={`text-[10px] font-mono mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{app.scope}</p>
+                  <h3 className={`text-[13px] font-semibold truncate text-foreground`}>{app.name}</h3>
+                  <p className={`text-[10px] font-mono mt-0.5 text-muted-foreground`}>{app.scope}</p>
                 </div>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${isDark ? 'bg-white/[0.06] text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium text-muted-foreground ${isDark ? 'bg-white/[0.06]' : 'bg-muted'}`}>
                   v{app.version}
                 </span>
               </div>
-              <p className={`text-[11px] leading-snug mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{app.shortDescription}</p>
+              <p className={`text-[11px] leading-snug mb-3 text-muted-foreground`}>{app.shortDescription}</p>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { label: 'Tables', value: blueprint.tables.length },
                   { label: 'Scripts', value: scripts.length },
                   { label: 'Rules', value: rules.length },
                 ].map((s) => (
-                  <div key={s.label} className={`rounded-lg px-2 py-1.5 text-center ${isDark ? 'bg-white/[0.03]' : 'bg-slate-50'}`}>
-                    <p className={`text-[14px] font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{s.value}</p>
-                    <p className={`text-[9px] uppercase tracking-wide ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{s.label}</p>
+                  <div key={s.label} className={`rounded-lg px-2 py-1.5 text-center ${isDark ? 'bg-white/[0.03]' : 'bg-muted'}`}>
+                    <p className={`text-[14px] font-semibold text-foreground`}>{s.value}</p>
+                    <p className={`text-[9px] uppercase tracking-wide text-muted-foreground`}>{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -295,10 +293,10 @@ export default function ServiceNowStudio({
               {blueprint.applicationMenu?.length ? (
                 <div className="space-y-1">
                   {blueprint.applicationMenu.map((mod) => (
-                    <div key={mod.title} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] ${isDark ? 'bg-white/[0.03]' : 'bg-white border border-slate-100'}`}>
+                    <div key={mod.title} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] ${isDark ? 'bg-white/[0.03]' : 'bg-card border border-border'}`}>
                       <Table2 className="w-3 h-3 text-brand-green shrink-0" />
-                      <span className={isDark ? 'text-slate-200' : 'text-slate-700'}>{mod.title}</span>
-                      <span className={`ml-auto font-mono text-[9px] ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>{mod.table}</span>
+                      <span className="text-foreground">{mod.title}</span>
+                      <span className={`ml-auto font-mono text-[9px] text-muted-foreground`}>{mod.table}</span>
                     </div>
                   ))}
                 </div>
@@ -310,7 +308,7 @@ export default function ServiceNowStudio({
             <ArtifactSection title="Roles" isDark={isDark}>
               <div className="flex flex-wrap gap-1.5">
                 {['admin', 'itil', `${app.scope}.user`].map((r) => (
-                  <span key={r} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono ${isDark ? 'bg-white/[0.04] text-slate-400' : 'bg-slate-100 text-slate-600'}`}>
+                  <span key={r} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground ${isDark ? 'bg-white/[0.04]' : 'bg-muted'}`}>
                     <Shield className="w-2.5 h-2.5" />{r}
                   </span>
                 ))}
@@ -331,18 +329,18 @@ export default function ServiceNowStudio({
                   onClick={() => { setSelectedTable(i); setTab('form'); }}
                   className={`w-full text-left rounded-xl border p-2.5 transition-colors ${
                     selectedTable === i
-                      ? isDark ? 'border-brand-green/25 bg-brand-green/5' : 'border-emerald-200 bg-emerald-50/50'
-                      : isDark ? 'border-white/[0.07] bg-white/[0.02] hover:border-white/[0.12]' : 'border-slate-200 bg-white hover:border-slate-300'
+                      ? isDark ? 'border-brand-green/25 bg-brand-green/5' : 'border-brand-green/30 bg-brand-green/10'
+                      : isDark ? 'border-white/[0.07] bg-white/[0.02] hover:border-white/[0.12]' : 'border-border bg-card hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className={`text-[12px] font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{t.label}</span>
-                    <span className={`text-[9px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t.name}</span>
+                    <span className={`text-[12px] font-semibold text-foreground`}>{t.label}</span>
+                    <span className={`text-[9px] font-mono text-muted-foreground`}>{t.name}</span>
                   </div>
                   {t.extendsTable && (
-                    <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>extends {t.extendsTable}</p>
+                    <p className={`text-[10px] mt-1 text-muted-foreground`}>extends {t.extendsTable}</p>
                   )}
-                  <p className={`text-[10px] mt-1 ${isDark ? 'text-brand-green/70' : 'text-emerald-600'}`}>{t.fields.length} fields</p>
+                  <p className={`text-[10px] mt-1 text-brand-green`}>{t.fields.length} fields</p>
                 </button>
               ))
             )}
@@ -370,8 +368,8 @@ export default function ServiceNowStudio({
                     onClick={() => setSelectedScript(i)}
                     className={`px-2 py-1 rounded text-[10px] font-medium ${
                       selectedScript === i
-                        ? isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-emerald-100 text-emerald-800'
-                        : isDark ? 'bg-white/[0.04] text-slate-400' : 'bg-slate-100 text-slate-600'
+                        ? isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-brand-green/20 text-brand-green'
+                        : isDark ? 'bg-white/[0.04] text-muted-foreground' : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {s.name}
@@ -398,8 +396,8 @@ export default function ServiceNowStudio({
                     onClick={() => setSelectedRule(i)}
                     className={`px-2 py-1 rounded text-[10px] font-medium ${
                       selectedRule === i
-                        ? isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-emerald-100 text-emerald-800'
-                        : isDark ? 'bg-white/[0.04] text-slate-400' : 'bg-slate-100 text-slate-600'
+                        ? isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-brand-green/20 text-brand-green'
+                        : isDark ? 'bg-white/[0.04] text-muted-foreground' : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {r.name}
@@ -415,41 +413,41 @@ export default function ServiceNowStudio({
 
         {tab === 'update_set' && (
           <div className="space-y-3">
-            <div className={`rounded-lg border px-3 py-2 flex items-center justify-between ${isDark ? 'border-white/[0.08] bg-white/[0.02]' : 'border-slate-200 bg-white'}`}>
+            <div className={`rounded-lg border px-3 py-2 flex items-center justify-between ${isDark ? 'border-white/[0.08] bg-white/[0.02]' : 'border-border bg-card'}`}>
               <div>
-                <p className={`text-[11px] font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{blueprint.updateSet?.name}</p>
-                <p className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{updateItems.length} artifacts</p>
+                <p className={`text-[11px] font-semibold text-foreground`}>{blueprint.updateSet?.name}</p>
+                <p className={`text-[10px] text-muted-foreground`}>{updateItems.length} artifacts</p>
               </div>
               <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded ${
                 blueprint.updateSet?.state === 'complete'
-                  ? isDark ? 'bg-brand-green/12 text-brand-green' : 'bg-emerald-100 text-emerald-700'
+                  ? isDark ? 'bg-brand-green/12 text-brand-green' : 'bg-brand-green/20 text-brand-green'
                   : isDark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-700'
               }`}>
                 {blueprint.updateSet?.state}
               </span>
             </div>
 
-            <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
+            <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-border'}`}>
               <table className="w-full text-left text-[10px]">
                 <thead>
-                  <tr className={isDark ? 'bg-white/[0.04] border-b border-white/[0.06]' : 'bg-slate-50 border-b border-slate-200'}>
-                    <th className={`px-2 py-1.5 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Type</th>
-                    <th className={`px-2 py-1.5 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Name</th>
-                    <th className={`px-2 py-1.5 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>State</th>
+                  <tr className={isDark ? 'bg-white/[0.04] border-b border-white/[0.06]' : 'bg-muted border-b border-border'}>
+                    <th className={`px-2 py-1.5 font-semibold text-muted-foreground`}>Type</th>
+                    <th className={`px-2 py-1.5 font-semibold text-muted-foreground`}>Name</th>
+                    <th className={`px-2 py-1.5 font-semibold text-muted-foreground`}>State</th>
                   </tr>
                 </thead>
                 <tbody>
                   {updateItems.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className={`px-2 py-4 text-center ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>
+                      <td colSpan={3} className={`px-2 py-4 text-center text-muted-foreground`}>
                         Artifacts appear as you build
                       </td>
                     </tr>
                   ) : (
                     updateItems.slice(0, 12).map((item, i) => (
-                      <tr key={i} className={isDark ? 'border-b border-white/[0.04]' : 'border-b border-slate-100'}>
-                        <td className={`px-2 py-1.5 font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.type}</td>
-                        <td className={`px-2 py-1.5 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{item.name}</td>
+                      <tr key={i} className={isDark ? 'border-b border-white/[0.04]' : 'border-b border-border'}>
+                        <td className={`px-2 py-1.5 font-mono text-muted-foreground`}>{item.type}</td>
+                        <td className={`px-2 py-1.5 text-foreground`}>{item.name}</td>
                         <td className={`px-2 py-1.5 ${item.state === 'Committed' ? 'text-brand-green' : isDark ? 'text-amber-400/80' : 'text-amber-600'}`}>{item.state}</td>
                       </tr>
                     ))
@@ -487,20 +485,20 @@ function StudioChrome({
   version?: string;
 }) {
   return (
-    <div className={`flex items-center gap-2 px-3 py-2 border-b shrink-0 ${isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-slate-200 bg-white'}`}>
-      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isDark ? 'bg-[#62d84e]/15' : 'bg-[#62d84e]/20'}`}>
-        <span className="text-[11px] font-bold text-[#62d84e]">SN</span>
+    <div className={`flex items-center gap-2 px-3 py-2 border-b shrink-0 ${isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-border bg-card'}`}>
+      <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isDark ? 'bg-[#4FCF36]/15' : 'bg-[#4FCF36]/20'}`}>
+        <span className="text-[11px] font-bold text-[#4FCF36]">SN</span>
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-[11px] font-semibold truncate ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{appName}</p>
-        <p className={`text-[9px] font-mono truncate ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+        <p className={`text-[11px] font-semibold truncate text-foreground`}>{appName}</p>
+        <p className={`text-[9px] font-mono truncate text-muted-foreground`}>
           {scope}{version ? ` · v${version}` : ''}
         </p>
       </div>
       <button
         type="button"
         onClick={onCollapse}
-        className={`p-1 rounded ${isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700'}`}
+        className={`p-1 rounded text-muted-foreground hover:text-foreground`}
       >
         <ChevronRight className="w-3.5 h-3.5" />
       </button>
@@ -511,7 +509,7 @@ function StudioChrome({
 function ArtifactSection({ title, children, isDark }: { title: string; children: React.ReactNode; isDark: boolean }) {
   return (
     <div>
-      <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{title}</p>
+      <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted-foreground`}>{title}</p>
       {children}
     </div>
   );
@@ -519,21 +517,21 @@ function ArtifactSection({ title, children, isDark }: { title: string; children:
 
 function EmptyHint({ children, isDark }: { children: React.ReactNode; isDark: boolean }) {
   return (
-    <p className={`text-[11px] text-center py-8 ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>{children}</p>
+    <p className={`text-[11px] text-center py-8 text-muted-foreground`}>{children}</p>
   );
 }
 
 function ScriptPanel({ script, isDark }: { script: NonNullable<SolutionBlueprint['clientScripts']>[0]; isDark: boolean }) {
   return (
-    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
-      <div className={`px-2.5 py-1.5 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-slate-50 border-slate-200'}`}>
+    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-border'}`}>
+      <div className={`px-2.5 py-1.5 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-muted border-border'}`}>
         <div className="flex items-center gap-2">
-          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{script.name}</span>
-          <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${isDark ? 'bg-brand-green/10 text-brand-green' : 'bg-emerald-100 text-emerald-700'}`}>{script.type}</span>
+          <span className={`text-[10px] font-semibold text-foreground`}>{script.name}</span>
+          <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${isDark ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-green/20 text-brand-green'}`}>{script.type}</span>
         </div>
         <CopyBtn text={script.script} isDark={isDark} />
       </div>
-      <pre className={`p-2.5 text-[10px] font-mono leading-relaxed overflow-x-auto max-h-48 ${isDark ? 'bg-slate-950 text-slate-300' : 'bg-slate-900 text-slate-300'}`}>
+      <pre className={`p-2.5 text-[10px] font-mono leading-relaxed overflow-x-auto max-h-48 bg-mitra-bg text-foreground`}>
         {script.script}
       </pre>
     </div>
@@ -543,15 +541,15 @@ function ScriptPanel({ script, isDark }: { script: NonNullable<SolutionBlueprint
 function RulePanel({ rule, isDark }: { rule: NonNullable<SolutionBlueprint['businessRules']>[0]; isDark: boolean }) {
   const when = `${rule.when} · ${rule.insert ? 'insert' : ''}${rule.update ? ' update' : ''}`.trim();
   return (
-    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
-      <div className={`px-2.5 py-1.5 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-slate-50 border-slate-200'}`}>
+    <div className={`rounded-lg border overflow-hidden ${isDark ? 'border-white/[0.08]' : 'border-border'}`}>
+      <div className={`px-2.5 py-1.5 border-b flex items-center justify-between ${isDark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-muted border-border'}`}>
         <div>
-          <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{rule.name}</span>
-          <p className={`text-[9px] font-mono mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{rule.table} · {when}</p>
+          <span className={`text-[10px] font-semibold text-foreground`}>{rule.name}</span>
+          <p className={`text-[9px] font-mono mt-0.5 text-muted-foreground`}>{rule.table} · {when}</p>
         </div>
         <CopyBtn text={rule.script} isDark={isDark} />
       </div>
-      <pre className={`p-2.5 text-[10px] font-mono leading-relaxed overflow-x-auto max-h-48 ${isDark ? 'bg-slate-950 text-slate-300' : 'bg-slate-900 text-slate-300'}`}>
+      <pre className={`p-2.5 text-[10px] font-mono leading-relaxed overflow-x-auto max-h-48 bg-mitra-bg text-foreground`}>
         {rule.script}
       </pre>
     </div>

@@ -114,19 +114,19 @@ export function ShareProjectModal({
             'relative flex max-h-[min(90vh,640px)] w-full max-w-md flex-col rounded-2xl border shadow-2xl',
             isDark
               ? 'glass-panel-dark border-border shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
-              : 'border-slate-200 bg-white shadow-[0_24px_60px_rgba(0,0,0,0.12)]',
+              : 'border-border bg-card shadow-[0_24px_60px_rgba(0,0,0,0.12)]',
           )}
         >
           <div className="shrink-0 border-b border-border/60 p-6 pb-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className={cn('text-[10px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                <p className={cn('text-[10px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                   Share project
                 </p>
-                <h2 className={cn('mt-1 text-lg font-semibold', isDark ? 'text-white' : 'text-slate-900')}>
+                <h2 className={cn('mt-1 text-lg font-semibold', isDark ? 'text-white' : 'text-foreground')}>
                   {projectTitle}
                 </h2>
-                <p className={cn('mt-1 text-xs', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                <p className={cn('mt-1 text-xs', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                   Share with teammates already on this instance.
                 </p>
               </div>
@@ -135,7 +135,7 @@ export function ShareProjectModal({
                 onClick={onClose}
                 className={cn(
                   'rounded-lg p-1 transition-colors',
-                  isDark ? 'text-muted-foreground hover:bg-muted hover:text-foreground' : 'text-slate-500 hover:bg-slate-100',
+                  isDark ? 'text-muted-foreground hover:bg-muted hover:text-foreground' : 'text-muted-foreground hover:bg-accent',
                 )}
               >
                 <X className="h-4 w-4" />
@@ -147,7 +147,7 @@ export function ShareProjectModal({
             <div className="space-y-3">
               <label
                 htmlFor="share-team-member"
-                className={cn('block text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}
+                className={cn('block text-xs font-medium', isDark ? 'text-slate-300' : 'text-muted-foreground')}
               >
                 Team member
               </label>
@@ -162,7 +162,7 @@ export function ShareProjectModal({
                 className={cn(
                   isDark
                     ? 'border-border bg-mitra-input text-foreground focus-visible:ring-brand-green/30'
-                    : 'border-input bg-background text-slate-900',
+                    : 'border-input bg-background text-foreground',
                 )}
               >
                 <option value="" disabled>
@@ -192,8 +192,8 @@ export function ShareProjectModal({
                           : 'border-border/60 hover:bg-muted/30',
                     )}
                   >
-                    <p className={cn('text-sm font-medium', isDark ? 'text-slate-100' : 'text-slate-900')}>{p.label}</p>
-                    <p className={cn('text-[10px] leading-snug', isDark ? 'text-slate-400' : 'text-slate-500')}>{p.desc}</p>
+                    <p className={cn('text-sm font-medium', isDark ? 'text-slate-100' : 'text-foreground')}>{p.label}</p>
+                    <p className={cn('text-[10px] leading-snug', isDark ? 'text-slate-400' : 'text-muted-foreground')}>{p.desc}</p>
                   </button>
                 ))}
               </div>
@@ -215,8 +215,8 @@ export function ShareProjectModal({
 
             <div>
               <div className="mb-2 flex items-center gap-1.5">
-                <Users className={cn('h-3.5 w-3.5', isDark ? 'text-slate-500' : 'text-slate-400')} />
-                <span className={cn('text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}>
+                <Users className={cn('h-3.5 w-3.5', isDark ? 'text-slate-500' : 'text-muted-foreground')} />
+                <span className={cn('text-xs font-medium', isDark ? 'text-slate-300' : 'text-muted-foreground')}>
                   People with access ({collaborators.length + 1})
                 </span>
               </div>
@@ -231,23 +231,23 @@ export function ShareProjectModal({
                   <div
                     className={cn(
                       'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold',
-                      isDark ? 'bg-brand-green/20 text-brand-green' : 'bg-emerald-100 text-emerald-700',
+                      isDark ? 'bg-brand-green/20 text-brand-green' : 'bg-emerald-100 text-brand-green',
                     )}
                   >
                     {USER_DISPLAY_NAME.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={cn('truncate text-sm font-medium', isDark ? 'text-slate-100' : 'text-slate-900')}>
+                    <p className={cn('truncate text-sm font-medium', isDark ? 'text-slate-100' : 'text-foreground')}>
                       {USER_DISPLAY_NAME}
                     </p>
-                    <p className={cn('truncate text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                    <p className={cn('truncate text-[11px]', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                       Owner · {ARCHITECT_DISPLAY_NAME}
                     </p>
                   </div>
                   <span
                     className={cn(
                       'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
-                      isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-emerald-100 text-emerald-700',
+                      isDark ? 'bg-brand-green/15 text-brand-green' : 'bg-emerald-100 text-brand-green',
                     )}
                   >
                     Owner
@@ -255,7 +255,7 @@ export function ShareProjectModal({
                 </div>
 
                 {collaborators.length === 0 ? (
-                  <p className={cn('py-3 text-center text-[11px]', isDark ? 'text-slate-500' : 'text-slate-400')}>
+                  <p className={cn('py-3 text-center text-[11px]', isDark ? 'text-slate-500' : 'text-muted-foreground')}>
                     No collaborators yet. Add a team member above.
                   </p>
                 ) : (
@@ -270,16 +270,16 @@ export function ShareProjectModal({
                       <div
                         className={cn(
                           'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold',
-                          isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                          isDark ? 'bg-muted text-slate-300' : 'bg-muted text-muted-foreground',
                         )}
                       >
                         {initialsFromEmail(collab.email, collab.name)}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className={cn('truncate text-sm font-medium', isDark ? 'text-slate-100' : 'text-slate-900')}>
+                        <p className={cn('truncate text-sm font-medium', isDark ? 'text-slate-100' : 'text-foreground')}>
                           {collab.name || collab.email}
                         </p>
-                        <p className={cn('truncate text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                        <p className={cn('truncate text-[11px]', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                           {collab.name ? collab.email : ''}
                           {collab.name ? ' · ' : ''}
                           Added {formatAddedAt(collab.invitedAt)}
@@ -288,7 +288,7 @@ export function ShareProjectModal({
                       <span
                         className={cn(
                           'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium capitalize',
-                          isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                          isDark ? 'bg-muted text-slate-300' : 'bg-muted text-muted-foreground',
                         )}
                       >
                         {collab.permission}
@@ -300,7 +300,7 @@ export function ShareProjectModal({
                           'shrink-0 rounded-md p-1.5 opacity-70 transition-all hover:opacity-100',
                           isDark
                             ? 'text-slate-400 hover:bg-destructive/15 hover:text-destructive'
-                            : 'text-slate-500 hover:bg-red-50 hover:text-red-600',
+                            : 'text-muted-foreground hover:bg-red-50 hover:text-red-600',
                         )}
                         aria-label={`Remove ${collab.name || collab.email}`}
                         title="Remove access"

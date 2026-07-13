@@ -32,13 +32,13 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
         className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all duration-300 ${
           isDark
             ? 'glass-panel-dark border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]'
-            : 'bg-white border-slate-200'
+            : 'bg-card border-border'
         }`}
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-brand-green" />
-            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>
+            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-foreground'}`}>
               New Project
             </h2>
           </div>
@@ -48,7 +48,7 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
             className={`p-1 rounded-lg border ${
               isDark
                 ? 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >
             <X className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-foreground'}`}>
               Project Name
             </label>
             <input
@@ -69,13 +69,13 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
               className={`w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none transition-all ${
                 isDark
                   ? 'bg-mitra-input border-white/[0.06] focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface'
-                  : 'bg-white border-slate-200 focus:border-brand-green text-slate-800 placeholder-slate-400'
+                  : 'bg-card border-border focus:border-brand-green text-foreground placeholder:text-muted-foreground'
               }`}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-foreground'}`}>
               Describe what you want to build
             </label>
             <textarea
@@ -86,12 +86,12 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
               className={`w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none resize-none transition-all ${
                 isDark
                   ? 'bg-mitra-input border-white/[0.06] focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface'
-                  : 'bg-white border-slate-200 focus:border-brand-green text-slate-800 placeholder-slate-400'
+                  : 'bg-card border-border focus:border-brand-green text-foreground placeholder:text-muted-foreground'
               }`}
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-800/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={onClose}

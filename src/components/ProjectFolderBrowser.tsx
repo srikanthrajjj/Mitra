@@ -93,7 +93,7 @@ function extensionColorClass(ext: string, isDark: boolean): string {
   if (key === 'json' || key === 'js') {
     return isDark ? 'text-emerald-400 bg-emerald-500/15' : 'text-emerald-700 bg-emerald-50';
   }
-  return isDark ? 'text-muted-foreground bg-muted/40' : 'text-slate-600 bg-slate-100';
+  return isDark ? 'text-muted-foreground bg-muted/40' : 'text-muted-foreground bg-muted';
 }
 
 export function ProjectFolderBrowser({
@@ -531,7 +531,7 @@ export function ProjectFolderBrowser({
                 'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors',
                 isDark
                   ? 'border-white/[0.08] text-slate-300 hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-white'
-                  : 'border-border text-slate-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
+                  : 'border-border text-muted-foreground hover:border-border hover:bg-accent hover:text-brand-green',
               )}
               title="Share project"
             >
@@ -541,7 +541,7 @@ export function ProjectFolderBrowser({
                 <span
                   className={cn(
                     'inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px]',
-                    isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                    isDark ? 'bg-muted text-slate-300' : 'bg-muted text-muted-foreground',
                   )}
                 >
                   <Users className="h-2.5 w-2.5" />

@@ -86,8 +86,8 @@ export default function HomeActionCards({
               className={cn(
                 'group cursor-pointer border bg-card/65 p-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]',
                 isDark 
-                  ? 'border-white/[0.06] hover:border-emerald-500/30 hover:bg-emerald-950/10'
-                  : 'border-slate-200/80 hover:border-emerald-500/20 hover:bg-emerald-50/20',
+                  ? 'border-mitra-border hover:border-emerald-500/30 hover:bg-emerald-950/10'
+                  : 'border-border/80 hover:border-emerald-500/20 hover:bg-emerald-50/20',
                 ACCENT[action.id],
               )}
             >
@@ -117,8 +117,8 @@ export default function HomeActionCards({
               onClick={() => onExampleClick(ex.actionId, ex.prompt)}
               className={`text-xs px-3.5 py-1.5 rounded-full border transition-all duration-200 hover:scale-105 active:scale-95 shadow-xs cursor-pointer ${
                 isDark
-                  ? 'bg-[#1e293b]/50 border-white/[0.08] text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30'
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300'
+                  ? 'bg-mitra-surface/50 border-mitra-border text-foreground hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30'
+                  : 'bg-card border-border text-muted-foreground hover:bg-accent hover:text-brand-green hover:border-border'
               }`}
             >
               {ex.label}

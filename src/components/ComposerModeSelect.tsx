@@ -33,12 +33,11 @@ export function ComposerModeSelect({
 
   const strokePill = (extra?: string) =>
     cn(
-      'rounded-full border bg-transparent',
-      isDark ? 'border-white/12' : 'border-slate-200/80',
+      'rounded-full border bg-transparent border-mitra-border',
       extra,
     );
 
-  const openStroke = isDark ? 'border-brand-green/35' : 'border-emerald-300/80';
+  const openStroke = isDark ? 'border-brand-green/35' : 'border-brand-green/80';
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -54,7 +53,7 @@ export function ComposerModeSelect({
                 'inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-medium leading-none',
               ),
               open && openStroke,
-              isDark ? 'text-slate-300' : 'text-slate-700',
+              'text-foreground',
             )}
           >
             <span>{current.label}</span>
@@ -69,9 +68,10 @@ export function ComposerModeSelect({
         className={cn(
           theme,
           'min-w-[5.25rem] rounded-xl border p-1 backdrop-blur-md',
+          'border-mitra-border bg-mitra-surface/95 text-foreground',
           isDark
-            ? 'border-white/[0.06] bg-zinc-900/95 text-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
-            : 'border-slate-200/60 bg-white/95 text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
+            ? 'shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
+            : 'shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
         )}
       >
         {COMPOSER_MODES.map((mode) => {
@@ -85,10 +85,8 @@ export function ComposerModeSelect({
                 selected
                   ? isDark
                     ? 'bg-brand-green/10 text-brand-green focus:bg-brand-green/10 focus:text-brand-green'
-                    : 'bg-emerald-50 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700'
-                  : isDark
-                    ? 'text-slate-400 focus:bg-white/[0.06] focus:text-slate-200'
-                    : 'text-slate-600 focus:bg-slate-50 focus:text-slate-900',
+                    : 'bg-muted text-brand-green focus:bg-muted focus:text-brand-green'
+                  : 'text-muted-foreground focus:bg-mitra-surface focus:text-foreground',
               )}
             >
               {mode.label}

@@ -51,7 +51,7 @@ export function CenterToast({
               'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border px-5 py-4 shadow-2xl backdrop-blur-md transition-all duration-300',
               isDark
                 ? 'bg-zinc-950/90 border-brand-green/25 shadow-[0_20px_50px_rgba(0,0,0,0.6)] shadow-brand-green/5'
-                : 'bg-white/90 border-emerald-200 shadow-[0_20px_50px_rgba(50,215,75,0.06)]',
+                : 'bg-card/90 border-border shadow-[0_20px_50px_rgba(50,215,75,0.06)]',
             )}
           >
             <div
@@ -59,7 +59,7 @@ export function CenterToast({
                 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border',
                 isDark
                   ? 'border-emerald-500/25 bg-emerald-500/10'
-                  : 'border-emerald-200 bg-emerald-50',
+                  : 'border-border bg-muted',
               )}
             >
               <CheckCircle2
@@ -71,7 +71,7 @@ export function CenterToast({
                 <p
                   className={cn(
                     'text-sm font-semibold leading-snug',
-                    isDark ? 'text-foreground' : 'text-slate-900',
+                    isDark ? 'text-foreground' : 'text-foreground',
                   )}
                 >
                   {toast.title}
@@ -81,7 +81,7 @@ export function CenterToast({
                 className={cn(
                   'text-[13px] leading-relaxed',
                   toast.title ? 'mt-1' : '',
-                  isDark ? 'text-muted-foreground' : 'text-slate-600',
+                  isDark ? 'text-muted-foreground' : 'text-muted-foreground',
                 )}
               >
                 {toast.message}
@@ -95,7 +95,7 @@ export function CenterToast({
                 'shrink-0 rounded-lg p-1 transition-colors',
                 isDark
                   ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700',
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
             >
               <X className="h-4 w-4" />

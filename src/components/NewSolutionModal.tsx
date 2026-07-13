@@ -46,17 +46,17 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
       
       {/* Modal Card frame */}
       <div className={`w-full max-w-lg rounded-2xl border p-6 overflow-hidden relative shadow-2xl transition-all duration-300 ${
-        isDark ? 'glass-panel-dark border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]' : 'bg-white border-slate-200'
+        isDark ? 'glass-panel-dark border-mitra-border shadow-[0_20px_50px_rgba(0,0,0,0.5)]' : 'bg-card border-border'
       }`}>
         
         {/* Glow ambient circle */}
         <div className="absolute -top-12 -left-12 w-28 h-28 bg-emerald-500/10 blur-xl rounded-full pointer-events-none" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/20 pb-4 mb-5">
+        <div className="flex items-center justify-between border-b border-mitra-border/20 pb-4 mb-5">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-brand-green animate-pulse" />
-            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-slate-950'}`}>
+            <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-foreground'}`}>
               Draft New ServiceNow Solution
             </h2>
           </div>
@@ -64,7 +64,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
             type="button"
             onClick={onClose}
             className={`p-1 rounded-lg border ${
-              isDark ? 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900' : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+              isDark ? 'border-mitra-border text-muted-foreground hover:text-foreground hover:bg-mitra-surface' : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >
             <X className="w-4.5 h-4.5" />
@@ -76,7 +76,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
           
           {/* Solution Name */}
           <div className="space-y-1.5">
-            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-750'}`}>
+            <label className={`text-xs font-semibold ${isDark ? 'text-foreground' : 'text-foreground'}`}>
               Solution / Service Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -87,8 +87,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
               onChange={(e) => setName(e.target.value)}
               className={`w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none transition-all ${
                 isDark 
-                  ? 'bg-mitra-input border-white/[0.06] focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface' 
-                  : 'bg-white border-slate-200 focus:border-brand-green text-slate-800 placeholder-slate-400'
+                  ? 'bg-mitra-input border-mitra-border focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface' 
+                  : 'bg-card border-border focus:border-brand-green text-foreground placeholder:text-muted-foreground'
               }`}
             />
           </div>
@@ -98,7 +98,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
             
             {/* Category selection */}
             <div className="space-y-1.5">
-              <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-750'}`}>
+            <label className={`text-xs font-semibold ${isDark ? 'text-foreground' : 'text-foreground'}`}>
                 Business Capability Category
               </label>
               <select
@@ -106,8 +106,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
                 onChange={(e) => setCategory(e.target.value as any)}
                 className={`w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-all ${
                   isDark 
-                    ? 'bg-mitra-input border-white/[0.06] text-illuminate-text focus:border-brand-green focus:bg-mitra-surface' 
-                    : 'bg-white border-slate-200 text-slate-700 focus:border-brand-green'
+                    ? 'bg-mitra-input border-mitra-border text-illuminate-text focus:border-brand-green focus:bg-mitra-surface' 
+                    : 'bg-card border-border text-foreground focus:border-brand-green'
                 }`}
               >
                 <option value="ITSM">ITSM (IT Service Management)</option>
@@ -119,7 +119,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
 
             {/* Extends base Table */}
             <div className="space-y-1.5">
-              <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-755'}`}>
+              <label className={`text-xs font-semibold ${isDark ? 'text-foreground' : 'text-foreground'}`}>
                 Extends Base ServiceNow Table
               </label>
               <select
@@ -127,8 +127,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
                 onChange={(e) => setExtendsTable(e.target.value)}
                 className={`w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-all ${
                   isDark 
-                    ? 'bg-mitra-input border-white/[0.06] text-illuminate-text focus:border-brand-green focus:bg-mitra-surface' 
-                    : 'bg-white border-slate-200 text-slate-700 focus:border-brand-green'
+                    ? 'bg-mitra-input border-mitra-border text-illuminate-text focus:border-brand-green focus:bg-mitra-surface' 
+                    : 'bg-card border-border text-foreground focus:border-brand-green'
                 }`}
               >
                 <option value="task">task (Recommended - inherits SLAs, priority, assignments)</option>
@@ -143,7 +143,7 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-755'}`}>
+            <label className={`text-xs font-semibold ${isDark ? 'text-foreground' : 'text-foreground'}`}>
               Description of Capabilities
             </label>
             <textarea
@@ -153,8 +153,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
               onChange={(e) => setDescription(e.target.value)}
               className={`w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none resize-none transition-all ${
                 isDark 
-                  ? 'bg-mitra-input border-white/[0.06] focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface' 
-                  : 'bg-white border-slate-200 focus:border-brand-green text-slate-800 placeholder-slate-400'
+                  ? 'bg-mitra-input border-mitra-border focus:border-brand-green focus:active-glow-dark text-illuminate-text placeholder:text-illuminate-muted focus:bg-mitra-surface' 
+                  : 'bg-card border-border focus:border-brand-green text-foreground placeholder:text-muted-foreground'
               }`}
             />
           </div>
@@ -162,17 +162,17 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
           {/* Inheritance warning hint */}
           {extendsTable === 'task' && (
             <div className={`p-3 rounded-lg flex items-start gap-2 border ${
-              isDark ? 'bg-mitra-surface/60 border-white/[0.06]' : 'bg-emerald-50/10 border-emerald-100'
+              isDark ? 'bg-mitra-surface/60 border-mitra-border' : 'bg-emerald-50/10 border-emerald-100'
             }`}>
               <AlertCircle className="w-4 h-4 text-brand-green shrink-0 mt-0.5" />
-              <p className="text-[11px] text-slate-500 leading-relaxed">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
                 Extending the <strong>task</strong> table is an official ServiceNow best practice. Your new table will automatically inherit standard states, task numbers, priority matrix, activities log, SLA tracking and active work lists.
               </p>
             </div>
           )}
 
           {/* Footer controls */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-800/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-mitra-border/10">
             <button
               type="button"
               onClick={onClose}

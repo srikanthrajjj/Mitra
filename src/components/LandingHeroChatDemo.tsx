@@ -397,7 +397,7 @@ export function LandingHeroChatDemo({ isLight = false }: LandingHeroChatDemoProp
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="text-center space-y-4 px-6 max-w-sm"
             >
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/20 mb-2">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#4FCF36]/10 border border-[#4FCF36]/20 mb-2">
                 <MitraLogo className="h-5 w-5" />
               </div>
               <h2 className="text-xl md:text-2xl font-light tracking-wide text-white/95 leading-relaxed">

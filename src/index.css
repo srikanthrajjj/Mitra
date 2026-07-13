@@ -40,28 +40,28 @@
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
-  /* VR dark portal — ~90% neutral charcoal, ~10% neon accent */
-  --color-brand-green: #00ff66;
-  --color-brand-green-hover: #00e65a;
+  /* VR dark portal — primary green palette */
+  --color-brand-green: #4FCF36;
+  --color-brand-green-hover: #72E95A;
   --color-vr-cyan: #00c9a0;
-  --color-vr-accent: rgba(0, 255, 102, 0.55);
+  --color-vr-accent: rgba(79, 207, 54, 0.55);
 
-  --color-emerald-400: #00ff66;
-  --color-emerald-500: #00e65a;
-  --color-emerald-600: #00cc50;
-  --color-emerald-700: #00993c;
-  --color-emerald-950: #001a0a;
+  --color-emerald-400: #72E95A;
+  --color-emerald-500: #4FCF36;
+  --color-emerald-600: #3F8F2B;
+  --color-emerald-700: #316726;
+  --color-emerald-950: #142414;
 
-  --color-mitra-bg: #0a0a0a;
-  --color-mitra-sidebar: #111111;
-  --color-mitra-surface: #171717;
-  --color-mitra-border: #262626;
-  --color-mitra-highlight: #1a1a1a;
-  --color-mitra-input: #0f0f0f;
+  --color-mitra-bg: var(--mitra-bg);
+  --color-mitra-sidebar: var(--mitra-sidebar);
+  --color-mitra-surface: var(--mitra-surface);
+  --color-mitra-border: var(--mitra-border-color);
+  --color-mitra-highlight: var(--mitra-highlight);
+  --color-mitra-input: var(--mitra-input);
 
-  --color-illuminate-text: #d4d4d4;
-  --color-illuminate-muted: #737373;
-  --color-illuminate-teal: #1a1a1a;
+  --color-illuminate-text: var(--illuminate-text);
+  --color-illuminate-muted: var(--illuminate-muted);
+  --color-illuminate-teal: var(--illuminate-teal);
   --animate-orbit: orbit calc(var(--duration)*1s) linear infinite;
   @keyframes orbit {
   0% {
@@ -100,118 +100,129 @@ h6,
 /* Semantic tokens — dark default on :root, light overrides on .light (html) */
 :root {
   --radius: 0.625rem;
-  --background: 0 0% 7%;
-  --foreground: 0 0% 92%;
-  --card: 0 0% 11%;
-  --card-foreground: 0 0% 92%;
-  --popover: 0 0% 13%;
-  --popover-foreground: 0 0% 92%;
-  --primary: 140 100% 50%;
-  --primary-foreground: 150 80% 5%;
-  --secondary: 0 0% 14%;
-  --secondary-foreground: 0 0% 92%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 58%;
-  --accent: 0 0% 16%;
-  --accent-foreground: 0 0% 92%;
+  --background: 0 0% 4%;
+  --foreground: 210 16% 82%;
+  --card: 0 0% 9%;
+  --card-foreground: 210 16% 82%;
+  --popover: 0 0% 9%;
+  --popover-foreground: 210 16% 82%;
+  --primary: 110 60% 57%;
+  --primary-foreground: 113 31% 15%;
+  --secondary: 0 0% 9%;
+  --secondary-foreground: 210 16% 82%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 210 10% 54%;
+  --accent: 0 0% 14%;
+  --accent-foreground: 210 16% 82%;
   --destructive: 0 62% 50%;
-  --destructive-foreground: 0 0% 92%;
-  --border: 0 0% 22%;
-  --input: 0 0% 12%;
-  --ring: 140 100% 50%;
-  --sidebar: 0 0% 9%;
-  --sidebar-foreground: 0 0% 92%;
-  --sidebar-primary: 140 100% 50%;
-  --sidebar-primary-foreground: 150 80% 5%;
-  --sidebar-accent: 0 0% 14%;
-  --sidebar-accent-foreground: 0 0% 92%;
-  --sidebar-border: 0 0% 20%;
-  --sidebar-ring: 140 100% 50%;
+  --destructive-foreground: 210 16% 82%;
+  --border: 0 0% 17%;
+  --input: 0 0% 7%;
+  --ring: 110 60% 57%;
+  --sidebar: 0 0% 4%;
+  --sidebar-foreground: 210 16% 82%;
+  --sidebar-primary: 110 60% 57%;
+  --sidebar-primary-foreground: 113 31% 15%;
+  --sidebar-accent: 0 0% 9%;
+  --sidebar-accent-foreground: 210 16% 82%;
+  --sidebar-border: 0 0% 14%;
+  --sidebar-ring: 110 60% 57%;
+
+  --mitra-bg: #0A0A0A;
+  --mitra-sidebar: #121212;
+  --mitra-surface: #1F1F1F;
+  --mitra-border-color: #484E57;
+  --mitra-highlight: #242424;
+  --mitra-input: #171717;
+
+  --illuminate-text: #CDD2D7;
+  --illuminate-muted: #636A75;
+  --illuminate-teal: #1A3218;
 
   --radius-button: 9999px;
 }
 
 .light {
   --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
+  --foreground: 120 30% 15%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 120 30% 15%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 140 100% 50%;
-  --primary-foreground: 150 80% 5%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
+  --popover-foreground: 120 30% 15%;
+  --primary: 110 87% 34%;
+  --primary-foreground: 92 97% 53%;
+  --secondary: 95 65% 93%;
+  --secondary-foreground: 120 30% 15%;
+  --muted: 95 65% 96%;
+  --muted-foreground: 110 20% 40%;
+  --accent: 95 65% 93%;
+  --accent-foreground: 120 30% 15%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 140 100% 50%;
-  --sidebar: 0 0% 98%;
-  --sidebar-foreground: 222 47% 11%;
-  --sidebar-primary: 140 100% 50%;
-  --sidebar-primary-foreground: 150 80% 5%;
-  --sidebar-accent: 210 40% 96%;
-  --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-ring: 140 100% 50%;
+  --border: 100 30% 88%;
+  --input: 95 40% 93%;
+  --ring: 110 87% 34%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 120 30% 15%;
+  --sidebar-primary: 110 87% 34%;
+  --sidebar-primary-foreground: 92 97% 53%;
+  --sidebar-accent: 95 65% 93%;
+  --sidebar-accent-foreground: 120 30% 15%;
+  --sidebar-border: 100 30% 88%;
+  --sidebar-ring: 110 87% 34%;
 
-  --color-mitra-bg: #f8fafc;
-  --color-mitra-sidebar: #ffffff;
-  --color-mitra-surface: #ffffff;
-  --color-mitra-border: #e2e8f0;
-  --color-mitra-highlight: #f1f5f9;
-  --color-mitra-input: #ffffff;
+  --mitra-bg: #FFFFFF;
+  --mitra-sidebar: #FFFFFF;
+  --mitra-surface: #FFFFFF;
+  --mitra-border-color: #DCF8D2;
+  --mitra-highlight: #F2FDEA;
+  --mitra-input: #FFFFFF;
 
-  --color-illuminate-text: #0f172a;
-  --color-illuminate-muted: #64748b;
-  --color-illuminate-teal: #f8fafc;
+  --illuminate-text: #106F00;
+  --illuminate-muted: #158F00;
+  --illuminate-teal: #FFFFFF;
 
   --radius-button: 9999px;
 }
 
 /* Bluish dark theme — IDE / ChatGPT blue-dark surfaces, Mitra green primary */
 .blue {
-  --background: 216 25% 7%;
-  --foreground: 210 18% 92%;
-  --card: 218 26% 15%;
-  --card-foreground: 210 18% 92%;
-  --popover: 218 24% 13%;
-  --popover-foreground: 210 18% 92%;
-  --primary: 140 100% 50%;
-  --primary-foreground: 150 80% 5%;
-  --secondary: 218 22% 14%;
-  --secondary-foreground: 210 18% 92%;
-  --muted: 218 22% 14%;
-  --muted-foreground: 215 14% 58%;
-  --accent: 218 24% 16%;
-  --accent-foreground: 210 18% 92%;
+  --background: 210 14% 14%;
+  --foreground: 210 16% 82%;
+  --card: 210 14% 18%;
+  --card-foreground: 210 16% 82%;
+  --popover: 210 13% 24%;
+  --popover-foreground: 210 16% 82%;
+  --primary: 110 60% 57%;
+  --primary-foreground: 113 31% 15%;
+  --secondary: 210 13% 24%;
+  --secondary-foreground: 210 16% 82%;
+  --muted: 210 13% 24%;
+  --muted-foreground: 210 10% 54%;
+  --accent: 210 12% 32%;
+  --accent-foreground: 210 16% 82%;
   --destructive: 0 62% 50%;
-  --destructive-foreground: 210 18% 92%;
-  --border: 215 28% 26%;
-  --input: 218 24% 12%;
-  --ring: 140 100% 50%;
-  --sidebar: 215 22% 11%;
-  --sidebar-foreground: 210 18% 92%;
-  --sidebar-primary: 140 100% 50%;
-  --sidebar-primary-foreground: 150 80% 5%;
-  --sidebar-accent: 218 22% 14%;
-  --sidebar-accent-foreground: 210 18% 92%;
-  --sidebar-border: 215 32% 24%;
-  --sidebar-ring: 140 100% 50%;
+  --destructive-foreground: 210 16% 82%;
+  --border: 210 12% 32%;
+  --input: 210 13% 24%;
+  --ring: 110 60% 57%;
+  --sidebar: 210 14% 14%;
+  --sidebar-foreground: 210 16% 82%;
+  --sidebar-primary: 110 60% 57%;
+  --sidebar-primary-foreground: 113 31% 15%;
+  --sidebar-accent: 210 13% 24%;
+  --sidebar-accent-foreground: 210 16% 82%;
+  --sidebar-border: 210 12% 32%;
+  --sidebar-ring: 110 60% 57%;
 
-  --color-mitra-bg: #0e1117;
-  --color-mitra-sidebar: #161b22;
-  --color-mitra-surface: #1c2333;
-  --color-mitra-border: #2a3548;
-  --color-mitra-highlight: #1a2230;
-  --color-mitra-input: #141a24;
+  --color-mitra-bg: #0A0A0A;
+  --color-mitra-sidebar: #121212;
+  --color-mitra-surface: #1F1F1F;
+  --color-mitra-border: #484E57;
+  --color-mitra-highlight: #242424;
+  --color-mitra-input: #171717;
 
-  color: #d4d4d4;
+  color: #CDD2D7;
 }
 
 /* Hide native scrollbars and enable smooth scrolling */
@@ -280,7 +291,7 @@ html, body, div, textarea, pre, select {
   border: none;
   border-radius: 9999px !important;
   font-weight: 600;
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.35);
+  box-shadow: 0 0 12px rgba(79, 207, 54, 0.35);
   transition:
     background-color 0.15s ease,
     transform 0.15s ease,
@@ -292,7 +303,7 @@ html, body, div, textarea, pre, select {
 .btn-dark-primary:hover {
   background: var(--color-brand-green-hover);
   color: #021208;
-  box-shadow: 0 0 16px rgba(0, 255, 102, 0.45);
+  box-shadow: 0 0 16px rgba(79, 207, 54, 0.45);
 }
 
 .btn-cta:active,
@@ -1192,7 +1203,7 @@ button.btn-danger {
 }
 
 .light .accent-neon-glow {
-  box-shadow: 0 0 0 1px rgba(0, 255, 102, 0.2);
+  box-shadow: 0 0 0 1px rgba(79, 207, 54, 0.2);
 }
 
 /* Accent utility — use sparingly (~10% of UI) */
@@ -1201,11 +1212,11 @@ button.btn-danger {
 }
 
 .accent-neon-border {
-  border-color: rgba(0, 255, 102, 0.35);
+  border-color: rgba(79, 207, 54, 0.35);
 }
 
 .accent-neon-glow {
-  box-shadow: 0 0 12px rgba(0, 255, 102, 0.12);
+  box-shadow: 0 0 12px rgba(79, 207, 54, 0.12);
 }
 
 /* Chat composer ΓÇö seamless center ΓåÆ bottom dock */
@@ -1250,7 +1261,7 @@ button.btn-danger {
 }
 
 .vr-tour-spotlight--light {
-  border-color: rgba(0, 255, 102, 0.28);
+  border-color: rgba(79, 207, 54, 0.28);
   box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.42);
 }
 
@@ -2264,7 +2275,7 @@ button.btn-danger {
 
 /* Landing page — dark AI product marketing shell */
 .landing-page {
-  --landing-accent: #00ff66;
+  --landing-accent: #4FCF36;
   --landing-accent-deep: #00cc50;
   --landing-cyan: #00c9a0;
   --landing-purple: #7c3aed;
@@ -2287,7 +2298,7 @@ button.btn-danger {
   overflow: hidden;
   background-color: #040608;
   background-image: 
-    radial-gradient(ellipse 65% 50% at 20% 25%, rgba(0, 255, 102, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 50% at 20% 25%, rgba(79, 207, 54, 0.12) 0%, transparent 60%),
     radial-gradient(ellipse 55% 55% at 85% 20%, rgba(0, 201, 160, 0.08) 0%, transparent 65%),
     radial-gradient(ellipse 70% 60% at 50% 80%, rgba(0, 46, 18, 0.5) 0%, transparent 70%);
 }
@@ -2417,7 +2428,7 @@ button.btn-danger {
       rgba(6, 8, 10, 0.98) 0%,
       rgba(6, 8, 10, 0.88) 40%,
       rgba(6, 8, 10, 0.38) 64%,
-      rgba(0, 255, 102, 0.03) 84%,
+      rgba(79, 207, 54, 0.03) 84%,
       transparent 100%
     ),
     linear-gradient(
@@ -2670,7 +2681,7 @@ button.btn-danger {
 .landing-hero-chat-bubble--assistant {
   border-radius: 1.25rem 1.25rem 1.25rem 0.375rem;
   background: rgba(10, 18, 12, 0.92);
-  border: 1px solid rgba(0, 255, 102, 0.28);
+  border: 1px solid rgba(79, 207, 54, 0.28);
   color: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(16px);
@@ -2816,9 +2827,9 @@ button.btn-danger {
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: none;
-  color: #00ff66;
-  background: rgba(0, 255, 102, 0.08);
-  border: 1px solid rgba(0, 255, 102, 0.24);
+  color: #4FCF36;
+  background: rgba(79, 207, 54, 0.08);
+  border: 1px solid rgba(79, 207, 54, 0.24);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: all 200ms ease;
 }
@@ -3468,7 +3479,7 @@ button.btn-danger {
   display: inline-block;
   width: 2px;
   height: 14px;
-  background: #00ff66;
+  background: #4FCF36;
   margin-left: 2px;
   animation: blink-cursor 1s step-end infinite;
   vertical-align: middle;
@@ -3476,7 +3487,7 @@ button.btn-danger {
 
 @keyframes blink-cursor {
   from, to { background-color: transparent }
-  50% { background-color: #00ff66 }
+  50% { background-color: #4FCF36 }
 }
 
 .tab-flash {
@@ -3485,11 +3496,11 @@ button.btn-danger {
 
 @keyframes green-flash-pulse {
   0% {
-    box-shadow: 0 0 0 0px rgba(0, 255, 102, 0.6);
-    border-color: rgba(0, 255, 102, 0.8);
+    box-shadow: 0 0 0 0px rgba(79, 207, 54, 0.6);
+    border-color: rgba(79, 207, 54, 0.8);
   }
   100% {
-    box-shadow: 0 0 0 15px rgba(0, 255, 102, 0);
+    box-shadow: 0 0 0 15px rgba(79, 207, 54, 0);
     border-color: transparent;
   }
 }
@@ -3510,9 +3521,9 @@ button.btn-danger {
 }
 
 .btn-liquid-primary:hover {
-  background: #00ff66 !important;
+  background: #4FCF36 !important;
   color: #000000 !important;
-  box-shadow: 0 4px 16px rgba(0, 255, 102, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(79, 207, 54, 0.4) !important;
 }
 
 .btn-liquid-primary:active {
@@ -3533,10 +3544,10 @@ button.btn-danger {
 }
 
 .btn-liquid-secondary:hover {
-  background: rgba(0, 255, 102, 0.06) !important;
-  color: #00ff66 !important;
-  border-color: #00ff66 !important;
-  box-shadow: 0 4px 12px rgba(0, 255, 102, 0.2) !important;
+  background: rgba(79, 207, 54, 0.06) !important;
+  color: #4FCF36 !important;
+  border-color: #4FCF36 !important;
+  box-shadow: 0 4px 12px rgba(79, 207, 54, 0.2) !important;
 }
 
 .btn-liquid-secondary:active {
@@ -3554,14 +3565,14 @@ button.btn-danger {
 
 /* ── Echelon-inspired layout (Illuminaite theme) ── */
 .landing-echelon {
-  --landing-accent: #00ff66;
+  --landing-accent: #4FCF36;
   --landing-accent-deep: #00cc50;
 }
 
 .landing-echelon-hero-bg {
   height: 100vh;
   background:
-    radial-gradient(ellipse 70% 55% at 50% -10%, rgba(0, 255, 102, 0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 55% at 50% -10%, rgba(79, 207, 54, 0.14) 0%, transparent 65%),
     #030508;
 }
 
@@ -3575,17 +3586,17 @@ button.btn-danger {
 .landing-glow-word {
   color: var(--landing-accent);
   text-shadow:
-    0 0 24px rgba(0, 255, 102, 0.45),
-    0 0 48px rgba(0, 255, 102, 0.2);
+    0 0 24px rgba(79, 207, 54, 0.45),
+    0 0 48px rgba(79, 207, 54, 0.2);
 }
 
 .landing-email-pill {
   border-radius: 9999px;
-  border: 1px solid rgba(0, 255, 102, 0.35);
+  border: 1px solid rgba(79, 207, 54, 0.35);
   background: rgba(0, 0, 0, 0.55);
   box-shadow:
-    0 0 0 1px rgba(0, 255, 102, 0.08),
-    0 0 32px rgba(0, 255, 102, 0.12);
+    0 0 0 1px rgba(79, 207, 54, 0.08),
+    0 0 32px rgba(79, 207, 54, 0.12);
   backdrop-filter: blur(12px);
 }
 
@@ -3615,15 +3626,15 @@ button.btn-danger {
 .landing-platform-panel {
   position: relative;
   box-shadow:
-    0 0 0 1px rgba(0, 255, 102, 0.06) inset,
+    0 0 0 1px rgba(79, 207, 54, 0.06) inset,
     0 32px 80px rgba(0, 0, 0, 0.45),
-    0 0 60px rgba(0, 255, 102, 0.06);
+    0 0 60px rgba(79, 207, 54, 0.06);
 }
 
 .landing-platform-panel-glow {
   background:
-    radial-gradient(ellipse 70% 80% at 0% 50%, rgba(0, 255, 102, 0.07), transparent 55%),
-    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(0, 255, 102, 0.05), transparent 50%);
+    radial-gradient(ellipse 70% 80% at 0% 50%, rgba(79, 207, 54, 0.07), transparent 55%),
+    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(79, 207, 54, 0.05), transparent 50%);
 }
 
 .landing-platform-feature-card {
@@ -3631,7 +3642,7 @@ button.btn-danger {
 }
 
 .landing-platform-feature-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 255, 102, 0.08);
+  box-shadow: 0 8px 32px rgba(79, 207, 54, 0.08);
 }
 
 /* Intent journey — What We Do */

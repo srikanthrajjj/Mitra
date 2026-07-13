@@ -18,9 +18,7 @@ export function ArchitectColdStartLeads({
   return (
     <div className="w-full max-w-2xl mx-auto">
       <p
-        className={`text-[11px] font-medium uppercase tracking-wide mb-3 text-center ${
-          isDark ? 'text-slate-500' : 'text-slate-500'
-        }`}
+        className="text-[11px] font-medium uppercase tracking-wide mb-3 text-center text-muted-foreground"
       >
         Or start from a scenario
       </p>
@@ -33,22 +31,22 @@ export function ArchitectColdStartLeads({
             onClick={() => onSelect(lead.message)}
             className={`architect-cold-start-lead group text-left rounded-xl border px-3.5 py-3 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${
               isDark
-                ? 'bg-mitra-surface/40 border-white/[0.07] hover:bg-mitra-highlight hover:border-brand-green/25'
-                : 'bg-white border-slate-200 hover:bg-emerald-50/80 hover:border-emerald-300 shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
+                ? 'bg-mitra-surface/40 border-mitra-border hover:bg-mitra-highlight hover:border-brand-green/25'
+                : 'bg-card border-border hover:bg-accent hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
             }`}
           >
             <span
               className={`block text-[13px] font-semibold leading-snug mb-1 transition-colors ${
                 isDark
-                  ? 'text-slate-100 group-hover:text-illuminate-text'
-                  : 'text-slate-800 group-hover:text-emerald-900'
+                  ? 'text-foreground group-hover:text-illuminate-text'
+                  : 'text-foreground group-hover:text-brand-green'
               }`}
             >
               {lead.label}
             </span>
             <span
               className={`block text-[11px] leading-relaxed ${
-                isDark ? 'text-slate-500 group-hover:text-slate-400' : 'text-slate-500'
+                isDark ? 'text-muted-foreground group-hover:text-muted-foreground' : 'text-muted-foreground'
               }`}
             >
               {lead.scope}

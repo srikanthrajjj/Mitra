@@ -91,7 +91,7 @@ export default function MitraThinkingIndicator({
             key={i}
             className={cn(
               'h-[5px] w-[5px] rounded-full transition-all duration-200 ease-in-out',
-              isDark ? 'bg-white' : 'bg-slate-900',
+              isDark ? 'bg-slate-900' : 'bg-card',
               i === activeIndex
                 ? cn(
                     'scale-[1.15] opacity-100',
@@ -106,7 +106,7 @@ export default function MitraThinkingIndicator({
         className={cn(
           'text-[13px] font-normal leading-none',
           compact ? 'text-[12px]' : 'text-[13px]',
-          isDark ? 'text-zinc-300' : 'text-slate-600',
+          isDark ? 'text-zinc-300' : 'text-muted-foreground',
         )}
       >
         {label}

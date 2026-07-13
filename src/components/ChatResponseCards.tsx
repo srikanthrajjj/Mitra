@@ -43,11 +43,11 @@ export function ActionPillList({
                   : 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
                 : anySelected
                   ? isDark
-                    ? 'bg-mitra-surface/30 border-white/[0.04] text-slate-600 opacity-40'
-                    : 'bg-slate-50 border-slate-100 text-slate-400 opacity-40'
+                    ? 'bg-mitra-surface/30 border-white/[0.04] text-muted-foreground opacity-40'
+                    : 'bg-muted border-border text-muted-foreground opacity-40'
                   : isDark
-                    ? 'bg-mitra-surface/60 border-white/[0.1] text-slate-200 hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-white hover:shadow-[0_0_12px_rgba(50,215,75,0.12)] cursor-pointer active:scale-[0.99]'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.99]'
+                    ? 'bg-mitra-surface/60 border-white/[0.1] text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-white hover:shadow-[0_0_12px_rgba(50,215,75,0.12)] cursor-pointer active:scale-[0.99]'
+                    : 'bg-card border-mitra-border text-foreground hover:bg-accent hover:border-border hover:text-brand-green shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.99]'
             }`}
           >
             {numbered ? (
@@ -89,7 +89,7 @@ export function SimpleFacts({
   isDark: boolean;
 }) {
   return (
-    <p className={`text-[13px] leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+    <p className={`text-[13px] leading-relaxed ${isDark ? 'text-foreground' : 'text-foreground'}`}>
       {items.map((item) => item.value).join(' ')}
     </p>
   );
@@ -105,7 +105,7 @@ export function BulletList({
   renderItem: (text: string) => React.ReactNode;
 }) {
   return (
-    <ul className={`space-y-1 list-disc pl-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+    <ul className={`space-y-1 list-disc pl-4 ${isDark ? 'text-foreground' : 'text-foreground'}`}>
       {items.map((item, i) => (
         <li key={i} className="text-[13px] leading-relaxed">
           {renderItem(item)}
@@ -123,10 +123,10 @@ export function SimpleTaskList({
   isDark: boolean;
 }) {
   return (
-    <ol className={`space-y-0.5 list-none ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+    <ol className={`space-y-0.5 list-none ${isDark ? 'text-foreground' : 'text-muted-foreground'}`}>
       {items.map((item, i) => (
         <li key={i} className={`text-[13px] leading-snug flex gap-2 ${item.done ? 'opacity-50 line-through' : ''}`}>
-          <span className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{i + 1}.</span>
+          <span className={`shrink-0 ${isDark ? 'text-muted-foreground' : 'text-muted-foreground'}`}>{i + 1}.</span>
           <span>{item.text}</span>
         </li>
       ))}
@@ -142,7 +142,7 @@ export function SimpleNext({
   isDark: boolean;
 }) {
   return (
-    <p className={`text-[13px] leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+    <p className={`text-[13px] leading-relaxed ${isDark ? 'text-foreground' : 'text-foreground'}`}>
       {children}
     </p>
   );
@@ -156,7 +156,7 @@ export function SectionLabel({
   isDark: boolean;
 }) {
   return (
-    <p className={`text-[12px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+    <p className={`text-[12px] font-medium ${isDark ? 'text-muted-foreground' : 'text-slate-500'}`}>
       {children}
     </p>
   );
@@ -172,14 +172,14 @@ export function DataTable({
   isDark: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white/80 dark:border-white/[0.06] dark:bg-white/[0.015]">
+    <div className="overflow-x-auto rounded-lg border border-mitra-border bg-card/80 dark:bg-white/[0.015]">
       <table className="w-full text-left text-[12px]">
         <thead>
-          <tr className="border-b border-slate-200 dark:border-white/[0.06]">
+            <tr className="border-b border-mitra-border">
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="whitespace-nowrap px-3 py-1.5 font-semibold text-slate-600 dark:text-slate-400"
+                className="whitespace-nowrap px-3 py-1.5 font-semibold text-muted-foreground"
               >
                 {h}
               </th>
@@ -190,12 +190,12 @@ export function DataTable({
           {rows.map((row, ri) => (
             <tr
               key={ri}
-              className="border-b border-slate-100 last:border-0 dark:border-white/[0.04]"
+              className="border-b border-mitra-border last:border-0"
             >
               {row.map((cell, ci) => (
                 <td
                   key={ci}
-                  className="px-3 py-1.5 align-top text-slate-800 dark:text-slate-200"
+                  className="px-3 py-1.5 align-top text-foreground"
                 >
                   {parseInlineMarkdown(cell, isDark)}
                 </td>
@@ -218,7 +218,7 @@ export function QuoteBlock({
   return (
     <blockquote
       className={`border-l-2 pl-3 text-[13px] leading-relaxed ${
-        isDark ? 'border-white/15 text-slate-400' : 'border-slate-300 text-slate-500'
+        isDark ? 'border-white/15 text-muted-foreground' : 'border-border text-slate-500'
       }`}
     >
       {children}
@@ -236,8 +236,8 @@ export function ActionChip({
   isDark: boolean;
 }) {
   return (
-    <span className={`text-[13px] ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-      <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>{label}: </span>
+    <span className={`text-[13px] ${isDark ? 'text-foreground' : 'text-muted-foreground'}`}>
+      <span className={isDark ? 'text-muted-foreground' : 'text-muted-foreground'}>{label}: </span>
       {value}
     </span>
   );
@@ -311,7 +311,7 @@ export function ActionCard({
   disabled?: boolean;
   isDark: boolean;
 }) {
-  const className = `text-left text-[13px] ${isDark ? 'text-slate-300 hover:text-slate-100' : 'text-slate-600 hover:text-slate-900'} ${disabled ? 'opacity-40' : ''} ${onClick ? 'cursor-pointer' : ''}`;
+  const className = `text-left text-[13px] ${isDark ? 'text-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground'} ${disabled ? 'opacity-40' : ''} ${onClick ? 'cursor-pointer' : ''}`;
 
   if (onClick) {
     return (
@@ -339,8 +339,8 @@ export function TaskRow({
   isDark: boolean;
 }) {
   const content = (
-    <span className={`text-[13px] flex gap-2 ${isDark ? 'text-slate-300' : 'text-slate-600'} ${done ? 'line-through opacity-50' : ''}`}>
-      <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>{index}.</span>
+    <span className={`text-[13px] flex gap-2 ${isDark ? 'text-foreground' : 'text-muted-foreground'} ${done ? 'line-through opacity-50' : ''}`}>
+      <span className={isDark ? 'text-muted-foreground' : 'text-muted-foreground'}>{index}.</span>
       {label}
     </span>
   );

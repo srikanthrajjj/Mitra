@@ -40,12 +40,11 @@ export function ComposerInstanceSelect({
 
   const strokePill = (extra?: string) =>
     cn(
-      'rounded-full border bg-transparent',
-      isDark ? 'border-white/12' : 'border-slate-200/80',
+      'rounded-full border bg-transparent border-mitra-border',
       extra,
     );
 
-  const openStroke = isDark ? 'border-brand-green/35' : 'border-emerald-300/80';
+  const openStroke = isDark ? 'border-brand-green/35' : 'border-brand-green/80';
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -68,7 +67,7 @@ export function ComposerInstanceSelect({
             className={cn(
               strokePill('inline-flex h-6 w-6 items-center justify-center'),
               open && openStroke,
-              isDark ? 'text-slate-400' : 'text-slate-500',
+              'text-muted-foreground',
             )}
           >
             <Plus
@@ -85,7 +84,7 @@ export function ComposerInstanceSelect({
                   'max-w-[7.5rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
                 ),
                 open && openStroke,
-                isDark ? 'text-slate-300' : 'text-slate-700',
+                'text-foreground',
               )}
             >
               {selected.name}
@@ -95,7 +94,7 @@ export function ComposerInstanceSelect({
               className={cn(
                 strokePill('px-2 py-0.5 text-[10px] font-medium leading-none'),
                 open && openStroke,
-                isDark ? 'text-slate-400' : 'text-slate-500',
+                'text-muted-foreground',
               )}
             >
               Instance
@@ -109,15 +108,16 @@ export function ComposerInstanceSelect({
         className={cn(
           theme,
           'w-64 rounded-xl border p-1 backdrop-blur-md',
+          'border-mitra-border bg-mitra-surface/95 text-foreground',
           isDark
-            ? 'border-white/[0.06] bg-zinc-900/95 text-zinc-200 shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
-            : 'border-slate-200/60 bg-white/95 text-slate-800 shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
+            ? 'shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
+            : 'shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
         )}
       >
         <DropdownMenuLabel className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
           ServiceNow instance
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+        <DropdownMenuSeparator className="bg-mitra-border/30" />
         {instances.map((instance) => {
           const isSelected = value === instance.id;
           return (
@@ -133,10 +133,8 @@ export function ComposerInstanceSelect({
                 isSelected
                   ? isDark
                     ? 'bg-brand-green/10 focus:bg-brand-green/10'
-                    : 'bg-emerald-50 focus:bg-emerald-50'
-                  : isDark
-                    ? 'focus:bg-white/[0.06]'
-                    : 'focus:bg-slate-50',
+                    : 'bg-muted focus:bg-muted'
+                  : 'focus:bg-mitra-surface',
                 !instance.active && 'opacity-50',
               )}
             >
@@ -145,9 +143,7 @@ export function ComposerInstanceSelect({
                   'mr-2 h-4 w-4 shrink-0',
                   isSelected
                     ? 'text-brand-green'
-                    : isDark
-                      ? 'text-slate-500'
-                      : 'text-slate-400',
+                    : 'text-muted-foreground',
                 )}
               />
               <div className="min-w-0 flex-1">
@@ -157,7 +153,7 @@ export function ComposerInstanceSelect({
                     className={cn(
                       strokePill('shrink-0 px-1.5 py-px text-[9px] font-semibold uppercase'),
                       isSelected && openStroke,
-                      isDark ? 'text-slate-400' : 'text-slate-500',
+              'text-muted-foreground',
                     )}
                   >
                     {instance.tag}
@@ -178,7 +174,7 @@ export function ComposerInstanceSelect({
         })}
         {onCreateConnection && (
           <>
-            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+            <DropdownMenuSeparator className="bg-mitra-border/30" />
             <DropdownMenuItem
               onClick={() => {
                 setOpen(false);
@@ -188,7 +184,7 @@ export function ComposerInstanceSelect({
                 'cursor-pointer rounded-lg px-2.5 py-2 text-xs font-medium outline-none',
                 isDark
                   ? 'text-brand-green focus:bg-brand-green/10 focus:text-brand-green'
-                  : 'text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700',
+                  : 'text-brand-green focus:bg-muted focus:text-brand-green',
               )}
             >
               <Plus className="mr-2 h-3.5 w-3.5" />

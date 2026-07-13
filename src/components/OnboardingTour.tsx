@@ -30,7 +30,7 @@ function parseTourContent(text: string, isDark: boolean) {
       return (
         <strong
           key={idx}
-          className={`font-semibold ${isDark ? 'text-illuminate-text' : 'text-emerald-700'}`}
+          className={`font-semibold ${isDark ? 'text-illuminate-text' : 'text-brand-green'}`}
         >
           {part}
         </strong>
@@ -281,7 +281,7 @@ export default function OnboardingTour({
           placementClass,
           isDark
             ? 'glass-panel-dark text-illuminate-text backdrop-blur-md'
-            : 'bg-white/95 border border-slate-200 text-slate-800 backdrop-blur-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)]',
+            : 'bg-card/95 border border-border text-foreground backdrop-blur-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)]',
         )}
         style={tooltipStyle}
       >
@@ -290,7 +290,7 @@ export default function OnboardingTour({
             <p
               className={cn(
                 'text-[9px] font-mono uppercase tracking-[0.18em]',
-                isDark ? 'text-slate-500' : 'text-slate-400',
+                isDark ? 'text-slate-500' : 'text-muted-foreground',
               )}
             >
               Step {stepIndex + 1} of {steps.length}
@@ -302,7 +302,7 @@ export default function OnboardingTour({
                 'cursor-pointer rounded-lg p-1.5 transition-all duration-200',
                 isDark
                   ? 'text-slate-500 hover:bg-white/[0.04] hover:text-illuminate-text'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800',
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
               aria-label="Close tour"
             >
@@ -314,7 +314,7 @@ export default function OnboardingTour({
             id="mitra-tour-title"
             className={cn(
               'mb-3 pr-6 font-display text-[15px] font-semibold leading-snug tracking-tight',
-              isDark ? 'text-illuminate-text' : 'text-slate-900',
+              isDark ? 'text-illuminate-text' : 'text-foreground',
             )}
           >
             {currentStep.title}
@@ -323,7 +323,7 @@ export default function OnboardingTour({
           <p
             className={cn(
               'mb-5 font-sans text-[12.5px] font-normal leading-relaxed',
-              isDark ? 'text-slate-400' : 'text-slate-600',
+              isDark ? 'text-slate-400' : 'text-muted-foreground',
             )}
           >
             {parseTourContent(currentStep.content, isDark)}
@@ -333,7 +333,7 @@ export default function OnboardingTour({
             <div
               className={cn(
                 'mb-4 flex items-center gap-2 text-[11px]',
-                isDark ? 'text-slate-500' : 'text-slate-500',
+                isDark ? 'text-slate-500' : 'text-muted-foreground',
               )}
             >
               <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
@@ -344,7 +344,7 @@ export default function OnboardingTour({
           <div
             className={cn(
               'flex items-center justify-between border-t pt-4',
-              isDark ? 'border-white/[0.06]' : 'border-slate-200',
+              isDark ? 'border-white/[0.06]' : 'border-border',
             )}
           >
             <div className="flex items-center gap-1.5">
@@ -367,7 +367,7 @@ export default function OnboardingTour({
                 onClick={handleComplete}
                 className={cn(
                   'cursor-pointer rounded-lg px-2 py-1 text-xs font-semibold tracking-wide transition-colors',
-                  isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600',
+                  isDark ? 'text-slate-500 hover:text-slate-300' : 'text-muted-foreground hover:text-slate-600',
                 )}
               >
                 Skip

@@ -73,7 +73,7 @@ export default function AlertDialog({
         className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
           isDark
             ? 'glass-panel-dark border-white/[0.08] shadow-[0_24px_60px_rgba(0,0,0,0.55)]'
-            : 'bg-white border-slate-200 shadow-[0_24px_60px_rgba(0,0,0,0.12)]'
+            : 'bg-card border-border shadow-[0_24px_60px_rgba(0,0,0,0.12)]'
         }`}
       >
         <div className={`absolute -top-10 left-1/2 -translate-x-1/2 w-32 h-32 ${accentGlow} blur-2xl rounded-full pointer-events-none`} />
@@ -82,7 +82,7 @@ export default function AlertDialog({
           <div className="flex items-start gap-3 min-w-0">
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                isDark ? 'bg-mitra-surface/80 border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-mitra-surface/80 border-white/[0.08]' : 'bg-muted border-border'
               }`}
             >
               <Icon className={`w-5 h-5 ${iconColor}`} />
@@ -91,7 +91,7 @@ export default function AlertDialog({
               <h2
                 id="alert-dialog-title"
                 className={`font-display font-semibold text-[16px] leading-snug ${
-                  isDark ? 'text-white' : 'text-slate-900'
+                  isDark ? 'text-white' : 'text-foreground'
                 }`}
               >
                 {title}
@@ -104,14 +104,14 @@ export default function AlertDialog({
             className={`p-1.5 rounded-lg border transition-colors shrink-0 ${
               isDark
                 ? 'border-neutral-800 text-slate-400 hover:text-white hover:bg-neutral-900'
-                : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className={`text-[13px] leading-relaxed mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+        <div className={`text-[13px] leading-relaxed mb-6 ${isDark ? 'text-slate-300' : 'text-muted-foreground'}`}>
           {message}
         </div>
 

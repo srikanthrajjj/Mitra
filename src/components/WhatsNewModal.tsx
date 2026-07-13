@@ -65,7 +65,7 @@ export function WhatsNewModal({ theme, isOpen, onClose }: WhatsNewModalProps) {
       {isOpen && (
         <>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9500] bg-black/50 backdrop-blur-[2px]" onClick={handleDismiss} aria-hidden />
-          <motion.div role="dialog" aria-modal="true" aria-labelledby="whats-new-title" initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ type: "spring", stiffness: 380, damping: 32 }} className={cn("fixed left-1/2 top-1/2 z-[9600] w-[min(100vw-2rem,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border p-6 shadow-2xl", isDark ? "glass-panel-dark border-border bg-card/95" : "border-slate-200 bg-white")}>
+          <motion.div role="dialog" aria-modal="true" aria-labelledby="whats-new-title" initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ type: "spring", stiffness: 380, damping: 32 }} className={cn("fixed left-1/2 top-1/2 z-[9600] w-[min(100vw-2rem,520px)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border p-6 shadow-2xl", isDark ? "glass-panel-dark border-border bg-card/95" : "border-border bg-card")}>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-green">Welcome back</p>
             <h2 id="whats-new-title" className={cn("mt-1 text-xl font-semibold tracking-tight", isDark ? "text-foreground" : "text-slate-900")}>What&apos;s new in Mitra</h2>
             <ul className="mt-5 space-y-3.5">

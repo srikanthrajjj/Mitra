@@ -47,15 +47,15 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
         <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider px-2.5 py-1 rounded-full border ${
           isDark
             ? 'text-brand-green bg-mitra-surface border-white/[0.06]'
-            : 'text-emerald-700 bg-emerald-50 border-emerald-200/60'
+            : 'text-brand-green bg-muted border-border/60'
         }`}>
           <Heart className="w-3 h-3" />
           Nonprofit templates
         </span>
-        <h1 className={`text-2xl md:text-3xl font-display font-bold mt-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        <h1 className={`text-2xl md:text-3xl font-display font-bold mt-3 ${isDark ? 'text-white' : 'text-foreground'}`}>
           Start from a proven blueprint
         </h1>
-        <p className={`text-sm mt-1.5 max-w-2xl leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-sm mt-1.5 max-w-2xl leading-relaxed ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
           Pick a template for your programs, donors, volunteers, or grants — then customize it for your mission.
         </p>
       </div>
@@ -64,16 +64,16 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
         <div className={`flex-1 rounded-xl border flex items-center px-3.5 py-2.5 ${
           isDark
             ? 'bg-mitra-surface/50 border-white/[0.06] focus-within:border-brand-green/40'
-            : 'bg-white border-slate-200 focus-within:border-emerald-400'
+            : 'bg-card border-border focus-within:border-emerald-400'
         } transition-colors`}>
-          <Search className={`w-4 h-4 mr-2 shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+          <Search className={`w-4 h-4 mr-2 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
           <input
             type="text"
             placeholder="Search templates…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full bg-transparent outline-none text-sm ${
-              isDark ? 'text-slate-100 placeholder-slate-500' : 'text-slate-800 placeholder-slate-400'
+              isDark ? 'text-slate-100 placeholder-slate-500' : 'text-foreground placeholder:text-muted-foreground'
             }`}
           />
         </div>
@@ -90,10 +90,10 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
                   isSelected
                     ? isDark
                       ? 'bg-brand-green/15 text-brand-green border-brand-green/30'
-                      : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : 'bg-muted text-brand-green border-emerald-300'
                     : isDark
                       ? 'border-white/[0.06] bg-mitra-surface/40 text-slate-400 hover:text-slate-200'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                      : 'border-border bg-card text-muted-foreground hover:bg-accent'
                 }`}
               >
                 {CATEGORY_LABELS[cat]}
@@ -105,7 +105,7 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
 
       {filteredTemplates.length === 0 ? (
         <div className={`text-center py-16 border rounded-2xl border-dashed ${
-          isDark ? 'border-white/[0.08]' : 'border-slate-200'
+          isDark ? 'border-white/[0.08]' : 'border-border'
         }`}>
           <ListFilter className="w-10 h-10 text-slate-500 mb-2 mx-auto" />
           <p className="text-slate-400 text-sm">No templates match &ldquo;{searchTerm}&rdquo;.</p>
@@ -118,7 +118,7 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
               className={`rounded-xl border flex flex-col h-full overflow-hidden transition-colors duration-200 ${
                 isDark
                   ? 'bg-mitra-surface/50 border-white/[0.06] hover:border-white/[0.1]'
-                  : 'bg-white border-slate-200 hover:border-slate-300'
+                  : 'bg-card border-border hover:border-slate-300'
               }`}
             >
               <div className="flex-1 px-5 pt-5 pb-4 flex flex-col gap-2 min-w-0">
@@ -127,13 +127,13 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
                 </p>
 
                 <h3 className={`font-display font-semibold text-[15px] leading-snug ${
-                  isDark ? 'text-slate-50' : 'text-slate-900'
+                  isDark ? 'text-slate-50' : 'text-foreground'
                 }`}>
                   {tpl.title}
                 </h3>
 
                 <p className={`text-[13px] leading-[1.65] line-clamp-3 flex-1 ${
-                  isDark ? 'text-slate-300' : 'text-slate-600'
+                  isDark ? 'text-slate-300' : 'text-muted-foreground'
                 }`}>
                   {tpl.description}
                 </p>

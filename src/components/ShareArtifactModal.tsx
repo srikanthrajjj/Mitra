@@ -104,21 +104,21 @@ export function ShareArtifactModal({
             'relative w-full max-w-md rounded-2xl border p-6 shadow-2xl',
             isDark
               ? 'glass-panel-dark border-border shadow-[0_24px_60px_rgba(0,0,0,0.45)]'
-              : 'border-slate-200 bg-white shadow-[0_24px_60px_rgba(0,0,0,0.12)]',
+              : 'border-border bg-card shadow-[0_24px_60px_rgba(0,0,0,0.12)]',
           )}
         >
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
-              <p className={cn('text-[10px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-slate-500')}>
+              <p className={cn('text-[10px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                 Share for approval
               </p>
-              <h2 className={cn('mt-1 text-lg font-semibold', isDark ? 'text-white' : 'text-slate-900')}>
+              <h2 className={cn('mt-1 text-lg font-semibold', isDark ? 'text-white' : 'text-foreground')}>
                 {artifact.name}
               </h2>
-              <p className={cn('mt-0.5 font-mono text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>
+              <p className={cn('mt-0.5 font-mono text-[11px]', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                 {artifact.filingName}
               </p>
-              <p className={cn('text-xs', isDark ? 'text-slate-400' : 'text-slate-500')}>{solutionTitle}</p>
+              <p className={cn('text-xs', isDark ? 'text-slate-400' : 'text-muted-foreground')}>{solutionTitle}</p>
               <p className={cn('mt-1.5 text-[11px] font-medium', isDark ? 'text-brand-green/80' : 'text-primary')}>
                 Gate: {personaLabel}
               </p>
@@ -128,7 +128,7 @@ export function ShareArtifactModal({
               onClick={onClose}
               className={cn(
                 'rounded-lg p-1 transition-colors',
-                isDark ? 'text-muted-foreground hover:bg-muted hover:text-foreground' : 'text-slate-500 hover:bg-slate-100',
+                isDark ? 'text-muted-foreground hover:bg-muted hover:text-foreground' : 'text-muted-foreground hover:bg-accent',
               )}
             >
               <X className="h-4 w-4" />
@@ -138,11 +138,11 @@ export function ShareArtifactModal({
           {!sent ? (
             <div className="space-y-4">
               <div>
-                <label className={cn('mb-1.5 block text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}>
+                <label className={cn('mb-1.5 block text-xs font-medium', isDark ? 'text-slate-300' : 'text-muted-foreground')}>
                   {personaLabel} email
                 </label>
                 <div className="relative">
-                  <Mail className={cn('pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2', isDark ? 'text-slate-500' : 'text-slate-400')} />
+                  <Mail className={cn('pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2', isDark ? 'text-slate-500' : 'text-muted-foreground')} />
                   <input
                     type="email"
                     value={email}
@@ -152,14 +152,14 @@ export function ShareArtifactModal({
                       'h-9 w-full rounded-md border pl-8 pr-3 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring',
                       isDark
                         ? 'border-border bg-mitra-input text-foreground placeholder:text-muted-foreground focus:border-brand-green/40'
-                        : 'border-input bg-background text-slate-900 placeholder:text-slate-400',
+                        : 'border-input bg-background text-foreground placeholder:text-muted-foreground',
                     )}
                   />
                 </div>
               </div>
 
               <div>
-                <label className={cn('mb-2 block text-xs font-medium', isDark ? 'text-slate-300' : 'text-slate-600')}>
+                <label className={cn('mb-2 block text-xs font-medium', isDark ? 'text-slate-300' : 'text-muted-foreground')}>
                   Permission
                 </label>
                 <div className="space-y-1.5">
@@ -179,8 +179,8 @@ export function ShareArtifactModal({
                             : 'border-border/60 hover:bg-muted/30',
                       )}
                     >
-                      <p className={cn('text-sm font-medium', isDark ? 'text-slate-100' : 'text-slate-900')}>{p.label}</p>
-                      <p className={cn('text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>{p.desc}</p>
+                      <p className={cn('text-sm font-medium', isDark ? 'text-slate-100' : 'text-foreground')}>{p.label}</p>
+                      <p className={cn('text-[11px]', isDark ? 'text-slate-400' : 'text-muted-foreground')}>{p.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -205,11 +205,11 @@ export function ShareArtifactModal({
                   className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-primary"
                 />
                 <span>
-                  <span className={cn('flex items-center gap-1.5 text-sm font-medium', isDark ? 'text-slate-100' : 'text-slate-900')}>
+                  <span className={cn('flex items-center gap-1.5 text-sm font-medium', isDark ? 'text-slate-100' : 'text-foreground')}>
                     <Zap className="h-3.5 w-3.5 text-primary" />
                     Auto-approve for demo
                   </span>
-                  <span className={cn('mt-0.5 block text-[11px]', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                  <span className={cn('mt-0.5 block text-[11px]', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                     Approves automatically after 30 seconds (demo presentations)
                   </span>
                 </span>
@@ -226,7 +226,7 @@ export function ShareArtifactModal({
             </div>
           ) : (
             <div className="space-y-4">
-              <p className={cn('text-sm', isDark ? 'text-slate-300' : 'text-slate-600')}>
+              <p className={cn('text-sm', isDark ? 'text-slate-300' : 'text-muted-foreground')}>
                 {autoApprove
                   ? `Shared with ${personaLabel}. Auto-approving in 30 seconds — notification will land live.`
                   : `Guest review link sent to ${personaLabel}. Copy or open below — no login required.`}
@@ -251,11 +251,11 @@ export function ShareArtifactModal({
                     isDark ? 'border-border bg-muted/40' : 'border-border/60 bg-muted/20',
                   )}
                 >
-                  <p className={cn('mb-2 flex items-center gap-1.5 text-[11px] font-medium', isDark ? 'text-slate-400' : 'text-slate-500')}>
+                  <p className={cn('mb-2 flex items-center gap-1.5 text-[11px] font-medium', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
                     <Link2 className="h-3 w-3" />
                     Guest review link (no login)
                   </p>
-                  <p className={cn('break-all text-[11px]', isDark ? 'text-slate-300' : 'text-slate-700')}>{guestUrl}</p>
+                  <p className={cn('break-all text-[11px]', isDark ? 'text-slate-300' : 'text-foreground')}>{guestUrl}</p>
                   <div className="mt-3 flex gap-2">
                     <button
                       type="button"

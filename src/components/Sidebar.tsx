@@ -229,12 +229,12 @@ export default function Sidebar({
                       theme,
                       'w-56 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
                       isDark
-                        ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                        : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
+                        ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                        : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
                     )}
                   >
                     <DropdownMenuLabel className="text-xs font-semibold px-2.5 py-1.5 text-muted-foreground/80">Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+                    <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
                     <DropdownMenuItem
                       onClick={() => setActiveTab('settings')}
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
@@ -250,7 +250,7 @@ export default function Sidebar({
                       <span>Restart guide tour</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+<DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
                     <DropdownMenuItem
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
                     >
@@ -280,7 +280,7 @@ export default function Sidebar({
                   Mitra
                 </span>
                 {version === 'v3' && (
-                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[#00ff66] border border-emerald-500/20 animate-pulse font-mono leading-none">
+                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[#4FCF36] border border-emerald-500/20 animate-pulse font-mono leading-none">
                     v3 Beta
                   </span>
                 )}
@@ -397,7 +397,7 @@ export default function Sidebar({
               aria-label="Account menu"
             >
               <Avatar className="h-9 w-9 rounded-full shrink-0">
-                <AvatarFallback className="rounded-full bg-emerald-500/10 text-emerald-600 font-semibold text-xs">
+                <AvatarFallback className="rounded-full bg-brand-green/10 text-brand-green font-semibold text-xs">
                   {userRole === 'architect' ? 'RC' : USER_INITIALS}
                 </AvatarFallback>
               </Avatar>
@@ -419,12 +419,12 @@ export default function Sidebar({
               theme,
               'w-56 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
               isDark
-                ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
+                ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
             )}
           >
             <DropdownMenuLabel className="text-xs font-semibold px-2.5 py-1.5 text-muted-foreground/80">Account</DropdownMenuLabel>
-            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+            <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
             <DropdownMenuItem
               onClick={() => setActiveTab('settings')}
               className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
@@ -439,7 +439,7 @@ export default function Sidebar({
               <HelpCircle className="h-4 w-4 opacity-70" />
               <span>Restart guide tour</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-slate-100'} />
+            <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
             <DropdownMenuItem
               className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
             >

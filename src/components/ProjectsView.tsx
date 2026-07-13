@@ -42,10 +42,10 @@ export default function ProjectsView({
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
-      <div className={cn('mx-auto w-full', viewMode === 'grid' ? 'max-w-6xl' : 'max-w-3xl')}>
+      <div className="mx-auto w-full max-w-5xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between gap-4">
-          <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
             Projects
           </h1>
           <button
@@ -71,13 +71,13 @@ export default function ProjectsView({
                 'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
                 isDark
                   ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
-                  : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-emerald-300',
+                  : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
               )}
             />
           </div>
           <div className={cn(
             'flex rounded-lg border p-0.5',
-            isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-slate-200 bg-slate-50',
+            isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-border bg-muted',
           )}>
             <button
               type="button"
@@ -85,8 +85,8 @@ export default function ProjectsView({
               className={cn(
                 'rounded-md p-1.5 transition-all',
                 viewMode === 'list'
-                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-white text-slate-900 shadow-sm'
-                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-slate-400 hover:text-slate-600',
+                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
+                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
               )}
               aria-label="List view"
             >
@@ -98,8 +98,8 @@ export default function ProjectsView({
               className={cn(
                 'rounded-md p-1.5 transition-all',
                 viewMode === 'grid'
-                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-white text-slate-900 shadow-sm'
-                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-slate-400 hover:text-slate-600',
+                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
+                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
               )}
               aria-label="Grid view"
             >
@@ -121,7 +121,7 @@ export default function ProjectsView({
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : isDark
                     ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800',
+                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
             >
               {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : f === 'shared' ? 'Shared' : 'Organisational'}
@@ -135,15 +135,15 @@ export default function ProjectsView({
             <div
               className={cn(
                 'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl',
-                isDark ? 'bg-white/[0.06]' : 'bg-slate-100',
+                isDark ? 'bg-white/[0.06]' : 'bg-muted',
               )}
             >
               <FolderOpen className="h-7 w-7 text-muted-foreground" />
             </div>
-            <p className={`mb-1 text-sm font-medium ${isDark ? 'text-white/70' : 'text-slate-600'}`}>
+            <p className={`mb-1 text-sm font-medium ${isDark ? 'text-white/70' : 'text-muted-foreground'}`}>
               No projects yet
             </p>
-            <p className={`mb-5 text-xs ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
+            <p className={`mb-5 text-xs ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
               Create your first project to get started.
             </p>
             <button
@@ -170,14 +170,14 @@ export default function ProjectsView({
                     isActive
                       ? isDark
                         ? 'border-primary/30 bg-primary/[0.06]'
-                        : 'border-emerald-200 bg-emerald-50/60'
+                        : 'border-border bg-muted'
                       : isDark
                         ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
-                        : 'bg-white hover:bg-slate-50/50 border-slate-200 text-slate-800 hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                        : 'bg-card hover:bg-accent border-border text-foreground hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                   )}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
                       {sol.name}
                     </p>
                     <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
@@ -185,7 +185,7 @@ export default function ProjectsView({
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className={`whitespace-nowrap text-[10px] font-medium ${isDark ? 'text-white/35' : 'text-slate-400'}`}>
+                    <span className={`whitespace-nowrap text-[10px] font-medium ${isDark ? 'text-white/35' : 'text-muted-foreground'}`}>
                       {sol.timeLabel || sol.createdAt}
                     </span>
                     <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -208,17 +208,17 @@ export default function ProjectsView({
                     isActive
                       ? isDark
                         ? 'border-primary/30 bg-primary/[0.06]'
-                        : 'border-emerald-200 bg-emerald-50/60'
+                        : 'border-border bg-muted'
                       : isDark
                         ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
-                        : 'bg-white hover:bg-slate-50/50 border-slate-200 text-slate-800 hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                        : 'bg-card hover:bg-accent border-border text-foreground hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                   )}
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <h3 className={cn(
                         'text-sm font-semibold truncate flex-1',
-                        isDark ? 'text-white' : 'text-slate-900',
+                        isDark ? 'text-white' : 'text-foreground',
                       )}>
                         {sol.name}
                       </h3>
@@ -228,7 +228,7 @@ export default function ProjectsView({
                       {sol.description || 'No description'}
                     </p>
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-4 font-medium">
+                  <div className="text-[10px] text-muted-foreground mt-4 font-medium">
                     {sol.timeLabel || sol.createdAt}
                   </div>
                 </div>

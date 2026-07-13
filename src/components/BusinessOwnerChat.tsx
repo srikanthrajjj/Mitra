@@ -105,7 +105,7 @@ export function BusinessOwnerChatThread({
               <div
                 className={cn(
                   'mb-1 inline-flex items-center gap-1.5 pl-1 text-[11px]',
-                  isDark ? 'text-slate-500' : 'text-slate-500',
+                  isDark ? 'text-slate-500' : 'text-muted-foreground',
                 )}
               >
                 <Lightbulb className="h-3.5 w-3.5 shrink-0" />
@@ -119,7 +119,7 @@ export function BusinessOwnerChatThread({
                   ? 'bg-primary text-primary-foreground'
                   : isDark
                     ? 'bg-card/80 text-foreground border border-border/50'
-                    : 'bg-white text-foreground border border-slate-200 shadow-sm',
+                    : 'bg-card text-foreground border border-border shadow-sm',
               )}
             >
               {msg.sender === 'mitra' ? parseBold(msg.text) : msg.text}
@@ -167,7 +167,7 @@ export function BusinessOwnerChatComposer({
         <div
           className={cn(
             'flex items-end gap-2 rounded-2xl border px-3 py-2',
-            isDark ? 'border-border/60 bg-card/40' : 'border-slate-200 bg-white shadow-sm',
+            isDark ? 'border-border/60 bg-card/40' : 'border-border bg-card shadow-sm',
           )}
         >
           <textarea

@@ -40,13 +40,13 @@ export function SearchView({
       <div
         className={cn(
           'shrink-0 border-b px-6 py-5',
-          isDarkTheme(theme) ? 'border-neutral-800' : 'border-slate-200',
+          isDarkTheme(theme) ? 'border-neutral-800' : 'border-border',
         )}
       >
         <h1
           className={cn(
             'mb-4 text-xl font-semibold tracking-tight',
-            isDarkTheme(theme) ? 'text-white' : 'text-slate-900',
+            isDarkTheme(theme) ? 'text-white' : 'text-foreground',
           )}
         >
           Search
@@ -87,7 +87,7 @@ export function SearchView({
                     <span
                       className={cn(
                         'block truncate text-sm font-medium',
-                        isDarkTheme(theme) ? 'text-white' : 'text-slate-900',
+                        isDarkTheme(theme) ? 'text-white' : 'text-foreground',
                       )}
                     >
                       {sol.name}

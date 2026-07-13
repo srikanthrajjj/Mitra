@@ -378,17 +378,17 @@ function StaticCenterToastPreview({ isDark }: { isDark: boolean }) {
         className={cn(
           'flex w-full max-w-sm items-start gap-3 rounded-2xl border px-5 py-4 shadow-2xl backdrop-blur-md transition-all duration-300',
           isDark
-            ? 'bg-zinc-950/90 border-brand-green/25 shadow-[0_20px_50px_rgba(0,0,0,0.6)] shadow-brand-green/5'
-            : 'bg-white/90 border-emerald-200 shadow-[0_20px_50px_rgba(50,215,75,0.06)]',
+            ? 'bg-mitra-bg/90 border-brand-green/25 shadow-[0_20px_50px_rgba(0,0,0,0.6)] shadow-brand-green/5'
+            : 'bg-card/90 border-border shadow-[0_20px_50px_rgba(50,215,75,0.06)]',
         )}
       >
         <div
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border',
-            isDark ? 'border-emerald-500/25 bg-emerald-500/10' : 'border-emerald-200 bg-emerald-50',
+            isDark ? 'border-brand-green/25 bg-brand-green/10' : 'border-emerald-200 bg-emerald-50',
           )}
         >
-          <CheckCircle2 className={cn('h-4 w-4', isDark ? 'text-emerald-400' : 'text-emerald-600')} />
+          <CheckCircle2 className={cn('h-4 w-4', isDark ? 'text-brand-green' : 'text-emerald-600')} />
         </div>
         <div className="min-w-0 flex-1 pt-0.5">
           <p className={cn('text-sm font-semibold leading-snug', isDark ? 'text-foreground' : 'text-slate-900')}>
@@ -402,7 +402,7 @@ function StaticCenterToastPreview({ isDark }: { isDark: boolean }) {
           type="button"
           className={cn(
             'shrink-0 rounded-lg p-1 transition-colors',
-            isDark ? 'text-muted-foreground hover:bg-white/5' : 'text-slate-400 hover:bg-slate-100',
+            isDark ? 'text-muted-foreground hover:bg-white/5' : 'text-muted-foreground hover:bg-accent',
           )}
           aria-label="Dismiss"
         >
@@ -418,7 +418,7 @@ function ChatComposerPreview({ isDark }: { isDark: boolean }) {
     <div
       className={cn(
         'rounded-2xl border px-4 py-3',
-        isDark ? 'input-invite-glow bg-mitra-surface/60' : 'input-invite-glow light bg-white',
+        isDark ? 'input-invite-glow bg-mitra-surface/60' : 'input-invite-glow light bg-card',
       )}
     >
       <textarea
@@ -481,7 +481,7 @@ function ArchitectNavPreview({ isDark }: { isDark: boolean }) {
         className={cn(
           'architect-nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 px-3 py-2.5 text-[13px] font-semibold leading-none',
           isDark
-            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+            ? 'border-brand-green bg-brand-green/10 text-brand-green'
             : 'border-emerald-500 bg-emerald-50 text-emerald-700',
         )}
       >
@@ -491,7 +491,7 @@ function ArchitectNavPreview({ isDark }: { isDark: boolean }) {
         type="button"
         className={cn(
           'architect-nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-[13px] font-medium leading-none',
-          isDark ? 'text-slate-400 hover:bg-emerald-500/5' : 'text-slate-600 hover:bg-emerald-50/55',
+          isDark ? 'text-slate-400 hover:bg-brand-green/5' : 'text-slate-600 hover:bg-emerald-50/55',
         )}
       >
         Connections (default)
@@ -509,7 +509,7 @@ function WorkflowStepperPreview({ isDark }: { isDark: boolean }) {
           <div
             className={cn(
               'workflow-stepper-node workflow-stepper-node--complete flex h-5 w-5 items-center justify-center rounded-full border',
-              isDark ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-emerald-300 bg-emerald-50 text-emerald-600',
+              isDark ? 'border-brand-green/30 bg-brand-green/10 text-brand-green' : 'border-emerald-300 bg-emerald-50 text-emerald-600',
             )}
           >
             <Check className="h-3 w-3 stroke-[3]" />

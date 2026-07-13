@@ -61,7 +61,7 @@ function parseInlineMarkdown(text: string, isDark: boolean = true) {
     }
     if (match[0].startsWith('**')) {
       parts.push(
-        <strong key={match.index} className={`font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+        <strong key={match.index} className={`font-semibold ${isDark ? 'text-foreground' : 'text-foreground'}`}>
           {match[2]}
         </strong>
       );
@@ -70,7 +70,7 @@ function parseInlineMarkdown(text: string, isDark: boolean = true) {
         <code key={match.index} className={`px-1.5 py-0.5 rounded font-mono text-[11.5px] mx-0.5 ${
           isDark
             ? 'bg-muted text-brand-green border border-border'
-            : 'bg-slate-100 text-emerald-700 border border-slate-200'
+            : 'bg-muted text-brand-green border border-border'
         }`}>
           {match[3]}
         </code>
@@ -104,12 +104,12 @@ function CodeBlock({ code, isDark, language }: { code: string; isDark: boolean; 
       <div className={`flex items-center justify-between px-4 py-2 border-b ${
         isDark ? 'border-border bg-card/80' : 'border-slate-700 bg-slate-800'
       }`}>
-        <span className="text-[10px] font-mono uppercase tracking-wide text-slate-500">
+        <span className="text-[10px] font-mono uppercase tracking-wide text-muted-foreground">
           {language || 'code'}
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           {copied
             ? <><Check className="w-3 h-3 text-brand-green" /><span className="text-brand-green">Copied</span></>
@@ -118,7 +118,7 @@ function CodeBlock({ code, isDark, language }: { code: string; isDark: boolean; 
         </button>
       </div>
       {/* Code body */}
-      <pre className="overflow-x-auto p-4 text-[12px] leading-relaxed font-mono text-slate-300 whitespace-pre">
+      <pre className="overflow-x-auto p-4 text-[12px] leading-relaxed font-mono text-foreground whitespace-pre">
         {code}
       </pre>
     </div>
@@ -138,7 +138,7 @@ function SnRecordUpdateShell({
         <ClipboardList className="h-3.5 w-3.5 shrink-0" />
         <span>ServiceNow · Record updated</span>
       </div>
-      <div className={`px-3.5 py-3 ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{children}</div>
+      <div className={`px-3.5 py-3 ${isDark ? 'text-foreground' : 'text-foreground'}`}>{children}</div>
     </div>
   );
 }
@@ -147,8 +147,8 @@ function InfoCard({ children, isDark }: { children: React.ReactNode; isDark: boo
   return (
     <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-[12.5px] leading-relaxed ${
       isDark
-        ? 'bg-brand-green/5 border-brand-green/15 text-slate-300'
-        : 'bg-emerald-50 border-emerald-200/60 text-slate-700'
+        ? 'bg-brand-green/5 border-brand-green/15 text-foreground'
+        : 'bg-muted border-border text-foreground'
     }`}>
       <Sparkles className="w-3.5 h-3.5 text-brand-green mt-0.5 shrink-0" />
       <span>{children}</span>
@@ -178,7 +178,7 @@ function ThoughtDurationBadge({ isDark, durationMs }: { isDark: boolean; duratio
     <div
       className={cn(
         'mb-1 inline-flex items-center gap-1.5 text-[11px]',
-        isDark ? 'text-slate-500' : 'text-slate-500',
+        isDark ? 'text-muted-foreground' : 'text-muted-foreground',
       )}
     >
       <Lightbulb className="h-3.5 w-3.5 shrink-0" />
@@ -474,8 +474,8 @@ export default function ChatView({
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors',
                 isDark
-                  ? 'border-white/[0.08] text-slate-300 hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-white'
-                  : 'border-border text-slate-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
+                  ? 'border-mitra-border text-foreground hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-foreground'
+                  : 'border-border text-muted-foreground hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
               )}
               title="Share project"
             >
@@ -485,7 +485,7 @@ export default function ChatView({
                 <span
                   className={cn(
                     'inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px]',
-                    isDark ? 'bg-muted text-slate-300' : 'bg-slate-100 text-slate-600',
+                    isDark ? 'bg-muted text-foreground' : 'bg-muted text-muted-foreground',
                   )}
                 >
                   <Users className="h-2.5 w-2.5" />
@@ -520,21 +520,21 @@ export default function ChatView({
                     }`} />
                     <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl border ${
                       isDark
-                        ? 'bg-card/80 border-white/[0.08] text-primary'
-                        : 'bg-emerald-50 border-emerald-200/60 text-emerald-600'
+                        ? 'bg-card/80 border-mitra-border text-primary'
+                        : 'bg-muted border-border text-emerald-600'
                     }`}>
                       <Sparkles className="h-7 w-7 animate-pulse text-primary" />
                     </div>
                   </div>
                 </div>
                 {appVersion === 'v3' && (
-                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-[#00ff66] border border-emerald-500/25 animate-pulse font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00ff66] shrink-0" />
+                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-[#4FCF36] border border-emerald-500/25 animate-pulse font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#4FCF36] shrink-0" />
                     v3 · Agentic Reasoner
                   </span>
                 )}
                 <h2 className={`font-display text-3xl md:text-4xl font-bold tracking-tight mb-3 text-center ${
-                  isDark ? 'text-slate-50' : 'text-slate-900'
+                  isDark ? 'text-foreground' : 'text-foreground'
                 }`}>
                   {appVersion === 'v3'
                     ? 'Mitra v3 — Agentic Mode'
@@ -545,7 +545,7 @@ export default function ChatView({
                         : 'What would you like to build?'}
                 </h2>
                 <p className={`text-[14px] leading-relaxed max-w-lg mx-auto text-center ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
+                  isDark ? 'text-muted-foreground' : 'text-muted-foreground'
                 }`}>
                   {appVersion === 'v3'
                     ? 'Multi-agent orchestration with autonomous reasoning, schema graph mapping, and ATF suite generation — releasing next week.'
@@ -605,7 +605,7 @@ export default function ChatView({
                       isStreamingThisMessage 
                         ? isDark
                             ? 'bg-brand-green/5 border border-brand-green/20 text-brand-green'
-                            : 'bg-emerald-50 border border-emerald-200 text-emerald-600'
+                            : 'bg-muted border border-border text-emerald-600'
                         : isMitra 
                           ? isSnUpdate
                             ? isDark
@@ -613,8 +613,8 @@ export default function ChatView({
                               : 'bg-amber-50 border border-amber-200 text-amber-700'
                             : 'bg-transparent border-transparent'
                           : isDark
-                            ? 'bg-mitra-surface border border-white/[0.08] text-brand-green'
-                            : 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                            ? 'bg-mitra-surface border border-mitra-border text-brand-green'
+                            : 'bg-muted border border-border text-brand-green'
                     }`}>
                       {isMitra ? (
                         isSnUpdate ? (
@@ -637,11 +637,11 @@ export default function ChatView({
                     <div className={`break-words ${
                       isMitra 
                         ? isDark 
-                          ? 'text-slate-200' 
-                          : 'text-slate-800'
+                          ? 'text-foreground' 
+                          : 'text-foreground'
                         : isDark
-                          ? 'px-4 py-3 rounded-2xl border bg-mitra-highlight/80 border-white/[0.08] text-slate-50 font-medium'
-                          : 'px-5 py-3 rounded-[20px] rounded-tr-[4px] bg-emerald-50 border border-emerald-200/60 text-slate-900'
+                          ? 'px-4 py-3 rounded-2xl border bg-mitra-highlight/80 border-mitra-border text-foreground font-medium'
+                          : 'px-5 py-3 rounded-[20px] rounded-tr-[4px] bg-muted border border-border text-foreground'
                     }`}>
                       {isMitra ? (
                         <>
@@ -656,8 +656,8 @@ export default function ChatView({
                               className={cn(
                                 'mb-3 rounded-xl border p-3',
                                 isDark
-                                  ? 'border-white/[0.08] bg-mitra-surface/50'
-                                  : 'border-slate-200 bg-white shadow-sm',
+                                  ? 'border-mitra-border bg-mitra-surface/50'
+                                  : 'border-border bg-card shadow-sm',
                               )}
                             >
                               <MitraTodos
@@ -740,14 +740,14 @@ export default function ChatView({
                                   isSelected
                                     ? isDark
                                       ? 'border-brand-green/50 bg-brand-green/20 text-brand-green shadow-[0_0_20px_rgba(50,215,75,0.22)]'
-                                      : 'border-emerald-400 bg-emerald-50 text-emerald-800 shadow-md'
+                                      : 'border-emerald-400 bg-muted text-emerald-800 shadow-md'
                                     : isAnySelected
                                       ? isDark
-                                        ? 'border-white/[0.04] bg-mitra-surface/30 text-slate-600 opacity-40'
-                                        : 'border-slate-100 bg-slate-50 text-slate-400 opacity-40'
+                                        ? 'border-mitra-border/40 bg-mitra-surface/30 text-muted-foreground opacity-40'
+                                        : 'border-border bg-muted text-muted-foreground opacity-40'
                                       : isDark
                                         ? 'border-brand-green/35 bg-brand-green/10 text-brand-green hover:bg-brand-green/18 hover:border-brand-green/50 hover:shadow-[0_0_18px_rgba(50,215,75,0.2)] cursor-pointer active:scale-[0.99]'
-                                        : 'border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99]'
+                                        : 'border-emerald-300 bg-muted text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99]'
                                 }`}
                               >
                                 {isSelected ? (
@@ -769,14 +769,14 @@ export default function ChatView({
                                 isSelected
                                   ? isDark
                                     ? 'bg-brand-green/15 border-brand-green/40 text-brand-green shadow-[0_0_14px_rgba(50,215,75,0.18)]'
-                                    : 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
+                                      : 'bg-muted border-emerald-300 text-emerald-800 shadow-sm'
                                   : isAnySelected
                                     ? isDark
-                                      ? 'bg-mitra-surface/30 border-white/[0.04] text-slate-600 opacity-40'
-                                      : 'bg-slate-50 border-slate-100 text-slate-400 opacity-40'
+                                      ? 'bg-mitra-surface/30 border-mitra-border/40 text-muted-foreground opacity-40'
+                                      : 'bg-muted border-border text-muted-foreground opacity-40'
                                     : isDark
-                                      ? 'bg-mitra-surface/60 border-white/[0.1] text-slate-200 hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-white hover:shadow-[0_0_12px_rgba(50,215,75,0.12)] cursor-pointer active:scale-[0.98]'
-                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
+                                      ? 'bg-mitra-surface/60 border-mitra-border text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-foreground hover:shadow-[0_0_12px_rgba(79,207,54,0.12)] cursor-pointer active:scale-[0.98]'
+                                      : 'bg-card border-border text-foreground hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
                               }`}
                             >
                               {isSelected ? (
@@ -800,7 +800,7 @@ export default function ChatView({
                             {secondary.length > 0 && (
                               <>
                                 <p className={`text-[11px] font-medium uppercase tracking-wide mb-2 ${primary.length > 0 ? 'mt-4' : ''} ${
-                                  isDark ? 'text-slate-500' : 'text-slate-400'
+                                  isDark ? 'text-muted-foreground' : 'text-muted-foreground'
                                 }`}>
                                   {primary.length > 0 ? 'Or' : 'Pick one'}
                                 </p>
@@ -839,8 +839,8 @@ export default function ChatView({
                               likedMessages[msg.id || `${i}`]
                                 ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30'
                                 : isDark
-                                  ? 'text-slate-400 hover:text-slate-200 border-white/[0.08] bg-slate-900/90 hover:bg-slate-800'
-                                  : 'text-slate-500 hover:text-slate-800 border-slate-200 bg-white/95 hover:bg-slate-50'
+                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
                             }`}
                             title="Like"
                           >
@@ -853,8 +853,8 @@ export default function ChatView({
                               dislikedMessages[msg.id || `${i}`]
                                 ? 'text-rose-500 bg-rose-500/10 border-rose-500/30'
                                 : isDark
-                                  ? 'text-slate-400 hover:text-slate-200 border-white/[0.08] bg-slate-900/90 hover:bg-slate-800'
-                                  : 'text-slate-500 hover:text-slate-800 border-slate-200 bg-white/95 hover:bg-slate-50'
+                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
                             }`}
                             title="Dislike"
                           >
@@ -867,8 +867,8 @@ export default function ChatView({
                               speakingMessageId === (msg.id || `${i}`)
                                 ? 'text-primary bg-primary/10 border-primary/30 animate-pulse'
                                 : isDark
-                                  ? 'text-slate-400 hover:text-slate-200 border-white/[0.08] bg-slate-900/90 hover:bg-slate-800'
-                                  : 'text-slate-500 hover:text-slate-800 border-slate-200 bg-white/95 hover:bg-slate-50'
+                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
                             }`}
                             title="Speak aloud"
                           >
@@ -881,8 +881,8 @@ export default function ChatView({
                               copiedId === (msg.id || `${i}`)
                                 ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30'
                                 : isDark
-                                  ? 'text-slate-400 hover:text-slate-200 border-white/[0.08] bg-slate-900/90 hover:bg-slate-800'
-                                  : 'text-slate-500 hover:text-slate-800 border-slate-200 bg-white/95 hover:bg-slate-50'
+                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
                             }`}
                             title="Copy text"
                           >
@@ -914,11 +914,11 @@ export default function ChatView({
               inputValue.trim().length > 0
                 ? isDark
                   ? 'bg-mitra-input'
-                  : 'bg-white'
+                  : 'bg-card'
                 : showInviteGlow
                   ? isDark
                     ? 'vr-glass-surface'
-                    : 'bg-white'
+                    : 'bg-card'
                   : isDark
                     ? 'vr-glass-surface'
                     : 'bg-[#f3f4f6]'
@@ -959,7 +959,7 @@ export default function ChatView({
               disabled={isGeneratingMessage}
               rows={1}
               className={`w-full bg-transparent outline-none border-none resize-none text-[13.5px] leading-relaxed font-sans px-2 pt-1 font-medium min-h-[38px] max-h-[200px] ${
-                isDark ? 'text-slate-100 placeholder:text-slate-500' : 'text-slate-800 placeholder:text-slate-400'
+                isDark ? 'text-foreground placeholder:text-muted-foreground' : 'text-foreground placeholder:text-muted-foreground'
               }`}
             />
 
@@ -983,7 +983,7 @@ export default function ChatView({
 
               <div
                 className={`inline-flex items-center justify-center gap-1 justify-self-center text-[10px] ${
-                  isDark ? 'text-slate-500' : 'text-slate-400'
+                  isDark ? 'text-muted-foreground' : 'text-muted-foreground'
                 }`}
                 aria-label={isServerConnected ? 'Connected' : 'Offline'}
               >
@@ -1002,7 +1002,7 @@ export default function ChatView({
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                     isDark 
                       ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
-                      : 'text-slate-555 hover:text-slate-800 hover:bg-slate-200'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                   title="Voice Input"
                 >
@@ -1015,7 +1015,7 @@ export default function ChatView({
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                     isDark 
                       ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
-                      : 'text-slate-555 hover:text-slate-800 hover:bg-slate-200'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                   title="Attach Document"
                 >
@@ -1042,7 +1042,7 @@ export default function ChatView({
                     disabled={!inputValue.trim()}
                     className={`w-7.5 h-7.5 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${
                       inputValue.trim()
-                        ? 'bg-brand-green hover:bg-brand-green-hover hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(0,255,102,0.45)] cursor-pointer'
+                        ? 'bg-brand-green hover:bg-brand-green-hover hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(79,207,54,0.45)] cursor-pointer'
                         : isDark
                           ? 'bg-muted text-muted-foreground opacity-40 cursor-not-allowed'
                           : 'bg-slate-200 text-slate-455 opacity-40 cursor-not-allowed'

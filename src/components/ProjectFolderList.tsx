@@ -41,7 +41,7 @@ interface ProjectFolderListProps {
 
 function ThreadDotsIcon() {
   return (
-    <span className="w-4 h-4 flex flex-col items-center justify-center shrink-0 text-slate-500">
+    <span className="w-4 h-4 flex flex-col items-center justify-center shrink-0 text-muted-foreground">
       <span className="w-[3px] h-[3px] rounded-full bg-current mb-[2px]" />
       <span className="flex gap-[2px]">
         <span className="w-[3px] h-[3px] rounded-full bg-current" />
@@ -74,12 +74,12 @@ function RowActionButton({
       }}
       className={`p-1 rounded transition-colors cursor-pointer shrink-0 ${
         danger
-          ? isDark
-            ? 'text-slate-500 hover:text-red-400 hover:bg-red-500/10'
-            : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
-          : isDark
-            ? 'text-slate-500 hover:text-illuminate-text hover:bg-mitra-highlight'
-            : 'text-slate-400 hover:text-emerald-700 hover:bg-emerald-50'
+            ? isDark
+            ? 'text-muted-foreground hover:text-red-400 hover:bg-red-500/10'
+            : 'text-muted-foreground hover:text-red-600 hover:bg-red-50'
+            : isDark
+            ? 'text-muted-foreground hover:text-illuminate-text hover:bg-mitra-highlight'
+            : 'text-muted-foreground hover:text-brand-green hover:bg-accent'
       }`}
     >
       {children}
@@ -227,7 +227,7 @@ export default function ProjectFolderList({
       className={`flex-1 min-w-0 font-medium px-1 py-0.5 rounded border outline-none ${textSize} ${
         isDark
           ? 'bg-mitra-input border-white/[0.06] text-illuminate-text focus:border-brand-green/25'
-          : 'bg-white border-emerald-200 text-slate-800 focus:border-brand-green'
+          : 'bg-card border-border text-foreground focus:border-brand-green'
       }`}
     />
   );
@@ -244,10 +244,10 @@ export default function ProjectFolderList({
           isSelected
             ? isDark
               ? 'text-illuminate-text bg-mitra-highlight/90 border-l-2 border-l-brand-green pl-[calc(0.5rem-2px)]'
-              : 'text-emerald-900 bg-emerald-50 border-l-2 border-l-brand-green pl-[calc(0.5rem-2px)]'
+              : 'text-brand-green bg-muted border-l-2 border-l-brand-green pl-[calc(0.5rem-2px)]'
             : isDark
-              ? 'text-slate-500 hover:text-slate-300 border-l-2 border-l-transparent'
-              : 'text-slate-500 hover:text-slate-700 border-l-2 border-l-transparent'
+              ? 'text-muted-foreground hover:text-foreground border-l-2 border-l-transparent'
+              : 'text-muted-foreground hover:text-foreground border-l-2 border-l-transparent'
         }`}
       >
         {isEditing ? (
@@ -283,7 +283,7 @@ export default function ProjectFolderList({
     if (!searchQuery) return null;
     return (
       <div className={`text-center py-8 ${isPage ? 'py-16' : 'py-5'}`}>
-        <span className={`text-[12px] font-semibold ${isDark ? 'text-illuminate-muted/60' : 'text-slate-400'}`}>
+        <span className={`text-[12px] font-semibold ${isDark ? 'text-illuminate-muted/60' : 'text-muted-foreground'}`}>
           No matches found
         </span>
       </div>
@@ -311,13 +311,13 @@ export default function ProjectFolderList({
                   isActiveFolder
                     ? isDark
                       ? 'bg-mitra-highlight text-illuminate-text'
-                      : 'bg-emerald-50 text-slate-800'
+                      : 'bg-muted text-foreground'
                     : isDark
-                      ? 'text-slate-500 hover:bg-mitra-highlight/50 hover:text-illuminate-text'
-                      : 'text-slate-600 hover:bg-emerald-50/60'
+                      ? 'text-muted-foreground hover:bg-mitra-highlight/50 hover:text-illuminate-text'
+                      : 'text-muted-foreground hover:bg-accent/60'
                 }`}
               >
-                <CustomFolder size={0.16} color={isDark ? '#10B981' : '#047857'} open={isExpanded} className="shrink-0" />
+                <CustomFolder size={0.16} color={isDark ? '#4FCF36' : '#047857'} open={isExpanded} className="shrink-0" />
                 <div className="flex-1 flex items-center gap-1 min-w-0">
                   {isEditingFolder ? (
                     renderRenameInput('text-[12.5px]')
@@ -335,7 +335,7 @@ export default function ProjectFolderList({
                       <ChevronDown
                         className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
                           isExpanded ? '' : '-rotate-90'
-                        } ${isDark ? 'text-slate-500' : 'text-emerald-500'}`}
+                        } ${isDark ? 'text-muted-foreground' : 'text-brand-green'}`}
                       />
                     </button>
                   )}
@@ -354,8 +354,8 @@ export default function ProjectFolderList({
                   }}
                   className={`p-0.5 rounded transition-colors cursor-pointer shrink-0 ${
                     isDark
-                      ? 'text-slate-500 hover:text-illuminate-text hover:bg-mitra-highlight'
-                      : 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50'
+                      ? 'text-muted-foreground hover:text-illuminate-text hover:bg-mitra-highlight'
+                      : 'text-brand-green hover:text-brand-green hover:bg-accent'
                   }`}
                   title="New thread"
                 >
@@ -395,17 +395,17 @@ export default function ProjectFolderList({
             className={`rounded-lg border overflow-hidden ${
               isDark
                 ? isActiveFolder ? 'border-white/[0.06] bg-mitra-surface/60' : 'border-white/[0.04] bg-transparent'
-                : isActiveFolder ? 'border-emerald-200 bg-white' : 'border-emerald-100/50 bg-transparent'
+                : isActiveFolder ? 'border-border bg-card'                       : 'border-border/50 bg-transparent'
             }`}
           >
             <div
               className={`group flex items-center gap-1.5 px-3 py-2.5 ${
                 isActiveFolder
-                  ? isDark ? 'bg-mitra-highlight text-illuminate-text' : 'bg-emerald-50 text-slate-800'
-                  : isDark ? 'text-slate-500 hover:bg-mitra-highlight/35' : 'text-slate-600 hover:bg-emerald-50/60'
+                  ? isDark ? 'bg-mitra-highlight text-illuminate-text' : 'bg-muted text-foreground'
+                   : isDark ? 'text-muted-foreground hover:bg-mitra-highlight/35' : 'text-muted-foreground hover:bg-accent/60'
               }`}
             >
-              <CustomFolder size={0.16} color={isDark ? '#10B981' : '#047857'} open={isExpanded} className="shrink-0" />
+              <CustomFolder size={0.16} color={isDark ? '#4FCF36' : '#047857'} open={isExpanded} className="shrink-0" />
               <div className="flex-1 flex items-center gap-1.5 min-w-0">
                 {isEditingFolder ? (
                   <div className="min-w-0 flex-1">{renderRenameInput('text-[13px]')}</div>
@@ -425,7 +425,7 @@ export default function ProjectFolderList({
                   </button>
                 )}
               </div>
-              <span className={`text-[11px] font-medium mr-1 ${isDark ? 'text-slate-500' : 'text-emerald-500'}`}>
+              <span className={`text-[11px] font-medium mr-1 ${isDark ? 'text-muted-foreground' : 'text-brand-green'}`}>
                 {folderSolutions.length}
               </span>
               <HoverRowActions
@@ -438,7 +438,7 @@ export default function ProjectFolderList({
                 type="button"
                 onClick={() => onNewThreadInFolder?.(folder.id)}
                 className={`p-1 rounded transition-colors cursor-pointer ${
-                  isDark ? 'text-slate-500 hover:text-illuminate-text' : 'text-emerald-500 hover:text-emerald-700'
+                  isDark ? 'text-muted-foreground hover:text-illuminate-text' : 'text-brand-green hover:text-brand-green'
                 }`}
                 title="New thread"
               >
@@ -450,7 +450,7 @@ export default function ProjectFolderList({
               <div className="px-2 py-1.5">
                 {folderSolutions.length === 0 ? (
                   <div className="py-2 px-3">
-                    <span className={`text-[11px] italic ${isDark ? 'text-illuminate-muted/50' : 'text-slate-400'}`}>
+                    <span className={`text-[11px] italic ${isDark ? 'text-illuminate-muted/50' : 'text-muted-foreground'}`}>
                       Empty folder
                     </span>
                   </div>

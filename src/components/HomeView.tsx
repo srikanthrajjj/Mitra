@@ -241,13 +241,13 @@ export default function HomeView({
 
                   <span
                     className={`inline-flex items-center justify-center gap-1 justify-self-center text-[10px] ${
-                      isDark ? 'text-slate-500' : 'text-slate-400'
+                      'text-muted-foreground'
                     }`}
                     aria-label={isServerConnected ? 'Connected' : 'Offline'}
                   >
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${
-                        isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
+                        isServerConnected ? 'bg-brand-green' : 'bg-muted-foreground'
                       }`}
                       aria-hidden="true"
                     />
@@ -291,13 +291,13 @@ export default function HomeView({
                 {/* Feature 1 */}
                 <div className={`p-4 rounded-xl border transition-all duration-300 ${
                   isDark
-                    ? 'bg-zinc-900/40 border-white/[0.06] hover:bg-zinc-900/60'
-                    : 'bg-slate-50/60 border-slate-100 hover:bg-slate-50'
+                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
+                    : 'bg-muted/60 border-border hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
                     <Sparkles className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
                     Multi-Agent Canvas
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -308,13 +308,13 @@ export default function HomeView({
                 {/* Feature 2 */}
                 <div className={`p-4 rounded-xl border transition-all duration-300 ${
                   isDark
-                    ? 'bg-zinc-900/40 border-white/[0.06] hover:bg-zinc-900/60'
-                    : 'bg-slate-50/60 border-slate-100 hover:bg-slate-50'
+                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
+                    : 'bg-muted/60 border-border hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
                     <FileText className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
                     Schema Graph Mapper
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -325,13 +325,13 @@ export default function HomeView({
                 {/* Feature 3 */}
                 <div className={`p-4 rounded-xl border transition-all duration-300 ${
                   isDark
-                    ? 'bg-zinc-900/40 border-white/[0.06] hover:bg-zinc-900/60'
-                    : 'bg-slate-50/60 border-slate-100 hover:bg-slate-50'
+                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
+                    : 'bg-muted/60 border-border hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
                     <Terminal className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
                     ATF Suite Generator
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">

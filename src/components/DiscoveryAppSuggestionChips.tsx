@@ -25,11 +25,11 @@ export function DiscoveryAppSuggestionChips({
 
   const chipClass = isDark
     ? 'bg-mitra-surface/50 border-white/[0.08] text-slate-300 hover:bg-mitra-highlight hover:text-illuminate-text hover:border-brand-green/30'
-    : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    : 'bg-card border-border text-foreground hover:bg-accent hover:text-brand-green hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
 
   const moreChipClass = isDark
     ? 'bg-mitra-surface/30 border-white/[0.06] text-slate-400 hover:bg-mitra-highlight hover:text-slate-200 hover:border-white/[0.12]'
-    : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700 hover:border-slate-300';
+    : 'bg-muted border-border text-muted-foreground hover:bg-accent hover:text-foreground hover:border-border';
 
   const visible = DISCOVERY_APP_SUGGESTIONS.slice(0, DISCOVERY_SUGGESTIONS_VISIBLE_COUNT);
   const hidden = DISCOVERY_APP_SUGGESTIONS.slice(DISCOVERY_SUGGESTIONS_VISIBLE_COUNT);
@@ -39,7 +39,7 @@ export function DiscoveryAppSuggestionChips({
     <div className={compact ? 'mt-3 flex flex-col items-center' : 'w-full max-w-xl mx-auto text-center flex flex-col items-center'}>
       <p
         className={`${compact ? 'text-[11px] font-medium uppercase tracking-wide mb-2' : 'text-[12px] mb-2.5'} ${
-          isDark ? 'text-slate-500' : 'text-slate-500'
+          isDark ? 'text-slate-500' : 'text-muted-foreground'
         }`}
       >
         Popular apps

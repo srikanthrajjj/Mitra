@@ -38,7 +38,7 @@ function TodoStatusIcon({ status, isDark }: { status: MitraTodoStatus; isDark: b
   if (status === 'active') {
     return (
       <CircleArrowRight
-        className={cn('h-4 w-4 shrink-0', isDark ? 'text-white/75' : 'text-slate-700')}
+        className={cn('h-4 w-4 shrink-0', 'text-foreground')}
         strokeWidth={1.75}
         aria-hidden="true"
       />
@@ -46,7 +46,7 @@ function TodoStatusIcon({ status, isDark }: { status: MitraTodoStatus; isDark: b
   }
   return (
     <CircleDashed
-      className={cn('h-4 w-4 shrink-0', isDark ? 'text-white/25' : 'text-slate-300')}
+      className={cn('h-4 w-4 shrink-0', 'text-muted-foreground')}
       strokeWidth={1.5}
       aria-hidden="true"
     />
@@ -118,7 +118,7 @@ export function MitraTodos({
         style={isDark ? undefined : { borderBottomColor: 'rgba(15, 23, 42, 0.08)' }}
       >
         <ListTodo
-          className={cn('h-4 w-4 shrink-0', isDark ? 'text-white/45' : 'text-slate-400')}
+          className={cn('h-4 w-4 shrink-0', 'text-muted-foreground')}
           strokeWidth={1.75}
           aria-hidden="true"
         />

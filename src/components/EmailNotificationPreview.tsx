@@ -50,19 +50,19 @@ export function EmailNotificationPreview({
           <Mail className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className={cn('text-[11px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-slate-500')}>
+          <p className={cn('text-[11px] font-medium uppercase tracking-wide', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
             Email notification (simulated)
           </p>
-          <p className={cn('truncate text-xs', isDark ? 'text-slate-300' : 'text-slate-700')}>
+          <p className={cn('truncate text-xs', isDark ? 'text-slate-300' : 'text-foreground')}>
             To: {recipientEmail}
           </p>
         </div>
       </div>
 
-      <p className={cn('text-sm leading-relaxed', isDark ? 'text-slate-200' : 'text-slate-800')}>
+      <p className={cn('text-sm leading-relaxed', isDark ? 'text-slate-200' : 'text-foreground')}>
         <strong>{senderName}</strong> shared <strong>{artifactName}</strong> for your review.
       </p>
-      <p className={cn('mt-2 text-xs', isDark ? 'text-slate-400' : 'text-slate-600')}>
+      <p className={cn('mt-2 text-xs', isDark ? 'text-slate-400' : 'text-muted-foreground')}>
         Open the link below to read, comment, and approve — no Mitra account required.
       </p>
 
@@ -76,7 +76,7 @@ export function EmailNotificationPreview({
       </button>
 
       {!compact && (
-        <p className={cn('mt-2 break-all text-[10px]', isDark ? 'text-slate-500' : 'text-slate-400')}>
+        <p className={cn('mt-2 break-all text-[10px]', isDark ? 'text-slate-500' : 'text-muted-foreground')}>
           {guestUrl}
         </p>
       )}

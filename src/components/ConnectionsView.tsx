@@ -248,10 +248,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
         
         {/* Top Header Row */}
         <div className="flex items-center justify-between gap-4 pb-4 mb-6">
-          <h1 className={cn(
-            'text-2xl font-bold font-display tracking-tight',
-            isDark ? 'text-zinc-150' : 'text-slate-900'
-          )}>
+          <h1 className="text-2xl font-bold font-display tracking-tight text-foreground">
             Connections
           </h1>
           <button
@@ -276,14 +273,14 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               className={cn(
                 'text-sm font-semibold px-2 py-0.5 border rounded outline-none w-64',
                 isDark 
-                  ? 'bg-zinc-800 border-white/[0.08] text-zinc-100' 
-                  : 'bg-white border-slate-200 text-slate-800'
+                    ? 'bg-mitra-surface border-mitra-border text-foreground' 
+                  : 'bg-card border-border text-foreground'
               )}
               autoFocus
             />
           ) : (
             <>
-              <span className={cn('text-sm font-semibold truncate', isDark ? 'text-zinc-300' : 'text-slate-700')}>
+              <span className={cn('text-sm font-semibold truncate', isDark ? 'text-foreground' : 'text-foreground')}>
                 {projectTitle}
               </span>
               <button
@@ -310,7 +307,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
           {connections.length === 0 ? (
             <div className={cn(
               'border rounded-2xl p-10 text-center flex flex-col items-center justify-center',
-              isDark ? 'border-white/[0.06] bg-card/10' : 'border-slate-200 bg-white'
+              isDark ? 'border-white/[0.06] bg-card/10' : 'border-border bg-card'
             )}>
               <HelpCircle className="h-8 w-8 text-muted-foreground/40 mb-3" />
               <h3 className="text-sm font-semibold text-foreground">No connections found</h3>
@@ -325,8 +322,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                 className={cn(
                   'border rounded-xl p-6 transition-all duration-200 shadow-sm flex flex-col gap-4',
                   isDark 
-                    ? 'bg-zinc-900/40 border-white/[0.06] hover:bg-zinc-900/60 hover:border-white/[0.1]' 
-                    : 'bg-white border-zinc-200 hover:border-zinc-300'
+                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60 hover:border-white/[0.1]' 
+                    : 'bg-card border-border hover:border-border'
                 )}
               >
                 {/* Top row: Tag on left, status + more menu on right */}
@@ -343,11 +340,11 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     <div className="flex items-center gap-1.5">
                       <span className={cn(
                         'w-1.5 h-1.5 rounded-full shrink-0',
-                        conn.active ? 'bg-brand-green' : 'bg-slate-400'
+                        conn.active ? 'bg-brand-green' : 'bg-muted-foreground'
                       )} />
                       <span className={cn(
                         'text-xs font-semibold',
-                        conn.active ? 'text-brand-green' : 'text-slate-400'
+                        conn.active ? 'text-brand-green' : 'text-muted-foreground'
                       )}>
                         Active
                       </span>
@@ -358,7 +355,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                       <DropdownMenuTrigger asChild>
                         <button
                           type="button"
-                          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer transition-colors"
+                          className="text-muted-foreground hover:text-foreground dark:hover:text-foreground p-1 cursor-pointer transition-colors"
                           title="Options"
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -370,8 +367,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                           theme,
                           'w-36 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
                           isDark
-                            ? 'bg-zinc-900/90 border-white/[0.08] text-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                            : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
+                            ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                            : 'bg-card/90 border-border/80 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
                         )}
                       >
                         <DropdownMenuItem
@@ -402,10 +399,10 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
                 {/* Details Stack */}
                 <div className="space-y-1">
-                  <h3 className={cn('text-sm font-bold', isDark ? 'text-zinc-150' : 'text-[#0f172a]')}>
+                  <h3 className={cn('text-sm font-bold', isDark ? 'text-foreground' : 'text-foreground')}>
                     {conn.name}
                   </h3>
-                  <p className={cn('text-xs', isDark ? 'text-zinc-400' : 'text-zinc-500')}>
+                  <p className={cn('text-xs', isDark ? 'text-muted-foreground' : 'text-muted-foreground')}>
                     {conn.description}
                   </p>
                   <div className="pt-0.5">
@@ -421,7 +418,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                 </div>
 
                 {/* Footer Section */}
-                <div className={cn('text-[10px] pt-1 font-sans', isDark ? 'text-zinc-500' : 'text-zinc-400')}>
+                <div className={cn('text-[10px] pt-1 font-sans', isDark ? 'text-muted-foreground' : 'text-muted-foreground')}>
                   Updated {conn.updatedAt}
                 </div>
               </div>
@@ -440,19 +437,19 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
             ref={modalRef}
             className={cn(
               'w-full max-w-[560px] max-h-[85vh] rounded-xl shadow-xl flex flex-col overflow-hidden border',
-              isDark ? 'bg-[#18181b] border-zinc-800' : 'bg-white border-zinc-200'
+              isDark ? 'bg-mitra-surface border-mitra-border' : 'bg-card border-border'
             )}
           >
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80">
-              <h2 className={cn('text-base font-bold', isDark ? 'text-zinc-100' : 'text-zinc-900')}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border dark:border-mitra-border/80">
+              <h2 className={cn('text-base font-bold', isDark ? 'text-foreground' : 'text-foreground')}>
                 {editingConnection ? 'Edit Connection' : 'Create New Connection'}
               </h2>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer transition-colors"
+                className="text-muted-foreground hover:text-foreground dark:hover:text-foreground p-1 cursor-pointer transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="h-4 w-4" />
@@ -467,7 +464,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                 
                 {/* Name */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -479,15 +476,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   />
                 </div>
 
                 {/* Short Description */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Short Description
                   </label>
                   <textarea
@@ -498,15 +495,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all resize-none',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   />
                 </div>
 
                 {/* Tag */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Tag
                   </label>
                   <input
@@ -517,15 +514,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   />
                 </div>
 
                 {/* Active */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Active
                   </label>
                   <select
@@ -534,8 +531,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all cursor-pointer',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   >
                     <option value="" disabled>Select status</option>
@@ -546,7 +543,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
                 {/* Authentication Type */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Authentication Type <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -556,8 +553,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all cursor-pointer',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   >
                     <option value="" disabled>Select authentication type</option>
@@ -568,7 +565,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
                 {/* Instance URL */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Instance URL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -580,15 +577,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100 font-mono' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800 font-mono'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground font-mono' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground font-mono'
                     )}
                   />
                 </div>
 
                 {/* Username */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Username <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -600,15 +597,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   />
                 </div>
 
                 {/* Password */}
                 <div className="space-y-1">
-                  <label className={cn('block text-xs font-medium', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                  <label className={cn('block text-xs font-medium', isDark ? 'text-foreground' : 'text-foreground')}>
                     Password <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -620,8 +617,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                     className={cn(
                       'w-full px-3 py-2 border rounded-lg text-xs outline-none transition-all',
                       isDark 
-                        ? 'bg-[#09090b] border-zinc-800 focus:border-brand-green text-zinc-100' 
-                        : 'bg-white border-zinc-200 focus:border-brand-green text-zinc-800'
+                        ? 'bg-mitra-input border-mitra-border focus:border-brand-green text-foreground' 
+                        : 'bg-card border-border focus:border-brand-green text-foreground'
                     )}
                   />
                 </div>
@@ -629,7 +626,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               </div>
 
               {/* Modal Buttons (aligned to bottom-left) */}
-              <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center gap-3">
+              <div className="px-6 py-4 border-t border-border dark:border-mitra-border/80 flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
@@ -657,22 +654,22 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
             ref={modalRef}
             className={cn(
               'w-full max-w-[560px] max-h-[85vh] rounded-xl shadow-xl flex flex-col overflow-hidden border',
-              isDark ? 'bg-[#18181b] border-zinc-800' : 'bg-white border-zinc-200'
+              isDark ? 'bg-mitra-surface border-mitra-border' : 'bg-card border-border'
             )}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border dark:border-mitra-border/80">
               <div>
-                <h2 className={cn('text-base font-bold', isDark ? 'text-zinc-100' : 'text-zinc-900')}>
+              <h2 className={cn('text-base font-bold', isDark ? 'text-foreground' : 'text-foreground')}>
                   Connection History
                 </h2>
-                <p className={cn('text-xs mt-0.5', isDark ? 'text-zinc-400' : 'text-zinc-500')}>
+                <p className={cn('text-xs mt-0.5', isDark ? 'text-muted-foreground' : 'text-muted-foreground')}>
                   {historyConnection.name}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setHistoryModalOpen(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1 cursor-pointer transition-colors"
+                className="text-muted-foreground hover:text-foreground dark:hover:text-foreground p-1 cursor-pointer transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="h-4 w-4" />
@@ -681,7 +678,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {connectionHistory.filter((h) => h.connectionId === historyConnection.id).length === 0 ? (
-                <p className={cn('text-xs text-center py-8', isDark ? 'text-zinc-500' : 'text-zinc-400')}>
+                <p className={cn('text-xs text-center py-8', isDark ? 'text-muted-foreground' : 'text-muted-foreground')}>
                   No history events yet.
                 </p>
               ) : (
@@ -693,7 +690,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                         : event.type === 'failed' ? XCircle
                         : event.type === 'disconnected' ? AlertTriangle
                         : History;
-                      const iconColor = event.type === 'connected' ? 'text-emerald-500'
+                      const iconColor = event.type === 'connected' ? 'text-brand-green'
                         : event.type === 'failed' ? 'text-rose-500'
                         : event.type === 'disconnected' ? 'text-amber-500'
                         : 'text-blue-500';
@@ -702,15 +699,15 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                           key={event.id}
                           className={cn(
                             'flex items-start gap-3 rounded-lg px-3 py-2.5',
-                            isDark ? 'bg-white/[0.03]' : 'bg-slate-50',
+                            isDark ? 'bg-white/[0.03]' : 'bg-muted',
                           )}
                         >
                           <Icon className={cn('h-4 w-4 shrink-0 mt-0.5', iconColor)} />
                           <div className="min-w-0 flex-1">
-                            <p className={cn('text-xs leading-relaxed', isDark ? 'text-zinc-200' : 'text-zinc-700')}>
+                            <p className={cn('text-xs leading-relaxed', isDark ? 'text-foreground' : 'text-foreground')}>
                               {event.message}
                             </p>
-                            <p className={cn('text-[10px] mt-1', isDark ? 'text-zinc-500' : 'text-zinc-400')}>
+                            <p className={cn('text-[10px] mt-1', isDark ? 'text-muted-foreground' : 'text-muted-foreground')}>
                               {event.timestamp}
                             </p>
                           </div>
@@ -721,7 +718,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 flex justify-end">
+            <div className="px-6 py-4 border-t border-border dark:border-mitra-border/80 flex justify-end">
               <button
                 type="button"
                 onClick={() => setHistoryModalOpen(false)}

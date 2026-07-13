@@ -56,12 +56,12 @@ export default function ProjectDetailView({ theme, solution, onBack }: ProjectDe
               'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-all',
               isDark
                 ? 'border-white/[0.08] text-white/60 hover:bg-white/[0.06] hover:text-white'
-                : 'border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800',
+                : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground',
             )}
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <h1 className={`font-display text-2xl font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`font-display text-2xl font-bold truncate ${isDark ? 'text-white' : 'text-foreground'}`}>
             {solution.name}
           </h1>
         </div>
@@ -75,17 +75,17 @@ export default function ProjectDetailView({ theme, solution, onBack }: ProjectDe
                 'rounded-xl border p-5',
                 isDark
                   ? 'bg-card border-border'
-                  : 'bg-white border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                  : 'bg-card border-border shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
               )}
             >
               <div className="mb-3 flex items-center justify-between">
-                <h2 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h2 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
                   {section.label}
                 </h2>
                 {section.count != null && (
                   <span className={cn(
                     'rounded-full px-2 py-0.5 text-[10px] font-medium',
-                    isDark ? 'bg-white/[0.08] text-white/60' : 'bg-slate-100 text-slate-500',
+                    isDark ? 'bg-white/[0.08] text-white/60' : 'bg-muted text-muted-foreground',
                   )}>
                     {section.count} {section.count === 1 ? 'item' : 'items'}
                   </span>
@@ -96,17 +96,17 @@ export default function ProjectDetailView({ theme, solution, onBack }: ProjectDe
                 <div className="flex flex-col gap-2">
                   {section.items.map((item) => (
                     <div key={item.label} className="flex gap-2">
-                      <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
+                      <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
                         {item.label}:
                       </span>
-                      <span className={`text-xs ${isDark ? 'text-white/70' : 'text-slate-600'}`}>
+                      <span className={`text-xs ${isDark ? 'text-white/70' : 'text-muted-foreground'}`}>
                         {item.value}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : section.items.length === 0 ? (
-                <p className={`text-xs ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
+                <p className={`text-xs ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
                   No items yet.
                 </p>
               ) : (
@@ -116,7 +116,7 @@ export default function ProjectDetailView({ theme, solution, onBack }: ProjectDe
                       key={i}
                       className={cn(
                         'rounded-lg px-3 py-2 text-xs leading-relaxed',
-                        isDark ? 'bg-white/[0.03] text-white/70' : 'bg-slate-50 text-slate-600',
+                        isDark ? 'bg-white/[0.03] text-white/70' : 'bg-muted text-muted-foreground',
                       )}
                     >
                       {item.value}

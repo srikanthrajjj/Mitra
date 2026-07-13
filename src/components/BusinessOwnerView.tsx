@@ -466,7 +466,7 @@ export function BusinessOwnerView({
                       ? 'border-primary bg-primary/5'
                       : isDark
                         ? 'border-border/60 bg-card/30 hover:border-primary/40 hover:bg-card/50'
-                        : 'border-slate-200 bg-white hover:border-primary/30 hover:bg-slate-50',
+                        : 'border-border bg-card hover:border-primary/30 hover:bg-accent',
                   )}
                 >
                   {dragActive && (

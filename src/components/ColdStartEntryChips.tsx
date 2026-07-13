@@ -25,12 +25,12 @@ export function ColdStartEntryChips({
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'bg-mitra-surface/50 border-white/[0.08] text-slate-300 hover:bg-mitra-highlight hover:text-illuminate-text hover:border-brand-green/30'
-    : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    ? 'bg-mitra-surface/50 border-mitra-border text-foreground hover:bg-mitra-highlight hover:text-illuminate-text hover:border-brand-green/30'
+    : 'bg-card border-border text-foreground hover:bg-accent hover:text-brand-green hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
 
   return (
     <div className="w-full max-w-xl mx-auto text-center flex flex-col items-center">
-      <p className={`text-[12px] mb-2.5 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+      <p className={`text-[12px] mb-2.5 text-muted-foreground`}>
         Choose an entry mode
       </p>
       <div className="flex flex-wrap justify-center gap-2">
