@@ -306,57 +306,63 @@ const shadePalettes = [
 function TypographySection() {
   return (
     <div className="space-y-10">
-      <SectionHeader icon={Type} title="Typography" subtitle="Rethink Sans is used across UI, display, and code." />
+      <SectionHeader icon={Type} title="Typography" subtitle="Manrope for headings, IBM Plex Sans for body, Rethink Sans for code." />
 
       <div className="space-y-6">
-        {/* UI body */}
+        {/* Display / Headings — Manrope */}
         <div className="rounded-xl border border-border bg-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-foreground">Rethink Sans — UI Sans</h3>
-              <p className="text-xs text-muted-foreground font-mono mt-0.5">--font-sans · var(--font-sans)</p>
-            </div>
-            <Chip label="body" />
-          </div>
-          <Separator className="bg-border/40" />
-          {[
-            { label: 'text-xs / 12px',   cls: 'text-xs',   sample: 'Metadata, captions, helper text' },
-            { label: 'text-sm / 14px',   cls: 'text-sm',   sample: 'Body text, labels, list items' },
-            { label: 'text-base / 16px', cls: 'text-base', sample: 'Primary reading size' },
-            { label: 'text-lg / 18px',   cls: 'text-lg',   sample: 'Large UI copy, subtitles' },
-            { label: 'text-xl / 20px',   cls: 'text-xl',   sample: 'Section headings (inner)' },
-          ].map(({ label, cls, sample }) => (
-            <div key={label} className="flex items-baseline justify-between gap-4">
-              <span className={`${cls} text-foreground flex-1`}>{sample}</span>
-              <code className="text-[10px] font-mono text-muted-foreground shrink-0">{label}</code>
-            </div>
-          ))}
-        </div>
-
-        {/* Display */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground">Rethink Sans — Display</h3>
+              <h3 className="font-semibold text-foreground">Manrope — Display / Headings</h3>
               <p className="text-xs text-muted-foreground font-mono mt-0.5">--font-display · font-display class</p>
             </div>
             <Chip label="headings" />
           </div>
           <Separator className="bg-border/40" />
           {[
-            { label: 'text-2xl', sample: 'Panel Heading' },
-            { label: 'text-3xl', sample: 'Page Title' },
-            { label: 'text-4xl', sample: 'Hero Sub' },
-            { label: 'text-5xl', sample: 'Hero' },
-          ].map(({ label, sample }) => (
+            { label: 'text-5xl', sample: 'Hero', tag: 'H1' },
+            { label: 'text-4xl', sample: 'Hero Sub', tag: 'H1' },
+            { label: 'text-3xl', sample: 'Page Title', tag: 'H2' },
+            { label: 'text-2xl', sample: 'Panel Heading', tag: 'H2' },
+          ].map(({ label, sample, tag }) => (
             <div key={label} className="flex items-baseline justify-between gap-4">
               <span className={`font-display ${label} font-bold text-foreground leading-tight`}>{sample}</span>
-              <code className="text-[10px] font-mono text-muted-foreground shrink-0">{label} bold</code>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-medium text-brand-green/80">{tag}</span>
+                <code className="text-[10px] font-mono text-muted-foreground">{label} bold</code>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Code / mono */}
+        {/* Body — IBM Plex Sans */}
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">IBM Plex Sans — Body</h3>
+              <p className="text-xs text-muted-foreground font-mono mt-0.5">--font-sans · var(--font-sans)</p>
+            </div>
+            <Chip label="body" />
+          </div>
+          <Separator className="bg-border/40" />
+          {[
+            { label: 'text-xs / 12px',   cls: 'text-xs',   sample: 'Metadata, captions, helper text', tag: 'H4' },
+            { label: 'text-sm / 14px',   cls: 'text-sm',   sample: 'Body text, labels, list items', tag: 'H4' },
+            { label: 'text-base / 16px', cls: 'text-base', sample: 'Primary reading size', tag: 'Body' },
+            { label: 'text-lg / 18px',   cls: 'text-lg',   sample: 'Large UI copy, subtitles', tag: 'H3' },
+            { label: 'text-xl / 20px',   cls: 'text-xl',   sample: 'Section headings (inner)', tag: 'H3' },
+          ].map(({ label, cls, sample, tag }) => (
+            <div key={label} className="flex items-baseline justify-between gap-4">
+              <span className={`${cls} text-foreground flex-1`}>{sample}</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-medium text-brand-green/80">{tag}</span>
+                <code className="text-[10px] font-mono text-muted-foreground">{label}</code>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Code / mono — Rethink Sans Mono */}
         <div className="rounded-xl border border-border bg-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
