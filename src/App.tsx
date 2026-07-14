@@ -2661,6 +2661,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   activeSolutionId={activeSolutionId}
                   onSelectSolution={handleSelectSolution}
                   onNewProject={() => setIsNewModalOpen(true)}
+                  onStartConversation={(id) => {
+                    setActiveSolutionId(id);
+                    setSelectedSidebarId(id);
+                  }}
                 />
               ) : (
                 <>
@@ -2671,7 +2675,13 @@ Pick a step below and I'll continue building — data model, scripts, and update
                     isGeneratingMessage={isGeneratingMessage}
                     onStopGeneration={stopGeneration}
                     onChoiceSelect={handleChoiceSelect}
-                    onNavigate={setActiveTab}
+                    onNavigate={(tab) => {
+                      if (tab === 'projects') {
+                        setActiveSolutionId('');
+                        setSelectedSidebarId('');
+                      }
+                      setActiveTab(tab);
+                    }}
                     onShareProject={() => handleShareProject(activeSolution.id)}
                     isServerConnected={isServerConnected}
                   />
@@ -2828,15 +2838,13 @@ Pick a step below and I'll continue building — data model, scripts, and update
               architectureSteps: [],
               tables: [],
             }),
-            chatHistory: [initialAiMessage],
+            chatHistory: [],
           };
 
           setSolutions((prev) => [
             newSolution,
             ...prev.map((sol) => ({ ...sol, active: false })),
           ]);
-          setActiveSolutionId(newId);
-          setSelectedSidebarId(newId);
           setActiveTab('projects');
         }}
       />

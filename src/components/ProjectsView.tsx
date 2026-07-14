@@ -12,6 +12,8 @@ import {
   Clock,
   X,
   Sparkles,
+  ArrowLeft,
+  MessageCircle,
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -27,6 +29,7 @@ interface ProjectsViewProps {
   activeSolutionId?: string;
   onSelectSolution: (solutionId: string) => void;
   onNewProject: () => void;
+  onStartConversation: (solutionId: string) => void;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
@@ -72,18 +75,182 @@ function MetaItem({ icon: Icon, value, label }: { icon: typeof FileText; value: 
   );
 }
 
+/* ─── Project Detail View ─── */
+
+function ProjectDetailView({
+  solution,
+  theme,
+  onBack,
+  onStartConversation,
+}: {
+  solution: Solution;
+  theme: Theme;
+  onBack: () => void;
+  onStartConversation: (id: string) => void;
+}) {
+  const isDark = isDarkTheme(theme);
+  const status = STATUS_CONFIG[solution.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
+  const stats = getStats(solution);
+  const hasConversation = solution.chatHistory.length > 0;
+
+  return (
+    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
+      {/* Header */}
+      <div className="shrink-0 px-4 pt-8 md:px-8 lg:px-12 pb-4">
+        <div className="mx-auto max-w-5xl">
+          <button
+            type="button"
+            onClick={onBack}
+            className={cn(
+              'mb-4 flex items-center gap-1.5 text-xs font-medium transition-colors',
+              isDark ? 'text-white/50 hover:text-white/80' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Projects
+          </button>
+
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="font-display text-2xl font-bold text-foreground">
+                {solution.name}
+              </h1>
+              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+                {status.label}
+              </span>
+            </div>
+            {solution.description && (
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+                {solution.description}
+              </p>
+            )}
+          </div>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-4 text-[11px]">
+            <MetaItem icon={FileText} value={stats.requirements} label="requirements" />
+            <MetaItem icon={GitBranch} value={stats.architecture} label="architecture steps" />
+            <MetaItem icon={MessageSquare} value={stats.messages} label="messages" />
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <Clock className="h-3 w-3 opacity-70" />
+              Updated {getLastUpdated(solution)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          'border-b transition-opacity duration-200 opacity-100',
+          'border-border',
+        )}
+      />
+
+      {/* Content */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12">
+        <div className="mx-auto max-w-5xl">
+          {!hasConversation ? (
+            /* Empty state — no conversations yet */
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div
+                className={cn(
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
+                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                )}
+              >
+                <MessageCircle className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <h2 className="mb-1.5 text-base font-semibold text-foreground">
+                No conversations yet
+              </h2>
+              <p className="mb-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
+                Start your first conversation to begin designing your solution with Mitra.
+              </p>
+              <Button
+                variant="cta"
+                type="button"
+                onClick={() => onStartConversation(solution.id)}
+                className="px-5 py-2.5 text-sm"
+              >
+                <Sparkles className="h-4 w-4" />
+                Start Conversation
+              </Button>
+            </div>
+          ) : (
+            /* Has conversations — show conversation thread */
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-foreground">
+                  Conversations
+                </h3>
+                <Button
+                  variant="cta"
+                  type="button"
+                  size="sm"
+                  onClick={() => onStartConversation(solution.id)}
+                  className="px-3 py-1.5 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  New Conversation
+                </Button>
+              </div>
+
+              {/* Single conversation thread card */}
+              <button
+                type="button"
+                onClick={() => onStartConversation(solution.id)}
+                className={cn(
+                  'group flex items-center justify-between gap-4 rounded-xl border px-5 py-4 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
+                  isDark
+                    ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
+                    : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                )}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <MessageSquare className="h-4 w-4 text-brand-green shrink-0" />
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      Main Conversation
+                    </p>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground">
+                    {solution.chatHistory.length} messages
+                    {stats.messages > 0 && ` · ${stats.messages} from you`}
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
+                    <Clock className="h-3 w-3 opacity-70" />
+                    {getLastUpdated(solution)}
+                  </span>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main ProjectsView ─── */
+
 export default function ProjectsView({
   theme,
   solutions,
-  activeSolutionId,
-  onSelectSolution,
+  activeSolutionId: _activeSolutionId,
+  onSelectSolution: _onSelectSolution,
   onNewProject,
+  onStartConversation,
 }: ProjectsViewProps) {
   const isDark = isDarkTheme(theme);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [viewingProjectId, setViewingProjectId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
@@ -117,12 +284,27 @@ export default function ProjectsView({
   }, [solutions, search, filter]);
 
   const hasAnyProjects = solutions.length > 0;
-  const hasActiveFilter = search.trim() !== '' || filter !== 'all';
+
+  const viewingProject = viewingProjectId
+    ? solutions.find((s) => s.id === viewingProjectId) ?? null
+    : null;
 
   const clearFilters = () => {
     setSearch('');
     setFilter('all');
   };
+
+  /* If viewing a specific project, show detail view */
+  if (viewingProject) {
+    return (
+      <ProjectDetailView
+        solution={viewingProject}
+        theme={theme}
+        onBack={() => setViewingProjectId(null)}
+        onStartConversation={onStartConversation}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
@@ -217,7 +399,6 @@ export default function ProjectsView({
             </div>
           </div>
         </div>
-        {/* Full-width separator — only when scrolled */}
         <div
           className={cn(
             'border-b transition-opacity duration-200',
@@ -233,7 +414,7 @@ export default function ProjectsView({
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-5xl">
-          {/* Case 1: No projects at all — first-time empty state */}
+          {/* Case 1: No projects at all */}
           {!hasAnyProjects ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div
@@ -291,23 +472,19 @@ export default function ProjectsView({
             /* List view */
             <div className="flex flex-col gap-2">
               {filtered.map((sol) => {
-                const isActive = sol.id === activeSolutionId;
                 const stats = getStats(sol);
                 const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
+                const hasConversation = sol.chatHistory.length > 0;
                 return (
                   <button
                     key={sol.id}
                     type="button"
-                    onClick={() => onSelectSolution(sol.id)}
+                    onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
                       'group relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
-                      isActive
-                        ? isDark
-                          ? 'border-primary/30 bg-primary/[0.06]'
-                          : 'border-border bg-muted'
-                        : isDark
-                          ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
-                          : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                      isDark
+                        ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
+                        : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                     )}
                   >
                     <div className="min-w-0 flex-1">
@@ -327,6 +504,11 @@ export default function ProjectsView({
                         <MetaItem icon={FileText} value={stats.requirements} label="reqs" />
                         <MetaItem icon={GitBranch} value={stats.architecture} label="steps" />
                         <MetaItem icon={MessageSquare} value={stats.messages} label="msgs" />
+                        {!hasConversation && (
+                          <span className="text-[10px] italic text-muted-foreground/60">
+                            No conversations yet
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-2">
@@ -344,22 +526,18 @@ export default function ProjectsView({
             /* Grid / Card view */
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((sol) => {
-                const isActive = sol.id === activeSolutionId;
                 const stats = getStats(sol);
                 const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
+                const hasConversation = sol.chatHistory.length > 0;
                 return (
                   <div
                     key={sol.id}
-                    onClick={() => onSelectSolution(sol.id)}
+                    onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
                       'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
-                      isActive
-                        ? isDark
-                          ? 'border-primary/30 bg-primary/[0.06]'
-                          : 'border-border bg-muted'
-                        : isDark
-                          ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
-                          : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                      isDark
+                        ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
+                        : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                     )}
                   >
                     <div>
@@ -393,9 +571,16 @@ export default function ProjectsView({
                         </span>
                       </div>
                     </div>
-                    <div className="mt-4 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
-                      <Clock className="h-3 w-3 opacity-70" />
-                      Updated {getLastUpdated(sol)}
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                        <Clock className="h-3 w-3 opacity-70" />
+                        Updated {getLastUpdated(sol)}
+                      </span>
+                      {!hasConversation && (
+                        <span className="text-[10px] italic text-muted-foreground/60">
+                          No conversations
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
