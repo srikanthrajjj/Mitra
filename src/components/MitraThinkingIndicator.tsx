@@ -108,7 +108,7 @@ export default function MitraThinkingIndicator({
         className={cn(
           'text-[13px] font-normal leading-none',
           compact ? 'text-[12px]' : 'text-[13px]',
-          isDark ? 'text-white/70' : 'text-muted-foreground',
+          isDark ? 'text-foreground' : 'text-foreground',
         )}
       >
         {label}

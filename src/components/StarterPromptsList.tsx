@@ -12,8 +12,8 @@ export default function StarterPromptsList({ theme, onSelect, disabled }: Starte
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'bg-mitra-surface/50 border-white/[0.08] text-slate-400 hover:bg-mitra-highlight hover:text-illuminate-text hover:border-white/[0.12]'
-    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    ? 'bg-mitra-surface/50 border-white/[0.08] text-foreground hover:bg-mitra-highlight hover:text-foreground hover:border-white/[0.12]'
+    : 'bg-card border-border text-foreground hover:bg-accent hover:text-foreground hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
 
   return (
     <div className="w-full max-w-xl mx-auto text-center flex flex-col items-center">

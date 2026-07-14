@@ -528,7 +528,7 @@ export default function ChatView({
                   </div>
                 </div>
                 {appVersion === 'v3' && (
-                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-[#4FCF36] border border-emerald-500/25 animate-pulse font-mono">
+                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground border border-emerald-500/25 animate-pulse font-mono">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#4FCF36] shrink-0" />
                     v3 · Agentic Reasoner
                   </span>
@@ -772,11 +772,11 @@ export default function ChatView({
                                       : 'bg-muted border-emerald-300 text-emerald-800 shadow-sm'
                                   : isAnySelected
                                     ? isDark
-                                      ? 'bg-mitra-surface/30 border-mitra-border/40 text-muted-foreground opacity-40'
-                                      : 'bg-muted border-border text-muted-foreground opacity-40'
+                                      ? 'bg-mitra-surface/30 border-mitra-border/40 text-foreground opacity-40'
+                                      : 'bg-muted border-border text-foreground opacity-40'
                                     : isDark
                                       ? 'bg-mitra-surface/60 border-mitra-border text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-foreground hover:shadow-[0_0_12px_rgba(79,207,54,0.12)] cursor-pointer active:scale-[0.98]'
-                                      : 'bg-card border-border text-foreground hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-900 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
+                                      : 'bg-card border-border text-foreground hover:bg-accent hover:border-border hover:text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
                               }`}
                             >
                               {isSelected ? (

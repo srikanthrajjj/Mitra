@@ -184,20 +184,20 @@ export function PhaseChip({
 
 const STATUS_PILL: Record<ArtifactStatus, { dark: string; light: string } | null> = {
   approved: {
-    dark: 'border-emerald-500/30 bg-emerald-500/8 text-emerald-400/90',
-    light: 'border-emerald-600/25 bg-emerald-50 text-emerald-700',
+    dark: 'border-emerald-500/30 bg-emerald-500/8 text-foreground',
+    light: 'border-emerald-600/25 bg-emerald-50 text-foreground',
   },
   in_review: {
-    dark: 'border-sky-500/30 bg-sky-500/8 text-sky-400/90',
-    light: 'border-sky-600/25 bg-sky-50 text-sky-700',
+    dark: 'border-sky-500/30 bg-sky-500/8 text-foreground',
+    light: 'border-sky-600/25 bg-sky-50 text-foreground',
   },
   pending: {
-    dark: 'border-amber-500/30 bg-amber-500/8 text-amber-400/90',
-    light: 'border-amber-600/25 bg-amber-50 text-amber-700',
+    dark: 'border-amber-500/30 bg-amber-500/8 text-foreground',
+    light: 'border-amber-600/25 bg-amber-50 text-foreground',
   },
   draft: {
-    dark: 'border-border/70 bg-muted/25 text-muted-foreground',
-    light: 'border-border bg-muted/40 text-muted-foreground',
+    dark: 'border-border/70 bg-muted/25 text-foreground',
+    light: 'border-border bg-muted/40 text-foreground',
   },
   not_started: null,
 };
@@ -233,8 +233,8 @@ export function ConflictBadge({ isDark = true, className }: { isDark?: boolean; 
       className={cn(
         'inline-flex items-center gap-0.5 rounded-sm border px-1 py-px text-[8px] font-semibold uppercase tracking-wider',
         isDark
-          ? 'border-amber-500/35 bg-amber-500/8 text-amber-400/90'
-          : 'border-amber-600/30 bg-amber-50 text-amber-700',
+          ? 'border-amber-500/35 bg-amber-500/8 text-foreground'
+          : 'border-amber-600/30 bg-amber-50 text-foreground',
         className,
       )}
     >

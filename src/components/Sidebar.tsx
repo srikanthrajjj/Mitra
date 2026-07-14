@@ -280,7 +280,7 @@ export default function Sidebar({
                   Mitra
                 </span>
                 {version === 'v3' && (
-                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[#4FCF36] border border-emerald-500/20 animate-pulse font-mono leading-none">
+                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground border border-emerald-500/20 animate-pulse font-mono leading-none">
                     v3 Beta
                   </span>
                 )}

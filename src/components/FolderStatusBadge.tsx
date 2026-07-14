@@ -12,12 +12,12 @@ const INLINE_DOT_CLASS: Record<FolderStatus, string> = {
 };
 
 const INLINE_TEXT_CLASS: Record<FolderStatus, string> = {
-  draft: 'text-muted-foreground/80',
-  in_review: 'text-amber-500/90',
-  accepted: 'text-emerald-500/90',
-  approved: 'text-emerald-500/90',
-  rejected: 'text-red-400/90',
-  changes_requested: 'text-orange-500/90',
+  draft: 'text-foreground',
+  in_review: 'text-foreground',
+  accepted: 'text-foreground',
+  approved: 'text-foreground',
+  rejected: 'text-foreground',
+  changes_requested: 'text-foreground',
 };
 
 export function FolderStatusBadge({

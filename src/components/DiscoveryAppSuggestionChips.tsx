@@ -24,12 +24,12 @@ export function DiscoveryAppSuggestionChips({
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'bg-mitra-surface/50 border-white/[0.08] text-slate-300 hover:bg-mitra-highlight hover:text-illuminate-text hover:border-brand-green/30'
-    : 'bg-card border-border text-foreground hover:bg-accent hover:text-brand-green hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    ? 'bg-mitra-surface/50 border-white/[0.08] text-foreground hover:bg-mitra-highlight hover:text-foreground hover:border-brand-green/30'
+    : 'bg-card border-border text-foreground hover:bg-accent hover:text-foreground hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
 
   const moreChipClass = isDark
-    ? 'bg-mitra-surface/30 border-white/[0.06] text-slate-400 hover:bg-mitra-highlight hover:text-slate-200 hover:border-white/[0.12]'
-    : 'bg-muted border-border text-muted-foreground hover:bg-accent hover:text-foreground hover:border-border';
+    ? 'bg-mitra-surface/30 border-white/[0.06] text-foreground hover:bg-mitra-highlight hover:text-foreground hover:border-white/[0.12]'
+    : 'bg-muted border-border text-foreground hover:bg-accent hover:text-foreground hover:border-border';
 
   const visible = DISCOVERY_APP_SUGGESTIONS.slice(0, DISCOVERY_SUGGESTIONS_VISIBLE_COUNT);
   const hidden = DISCOVERY_APP_SUGGESTIONS.slice(DISCOVERY_SUGGESTIONS_VISIBLE_COUNT);

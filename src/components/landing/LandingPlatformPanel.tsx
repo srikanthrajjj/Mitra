@@ -95,7 +95,7 @@ export function LandingPlatformPanel({
             'flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--landing-accent)]/60',
             isActive
               ? 'border-[var(--landing-accent)]/50 bg-[var(--landing-accent)]/15 text-white shadow-[0_0_24px_rgba(0,255,102,0.15)]'
-              : 'border-white/10 bg-white/[0.03] text-white/50 hover:border-white/20 hover:text-white/80',
+              : 'border-white/10 bg-white/[0.03] text-foreground hover:border-white/20 hover:text-foreground',
           )}
           aria-current={isActive ? 'true' : undefined}
         >

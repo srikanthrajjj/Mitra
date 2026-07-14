@@ -82,8 +82,8 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     filter === f
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : isDark
-                        ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
-                        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
+                        ? 'bg-white/[0.06] text-foreground hover:bg-white/[0.10] hover:text-foreground'
+                        : 'bg-muted text-foreground hover:bg-accent hover:text-foreground',
                   )}
                 >
                   {f}

@@ -93,8 +93,8 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
                       ? 'bg-brand-green/15 text-brand-green border-brand-green/30'
                       : 'bg-muted text-brand-green border-emerald-300'
                     : isDark
-                      ? 'border-white/[0.06] bg-mitra-surface/40 text-slate-400 hover:text-slate-200'
-                      : 'border-border bg-card text-muted-foreground hover:bg-accent'
+                      ? 'border-white/[0.06] bg-mitra-surface/40 text-foreground hover:text-foreground'
+                      : 'border-border bg-card text-foreground hover:bg-accent'
                 }`}
               >
                 {CATEGORY_LABELS[cat]}
