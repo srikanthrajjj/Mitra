@@ -248,7 +248,7 @@ export default function ProjectsView({
   const isDark = isDarkTheme(theme);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [hasScrolled, setHasScrolled] = useState(false);
   const [viewingProjectId, setViewingProjectId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
