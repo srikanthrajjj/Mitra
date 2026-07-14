@@ -10,6 +10,8 @@ import {
   GitBranch,
   MessageSquare,
   Clock,
+  X,
+  Sparkles,
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -33,6 +35,13 @@ const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
   designing: { label: 'Designing', dot: 'bg-amber-400/70' },
   generating: { label: 'Generating', dot: 'bg-brand-green/70' },
   completed: { label: 'Completed', dot: 'bg-brand-green' },
+};
+
+const FILTER_LABELS: Record<Filter, string> = {
+  all: 'All',
+  mine: 'Mine',
+  shared: 'Shared',
+  organisational: 'Organisational',
 };
 
 function getStats(sol: Solution) {
@@ -85,6 +94,16 @@ export default function ProjectsView({
 
   const filtered = useMemo(() => {
     let list = solutions;
+
+    if (filter !== 'all') {
+      list = list.filter((s) => {
+        if (filter === 'mine') return !s.folderId;
+        if (filter === 'shared') return !!s.folderId;
+        if (filter === 'organisational') return s.projectStatus === 'deployed';
+        return true;
+      });
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -93,8 +112,17 @@ export default function ProjectsView({
           s.description.toLowerCase().includes(q),
       );
     }
+
     return list;
-  }, [solutions, search]);
+  }, [solutions, search, filter]);
+
+  const hasAnyProjects = solutions.length > 0;
+  const hasActiveFilter = search.trim() !== '' || filter !== 'all';
+
+  const clearFilters = () => {
+    setSearch('');
+    setFilter('all');
+  };
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
@@ -103,7 +131,7 @@ export default function ProjectsView({
         <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
           <div className="mx-auto max-w-5xl">
             <div className="mb-4 flex items-center justify-between gap-4">
-              <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
+              <h1 className="font-display text-2xl font-bold text-foreground">
                 Projects
               </h1>
               <Button
@@ -145,7 +173,7 @@ export default function ProjectsView({
                     'rounded-md p-1.5 transition-all',
                     viewMode === 'list'
                       ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
+                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-foreground',
                   )}
                   aria-label="List view"
                 >
@@ -158,7 +186,7 @@ export default function ProjectsView({
                     'rounded-md p-1.5 transition-all',
                     viewMode === 'grid'
                       ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
+                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-foreground',
                   )}
                   aria-label="Grid view"
                 >
@@ -183,7 +211,7 @@ export default function ProjectsView({
                         : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
                   )}
                 >
-                  {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : f === 'shared' ? 'Shared' : 'Organisational'}
+                  {FILTER_LABELS[f]}
                 </button>
               ))}
             </div>
@@ -205,151 +233,175 @@ export default function ProjectsView({
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-5xl">
-        {/* Empty state */}
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div
-              className={cn(
-                'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl',
-                isDark ? 'bg-white/[0.06]' : 'bg-muted',
-              )}
-            >
-              <FolderOpen className="h-7 w-7 text-muted-foreground" />
+          {/* Case 1: No projects at all — first-time empty state */}
+          {!hasAnyProjects ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div
+                className={cn(
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
+                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                )}
+              >
+                <FolderOpen className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <h2 className="mb-1.5 text-base font-semibold text-foreground">
+                No projects yet
+              </h2>
+              <p className="mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                Projects let you collaborate with Mitra to design, build, and deploy ServiceNow applications from a single idea.
+              </p>
+              <Button
+                variant="cta"
+                type="button"
+                onClick={onNewProject}
+                className="px-5 py-2.5 text-sm"
+              >
+                <Sparkles className="h-4 w-4" />
+                Create your first project
+              </Button>
             </div>
-            <p className={`mb-1 text-sm font-medium ${isDark ? 'text-white/70' : 'text-muted-foreground'}`}>
-              No projects yet
-            </p>
-            <p className={`mb-5 text-xs ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
-              Create your first project to get started.
-            </p>
-            <Button
-              variant="cta"
-              type="button"
-              onClick={onNewProject}
-              className="px-5 py-2.5 text-sm"
-            >
-              <Plus className="h-4 w-4" />
-              New Project
-            </Button>
-          </div>
-        ) : viewMode === 'list' ? (
-          /* List view */
-          <div className="flex flex-col gap-2">
-            {filtered.map((sol) => {
-              const isActive = sol.id === activeSolutionId;
-              const stats = getStats(sol);
-              const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
-              return (
-                <button
-                  key={sol.id}
-                  type="button"
-                  onClick={() => onSelectSolution(sol.id)}
-                  className={cn(
-                    'group relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
-                    isActive
-                      ? isDark
-                        ? 'border-primary/30 bg-primary/[0.06]'
-                        : 'border-border bg-muted'
-                      : isDark
-                        ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
-                        : 'bg-card hover:bg-accent border-border text-foreground hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
-                  )}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className={`truncate text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                        {sol.name}
-                      </p>
-                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground">
-                        <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
-                        {status.label}
-                      </span>
-                    </div>
-                    <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
-                      {sol.description || 'No description'}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
-                      <MetaItem icon={FileText} value={stats.requirements} label="reqs" />
-                      <MetaItem icon={GitBranch} value={stats.architecture} label="steps" />
-                      <MetaItem icon={MessageSquare} value={stats.messages} label="msgs" />
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-2">
-                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
-                      <Clock className="h-3 w-3 opacity-70" />
-                      {getLastUpdated(sol)}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          /* Grid / Card view */
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((sol) => {
-              const isActive = sol.id === activeSolutionId;
-              const stats = getStats(sol);
-              const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
-              return (
-                <div
-                  key={sol.id}
-                  onClick={() => onSelectSolution(sol.id)}
-                  className={cn(
-                    'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
-                    isActive
-                      ? isDark
-                        ? 'border-primary/30 bg-primary/[0.06]'
-                        : 'border-border bg-muted'
-                      : isDark
-                        ? 'bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30'
-                        : 'bg-card hover:bg-accent border-border text-foreground hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
-                  )}
-                >
-                  <div>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <h3 className={cn(
-                          'text-sm font-semibold truncate flex-1',
-                          isDark ? 'text-white' : 'text-foreground',
-                        )}>
+          ) : /* Case 2: Has projects but search/filter yielded nothing */
+          filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div
+                className={cn(
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
+                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                )}
+              >
+                <Search className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <h2 className="mb-1.5 text-base font-semibold text-foreground">
+                No matching projects
+              </h2>
+              <p className="mb-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                No projects match your current filters. Try adjusting your search or filter criteria.
+              </p>
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={clearFilters}
+                className="gap-1.5 px-4 py-2 text-xs"
+              >
+                <X className="h-3.5 w-3.5" />
+                Clear filters
+              </Button>
+            </div>
+          ) : viewMode === 'list' ? (
+            /* List view */
+            <div className="flex flex-col gap-2">
+              {filtered.map((sol) => {
+                const isActive = sol.id === activeSolutionId;
+                const stats = getStats(sol);
+                const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
+                return (
+                  <button
+                    key={sol.id}
+                    type="button"
+                    onClick={() => onSelectSolution(sol.id)}
+                    className={cn(
+                      'group relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
+                      isActive
+                        ? isDark
+                          ? 'border-primary/30 bg-primary/[0.06]'
+                          : 'border-border bg-muted'
+                        : isDark
+                          ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
+                          : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                    )}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-semibold text-foreground">
                           {sol.name}
-                        </h3>
+                        </p>
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground">
+                          <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+                          {status.label}
+                        </span>
                       </div>
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
+                        {sol.description || 'No description'}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
+                        <MetaItem icon={FileText} value={stats.requirements} label="reqs" />
+                        <MetaItem icon={GitBranch} value={stats.architecture} label="steps" />
+                        <MetaItem icon={MessageSquare} value={stats.messages} label="msgs" />
+                      </div>
                     </div>
-                    <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
-                      {sol.description || 'No description'}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
-                        {status.label}
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <FileText className="h-3 w-3 opacity-70" />
-                        <span className="tabular-nums">{stats.requirements}</span>
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <GitBranch className="h-3 w-3 opacity-70" />
-                        <span className="tabular-nums">{stats.architecture}</span>
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <MessageSquare className="h-3 w-3 opacity-70" />
-                        <span className="tabular-nums">{stats.messages}</span>
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
+                        <Clock className="h-3 w-3 opacity-70" />
+                        {getLastUpdated(sol)}
                       </span>
                     </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            /* Grid / Card view */
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((sol) => {
+                const isActive = sol.id === activeSolutionId;
+                const stats = getStats(sol);
+                const status = STATUS_CONFIG[sol.blueprint.status ?? 'not_started'] ?? STATUS_CONFIG.not_started;
+                return (
+                  <div
+                    key={sol.id}
+                    onClick={() => onSelectSolution(sol.id)}
+                    className={cn(
+                      'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
+                      isActive
+                        ? isDark
+                          ? 'border-primary/30 bg-primary/[0.06]'
+                          : 'border-border bg-muted'
+                        : isDark
+                          ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
+                          : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                    )}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <h3 className="text-sm font-semibold truncate flex-1 text-foreground">
+                            {sol.name}
+                          </h3>
+                        </div>
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
+                        {sol.description || 'No description'}
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
+                          {status.label}
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <FileText className="h-3 w-3 opacity-70" />
+                          <span className="tabular-nums">{stats.requirements}</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <GitBranch className="h-3 w-3 opacity-70" />
+                          <span className="tabular-nums">{stats.architecture}</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <MessageSquare className="h-3 w-3 opacity-70" />
+                          <span className="tabular-nums">{stats.messages}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                      <Clock className="h-3 w-3 opacity-70" />
+                      Updated {getLastUpdated(sol)}
+                    </div>
                   </div>
-                  <div className="mt-4 flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
-                    <Clock className="h-3 w-3 opacity-70" />
-                    Updated {getLastUpdated(sol)}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
