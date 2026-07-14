@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { X, Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Skill } from '../data/skills';
@@ -101,7 +101,6 @@ export default function SkillDetailModal({ theme, skill, onClose, onRun }: Skill
           onClick={() => onRun(skill)}
           className="w-full"
         >
-          <Sparkles className="h-4 w-4" />
           Run Skill
         </Button>
       </div>

@@ -11,7 +11,7 @@ import {
   MessageSquare,
   Clock,
   X,
-  Sparkles,
+
   ArrowLeft,
   MessageCircle,
 } from 'lucide-react';
@@ -173,7 +173,6 @@ function ProjectDetailView({
                 onClick={() => onStartConversation(solution.id)}
                 className="px-5 py-2.5 text-sm"
               >
-                <Sparkles className="h-4 w-4" />
                 Start Conversation
               </Button>
             </div>
@@ -437,7 +436,6 @@ export default function ProjectsView({
                 onClick={onNewProject}
                 className="px-5 py-2.5 text-sm"
               >
-                <Sparkles className="h-4 w-4" />
                 Create your first project
               </Button>
             </div>
