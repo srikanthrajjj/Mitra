@@ -120,7 +120,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd }: AddSkil
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+          <div className="flex items-center justify-between px-1 py-1">
             <div>
               <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>
                 Enabled

@@ -104,7 +104,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                 Skills
               </h1>
               <Button
-                variant="secondary"
+                variant="cta"
                 size="sm"
                 onClick={() => setIsAddModalOpen(true)}
                 className="gap-1.5 text-xs"
