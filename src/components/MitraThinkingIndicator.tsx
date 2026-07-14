@@ -91,13 +91,15 @@ export default function MitraThinkingIndicator({
             key={i}
             className={cn(
               'h-[5px] w-[5px] rounded-full transition-all duration-200 ease-in-out',
-              isDark ? 'bg-slate-900' : 'bg-card',
               i === activeIndex
                 ? cn(
                     'scale-[1.15] opacity-100',
-                    isDark ? 'shadow-[0_0_6px_rgba(255,255,255,0.35)]' : 'shadow-[0_0_4px_rgba(15,23,42,0.2)]',
+                    isDark ? 'bg-brand-green shadow-[0_0_6px_rgba(79,207,54,0.45)]' : 'bg-brand-green shadow-[0_0_6px_rgba(25,175,0,0.35)]',
                   )
-                : 'scale-[0.82] opacity-[0.14]',
+                : cn(
+                    'scale-[0.82] opacity-[0.18]',
+                    isDark ? 'bg-white' : 'bg-foreground',
+                  ),
             )}
           />
         ))}
@@ -106,7 +108,7 @@ export default function MitraThinkingIndicator({
         className={cn(
           'text-[13px] font-normal leading-none',
           compact ? 'text-[12px]' : 'text-[13px]',
-          isDark ? 'text-zinc-300' : 'text-muted-foreground',
+          isDark ? 'text-white/70' : 'text-muted-foreground',
         )}
       >
         {label}
