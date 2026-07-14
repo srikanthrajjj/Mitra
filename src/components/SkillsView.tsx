@@ -1,10 +1,27 @@
-import { useMemo, useRef, useState, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
+import { Search, Plus, Zap, Trash2 } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill, type SkillCategory } from '../data/skills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
+import { Switch } from '@/src/components/ui/switch';
+import AddSkillModal, { type CustomSkill } from './AddSkillModal';
+
+const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
+
+function loadCustomSkills(): CustomSkill[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_SKILLS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomSkills(skills: CustomSkill[]) {
+  localStorage.setItem(CUSTOM_SKILLS_KEY, JSON.stringify(skills));
+}
 
 interface SkillsViewProps {
   theme: Theme;
@@ -19,6 +36,12 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [filter, setFilter] = useState<Filter>('All');
   const [hasScrolled, setHasScrolled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  useEffect(() => {
+    saveCustomSkills(customSkills);
+  }, [customSkills]);
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -43,15 +66,53 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     return list;
   }, [search, filter]);
 
+  const filteredCustom = useMemo(() => {
+    let list = customSkills;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.instructions.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [search, customSkills]);
+
+  const handleAddSkill = (skill: CustomSkill) => {
+    setCustomSkills((prev) => [...prev, skill]);
+  };
+
+  const handleDeleteSkill = (id: string) => {
+    setCustomSkills((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleToggleSkill = (id: string) => {
+    setCustomSkills((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)),
+    );
+  };
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
-      {/* Sticky header — full width */}
+      {/* Sticky header */}
       <div className="shrink-0">
         <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
           <div className="mx-auto max-w-5xl">
-            <h1 className={`mb-4 font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
-              Skills
-            </h1>
+            <div className="mb-4 flex items-center justify-between">
+              <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                Skills
+              </h1>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsAddModalOpen(true)}
+                className="gap-1.5 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add a new skill
+              </Button>
+            </div>
 
             {/* Search */}
             <div className="relative mb-4">
@@ -92,7 +153,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
             </div>
           </div>
         </div>
-        {/* Full-width separator — only when scrolled */}
         <div
           className={cn(
             'border-b transition-opacity duration-200',
@@ -108,57 +168,129 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-5xl">
-          {filtered.length === 0 ? (
+          {/* Custom Skills */}
+          {filteredCustom.length > 0 && (
+            <div className="mb-6">
+              <h2 className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
+                Custom Skills
+              </h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredCustom.map((skill) => (
+                  <div
+                    key={skill.id}
+                    className={cn(
+                      'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200',
+                      skill.enabled
+                        ? isDark
+                          ? 'border-brand-green/20 bg-card hover:border-brand-green/40'
+                          : 'border-brand-green/20 bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/40'
+                        : isDark
+                          ? 'border-white/[0.04] bg-card/50 opacity-60'
+                          : 'border-border bg-card/50 opacity-60',
+                    )}
+                  >
+                    <div>
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
+                        <Zap className="h-5 w-5 text-brand-green" />
+                      </div>
+                      <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                        {skill.name}
+                      </h3>
+                      <p className="text-[12px] leading-relaxed text-muted-foreground line-clamp-2">
+                        {skill.instructions}
+                      </p>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
+                      <Switch
+                        checked={skill.enabled}
+                        onCheckedChange={() => handleToggleSkill(skill.id)}
+                      />
+                      <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
+                        {skill.enabled ? 'Active' : 'Inactive'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSkill(skill.id)}
+                        className={cn(
+                          'ml-auto rounded-lg p-1.5 transition-colors',
+                          isDark ? 'text-white/20 hover:text-red-400 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-red-500 hover:bg-muted',
+                        )}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Built-in Skills */}
+          {filtered.length === 0 && filteredCustom.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <p className={`text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
                 No skills match your search.
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((skill) => {
-                const Icon = skill.icon;
-                return (
-                  <div
-                    key={skill.id}
-                    className={cn(
-                      'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
-                      isDark
-                        ? 'border-border bg-card hover:border-brand-green/30'
-                        : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
-                    )}
-                  >
-                    <div>
-                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                        <Icon className="h-5 w-5 text-brand-green" />
+          ) : filtered.length > 0 ? (
+            <>
+              {filteredCustom.length > 0 && (
+                <h2 className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
+                  Built-in Skills
+                </h2>
+              )}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((skill) => {
+                  const Icon = skill.icon;
+                  return (
+                    <div
+                      key={skill.id}
+                      className={cn(
+                        'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
+                        isDark
+                          ? 'border-border bg-card hover:border-brand-green/30'
+                          : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
+                      )}
+                    >
+                      <div>
+                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
+                          <Icon className="h-5 w-5 text-brand-green" />
+                        </div>
+                        <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                          {skill.name}
+                        </h3>
+                        <p className="text-[12px] leading-relaxed text-muted-foreground">
+                          {skill.description}
+                        </p>
+                        <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          {skill.category}
+                        </span>
                       </div>
-                      <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                        {skill.name}
-                      </h3>
-                      <p className="text-[12px] leading-relaxed text-muted-foreground">
-                        {skill.description}
-                      </p>
-                      <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        {skill.category}
-                      </span>
+                      <div className="mt-4">
+                        <Button
+                          variant="cta"
+                          size="sm"
+                          onClick={() => onRunSkill(skill)}
+                          className="w-full text-xs"
+                        >
+                          Use Skill
+                        </Button>
+                      </div>
                     </div>
-                    <div className="mt-4">
-                      <Button
-                        variant="cta"
-                        size="sm"
-                        onClick={() => onRunSkill(skill)}
-                        className="w-full text-xs"
-                      >
-                        Use Skill
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
+
+      <AddSkillModal
+        theme={theme}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddSkill}
+      />
     </div>
   );
 }
