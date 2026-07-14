@@ -4,23 +4,35 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap',
+    'text-sm font-medium transition-all duration-200',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2',
+    'disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none',
+    '[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+        default:
+          'bg-brand-green text-[#030d0a] font-semibold rounded-[var(--radius-button)] hover:bg-brand-green-hover active:scale-[0.98] focus-visible:ring-brand-green/40',
         cta:
-          'rounded-full bg-brand-green text-[#030d0a] font-semibold shadow-[0_0_12px_rgba(0,255,102,0.35)] hover:bg-brand-green-hover hover:shadow-[0_0_16px_rgba(0,255,102,0.45)] active:scale-[0.98]',
-        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-brand-green underline-offset-4 hover:underline',
+          'bg-brand-green text-[#030d0a] font-semibold rounded-[var(--radius-button)] hover:bg-brand-green-hover active:scale-[0.98] focus-visible:ring-brand-green/40',
+        secondary:
+          'bg-muted text-foreground border border-border rounded-[var(--radius-button)] hover:bg-accent',
+        outline:
+          'bg-transparent text-foreground border border-border rounded-[var(--radius-button)] hover:bg-muted',
+        ghost:
+          'bg-transparent text-foreground rounded-[var(--radius-button)] hover:bg-muted',
+        destructive:
+          'bg-[rgb(239,68,68,0.1)] text-[rgb(252,165,165)] border border-[rgb(239,68,68,0.2)] rounded-[var(--radius-button)] hover:bg-[rgb(239,68,68,0.15)] focus-visible:ring-[rgb(239,68,68,0.4)]',
+        link:
+          'text-brand-green underline-offset-4 rounded-none hover:underline',
       },
       size: {
         default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
+        sm: 'h-8 px-3 text-xs',
+        lg: 'h-10 px-6 text-sm',
         icon: 'h-9 w-9',
       },
     },

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { SolutionBlueprint, ServiceNowTable, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { Button } from '@/src/components/ui/button';
 import {
   STUDIO_STEPS,
   enrichBlueprintStudio,
@@ -456,18 +457,19 @@ export default function ServiceNowStudio({
               </table>
             </div>
 
-            <button
-              type="button"
-              disabled={publishing || updateItems.length === 0 || blueprint.buildStage === 'published'}
-              onClick={() => {
-                setPublishing(true);
-                setTimeout(() => setPublishing(false), 2200);
-              }}
-              className="btn-cta w-full flex items-center justify-center gap-2 py-2 text-[12px] transition-colors disabled:opacity-40"
-            >
-              {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-              {blueprint.buildStage === 'published' ? 'Published to instance' : publishing ? 'Publishing…' : 'Publish to instance'}
-            </button>
+              <Button
+                variant="cta"
+                type="button"
+                disabled={publishing || updateItems.length === 0 || blueprint.buildStage === 'published'}
+                onClick={() => {
+                  setPublishing(true);
+                  setTimeout(() => setPublishing(false), 2200);
+                }}
+                className="w-full py-2 text-[12px]"
+              >
+                {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                {blueprint.buildStage === 'published' ? 'Published to instance' : publishing ? 'Publishing…' : 'Publish to instance'}
+              </Button>
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import { ExternalLink, Mail } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 
 interface EmailNotificationPreviewProps {
   theme?: Theme;
@@ -66,14 +67,15 @@ export function EmailNotificationPreview({
         Open the link below to read, comment, and approve — no Mitra account required.
       </p>
 
-      <button
+      <Button
+        variant="cta"
         type="button"
         onClick={handleReview}
-        className="btn-cta mt-4 inline-flex h-9 w-full items-center justify-center gap-2 text-sm transition-all"
+        className="mt-4 h-9 w-full text-sm"
       >
         Review
         <ExternalLink className="h-3.5 w-3.5 opacity-80" />
-      </button>
+      </Button>
 
       {!compact && (
         <p className={cn('mt-2 break-all text-[10px]', isDark ? 'text-slate-500' : 'text-muted-foreground')}>

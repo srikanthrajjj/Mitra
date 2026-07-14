@@ -4,6 +4,7 @@ import { AlertTriangle, Info, X } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 
 export interface AlertDialogProps {
   theme: Theme;
@@ -116,23 +117,20 @@ export default function AlertDialog({
         </div>
 
         <div className="flex items-center justify-end gap-2">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={onCancel}
-            className="btn-secondary px-4 py-2 text-[13px]"
+            className="px-4 py-2 text-[13px]"
           >
             {cancelLabel}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={variant === 'danger' ? 'destructive' : 'cta'}
             onClick={onConfirm}
-            className={cn(
-              'px-4 py-2 text-[13px] font-semibold transition-colors',
-              variant === 'danger' ? 'btn-danger' : 'btn-cta',
-            )}
+            className="px-4 py-2 text-[13px] font-semibold"
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

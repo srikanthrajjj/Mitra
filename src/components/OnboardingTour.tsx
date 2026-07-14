@@ -3,6 +3,7 @@ import { ArrowRight, ArrowLeft, X, Loader2 } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 import {
   ONBOARDING_TOUR_STEPS,
   tourTargetSelector,
@@ -374,21 +375,23 @@ export default function OnboardingTour({
               </button>
 
               {stepIndex > 0 && (
-                <button
+                <Button
+                  variant="secondary"
                   type="button"
                   onClick={handleBack}
-                  className="btn-secondary flex cursor-pointer items-center gap-1.5 px-4 py-2 text-xs transition-all duration-200"
+                  className="px-4 py-2 text-xs"
                 >
                   <ArrowLeft className="h-3 w-3" />
                   Back
-                </button>
+                </Button>
               )}
 
-              <button
+              <Button
+                variant="cta"
                 type="button"
                 onClick={handleNext}
                 disabled={Boolean(currentStep.target) && !targetReady}
-                className="btn-cta flex cursor-pointer items-center gap-1.5 px-4 py-2 text-xs transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="px-4 py-2 text-xs"
               >
                 {stepIndex === steps.length - 1 ? (
                   'Finish'
@@ -398,7 +401,7 @@ export default function OnboardingTour({
                     <ArrowRight className="h-3.5 w-3.5" />
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

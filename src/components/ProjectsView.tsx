@@ -14,6 +14,7 @@ import {
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 
 type Filter = 'all' | 'mine' | 'shared' | 'organisational';
 type ViewMode = 'list' | 'grid';
@@ -95,14 +96,15 @@ export default function ProjectsView({
           <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
             Projects
           </h1>
-          <button
+          <Button
+            variant="cta"
             type="button"
             onClick={onNewProject}
-            className="btn-cta cursor-pointer flex items-center gap-2 px-4 py-2 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+            className="px-4 py-2 text-sm"
           >
             <Plus className="h-4 w-4" />
             New Project
-          </button>
+          </Button>
         </div>
 
         {/* Search + View toggle */}
@@ -193,14 +195,15 @@ export default function ProjectsView({
             <p className={`mb-5 text-xs ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
               Create your first project to get started.
             </p>
-            <button
+            <Button
+              variant="cta"
               type="button"
               onClick={onNewProject}
-              className="btn-cta cursor-pointer flex items-center gap-2 px-5 py-2.5 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+              className="px-5 py-2.5 text-sm"
             >
               <Plus className="h-4 w-4" />
               New Project
-            </button>
+            </Button>
           </div>
         ) : viewMode === 'list' ? (
           /* List view */

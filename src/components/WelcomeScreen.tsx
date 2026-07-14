@@ -1,5 +1,6 @@
 import React from 'react';
 import { MitraLogo } from './MitraLogo';
+import { Button } from '@/src/components/ui/button';
 
 interface WelcomeScreenProps {
   onSignIn: () => void;
@@ -23,12 +24,13 @@ export default function WelcomeScreen({ onSignIn, onExploreGuest }: WelcomeScree
         </h1>
 
         <div className="flex flex-col items-center gap-3 w-full max-w-xs animate-welcome-in welcome-delay-3">
-          <button
+          <Button
+            variant="cta"
             onClick={onSignIn}
-            className="w-full py-3 px-6 text-[14px] font-bold btn-cta transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            className="w-full py-3 px-6 text-[14px]"
           >
             Sign in as
-          </button>
+          </Button>
 
           <button
             onClick={onExploreGuest}

@@ -433,13 +433,9 @@ function ChatComposerPreview({ isDark }: { isDark: boolean }) {
       />
       <div className="mt-2 flex items-center justify-between">
         <span className="text-[11px] text-muted-foreground">Phase 1 · Discovery</span>
-        <button
-          type="button"
-          className="inline-flex h-8 w-8 items-center justify-center btn-cta"
-          aria-label="Send"
-        >
+        <Button variant="cta" size="icon" aria-label="Send">
           <Send className="h-3.5 w-3.5" />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -820,12 +816,8 @@ export function StyleguideView({ theme, activeSolution, onBack }: StyleguideView
                 <PreviewSurface label="Neon green usage">
                   <div className="flex flex-wrap items-center gap-3">
                     <Button>Primary CTA</Button>
-                    <button type="button" className="px-4 py-2 text-sm btn-cta">
-                      btn-cta
-                    </button>
-                    <button type="button" className="px-4 py-2 text-sm btn-secondary">
-                      btn-secondary
-                    </button>
+                    <Button variant="cta">cta variant</Button>
+                    <Button variant="secondary">secondary variant</Button>
                     <span className="accent-neon text-sm font-semibold">accent-neon text</span>
                     <span className="rounded border accent-neon-border px-2 py-1 text-xs">accent-neon-border</span>
                   </div>
@@ -1173,12 +1165,8 @@ export function StyleguideView({ theme, activeSolution, onBack }: StyleguideView
                     <Button variant="outline">Outline</Button>
                     <Button variant="ghost">Ghost</Button>
                     <Button variant="destructive">Destructive</Button>
-                    <button type="button" className="px-4 py-2 text-sm btn-cta">
-                      btn-cta
-                    </button>
-                    <button type="button" className="px-4 py-2 text-sm btn-secondary">
-                      btn-secondary
-                    </button>
+                    <Button variant="cta">cta legacy</Button>
+                    <Button variant="secondary">secondary legacy</Button>
                   </div>
                 </PreviewSurface>
 

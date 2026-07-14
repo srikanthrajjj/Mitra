@@ -10,6 +10,7 @@ import {
   FolderIcon as AnimatedFolderIcon,
   LinkIcon as AnimatedLinkIcon,
   StarIcon as AnimatedStarIcon,
+  ZapIcon as AnimatedZapIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
@@ -338,6 +339,12 @@ export function ArchitectSidebar({
       tab: 'projects',
     },
     { id: 'connections', label: 'Connections', icon: AnimatedLinkIcon, tab: 'connections' },
+    {
+      id: 'skills',
+      label: 'Skills',
+      icon: AnimatedZapIcon,
+      tab: 'skills',
+    },
     {
       id: 'favourites',
       label: 'Favourites',

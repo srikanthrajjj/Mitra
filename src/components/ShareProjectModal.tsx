@@ -8,6 +8,7 @@ import { USER_DISPLAY_NAME, USER_EMAIL } from '../constants/user';
 import { getAvailableTeamMembers } from '../data/internalTeamMembers';
 import { SelectNative } from '@/src/components/ui/select-native';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 
 interface ShareProjectModalProps {
   theme: Theme;
@@ -202,15 +203,16 @@ export function ShareProjectModal({
                 <p className="text-[11px] text-destructive">{addError}</p>
               )}
 
-              <button
+              <Button
+                variant="cta"
                 type="button"
                 onClick={handleAddMember}
                 disabled={!selectedMemberId || availableMembers.length === 0}
-                className="btn-cta inline-flex h-9 w-full items-center justify-center gap-1.5 text-sm transition-all disabled:pointer-events-none disabled:opacity-50"
+                className="h-9 w-full"
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 Add to project
-              </button>
+              </Button>
             </div>
 
             <div>

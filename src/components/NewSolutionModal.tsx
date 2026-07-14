@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Sparkles, AlertCircle } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { Button } from '@/src/components/ui/button';
 
 interface NewSolutionModalProps {
   theme: Theme;
@@ -173,19 +174,21 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
 
           {/* Footer controls */}
           <div className="flex justify-end gap-3 pt-3 border-t border-mitra-border/10">
-            <button
+            <Button
+              variant="secondary"
               type="button"
               onClick={onClose}
-              className="btn-secondary cursor-pointer px-4 py-2 text-xs transition-all hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98]"
+              className="px-4 py-2 text-xs"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="cta"
               type="submit"
-              className="btn-cta cursor-pointer px-5 py-2.5 text-xs flex items-center gap-1.5 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+              className="px-5 py-2.5 text-xs"
             >
               Draft Solution Architecture
-            </button>
+            </Button>
           </div>
 
         </form>

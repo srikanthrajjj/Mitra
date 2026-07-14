@@ -4,6 +4,7 @@ import { Check, Copy, Link2, Mail, X, Zap } from 'lucide-react';
 import { SharePermission, SolutionArtifact, Theme, UserRole } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { buildGuestReviewUrl } from '../utils/projectWorkflow';
+import { Button } from '@/src/components/ui/button';
 import {
   getDefaultReviewerEmail,
   getPersonaShareLabel,
@@ -215,14 +216,15 @@ export function ShareArtifactModal({
                 </span>
               </label>
 
-              <button
+              <Button
+                variant="cta"
                 type="button"
                 onClick={handleSend}
                 disabled={!email.trim()}
-                className="btn-cta inline-flex h-9 w-full items-center justify-center text-sm transition-all disabled:pointer-events-none disabled:opacity-50"
+                className="h-9 w-full"
               >
                 Send to {personaLabel.split(' ')[0]}
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -257,22 +259,24 @@ export function ShareArtifactModal({
                   </p>
                   <p className={cn('break-all text-[11px]', isDark ? 'text-slate-300' : 'text-foreground')}>{guestUrl}</p>
                   <div className="mt-3 flex gap-2">
-                    <button
+                    <Button
+                      variant="secondary"
                       type="button"
                       onClick={handleCopy}
-                      className="btn-secondary inline-flex h-8 flex-1 items-center justify-center gap-1.5 text-xs transition-colors"
+                      className="h-8 flex-1"
                     >
                       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                       {copied ? 'Copied' : 'Copy link'}
-                    </button>
+                    </Button>
                     {onPreviewGuest && pendingReviewId && (
-                      <button
+                      <Button
+                        variant="cta"
                         type="button"
                         onClick={() => onPreviewGuest(pendingReviewId)}
-                        className="btn-cta inline-flex h-8 flex-1 items-center justify-center text-xs transition-all"
+                        className="h-8 flex-1 text-xs"
                       >
                         Review (same tab)
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>

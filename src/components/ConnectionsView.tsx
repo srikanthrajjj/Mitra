@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { Button } from '@/src/components/ui/button';
 import { 
   Plus, X, Edit, Key, MoreHorizontal, HelpCircle, History, CheckCircle2, XCircle, AlertTriangle
 } from 'lucide-react';
@@ -251,14 +252,14 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
           <h1 className="text-2xl font-bold font-display tracking-tight text-foreground">
             Connections
           </h1>
-          <button
-            type="button"
+          <Button
+            variant="cta"
             onClick={handleAddClick}
-            className="btn-cta px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 text-xs"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Add Credentials</span>
-          </button>
+          </Button>
         </div>
 
         {/* Project Section Title */}
@@ -627,19 +628,21 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
               {/* Modal Buttons (aligned to bottom-left) */}
               <div className="px-6 py-4 border-t border-border dark:border-mitra-border/80 flex items-center gap-3">
-                <button
+                <Button
+                  variant="secondary"
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="btn-secondary px-4 py-2 text-xs cursor-pointer"
+                  className="px-4 py-2 text-xs"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="cta"
                   type="submit"
-                  className="btn-cta px-4 py-2 text-xs font-semibold cursor-pointer"
+                  className="px-4 py-2 text-xs"
                 >
                   Save
-                </button>
+                </Button>
               </div>
 
             </form>
@@ -719,13 +722,14 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
             </div>
 
             <div className="px-6 py-4 border-t border-border dark:border-mitra-border/80 flex justify-end">
-              <button
+              <Button
+                variant="secondary"
                 type="button"
                 onClick={() => setHistoryModalOpen(false)}
-                className="btn-secondary px-4 py-2 text-xs cursor-pointer"
+                className="px-4 py-2 text-xs"
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>

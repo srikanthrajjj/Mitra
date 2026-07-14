@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Key, Lock, Shield, Eye, EyeOff, CheckCircle, Trash2 } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { Button } from '@/src/components/ui/button';
 
 const PERSONAL_KEY_STORAGE = 'GEMINI_API_KEY';
 
@@ -203,11 +204,12 @@ export default function ApiKeyModal({
               </div>
 
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="cta"
                   type="submit"
                   disabled={!personalKey.trim() || savedSuccess}
-                  className={`btn-cta flex-1 h-10 text-[13px] flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
-                    savedSuccess ? '' : 'active:scale-[0.98]'
+                  className={`flex-1 h-10 text-[13px] ${
+                    savedSuccess ? '' : ''
                   }`}
                 >
                   {savedSuccess ? (
@@ -218,17 +220,18 @@ export default function ApiKeyModal({
                   ) : (
                     'Save personal key'
                   )}
-                </button>
+                </Button>
                 {hasPersonalKey && (
-                  <button
+                  <Button
+                    variant="destructive"
                     type="button"
                     onClick={handleRemovePersonal}
-                    className="btn-danger h-10 px-3 text-[13px] flex items-center gap-1.5 transition-colors"
+                    className="h-10 px-3 text-[13px]"
                     title="Remove personal key and use Mitra private API only"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Remove
-                  </button>
+                  </Button>
                 )}
               </div>
             </form>
@@ -249,13 +252,14 @@ export default function ApiKeyModal({
             </p>
           </div>
 
-          <button
+          <Button
+            variant="secondary"
             type="button"
             onClick={onClose}
-            className="btn-secondary w-full h-10 text-[13px] transition-all"
+            className="w-full h-10 text-[13px]"
           >
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

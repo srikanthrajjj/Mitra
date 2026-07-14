@@ -3,6 +3,7 @@ import { SERVICE_TEMPLATES } from '../data/templates';
 import { ServiceTemplate, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Search, ListFilter, ArrowRight, Heart } from 'lucide-react';
+import { Button } from '@/src/components/ui/button';
 
 interface TemplatesViewProps {
   theme: Theme;
@@ -140,14 +141,15 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
               </div>
 
               <div className="px-5 pb-5 pt-0">
-                <button
+                <Button
+                  variant="cta"
                   type="button"
                   onClick={() => onUseTemplate(tpl)}
-                  className="btn-cta w-full py-2.5 text-[13px] flex items-center justify-center gap-1.5 transition-colors duration-200"
+                  className="w-full py-2.5 text-[13px]"
                 >
                   Use template
                   <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                </Button>
               </div>
             </article>
           ))}

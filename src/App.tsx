@@ -15,6 +15,8 @@ import ProjectsView from './components/ProjectsView';
 import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
+import SkillsView from './components/SkillsView';
+import SkillDetailModal from './components/SkillDetailModal';
 import { SearchView } from './components/SearchView';
 import { SearchDialog } from './components/SearchDialog';
 import NewSolutionModal from './components/NewSolutionModal';
@@ -480,6 +482,7 @@ export default function App() {
   const [isNewModalOpen, setIsNewModalOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
+  const [selectedSkill, setSelectedSkill] = useState<import('./data/skills').Skill | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -2730,6 +2733,13 @@ Pick a step below and I'll continue building — data model, scripts, and update
             />
           )}
 
+          {activeTab === 'skills' && (
+            <SkillsView
+              theme={resolvedTheme}
+              onRunSkill={(skill) => setSelectedSkill(skill)}
+            />
+          )}
+
           {activeTab === 'styleguide' && (
             <StyleguideView theme={resolvedTheme} activeSolution={activeSolution} onBack={handleLeaveStyleguide} />
           )}
@@ -2748,14 +2758,16 @@ Pick a step below and I'll continue building — data model, scripts, and update
           {activeTab === 'favourites' && (() => {
             const favoriteSolutions = visibleSolutions.filter((s) => s.isFavorite);
             return favoriteSolutions.length > 0 ? (
-              <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-6 py-8 md:px-8 bg-transparent">
-                <div className="mx-auto w-full max-w-6xl">
-                  <h1 className={cn(
-                    "text-2xl font-display font-semibold tracking-tight mb-6",
-                    isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
-                  )}>
-                    Favorites
-                  </h1>
+              <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
+                <div className="mx-auto w-full max-w-5xl">
+                  <div className="mb-8 flex items-center justify-between gap-4">
+                    <h1 className={cn(
+                      "font-display text-2xl font-bold",
+                      isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
+                    )}>
+                      Favorites
+                    </h1>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {favoriteSolutions.map((sol) => (
                       <div
@@ -2820,8 +2832,9 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-8 max-w-lg mx-auto">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border ${
+              <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col items-center justify-center px-4 py-8 md:px-8 lg:px-12">
+                <div className="flex flex-col items-center text-center">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border ${
                   isDarkTheme(resolvedTheme) ? 'bg-neutral-900 border-neutral-800 text-amber-500' : 'bg-amber-50 border-amber-200 text-amber-500'
                 }`}>
                   <Star className="w-8 h-8 fill-amber-500 text-amber-500" />
@@ -2832,6 +2845,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Bookmark or star your most frequently used blueprints, configurations, or custom incident templates to access them quickly here.
                 </p>
+                </div>
               </div>
             );
           })()}
@@ -2934,6 +2948,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
         }}
         onRemove={() => {
           localStorage.removeItem('GEMINI_API_KEY');
+        }}
+      />
+      <SkillDetailModal
+        theme={resolvedTheme}
+        skill={selectedSkill}
+        onClose={() => setSelectedSkill(null)}
+        onRun={(skill) => {
+          setSelectedSkill(null);
         }}
       />
       <OnboardingTour
