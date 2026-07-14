@@ -387,25 +387,25 @@ export default function Sidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-2">
+      <SidebarFooter className="border-t border-sidebar-border px-2 py-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
               data-tour="profile"
-              className="mx-1 my-1 w-[calc(100%-0.5rem)] rounded-xl p-3 flex items-center gap-3 text-left transition-colors hover:bg-sidebar-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              className="mx-0.5 my-0 w-[calc(100%-0.25rem)] rounded-lg px-2 py-1.5 flex items-center gap-2 text-left transition-colors hover:bg-sidebar-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
               aria-label="Account menu"
             >
-              <Avatar className="h-9 w-9 rounded-full shrink-0">
-                <AvatarFallback className="rounded-full bg-brand-green/10 text-brand-green font-semibold text-xs">
+              <Avatar className="h-7 w-7 rounded-full shrink-0">
+                <AvatarFallback className="rounded-full bg-brand-green/10 text-brand-green font-semibold text-[9px]">
                   {userRole === 'architect' ? 'RC' : USER_INITIALS}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[13px] font-semibold text-foreground">
+                <div className="truncate text-[12px] font-semibold text-foreground">
                   {userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME}
                 </div>
-                <div className="truncate text-[10.5px] text-muted-foreground">
+                <div className="truncate text-[10px] text-muted-foreground">
                   {userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]}
                 </div>
               </div>

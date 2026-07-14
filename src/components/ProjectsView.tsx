@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState, useCallback } from 'react';
 import {
   Search,
   Plus,
@@ -74,6 +74,14 @@ export default function ProjectsView({
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    if (scrollRef.current) {
+      setHasScrolled(scrollRef.current.scrollTop > 0);
+    }
+  }, []);
 
   const filtered = useMemo(() => {
     let list = solutions;
@@ -89,95 +97,114 @@ export default function ProjectsView({
   }, [solutions, search]);
 
   return (
-    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
-      <div className="mx-auto w-full max-w-5xl">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between gap-4">
-          <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
-            Projects
-          </h1>
-          <Button
-            variant="cta"
-            type="button"
-            onClick={onNewProject}
-            className="px-4 py-2 text-sm"
-          >
-            <Plus className="h-4 w-4" />
-            New Project
-          </Button>
-        </div>
+    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
+      {/* Sticky header — full width */}
+      <div className="shrink-0">
+        <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                Projects
+              </h1>
+              <Button
+                variant="cta"
+                type="button"
+                onClick={onNewProject}
+                className="px-4 py-2 text-sm"
+              >
+                <Plus className="h-4 w-4" />
+                New Project
+              </Button>
+            </div>
 
-        {/* Search + View toggle */}
-        <div className="relative mb-6 flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className={cn(
-                'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
-                isDark
-                  ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
-                  : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
-              )}
-            />
+            {/* Search + View toggle */}
+            <div className="relative mb-4 flex items-center gap-3">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search projects..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={cn(
+                    'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
+                    isDark
+                      ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
+                      : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
+                  )}
+                />
+              </div>
+              <div className={cn(
+                'flex rounded-lg border p-0.5',
+                isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-border bg-muted',
+              )}>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className={cn(
+                    'rounded-md p-1.5 transition-all',
+                    viewMode === 'list'
+                      ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
+                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
+                  )}
+                  aria-label="List view"
+                >
+                  <List className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    'rounded-md p-1.5 transition-all',
+                    viewMode === 'grid'
+                      ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
+                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
+                  )}
+                  aria-label="Grid view"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Filter pills */}
+            <div className="flex gap-2">
+              {(['all', 'mine', 'shared', 'organisational'] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    'rounded-full px-4 py-1.5 text-xs font-medium transition-all',
+                    filter === f
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : isDark
+                        ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
+                        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
+                  )}
+                >
+                  {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : f === 'shared' ? 'Shared' : 'Organisational'}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className={cn(
-            'flex rounded-lg border p-0.5',
-            isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-border bg-muted',
-          )}>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={cn(
-                'rounded-md p-1.5 transition-all',
-                viewMode === 'list'
-                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
-              )}
-              aria-label="List view"
-            >
-              <List className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={cn(
-                'rounded-md p-1.5 transition-all',
-                viewMode === 'grid'
-                  ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                  : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-muted-foreground',
-              )}
-              aria-label="Grid view"
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-          </div>
         </div>
+        {/* Full-width separator — only when scrolled */}
+        <div
+          className={cn(
+            'border-b transition-opacity duration-200',
+            hasScrolled ? 'border-border opacity-100' : 'border-transparent opacity-0',
+          )}
+        />
+      </div>
 
-        {/* Filter pills */}
-        <div className="mb-6 flex gap-2">
-          {(['all', 'mine', 'shared', 'organisational'] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFilter(f)}
-              className={cn(
-                'rounded-full px-4 py-1.5 text-xs font-medium transition-all',
-                filter === f
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : isDark
-                    ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
-                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              {f === 'all' ? 'All' : f === 'mine' ? 'Mine' : f === 'shared' ? 'Shared' : 'Organisational'}
-            </button>
-          ))}
-        </div>
-
+      {/* Scrollable content */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
+      >
+        <div className="mx-auto max-w-5xl">
         {/* Empty state */}
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -323,6 +350,7 @@ export default function ProjectsView({
             })}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

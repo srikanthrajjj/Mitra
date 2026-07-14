@@ -17,6 +17,7 @@ import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
 import SkillsView from './components/SkillsView';
 import SkillDetailModal from './components/SkillDetailModal';
+import FavouritesView from './components/FavouritesView';
 import { SearchView } from './components/SearchView';
 import { SearchDialog } from './components/SearchDialog';
 import NewSolutionModal from './components/NewSolutionModal';
@@ -2758,88 +2759,22 @@ Pick a step below and I'll continue building — data model, scripts, and update
           {activeTab === 'favourites' && (() => {
             const favoriteSolutions = visibleSolutions.filter((s) => s.isFavorite);
             return favoriteSolutions.length > 0 ? (
-              <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
-                <div className="mx-auto w-full max-w-5xl">
-                  <div className="mb-8 flex items-center justify-between gap-4">
-                    <h1 className={cn(
-                      "font-display text-2xl font-bold",
-                      isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
-                    )}>
-                      Favorites
-                    </h1>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {favoriteSolutions.map((sol) => (
-                      <div
-                        key={sol.id}
-                        onClick={() => {
-                          handleSelectSolution(sol.id);
-                          setActiveTab('projects');
-                        }}
-                        className={cn(
-                          "group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer",
-                          isDarkTheme(resolvedTheme)
-                            ? "bg-card hover:bg-neutral-900/60 border-border text-foreground hover:border-brand-green/30"
-                            : "bg-card hover:bg-accent border-border text-foreground hover:border-emerald-500/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-                        )}
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className={cn(
-                              "text-sm font-semibold truncate flex-1",
-                              isDarkTheme(resolvedTheme) ? "text-white" : "text-foreground"
-                            )}>
-                              {sol.name}
-                            </h3>
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              <button
-                                type="button"
-                                title="Open chat"
-                                className={cn(
-                                  "p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors",
-                                )}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSelectSolution(sol.id);
-                                  setActiveTab('projects');
-                                }}
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                title="Unfavorite"
-                                className="p-1 rounded hover:bg-muted/40 transition-colors text-emerald-500"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleFavorite(sol.id);
-                                }}
-                              >
-                                <Star className="h-3.5 w-3.5 fill-emerald-500 text-emerald-500 animate-pulse-fast" />
-                              </button>
-                            </div>
-                          </div>
-                          <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
-                            {sol.description}
-                          </p>
-                        </div>
-                        <div className="text-[10px] text-muted-foreground mt-4 font-medium">
-                          {sol.timeLabel || sol.createdAt}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <FavouritesView
+                solutions={favoriteSolutions}
+                theme={resolvedTheme}
+                onSelect={(solId) => {
+                  handleSelectSolution(solId);
+                  setActiveTab('projects');
+                }}
+                onToggleFavorite={handleToggleFavorite}
+              />
             ) : (
               <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col items-center justify-center px-4 py-8 md:px-8 lg:px-12">
                 <div className="flex flex-col items-center text-center">
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border ${
-                  isDarkTheme(resolvedTheme) ? 'bg-neutral-900 border-neutral-800 text-amber-500' : 'bg-amber-50 border-amber-200 text-amber-500'
-                }`}>
-                  <Star className="w-8 h-8 fill-amber-500 text-amber-500" />
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border bg-muted border-border text-muted-foreground">
+                  <Star className="w-8 h-8" />
                 </div>
-                <h2 className={`text-xl font-display font-bold mb-2 ${isDarkTheme(resolvedTheme) ? 'text-white' : 'text-foreground'}`}>
+                <h2 className="text-xl font-display font-bold mb-2 text-foreground">
                   No Favourites Added Yet
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
