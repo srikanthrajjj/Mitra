@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Pencil } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILL_CATEGORIES, type SkillCategory } from '../data/skills';
@@ -108,22 +108,14 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
           <X className="h-4 w-4" />
         </button>
 
-        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/10">
-          {isEditing ? (
-            <Pencil className="h-6 w-6 text-brand-green" />
-          ) : (
-            <Plus className="h-6 w-6 text-brand-green" />
-          )}
-        </div>
-
         <h2 className={`mb-1 font-display text-xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
           {isEditing ? 'Edit Skill' : 'Add a New Skill'}
         </h2>
-        <p className={`mb-5 text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
+        <p className={`mb-4 text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
           {isEditing ? 'Update this skill\'s details.' : 'Create a custom skill for your UNICEF workspace.'}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1.5">
             <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
               Skill Title
@@ -209,7 +201,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
               Instructions
             </label>
             <textarea
-              rows={4}
+              rows={3}
               required
               placeholder="Detailed instructions on how this skill should behave..."
               value={instructions}
