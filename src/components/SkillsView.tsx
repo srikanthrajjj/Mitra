@@ -17,6 +17,7 @@ import AddSkillModal, { type CustomSkill } from './AddSkillModal';
 import SkillExecutionModal from './SkillExecutionModal';
 
 const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
+const DELETED_SKILLS_KEY = 'mitra-deleted-skills';
 
 function loadCustomSkills(): CustomSkill[] {
   try {
@@ -29,6 +30,19 @@ function loadCustomSkills(): CustomSkill[] {
 
 function saveCustomSkills(skills: CustomSkill[]) {
   localStorage.setItem(CUSTOM_SKILLS_KEY, JSON.stringify(skills));
+}
+
+function loadDeletedSkillIds(): string[] {
+  try {
+    const raw = localStorage.getItem(DELETED_SKILLS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveDeletedSkillIds(ids: string[]) {
+  localStorage.setItem(DELETED_SKILLS_KEY, JSON.stringify(ids));
 }
 
 interface SkillsViewProps {
@@ -45,6 +59,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [hasScrolled, setHasScrolled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
+  const [deletedSkillIds, setDeletedSkillIds] = useState<string[]>(loadDeletedSkillIds);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<CustomSkill | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
@@ -53,6 +68,10 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     saveCustomSkills(customSkills);
   }, [customSkills]);
 
+  useEffect(() => {
+    saveDeletedSkillIds(deletedSkillIds);
+  }, [deletedSkillIds]);
+
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
       setHasScrolled(scrollRef.current.scrollTop > 0);
@@ -60,7 +79,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   }, []);
 
   const filtered = useMemo(() => {
-    let list = SKILLS;
+    let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id));
     if (filter !== 'All') {
       list = list.filter((s) => s.category === filter);
     }
@@ -74,7 +93,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       );
     }
     return list;
-  }, [search, filter]);
+  }, [search, filter, deletedSkillIds]);
 
   const filteredCustom = useMemo(() => {
     let list = customSkills;
@@ -100,6 +119,10 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
 
   const handleDeleteSkill = (id: string) => {
     setCustomSkills((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleDeleteBuiltinSkill = (id: string) => {
+    setDeletedSkillIds((prev) => [...prev, id]);
   };
 
   const handleToggleSkill = (id: string) => {
@@ -361,7 +384,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
                             <DropdownMenuItem
-                              onClick={() => {}}
+                              onClick={() => handleDeleteBuiltinSkill(skill.id)}
                               className={cn(
                                 'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
                               )}
