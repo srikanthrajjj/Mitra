@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Button } from '@/src/components/ui/button';
@@ -19,13 +19,28 @@ interface AddSkillModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (skill: CustomSkill) => void;
+  initialSkill?: CustomSkill | null;
 }
 
-export default function AddSkillModal({ theme, isOpen, onClose, onAdd }: AddSkillModalProps) {
+export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSkill }: AddSkillModalProps) {
   const isDark = isDarkTheme(theme);
   const [name, setName] = useState('');
   const [instructions, setInstructions] = useState('');
   const [enabled, setEnabled] = useState(true);
+
+  const isEditing = initialSkill !== null && initialSkill !== undefined;
+
+  useEffect(() => {
+    if (initialSkill) {
+      setName(initialSkill.name);
+      setInstructions(initialSkill.instructions);
+      setEnabled(initialSkill.enabled);
+    } else {
+      setName('');
+      setInstructions('');
+      setEnabled(true);
+    }
+  }, [initialSkill, isOpen]);
 
   if (!isOpen) return null;
 
@@ -33,7 +48,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd }: AddSkil
     e.preventDefault();
     if (!name.trim() || !instructions.trim()) return;
     onAdd({
-      id: `custom-${Date.now()}`,
+      id: isEditing ? initialSkill!.id : `custom-${Date.now()}`,
       name: name.trim(),
       instructions: instructions.trim(),
       enabled,
@@ -71,14 +86,18 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd }: AddSkil
         </button>
 
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/10">
-          <Plus className="h-6 w-6 text-brand-green" />
+          {isEditing ? (
+            <Pencil className="h-6 w-6 text-brand-green" />
+          ) : (
+            <Plus className="h-6 w-6 text-brand-green" />
+          )}
         </div>
 
         <h2 className={`mb-1 font-display text-xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
-          Add a New Skill
+          {isEditing ? 'Edit Skill' : 'Add a New Skill'}
         </h2>
         <p className={`mb-5 text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
-          Create a custom skill for your UNICEF workspace.
+          {isEditing ? 'Update your custom skill.' : 'Create a custom skill for your UNICEF workspace.'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -146,7 +165,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd }: AddSkil
               type="submit"
               className="px-5 py-2.5 text-xs"
             >
-              Add Skill
+              {isEditing ? 'Save Changes' : 'Add Skill'}
             </Button>
           </div>
         </form>

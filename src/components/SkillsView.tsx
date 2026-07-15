@@ -1,11 +1,18 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
-import { Search, Plus, Zap, Trash2 } from 'lucide-react';
+import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, Play } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill, type SkillCategory } from '../data/skills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu';
 import AddSkillModal, { type CustomSkill } from './AddSkillModal';
 import SkillExecutionModal from './SkillExecutionModal';
 
@@ -39,6 +46,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<CustomSkill | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
 
   useEffect(() => {
@@ -85,6 +93,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     setCustomSkills((prev) => [...prev, skill]);
   };
 
+  const handleUpdateSkill = (updated: CustomSkill) => {
+    setCustomSkills((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    setEditingSkill(null);
+  };
+
   const handleDeleteSkill = (id: string) => {
     setCustomSkills((prev) => prev.filter((s) => s.id !== id));
   };
@@ -94,6 +107,17 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)),
     );
   };
+
+  const buildSkillForModal = (custom: CustomSkill): Skill => ({
+    id: custom.id,
+    name: custom.name,
+    description: custom.instructions,
+    category: 'Documentation' as SkillCategory,
+    icon: Zap,
+    whatItHelpsWith: custom.instructions,
+    examplePrompt: custom.instructions,
+    parameters: [],
+  });
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
@@ -192,8 +216,63 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     )}
                   >
                     <div>
-                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                        <Zap className="h-5 w-5 text-brand-green" />
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
+                          <Zap className="h-5 w-5 text-brand-green" />
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className={cn(
+                                'rounded-lg p-1.5 transition-colors',
+                                isDark ? 'text-white/30 hover:text-white/60 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                              )}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className={cn(
+                              'w-40 rounded-xl border p-1',
+                              isDark
+                                ? 'border-white/[0.08] bg-[#1a1a1a]'
+                                : 'border-border bg-card',
+                            )}
+                          >
+                            <DropdownMenuItem
+                              onClick={() => setSelectedSkill(buildSkillForModal(skill))}
+                              className={cn(
+                                'gap-2 rounded-lg text-xs',
+                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
+                              )}
+                            >
+                              <Play className="h-3.5 w-3.5" />
+                              Run Skill
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setEditingSkill(skill)}
+                              className={cn(
+                                'gap-2 rounded-lg text-xs',
+                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
+                              )}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteSkill(skill.id)}
+                              className={cn(
+                                'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
+                              )}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
                         {skill.name}
@@ -210,16 +289,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                       <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
                         {skill.enabled ? 'Active' : 'Inactive'}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteSkill(skill.id)}
-                        className={cn(
-                          'ml-auto rounded-lg p-1.5 transition-colors',
-                          isDark ? 'text-white/20 hover:text-red-400 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-red-500 hover:bg-muted',
-                        )}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -255,8 +324,53 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                       )}
                     >
                       <div>
-                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                          <Icon className="h-5 w-5 text-brand-green" />
+                        <div className="mb-3 flex items-center justify-between">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
+                            <Icon className="h-5 w-5 text-brand-green" />
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className={cn(
+                                  'rounded-lg p-1.5 transition-colors',
+                                  isDark ? 'text-white/30 hover:text-white/60 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                                )}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className={cn(
+                                'w-40 rounded-xl border p-1',
+                                isDark
+                                  ? 'border-white/[0.08] bg-[#1a1a1a]'
+                                  : 'border-border bg-card',
+                              )}
+                            >
+                              <DropdownMenuItem
+                                onClick={() => setSelectedSkill(skill)}
+                                className={cn(
+                                  'gap-2 rounded-lg text-xs',
+                                  isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
+                                )}
+                              >
+                                <Play className="h-3.5 w-3.5" />
+                                Run Skill
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled
+                                className={cn(
+                                  'gap-2 rounded-lg text-xs',
+                                  isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
+                                )}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Edit
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                         <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
                           {skill.name}
@@ -267,16 +381,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                           {skill.category}
                         </span>
-                      </div>
-                      <div className="mt-4">
-                        <Button
-                          variant="cta"
-                          size="sm"
-                          onClick={() => setSelectedSkill(skill)}
-                          className="w-full text-xs"
-                        >
-                          Use Skill
-                        </Button>
                       </div>
                     </div>
                   );
@@ -292,6 +396,14 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddSkill}
+      />
+
+      <AddSkillModal
+        theme={theme}
+        isOpen={editingSkill !== null}
+        onClose={() => setEditingSkill(null)}
+        onAdd={handleUpdateSkill}
+        initialSkill={editingSkill}
       />
 
       <SkillExecutionModal
