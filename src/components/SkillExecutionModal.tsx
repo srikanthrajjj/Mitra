@@ -722,7 +722,12 @@ export default function SkillExecutionModal({
 
         {/* Main content */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center justify-between border-b px-6 py-4">
+          <div
+            className={cn(
+              'flex items-center justify-between border-b px-6 py-4',
+              isDark ? 'border-white/[0.06]' : 'border-border',
+            )}
+          >
             <h2 className={`font-display text-base font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
               {STEPS.find((s) => s.id === activeStep)?.label}
             </h2>
