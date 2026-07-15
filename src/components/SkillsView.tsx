@@ -296,6 +296,9 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                       <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         {skill.category}
                       </span>
+                      <p className={`mt-1.5 text-[10px] ${isDark ? 'text-white/30' : 'text-muted-foreground/60'}`}>
+                        Created by {skill.createdBy}
+                      </p>
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                       <Switch

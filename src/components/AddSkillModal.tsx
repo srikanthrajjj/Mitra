@@ -4,6 +4,7 @@ import { X, Plus, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILL_CATEGORIES, type SkillCategory } from '../data/skills';
+import { USER_DISPLAY_NAME } from '../constants/user';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -15,6 +16,7 @@ export interface CustomSkill {
   category: SkillCategory;
   instructions: string;
   enabled: boolean;
+  createdBy: string;
 }
 
 interface AddSkillModalProps {
@@ -63,6 +65,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
       category,
       instructions: instructions.trim(),
       enabled,
+      createdBy: isEditing ? initialSkill!.createdBy : USER_DISPLAY_NAME,
     });
     setName('');
     setDescription('');
