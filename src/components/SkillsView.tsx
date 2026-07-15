@@ -75,6 +75,18 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     }
   }, []);
 
+  const buildSkillForModal = (custom: CustomSkill): Skill => ({
+    id: custom.id,
+    name: custom.name,
+    description: custom.description,
+    category: custom.category,
+    icon: Zap,
+    whatItHelpsWith: custom.instructions,
+    examplePrompt: custom.instructions,
+    parameters: [],
+    createdBy: custom.createdBy,
+  });
+
   const builtinSkills = useMemo(() => {
     let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id));
     if (search.trim()) {
@@ -131,18 +143,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)),
     );
   };
-
-  const buildSkillForModal = (custom: CustomSkill): Skill => ({
-    id: custom.id,
-    name: custom.name,
-    description: custom.description,
-    category: custom.category,
-    icon: Zap,
-    whatItHelpsWith: custom.instructions,
-    examplePrompt: custom.instructions,
-    parameters: [],
-    createdBy: custom.createdBy,
-  });
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
