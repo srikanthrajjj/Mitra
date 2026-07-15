@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import AddSkillModal, { type CustomSkill } from './AddSkillModal';
+import SkillExecutionModal from './SkillExecutionModal';
 
 const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
 
@@ -38,6 +39,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
 
   useEffect(() => {
     saveCustomSkills(customSkills);
@@ -270,7 +272,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         <Button
                           variant="cta"
                           size="sm"
-                          onClick={() => onRunSkill(skill)}
+                          onClick={() => setSelectedSkill(skill)}
                           className="w-full text-xs"
                         >
                           Use Skill
@@ -290,6 +292,17 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddSkill}
+      />
+
+      <SkillExecutionModal
+        theme={theme}
+        skill={selectedSkill}
+        isOpen={selectedSkill !== null}
+        onClose={() => setSelectedSkill(null)}
+        onRun={(skill, params, instanceId, connectionId) => {
+          onRunSkill(skill);
+          setSelectedSkill(null);
+        }}
       />
     </div>
   );
