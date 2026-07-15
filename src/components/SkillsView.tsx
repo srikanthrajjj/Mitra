@@ -115,8 +115,8 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
 
   const allSkills = useMemo(() => {
     const converted: (Skill & { isCustom?: boolean; customData?: CustomSkill })[] = [
-      ...builtinSkills,
       ...filteredCustom.map((cs) => buildSkillForModal(cs)),
+      ...builtinSkills,
     ];
     return converted;
   }, [filteredCustom, builtinSkills]);
