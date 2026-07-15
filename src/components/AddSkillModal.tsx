@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Plus, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { SKILL_CATEGORIES, type SkillCategory } from '../data/skills';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -10,6 +11,8 @@ import { cn } from '@/lib/utils';
 export interface CustomSkill {
   id: string;
   name: string;
+  description: string;
+  category: SkillCategory;
   instructions: string;
   enabled: boolean;
 }
@@ -25,6 +28,8 @@ interface AddSkillModalProps {
 export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSkill }: AddSkillModalProps) {
   const isDark = isDarkTheme(theme);
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState<SkillCategory>('Documentation');
   const [instructions, setInstructions] = useState('');
   const [enabled, setEnabled] = useState(true);
 
@@ -33,10 +38,14 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
   useEffect(() => {
     if (initialSkill) {
       setName(initialSkill.name);
+      setDescription(initialSkill.description);
+      setCategory(initialSkill.category);
       setInstructions(initialSkill.instructions);
       setEnabled(initialSkill.enabled);
     } else {
       setName('');
+      setDescription('');
+      setCategory('Documentation');
       setInstructions('');
       setEnabled(true);
     }
@@ -46,14 +55,18 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !instructions.trim()) return;
+    if (!name.trim() || !description.trim() || !instructions.trim()) return;
     onAdd({
       id: isEditing ? initialSkill!.id : `custom-${Date.now()}`,
       name: name.trim(),
+      description: description.trim(),
+      category,
       instructions: instructions.trim(),
       enabled,
     });
     setName('');
+    setDescription('');
+    setCategory('Documentation');
     setInstructions('');
     setEnabled(true);
     onClose();
@@ -122,12 +135,51 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
 
           <div className="space-y-1.5">
             <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
+              Description
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="Brief summary of what this skill does"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={cn(
+                'w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition-all',
+                isDark
+                  ? 'border-white/[0.06] bg-white/[0.03] text-white placeholder:text-white/30 focus:border-brand-green/50'
+                  : 'border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-brand-green/50',
+              )}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as SkillCategory)}
+              className={cn(
+                'w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition-all',
+                isDark
+                  ? 'border-white/[0.06] bg-white/[0.03] text-white focus:border-brand-green/50'
+                  : 'border-border bg-background text-foreground focus:border-brand-green/50',
+              )}
+            >
+              {SKILL_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
               Instructions
             </label>
             <textarea
               rows={4}
               required
-              placeholder="Describe what this skill does and how it should behave..."
+              placeholder="Detailed instructions on how this skill should behave..."
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               className={cn(

@@ -134,8 +134,8 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const buildSkillForModal = (custom: CustomSkill): Skill => ({
     id: custom.id,
     name: custom.name,
-    description: custom.instructions,
-    category: 'Documentation' as SkillCategory,
+    description: custom.description,
+    category: custom.category,
     icon: Zap,
     whatItHelpsWith: custom.instructions,
     examplePrompt: custom.instructions,
@@ -291,8 +291,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         {skill.name}
                       </h3>
                       <p className="text-[12px] leading-relaxed text-muted-foreground line-clamp-2">
-                        {skill.instructions}
+                        {skill.description}
                       </p>
+                      <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        {skill.category}
+                      </span>
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                       <Switch
