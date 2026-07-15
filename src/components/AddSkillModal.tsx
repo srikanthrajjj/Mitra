@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Pencil } from 'lucide-react';
+import { X, Plus, Pencil, Server } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILL_CATEGORIES, type SkillCategory } from '../data/skills';
 import { USER_DISPLAY_NAME } from '../constants/user';
+import { SERVICE_NOW_INSTANCES, instanceHostname, loadSelectedInstanceId } from '../data/serviceNowInstances';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ export interface CustomSkill {
   instructions: string;
   enabled: boolean;
   createdBy: string;
+  instanceId: string;
 }
 
 interface AddSkillModalProps {
@@ -34,6 +36,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
   const [category, setCategory] = useState<SkillCategory>('Documentation');
   const [instructions, setInstructions] = useState('');
   const [enabled, setEnabled] = useState(true);
+  const [instanceId, setInstanceId] = useState(loadSelectedInstanceId());
 
   const isEditing = initialSkill !== null && initialSkill !== undefined;
 
@@ -44,12 +47,14 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
       setCategory(initialSkill.category);
       setInstructions(initialSkill.instructions);
       setEnabled(initialSkill.enabled);
+      setInstanceId(initialSkill.instanceId || loadSelectedInstanceId());
     } else {
       setName('');
       setDescription('');
       setCategory('Documentation');
       setInstructions('');
       setEnabled(true);
+      setInstanceId(loadSelectedInstanceId());
     }
   }, [initialSkill, isOpen]);
 
@@ -66,12 +71,14 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
       instructions: instructions.trim(),
       enabled,
       createdBy: isEditing ? initialSkill!.createdBy : USER_DISPLAY_NAME,
+      instanceId,
     });
     setName('');
     setDescription('');
     setCategory('Documentation');
     setInstructions('');
     setEnabled(true);
+    setInstanceId(loadSelectedInstanceId());
     onClose();
   };
 
@@ -173,6 +180,43 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
+              Target Instance
+            </label>
+            <div className="space-y-2">
+              {SERVICE_NOW_INSTANCES.filter((inst) => inst.active).map((inst) => (
+                <button
+                  key={inst.id}
+                  type="button"
+                  onClick={() => setInstanceId(inst.id)}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all',
+                    instanceId === inst.id
+                      ? isDark
+                        ? 'border-brand-green/40 bg-brand-green/10'
+                        : 'border-brand-green/40 bg-brand-green/5'
+                      : isDark
+                        ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+                        : 'border-border bg-background hover:bg-muted',
+                  )}
+                >
+                  <Server className={cn('h-4 w-4 shrink-0', instanceId === inst.id ? 'text-brand-green' : 'text-muted-foreground')} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{inst.name}</span>
+                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground">{inst.tag}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">{instanceHostname(inst.url)}</p>
+                  </div>
+                  {instanceId === inst.id && (
+                    <div className="h-2 w-2 shrink-0 rounded-full bg-brand-green" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-1.5">

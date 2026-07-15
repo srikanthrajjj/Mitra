@@ -35,6 +35,7 @@ export interface Skill {
   examplePrompt: string;
   parameters: SkillParameter[];
   createdBy: string;
+  instanceId?: string;
 }
 
 export const SKILL_CATEGORIES: SkillCategory[] = [

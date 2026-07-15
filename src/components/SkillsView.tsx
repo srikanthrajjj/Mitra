@@ -106,6 +106,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     examplePrompt: custom.instructions,
     parameters: [],
     createdBy: custom.createdBy,
+    instanceId: custom.instanceId,
   });
 
   const builtinSkills = useMemo(() => {
@@ -118,6 +119,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         description: o.description ?? s.description,
         category: o.category ?? s.category,
         whatItHelpsWith: o.instructions ?? s.whatItHelpsWith,
+        instanceId: o.instanceId ?? s.instanceId,
       };
     });
     if (search.trim()) {
@@ -183,6 +185,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         description: updated.description,
         category: updated.category,
         instructions: updated.instructions,
+        instanceId: updated.instanceId,
       },
     }));
     setEditingSkill(null);
@@ -196,6 +199,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     instructions: skill.whatItHelpsWith,
     enabled: true,
     createdBy: skill.createdBy,
+    instanceId: skill.instanceId ?? '',
   });
 
   const handleToggleSkill = (id: string) => {
