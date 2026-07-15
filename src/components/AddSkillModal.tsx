@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Pencil, Server } from 'lucide-react';
+import { X, Plus, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILL_CATEGORIES, type SkillCategory } from '../data/skills';
 import { USER_DISPLAY_NAME } from '../constants/user';
-import { SERVICE_NOW_INSTANCES, instanceHostname, loadSelectedInstanceId } from '../data/serviceNowInstances';
+import { SERVICE_NOW_INSTANCES, loadSelectedInstanceId } from '../data/serviceNowInstances';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -186,37 +186,22 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
             <label className={`text-xs font-semibold ${isDark ? 'text-white/70' : 'text-foreground'}`}>
               Target Instance
             </label>
-            <div className="space-y-2">
+            <select
+              value={instanceId}
+              onChange={(e) => setInstanceId(e.target.value)}
+              className={cn(
+                'w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none transition-all',
+                isDark
+                  ? 'border-white/[0.06] bg-white/[0.03] text-white focus:border-brand-green/50'
+                  : 'border-border bg-background text-foreground focus:border-brand-green/50',
+              )}
+            >
               {SERVICE_NOW_INSTANCES.filter((inst) => inst.active).map((inst) => (
-                <button
-                  key={inst.id}
-                  type="button"
-                  onClick={() => setInstanceId(inst.id)}
-                  className={cn(
-                    'flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all',
-                    instanceId === inst.id
-                      ? isDark
-                        ? 'border-brand-green/40 bg-brand-green/10'
-                        : 'border-brand-green/40 bg-brand-green/5'
-                      : isDark
-                        ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
-                        : 'border-border bg-background hover:bg-muted',
-                  )}
-                >
-                  <Server className={cn('h-4 w-4 shrink-0', instanceId === inst.id ? 'text-brand-green' : 'text-muted-foreground')} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{inst.name}</span>
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground">{inst.tag}</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">{instanceHostname(inst.url)}</p>
-                  </div>
-                  {instanceId === inst.id && (
-                    <div className="h-2 w-2 shrink-0 rounded-full bg-brand-green" />
-                  )}
-                </button>
+                <option key={inst.id} value={inst.id}>
+                  {inst.name} ({inst.tag})
+                </option>
               ))}
-            </div>
+            </select>
           </div>
 
           <div className="space-y-1.5">
