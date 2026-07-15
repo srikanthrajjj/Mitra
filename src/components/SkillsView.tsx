@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { Search, Plus, Zap, Trash2, MoreVertical, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
-import { SKILLS, type Skill } from '../data/skills';
+import { SKILLS, SKILL_CATEGORIES, type Skill } from '../data/skills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
@@ -60,6 +60,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<CustomSkill | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     saveCustomSkills(customSkills);
@@ -97,8 +98,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           s.description.toLowerCase().includes(q),
       );
     }
+    if (selectedCategory) {
+      list = list.filter((s) => s.category === selectedCategory);
+    }
     return list;
-  }, [search, deletedSkillIds]);
+  }, [search, deletedSkillIds, selectedCategory]);
 
   const filteredCustom = useMemo(() => {
     let list = customSkills;
@@ -110,8 +114,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           s.description.toLowerCase().includes(q),
       );
     }
+    if (selectedCategory) {
+      list = list.filter((s) => s.category === selectedCategory);
+    }
     return list;
-  }, [search, customSkills]);
+  }, [search, customSkills, selectedCategory]);
 
   const allSkills = useMemo(() => {
     const converted: (Skill & { isCustom?: boolean; customData?: CustomSkill })[] = [
@@ -180,6 +187,41 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
                 )}
               />
+            </div>
+
+            {/* Category pills */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory(null)}
+                className={cn(
+                  'rounded-full px-3 py-1 text-xs font-medium transition-all',
+                  selectedCategory === null
+                    ? 'bg-brand-green text-white'
+                    : isDark
+                      ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
+                )}
+              >
+                All
+              </button>
+              {SKILL_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                  className={cn(
+                    'rounded-full px-3 py-1 text-xs font-medium transition-all',
+                    selectedCategory === cat
+                      ? 'bg-brand-green text-white'
+                      : isDark
+                        ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
         </div>
