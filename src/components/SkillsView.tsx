@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
-import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, Play } from 'lucide-react';
+import { Search, Plus, Zap, Trash2, MoreVertical, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill, type SkillCategory } from '../data/skills';
@@ -242,16 +242,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             )}
                           >
                             <DropdownMenuItem
-                              onClick={() => setSelectedSkill(buildSkillForModal(skill))}
-                              className={cn(
-                                'gap-2 rounded-lg text-xs',
-                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
-                              )}
-                            >
-                              <Play className="h-3.5 w-3.5" />
-                              Run Skill
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
                               onClick={() => setEditingSkill(skill)}
                               className={cn(
                                 'gap-2 rounded-lg text-xs',
@@ -289,6 +279,16 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                       <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
                         {skill.enabled ? 'Active' : 'Inactive'}
                       </span>
+                    </div>
+                    <div className="mt-3">
+                      <Button
+                        variant="cta"
+                        size="sm"
+                        onClick={() => setSelectedSkill(buildSkillForModal(skill))}
+                        className="w-full text-xs"
+                      >
+                        Run Skill
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -340,36 +340,26 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
+                          <DropdownMenuContent
+                            align="end"
+                            className={cn(
+                              'w-40 rounded-xl border p-1',
+                              isDark
+                                ? 'border-white/[0.08] bg-[#1a1a1a]'
+                                : 'border-border bg-card',
+                            )}
+                          >
+                            <DropdownMenuItem
+                              disabled
                               className={cn(
-                                'w-40 rounded-xl border p-1',
-                                isDark
-                                  ? 'border-white/[0.08] bg-[#1a1a1a]'
-                                  : 'border-border bg-card',
+                                'gap-2 rounded-lg text-xs',
+                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
                               )}
                             >
-                              <DropdownMenuItem
-                                onClick={() => setSelectedSkill(skill)}
-                                className={cn(
-                                  'gap-2 rounded-lg text-xs',
-                                  isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
-                                )}
-                              >
-                                <Play className="h-3.5 w-3.5" />
-                                Run Skill
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled
-                                className={cn(
-                                  'gap-2 rounded-lg text-xs',
-                                  isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
-                                )}
-                              >
-                                <Pencil className="h-3.5 w-3.5" />
-                                Edit
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
+                              <Pencil className="h-3.5 w-3.5" />
+                              Edit
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                         <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
@@ -381,6 +371,16 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                           {skill.category}
                         </span>
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          variant="cta"
+                          size="sm"
+                          onClick={() => setSelectedSkill(skill)}
+                          className="w-full text-xs"
+                        >
+                          Run Skill
+                        </Button>
                       </div>
                     </div>
                   );
