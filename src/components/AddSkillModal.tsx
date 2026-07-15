@@ -113,7 +113,7 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
           {isEditing ? 'Edit Skill' : 'Add a New Skill'}
         </h2>
         <p className={`mb-5 text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
-          {isEditing ? 'Update your custom skill.' : 'Create a custom skill for your UNICEF workspace.'}
+          {isEditing ? 'Update this skill\'s details.' : 'Create a custom skill for your UNICEF workspace.'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

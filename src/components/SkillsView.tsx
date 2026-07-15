@@ -45,6 +45,21 @@ function saveDeletedSkillIds(ids: string[]) {
   localStorage.setItem(DELETED_SKILLS_KEY, JSON.stringify(ids));
 }
 
+const BUILTIN_OVERRIDES_KEY = 'mitra-builtin-overrides';
+
+function loadBuiltinOverrides(): Record<string, Partial<CustomSkill>> {
+  try {
+    const raw = localStorage.getItem(BUILTIN_OVERRIDES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveBuiltinOverrides(overrides: Record<string, Partial<CustomSkill>>) {
+  localStorage.setItem(BUILTIN_OVERRIDES_KEY, JSON.stringify(overrides));
+}
+
 interface SkillsViewProps {
   theme: Theme;
   onRunSkill: (skill: Skill) => void;
@@ -61,6 +76,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [editingSkill, setEditingSkill] = useState<CustomSkill | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [builtinOverrides, setBuiltinOverrides] = useState<Record<string, Partial<CustomSkill>>>(loadBuiltinOverrides);
 
   useEffect(() => {
     saveCustomSkills(customSkills);
@@ -69,6 +85,10 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   useEffect(() => {
     saveDeletedSkillIds(deletedSkillIds);
   }, [deletedSkillIds]);
+
+  useEffect(() => {
+    saveBuiltinOverrides(builtinOverrides);
+  }, [builtinOverrides]);
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -89,7 +109,17 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   });
 
   const builtinSkills = useMemo(() => {
-    let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id));
+    let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id)).map((s) => {
+      const o = builtinOverrides[s.id];
+      if (!o) return s;
+      return {
+        ...s,
+        name: o.name ?? s.name,
+        description: o.description ?? s.description,
+        category: o.category ?? s.category,
+        whatItHelpsWith: o.instructions ?? s.whatItHelpsWith,
+      };
+    });
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -102,7 +132,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       list = list.filter((s) => s.category === selectedCategory);
     }
     return list;
-  }, [search, deletedSkillIds, selectedCategory]);
+  }, [search, deletedSkillIds, selectedCategory, builtinOverrides]);
 
   const filteredCustom = useMemo(() => {
     let list = customSkills;
@@ -144,6 +174,29 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const handleDeleteBuiltinSkill = (id: string) => {
     setDeletedSkillIds((prev) => [...prev, id]);
   };
+
+  const handleUpdateBuiltinSkill = (updated: CustomSkill) => {
+    setBuiltinOverrides((prev) => ({
+      ...prev,
+      [updated.id]: {
+        name: updated.name,
+        description: updated.description,
+        category: updated.category,
+        instructions: updated.instructions,
+      },
+    }));
+    setEditingSkill(null);
+  };
+
+  const skillToCustomSkill = (skill: Skill): CustomSkill => ({
+    id: skill.id,
+    name: skill.name,
+    description: skill.description,
+    category: skill.category,
+    instructions: skill.whatItHelpsWith,
+    enabled: true,
+    createdBy: skill.createdBy,
+  });
 
   const handleToggleSkill = (id: string) => {
     setCustomSkills((prev) =>
@@ -293,7 +346,13 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             )}
                           >
                             <DropdownMenuItem
-                              onClick={() => custom && customData ? setEditingSkill(customData) : setSelectedSkill(skill)}
+                              onClick={() => {
+                                if (custom && customData) {
+                                  setEditingSkill(customData);
+                                } else {
+                                  setEditingSkill(skillToCustomSkill(skill));
+                                }
+                              }}
                               className={cn(
                                 'gap-2 rounded-lg text-xs',
                                 isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
@@ -369,7 +428,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         theme={theme}
         isOpen={editingSkill !== null}
         onClose={() => setEditingSkill(null)}
-        onAdd={handleUpdateSkill}
+        onAdd={editingSkill && editingSkill.id.startsWith('custom-') ? handleUpdateSkill : handleUpdateBuiltinSkill}
         initialSkill={editingSkill}
       />
 
