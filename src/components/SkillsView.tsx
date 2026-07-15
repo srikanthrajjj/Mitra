@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { Search, Plus, Zap, Trash2, MoreVertical, Pencil } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
-import { SKILLS, SKILL_CATEGORIES, type Skill, type SkillCategory } from '../data/skills';
+import { SKILLS, type Skill } from '../data/skills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
@@ -50,12 +50,9 @@ interface SkillsViewProps {
   onRunSkill: (skill: Skill) => void;
 }
 
-type Filter = 'All' | SkillCategory;
-
 export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const isDark = isDarkTheme(theme);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<Filter>('All');
   const [hasScrolled, setHasScrolled] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
@@ -78,22 +75,18 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     }
   }, []);
 
-  const filtered = useMemo(() => {
+  const builtinSkills = useMemo(() => {
     let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id));
-    if (filter !== 'All') {
-      list = list.filter((s) => s.category === filter);
-    }
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
         (s) =>
           s.name.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q) ||
-          s.category.toLowerCase().includes(q),
+          s.description.toLowerCase().includes(q),
       );
     }
     return list;
-  }, [search, filter, deletedSkillIds]);
+  }, [search, deletedSkillIds]);
 
   const filteredCustom = useMemo(() => {
     let list = customSkills;
@@ -102,11 +95,19 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       list = list.filter(
         (s) =>
           s.name.toLowerCase().includes(q) ||
-          s.instructions.toLowerCase().includes(q),
+          s.description.toLowerCase().includes(q),
       );
     }
     return list;
   }, [search, customSkills]);
+
+  const allSkills = useMemo(() => {
+    const converted: (Skill & { isCustom?: boolean; customData?: CustomSkill })[] = [
+      ...builtinSkills,
+      ...filteredCustom.map((cs) => buildSkillForModal(cs)),
+    ];
+    return converted;
+  }, [filteredCustom, builtinSkills]);
 
   const handleAddSkill = (skill: CustomSkill) => {
     setCustomSkills((prev) => [...prev, skill]);
@@ -140,6 +141,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     whatItHelpsWith: custom.instructions,
     examplePrompt: custom.instructions,
     parameters: [],
+    createdBy: custom.createdBy,
   });
 
   return (
@@ -179,27 +181,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                 )}
               />
             </div>
-
-            {/* Category filters */}
-            <div className="flex flex-wrap gap-2">
-              {(['All', ...SKILL_CATEGORIES] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setFilter(f)}
-                  className={cn(
-                    'rounded-full px-4 py-1.5 text-xs font-medium transition-all',
-                    filter === f
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : isDark
-                        ? 'bg-white/[0.06] text-foreground hover:bg-white/[0.10] hover:text-foreground'
-                        : 'bg-muted text-foreground hover:bg-accent hover:text-foreground',
-                  )}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
         <div
@@ -217,31 +198,36 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-5xl">
-          {/* Custom Skills */}
-          {filteredCustom.length > 0 && (
-            <div className="mb-6">
-              <h2 className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
-                Custom Skills
-              </h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredCustom.map((skill) => (
+          {allSkills.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <p className={`text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
+                No skills match your search.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {allSkills.map((skill) => {
+                const custom = skill.isCustom;
+                const customData = skill.customData;
+
+                return (
                   <div
                     key={skill.id}
                     className={cn(
-                      'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200',
-                      skill.enabled
+                      'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
+                      custom && customData && !customData.enabled
                         ? isDark
-                          ? 'border-brand-green/20 bg-card hover:border-brand-green/40'
-                          : 'border-brand-green/20 bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/40'
-                        : isDark
                           ? 'border-white/[0.04] bg-card/50 opacity-60'
-                          : 'border-border bg-card/50 opacity-60',
+                          : 'border-border bg-card/50 opacity-60'
+                        : isDark
+                          ? 'border-border bg-card hover:border-brand-green/30'
+                          : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
                     )}
                   >
                     <div>
                       <div className="mb-3 flex items-center justify-between">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                          <Zap className="h-5 w-5 text-brand-green" />
+                          <skill.icon className="h-5 w-5 text-brand-green" />
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -265,7 +251,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             )}
                           >
                             <DropdownMenuItem
-                              onClick={() => setEditingSkill(skill)}
+                              onClick={() => custom && customData ? setEditingSkill(customData) : setSelectedSkill(skill)}
                               className={cn(
                                 'gap-2 rounded-lg text-xs',
                                 isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
@@ -276,7 +262,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
                             <DropdownMenuItem
-                              onClick={() => handleDeleteSkill(skill.id)}
+                              onClick={() => custom && customData ? handleDeleteSkill(skill.id) : handleDeleteBuiltinSkill(skill.id)}
                               className={cn(
                                 'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
                               )}
@@ -300,118 +286,18 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         Created by {skill.createdBy}
                       </p>
                     </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <Switch
-                        checked={skill.enabled}
-                        onCheckedChange={() => handleToggleSkill(skill.id)}
-                      />
-                      <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
-                        {skill.enabled ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <Button
-                        variant="cta"
-                        size="sm"
-                        onClick={() => setSelectedSkill(buildSkillForModal(skill))}
-                        className="w-full text-xs"
-                      >
-                        Run Skill
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Built-in Skills */}
-          {filtered.length === 0 && filteredCustom.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className={`text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
-                No skills match your search.
-              </p>
-            </div>
-          ) : filtered.length > 0 ? (
-            <>
-              {filteredCustom.length > 0 && (
-                <h2 className={`mb-3 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
-                  Built-in Skills
-                </h2>
-              )}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered.map((skill) => {
-                  const Icon = skill.icon;
-                  return (
-                    <div
-                      key={skill.id}
-                      className={cn(
-                        'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
-                        isDark
-                          ? 'border-border bg-card hover:border-brand-green/30'
-                          : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
-                      )}
-                    >
-                      <div>
-                        <div className="mb-3 flex items-center justify-between">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                            <Icon className="h-5 w-5 text-brand-green" />
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className={cn(
-                                  'rounded-lg p-1.5 transition-colors',
-                                  isDark ? 'text-white/30 hover:text-white/60 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                                )}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </button>
-                            </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className={cn(
-                              'w-40 rounded-xl border p-1',
-                              isDark
-                                ? 'border-white/[0.08] bg-[#1a1a1a]'
-                                : 'border-border bg-card',
-                            )}
-                          >
-                            <DropdownMenuItem
-                              onClick={() => setSelectedSkill(skill)}
-                              className={cn(
-                                'gap-2 rounded-lg text-xs',
-                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
-                              )}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteBuiltinSkill(skill.id)}
-                              className={cn(
-                                'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
-                              )}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                          </DropdownMenu>
+                    <div className="mt-4">
+                      {custom && customData ? (
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={customData.enabled}
+                            onCheckedChange={() => handleToggleSkill(customData.id)}
+                          />
+                          <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
+                            {customData.enabled ? 'Active' : 'Inactive'}
+                          </span>
                         </div>
-                        <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                          {skill.name}
-                        </h3>
-                        <p className="text-[12px] leading-relaxed text-muted-foreground">
-                          {skill.description}
-                        </p>
-                        <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                          {skill.category}
-                        </span>
-                      </div>
-                      <div className="mt-4">
+                      ) : (
                         <Button
                           variant="cta"
                           size="sm"
@@ -420,13 +306,13 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         >
                           Run Skill
                         </Button>
-                      </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            </>
-          ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

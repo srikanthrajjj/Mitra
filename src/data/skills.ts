@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   type LucideIcon,
 } from 'lucide-react';
+import { USER_DISPLAY_NAME } from '../constants/user';
 
 export type SkillCategory = 'Design' | 'Development' | 'Documentation' | 'Testing';
 
@@ -33,6 +34,7 @@ export interface Skill {
   whatItHelpsWith: string;
   examplePrompt: string;
   parameters: SkillParameter[];
+  createdBy: string;
 }
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
@@ -57,6 +59,7 @@ export const SKILLS: Skill[] = [
       { id: 'story-points', label: 'Story Points', type: 'select', options: ['1', '2', '3', '5', '8', '13'], defaultValue: '3' },
       { id: 'priority', label: 'Priority', type: 'select', options: ['Critical', 'High', 'Medium', 'Low'], defaultValue: 'Medium' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'generate-brd',
@@ -72,6 +75,7 @@ export const SKILLS: Skill[] = [
       { id: 'stakeholders', label: 'Key Stakeholders', type: 'text', placeholder: 'e.g. HR Director, IT Manager', required: false },
       { id: 'timeline', label: 'Expected Timeline', type: 'select', options: ['1 month', '3 months', '6 months', '12 months'], defaultValue: '3 months' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'design-workflow',
@@ -87,6 +91,7 @@ export const SKILLS: Skill[] = [
       { id: 'approvers', label: 'Approvers', type: 'textarea', placeholder: 'List approver roles...', required: true },
       { id: 'sla-hours', label: 'SLA (hours)', type: 'text', placeholder: 'e.g. 48', defaultValue: '48' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'solution-architecture',
@@ -102,6 +107,7 @@ export const SKILLS: Skill[] = [
       { id: 'integrations', label: 'External Integrations', type: 'textarea', placeholder: 'List integrations...' },
       { id: 'phase', label: 'Implementation Phase', type: 'select', options: ['Discovery', 'Design', 'Build', 'Test', 'Deploy'], defaultValue: 'Discovery' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'ui-review',
@@ -116,6 +122,7 @@ export const SKILLS: Skill[] = [
       { id: 'focus-area', label: 'Focus Area', type: 'select', options: ['Usability', 'Accessibility', 'Performance', 'Visual Design', 'All'], defaultValue: 'All' },
       { id: 'notes', label: 'Additional Notes', type: 'textarea', placeholder: 'Any specific concerns...' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'create-test-cases',
@@ -131,6 +138,7 @@ export const SKILLS: Skill[] = [
       { id: 'scenarios', label: 'Test Scenarios', type: 'textarea', placeholder: 'Describe key scenarios...', required: true },
       { id: 'env', label: 'Test Environment', type: 'select', options: ['Dev', 'Staging', 'QA', 'Production'], defaultValue: 'Dev' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'api-specification',
@@ -146,6 +154,7 @@ export const SKILLS: Skill[] = [
       { id: 'auth', label: 'Authentication', type: 'select', options: ['OAuth 2.0', 'Basic Auth', 'API Key', 'None'], defaultValue: 'OAuth 2.0' },
       { id: 'schema', label: 'Request/Response Schema', type: 'textarea', placeholder: 'Describe the data model...' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'stakeholder-summary',
@@ -161,6 +170,7 @@ export const SKILLS: Skill[] = [
       { id: 'audience', label: 'Audience', type: 'select', options: ['Executive', 'Technical', 'Mixed'], defaultValue: 'Mixed' },
       { id: 'highlights', label: 'Key Highlights', type: 'textarea', placeholder: 'Major achievements or milestones...' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'release-notes',
@@ -176,6 +186,7 @@ export const SKILLS: Skill[] = [
       { id: 'breaking', label: 'Breaking Changes', type: 'textarea', placeholder: 'List any breaking changes...' },
       { id: 'rollback', label: 'Rollback Steps', type: 'textarea', placeholder: 'Rollback instructions...' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
   {
     id: 'risk-assessment',
@@ -191,5 +202,6 @@ export const SKILLS: Skill[] = [
       { id: 'risk-level', label: 'Risk Tolerance', type: 'select', options: ['Conservative', 'Moderate', 'Aggressive'], defaultValue: 'Moderate' },
       { id: 'areas', label: 'Focus Areas', type: 'textarea', placeholder: 'e.g. Data migration, Integration, Security' },
     ],
+    createdBy: USER_DISPLAY_NAME,
   },
 ];
