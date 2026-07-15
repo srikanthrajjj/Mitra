@@ -350,7 +350,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             )}
                           >
                             <DropdownMenuItem
-                              disabled
+                              onClick={() => setSelectedSkill(skill)}
                               className={cn(
                                 'gap-2 rounded-lg text-xs',
                                 isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
@@ -358,6 +358,16 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             >
                               <Pencil className="h-3.5 w-3.5" />
                               Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
+                            <DropdownMenuItem
+                              onClick={() => {}}
+                              className={cn(
+                                'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
+                              )}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                           </DropdownMenu>
