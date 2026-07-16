@@ -137,17 +137,17 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; s
 
 function HorizontalBarChart({ data, isDark }: { data: typeof USE_CASE_DATA; isDark: boolean }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {data.map((item, idx) => (
         <div key={item.label} className="space-y-1">
-          <div className="flex justify-between text-xs">
+          <div className="flex justify-between text-[11px]">
             <span className="text-muted-foreground">{item.label}</span>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground">{item.count.toLocaleString()} sessions</span>
+              <span className="text-[9px] text-muted-foreground">{item.count.toLocaleString()}</span>
               <span className="font-medium text-foreground">{item.value}%</span>
             </div>
           </div>
-          <div className={cn('h-2 overflow-hidden rounded-full', isDark ? 'bg-mitra-surface' : 'bg-muted')}>
+          <div className={cn('h-1.5 overflow-hidden rounded-full', isDark ? 'bg-mitra-surface' : 'bg-muted')}>
             <div
               className="h-full rounded-full bg-brand-green transition-all duration-700"
               style={{ width: `${item.value}%`, opacity: 1 - idx * 0.15 }}
@@ -188,7 +188,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" className="text-[8px] text-muted-foreground">
+          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="7" className="text-muted-foreground">
             {Math.round((maxUsers / 4) * i)}
           </text>
         ))}
@@ -217,7 +217,8 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
               y={120 - (d.users / maxUsers) * 100 - 8}
               textAnchor="middle"
               fill="currentColor"
-              className="text-[8px] text-muted-foreground"
+              fontSize="7"
+              className="text-muted-foreground"
             >
               {d.users}
             </text>
@@ -226,7 +227,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[10px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -252,7 +253,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" className="text-[8px] text-muted-foreground">
+          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="7" className="text-muted-foreground">
             {((maxTokens / 4) * i).toFixed(1)}M
           </text>
         ))}
@@ -278,7 +279,8 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
               y={100 - (d.tokens / maxTokens) * 80 - 8}
               textAnchor="middle"
               fill="currentColor"
-              className="text-[8px] text-muted-foreground"
+              fontSize="7"
+              className="text-muted-foreground"
             >
               {d.tokens}M
             </text>
@@ -287,7 +289,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[10px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -426,16 +428,16 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                   Weekly chat volume pattern
                 </p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {WEEKLY_DATA.map((d) => (
-                  <div key={d.day} className="flex items-center gap-3">
-                    <span className="w-8 text-[10px] text-muted-foreground text-right">{d.day}</span>
-                    <div className="flex-1 h-6 rounded bg-muted/50 overflow-hidden">
+                  <div key={d.day} className="flex items-center gap-2">
+                    <span className="w-7 text-[9px] text-muted-foreground text-right">{d.day}</span>
+                    <div className="flex-1 h-5 rounded bg-muted/50 overflow-hidden">
                       <div
-                        className="h-full rounded bg-brand-green/80 transition-all duration-500 flex items-center justify-end pr-2"
+                        className="h-full rounded bg-brand-green/80 transition-all duration-500 flex items-center justify-end pr-1.5"
                         style={{ width: `${(d.conversations / 356) * 100}%` }}
                       >
-                        <span className="text-[9px] font-medium text-foreground/80">{d.conversations}</span>
+                        <span className="text-[8px] font-medium text-foreground/80">{d.conversations}</span>
                       </div>
                     </div>
                   </div>
