@@ -27,7 +27,7 @@ export default function FavouritesView({ solutions, theme, onSelect, onToggleFav
       {/* Sticky header — full width */}
       <div className="shrink-0">
         <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <h1 className="font-display text-2xl font-bold text-foreground">
               Favorites
             </h1>
@@ -47,7 +47,7 @@ export default function FavouritesView({ solutions, theme, onSelect, onToggleFav
         onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {solutions.map((sol) => (
               <div

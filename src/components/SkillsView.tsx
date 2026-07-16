@@ -213,7 +213,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       {/* Sticky header */}
       <div className="shrink-0">
         <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-4 flex items-center justify-between">
               <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
                 Skills
@@ -296,7 +296,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           {allSkills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <p className={`text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>

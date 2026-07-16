@@ -97,7 +97,7 @@ function ProjectDetailView({
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       {/* Header */}
       <div className="shrink-0 px-4 pt-8 md:px-8 lg:px-12 pb-4">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           <button
             type="button"
             onClick={onBack}
@@ -149,7 +149,7 @@ function ProjectDetailView({
 
       {/* Content */}
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           {!hasConversation ? (
             /* Empty state — no conversations yet */
             <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -310,7 +310,7 @@ export default function ProjectsView({
       {/* Sticky header — full width */}
       <div className="shrink-0">
         <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-4 flex items-center justify-between gap-4">
               <h1 className="font-display text-2xl font-bold text-foreground">
                 Projects
@@ -412,7 +412,7 @@ export default function ProjectsView({
         onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           {/* Case 1: No projects at all */}
           {!hasAnyProjects ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
