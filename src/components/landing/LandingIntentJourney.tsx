@@ -271,7 +271,6 @@ export function LandingIntentJourney() {
                   {WHAT_WE_DO_BLOCKS.map((block, index) => {
                     const Icon = block.icon;
                     const isActive = block.id === activeId;
-                    const isPast = index < activeIndex;
 
                     return (
                       <li key={block.id}>
@@ -284,16 +283,6 @@ export function LandingIntentJourney() {
                           )}
                           aria-current={isActive ? 'true' : undefined}
                         >
-                          <span
-                            className={cn(
-                              'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-all duration-300',
-                              isActive
-                                ? 'left-0 h-1.5 w-1.5 bg-[#8BEA3C]'
-                                : isPast
-                                  ? 'left-0 h-1 w-1 bg-[#8BEA3C]/35'
-                                  : 'left-0 h-1 w-1 bg-white/15',
-                            )}
-                          />
                           <Icon
                             className={cn(
                               'h-4 w-4 shrink-0 transition-colors duration-300',
