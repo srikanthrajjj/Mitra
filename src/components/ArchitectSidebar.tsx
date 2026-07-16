@@ -319,10 +319,10 @@ export function ArchitectSidebar({
 
   const navItems: NavItemConfig[] = [
     {
-      id: 'dashboard',
+      id: 'analytics',
       label: 'Dashboard',
       icon: LayoutDashboard as unknown as NavItemConfig['icon'],
-      tab: 'dashboard',
+      tab: 'analytics',
     },
     {
       id: 'search',

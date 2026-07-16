@@ -2546,6 +2546,20 @@ Pick a step below and I'll continue building — data model, scripts, and update
           )}
 
           {activeTab === 'dashboard' && (
+            <HomeView
+              appVersion={appVersion}
+              theme={resolvedTheme}
+              onSelectAction={handleHomeAction}
+              onSendMessage={(text) => {
+                if (!text.trim()) return;
+                handleNewChat(undefined, text);
+              }}
+              isServerConnected={isServerConnected}
+              onCreateConnection={handleOpenCreateConnection}
+            />
+          )}
+
+          {activeTab === 'analytics' && (
             <DashboardView theme={resolvedTheme} />
           )}
 
