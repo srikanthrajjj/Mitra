@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
-import { Button } from '@/src/components/ui/button';
 import {
   Users,
   Code2,
@@ -76,11 +74,11 @@ const MONTHLY_DATA = [
 ];
 
 const USE_CASE_DATA = [
-  { label: 'Code Generation', value: 35, color: '#8BEA3C' },
-  { label: 'Documentation', value: 25, color: '#6bc27a' },
-  { label: 'Troubleshooting', value: 20, color: '#4a9a5c' },
-  { label: 'Architecture', value: 12, color: '#38754a' },
-  { label: 'Testing', value: 8, color: '#26503a' },
+  { label: 'Code Generation', value: 35 },
+  { label: 'Documentation', value: 25 },
+  { label: 'Troubleshooting', value: 20 },
+  { label: 'Architecture', value: 12 },
+  { label: 'Testing', value: 8 },
 ];
 
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
@@ -89,6 +87,7 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; s
   const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
+    const el = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated) {
@@ -106,14 +105,13 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; s
               setCount(current);
             }
           }, duration / steps);
-          return () => clearInterval(timer);
         }
       },
       { threshold: 0.3 },
     );
 
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    if (el) observer.observe(el);
+    return () => { observer.disconnect(); };
   }, [value, hasAnimated]);
 
   const display = value % 1 !== 0 ? count.toFixed(1) : Math.round(count).toLocaleString();
@@ -125,17 +123,16 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; s
   );
 }
 
-function MiniBarChart({ data, maxVal, color }: { data: number[]; maxVal: number; color: string }) {
+function MiniBarChart({ data, maxVal }: { data: number[]; maxVal: number }) {
   return (
     <div className="flex items-end gap-1 h-16">
       {data.map((val, i) => (
         <div
           key={i}
-          className="flex-1 rounded-t transition-all duration-500"
+          className="flex-1 rounded-t bg-brand-green transition-all duration-500"
           style={{
             height: `${(val / maxVal) * 100}%`,
-            backgroundColor: color,
-            opacity: 0.6 + (i / data.length) * 0.4,
+            opacity: 0.4 + (i / data.length) * 0.6,
           }}
         />
       ))}
@@ -146,16 +143,16 @@ function MiniBarChart({ data, maxVal, color }: { data: number[]; maxVal: number;
 function HorizontalBarChart({ data, isDark }: { data: typeof USE_CASE_DATA; isDark: boolean }) {
   return (
     <div className="space-y-3">
-      {data.map((item) => (
+      {data.map((item, idx) => (
         <div key={item.label} className="space-y-1">
           <div className="flex justify-between text-xs">
-            <span className={isDark ? 'text-white/60' : 'text-muted-foreground'}>{item.label}</span>
-            <span className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{item.value}%</span>
+            <span className="text-muted-foreground">{item.label}</span>
+            <span className="font-medium text-foreground">{item.value}%</span>
           </div>
-          <div className={`h-2 overflow-hidden rounded-full ${isDark ? 'bg-white/[0.06]' : 'bg-muted'}`}>
+          <div className={cn('h-2 overflow-hidden rounded-full', isDark ? 'bg-mitra-surface' : 'bg-muted')}>
             <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${item.value}%`, backgroundColor: item.color }}
+              className="h-full rounded-full bg-brand-green transition-all duration-700"
+              style={{ width: `${item.value}%`, opacity: 1 - idx * 0.15 }}
             />
           </div>
         </div>
@@ -164,55 +161,59 @@ function HorizontalBarChart({ data, isDark }: { data: typeof USE_CASE_DATA; isDa
   );
 }
 
+function ChartDefs({ gradId, colorVar }: { gradId: string; colorVar: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${gradId}-fill`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor={colorVar} stopOpacity="0.3" />
+        <stop offset="100%" stopColor={colorVar} stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id={`${gradId}-stroke`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor={colorVar} stopOpacity="0.5" />
+        <stop offset="100%" stopColor={colorVar} stopOpacity="1" />
+      </linearGradient>
+    </defs>
+  );
+}
+
 function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolean }) {
   const maxUsers = Math.max(...data.map((d) => d.users));
-  const maxConv = Math.max(...data.map((d) => d.conversations));
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const dotStroke = isDark ? 'hsl(var(--card))' : 'hsl(var(--card))';
+  const brandGreen = 'hsl(88, 65%, 49%)';
 
   return (
     <div className="relative">
       <svg viewBox="0 0 400 120" className="w-full h-32">
-        <defs>
-          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8BEA3C" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#8BEA3C" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8BEA3C" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#8BEA3C" stopOpacity="1" />
-          </linearGradient>
-        </defs>
-        {/* Grid lines */}
+        <ChartDefs gradId="area" colorVar={brandGreen} />
         {[0, 30, 60, 90, 120].map((y) => (
-          <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} strokeWidth="1" />
+          <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
-        {/* Area */}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.users / maxUsers) * 100}`).join(' L ')} L 400,120 L 0,120 Z`}
-          fill="url(#areaGrad)"
+          fill="url(#area-fill)"
         />
-        {/* Line */}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.users / maxUsers) * 100}`).join(' L ')}`}
           fill="none"
-          stroke="url(#lineGrad)"
+          stroke="url(#area-stroke)"
           strokeWidth="2"
         />
-        {/* Dots */}
         {data.map((d, i) => (
           <circle
             key={i}
             cx={(i / (data.length - 1)) * 400}
             cy={120 - (d.users / maxUsers) * 100}
             r="3"
-            fill="#8BEA3C"
-            stroke={isDark ? '#111' : '#fff'}
+            fill={brandGreen}
+            stroke={dotStroke}
             strokeWidth="2"
           />
         ))}
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className={`text-[10px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>{d.month}</span>
+          <span key={d.month} className="text-[10px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -221,23 +222,26 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
 
 function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolean }) {
   const maxTokens = Math.max(...data.map((d) => d.tokens));
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const dotStroke = isDark ? 'hsl(var(--card))' : 'hsl(var(--card))';
+  const tokenColor = 'hsl(217, 70%, 60%)';
 
   return (
     <div className="relative">
       <svg viewBox="0 0 400 100" className="w-full h-28">
         <defs>
-          <linearGradient id="tokenGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#60a5fa" stopOpacity="1" />
+          <linearGradient id="token-stroke" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={tokenColor} stopOpacity="0.5" />
+            <stop offset="100%" stopColor={tokenColor} stopOpacity="1" />
           </linearGradient>
         </defs>
         {[0, 25, 50, 75, 100].map((y) => (
-          <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} strokeWidth="1" />
+          <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${100 - (d.tokens / maxTokens) * 80}`).join(' L ')}`}
           fill="none"
-          stroke="url(#tokenGrad)"
+          stroke="url(#token-stroke)"
           strokeWidth="2"
           strokeLinecap="round"
         />
@@ -247,15 +251,15 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
             cx={(i / (data.length - 1)) * 400}
             cy={100 - (d.tokens / maxTokens) * 80}
             r="3"
-            fill="#60a5fa"
-            stroke={isDark ? '#111' : '#fff'}
+            fill={tokenColor}
+            stroke={dotStroke}
             strokeWidth="2"
           />
         ))}
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className={`text-[10px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>{d.month}</span>
+          <span key={d.month} className="text-[10px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -276,19 +280,17 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
-      {/* Header */}
       <div className="shrink-0 px-4 pt-8 md:px-8 lg:px-12 pb-4">
         <div className="mx-auto max-w-6xl">
-          <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
+          <h1 className="font-display text-2xl font-bold text-foreground">
             Dashboard
           </h1>
-          <p className={`mt-1 text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
+          <p className="mt-1 text-sm text-muted-foreground">
             Platform analytics and usage insights
           </p>
         </div>
       </div>
 
-      {/* Content */}
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 md:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl space-y-6">
           {/* Tabs */}
@@ -302,9 +304,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                   'rounded-lg px-3 py-1.5 text-xs font-medium transition-all',
                   activeTab === tab
                     ? 'bg-brand-green text-white'
-                    : isDark
-                      ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10]'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
                 )}
               >
                 {tab}
@@ -319,10 +319,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
               return (
                 <div
                   key={stat.label}
-                  className={cn(
-                    'rounded-xl border p-4 transition-all hover:shadow-md',
-                    isDark ? 'border-white/[0.06] bg-card' : 'border-border bg-card',
-                  )}
+                  className="rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-green/10">
@@ -330,17 +327,17 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                     </div>
                     <span className={cn(
                       'flex items-center gap-0.5 text-[11px] font-medium',
-                      stat.changeUp ? 'text-brand-green' : 'text-red-400',
+                      stat.changeUp ? 'text-brand-green' : 'text-foreground/60',
                     )}>
                       <ArrowUpRight className="h-3 w-3" />
                       {stat.change}
                     </span>
                   </div>
                   <div className="mt-3">
-                    <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                    <p className="text-2xl font-bold text-foreground">
                       <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix} />
                     </p>
-                    <p className={`mt-0.5 text-[11px] ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {stat.label}
                     </p>
                   </div>
@@ -351,35 +348,27 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Charts row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {/* Usage over time */}
-            <div className={cn(
-              'rounded-xl border p-5',
-              isDark ? 'border-white/[0.06] bg-card' : 'border-border bg-card',
-            )}>
+            <div className="rounded-xl border border-border bg-card p-5">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                <h3 className="text-sm font-semibold text-foreground">
                   Active Users Over Time
                 </h3>
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-brand-green" />
-                  <span className={`text-[10px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>Users</span>
+                  <span className="text-[10px] text-muted-foreground">Users</span>
                 </div>
               </div>
               <AreaChart data={MONTHLY_DATA} isDark={isDark} />
             </div>
 
-            {/* Token utilization */}
-            <div className={cn(
-              'rounded-xl border p-5',
-              isDark ? 'border-white/[0.06] bg-card' : 'border-border bg-card',
-            )}>
+            <div className="rounded-xl border border-border bg-card p-5">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+                <h3 className="text-sm font-semibold text-foreground">
                   Token Utilization (Millions)
                 </h3>
                 <div className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-blue-400" />
-                  <span className={`text-[10px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>Tokens</span>
+                  <span className="h-2 w-2 rounded-full bg-brand-green/60" />
+                  <span className="text-[10px] text-muted-foreground">Tokens</span>
                 </div>
               </div>
               <LineChart data={MONTHLY_DATA} isDark={isDark} />
@@ -388,33 +377,21 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Bottom row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {/* Conversations by use case */}
-            <div className={cn(
-              'rounded-xl border p-5',
-              isDark ? 'border-white/[0.06] bg-card' : 'border-border bg-card',
-            )}>
-              <h3 className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-4 text-sm font-semibold text-foreground">
                 Conversations by Use Case
               </h3>
               <HorizontalBarChart data={USE_CASE_DATA} isDark={isDark} />
             </div>
 
-            {/* Weekly activity */}
-            <div className={cn(
-              'rounded-xl border p-5',
-              isDark ? 'border-white/[0.06] bg-card' : 'border-border bg-card',
-            )}>
-              <h3 className={`mb-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-4 text-sm font-semibold text-foreground">
                 Weekly Activity
               </h3>
-              <MiniBarChart
-                data={[65, 78, 82, 91, 74, 88, 95]}
-                maxVal={100}
-                color="#8BEA3C"
-              />
+              <MiniBarChart data={[65, 78, 82, 91, 74, 88, 95]} maxVal={100} />
               <div className="flex justify-between mt-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-                  <span key={d} className={`text-[10px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>{d}</span>
+                  <span key={d} className="text-[10px] text-muted-foreground">{d}</span>
                 ))}
               </div>
             </div>
