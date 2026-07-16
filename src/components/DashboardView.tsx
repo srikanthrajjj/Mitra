@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Button } from '@/src/components/ui/button';
 import {
   Users,
   Code2,
@@ -296,19 +297,18 @@ export default function DashboardView({ theme }: DashboardViewProps) {
           {/* Tabs */}
           <div className="flex flex-wrap gap-2">
             {TABS.map((tab) => (
-              <button
+              <Button
                 key={tab}
                 type="button"
+                variant={activeTab === tab ? 'cta' : 'ghost'}
+                size="sm"
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium transition-all',
-                  activeTab === tab
-                    ? 'bg-brand-green text-white'
-                    : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
+                  activeTab === tab && 'shadow-sm',
                 )}
               >
                 {tab}
-              </button>
+              </Button>
             ))}
           </div>
 
