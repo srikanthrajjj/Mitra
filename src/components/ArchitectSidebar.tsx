@@ -151,8 +151,8 @@ export function ArchitectSidebar({
               ? 'bg-brand-green/10 text-brand-green border-brand-green'
               : 'bg-muted text-brand-green border-brand-green'
             : isDark
-              ? 'text-muted-foreground border-transparent hover:bg-brand-green/5 hover:text-brand-green'
-              : 'text-muted-foreground border-transparent hover:bg-accent/55 hover:text-brand-green',
+              ? 'text-foreground/70 border-transparent hover:bg-brand-green/5 hover:text-brand-green'
+              : 'text-foreground/70 border-transparent hover:bg-accent/55 hover:text-brand-green',
         )}
       >
         {isEditing ? (
@@ -410,8 +410,8 @@ export function ArchitectSidebar({
                       ? 'bg-brand-green/10 text-brand-green font-semibold border-brand-green'
                       : 'bg-muted text-brand-green font-semibold border-brand-green'
                     : isDark
-                      ? 'text-muted-foreground border-transparent hover:bg-brand-green/5 hover:text-brand-green'
-              : 'text-muted-foreground border-transparent hover:bg-accent/55 hover:text-brand-green',
+                      ? 'text-foreground/70 border-transparent hover:bg-brand-green/5 hover:text-brand-green'
+              : 'text-foreground/70 border-transparent hover:bg-accent/55 hover:text-brand-green',
                 )}
               >
                 <AnimatedSidebarNavIcon
