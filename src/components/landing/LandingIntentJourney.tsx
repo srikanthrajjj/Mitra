@@ -256,9 +256,9 @@ export function LandingIntentJourney() {
               }
               aria-label="What we do topics"
             >
-              <div className="relative pl-4">
+              <div className="relative pl-5">
                 <div
-                  className="absolute bottom-1 left-[3px] top-1 w-px overflow-hidden bg-white/[0.06]"
+                  className="absolute bottom-1 left-[5px] top-1 w-px overflow-hidden bg-white/[0.06]"
                   aria-hidden
                 >
                   <div
@@ -286,12 +286,12 @@ export function LandingIntentJourney() {
                         >
                           <span
                             className={cn(
-                              'absolute -left-4 top-1/2 -translate-y-1/2 rounded-full transition-all duration-300',
+                              'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-all duration-300',
                               isActive
-                                ? 'h-1.5 w-1.5 bg-[#8BEA3C]'
+                                ? 'left-0 h-1.5 w-1.5 bg-[#8BEA3C]'
                                 : isPast
-                                  ? 'h-1 w-1 bg-[#8BEA3C]/35'
-                                  : 'h-1 w-1 bg-white/15',
+                                  ? 'left-0 h-1 w-1 bg-[#8BEA3C]/35'
+                                  : 'left-0 h-1 w-1 bg-white/15',
                             )}
                           />
                           <Icon
