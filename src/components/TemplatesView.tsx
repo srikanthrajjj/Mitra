@@ -42,7 +42,7 @@ export default function TemplatesView({ theme, onUseTemplate }: TemplatesViewPro
   const categories: FilterCategory[] = ['ALL', 'Programs', 'Fundraising', 'Volunteers', 'Grants', 'Operations'];
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-8 max-w-5xl mx-auto w-full">
+    <div className="flex-1 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
 
       <div className="mb-6">
         <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider px-2.5 py-1 rounded-full border ${

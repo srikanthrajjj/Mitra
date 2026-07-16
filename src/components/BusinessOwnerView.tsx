@@ -413,7 +413,7 @@ export function BusinessOwnerView({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="shrink-0 border-b border-border px-6 py-3">
+        <div className="shrink-0 border-b border-border px-4 pt-8 pb-4 md:px-8 lg:px-12">
           <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-base font-display font-medium tracking-tight text-foreground">
@@ -438,7 +438,7 @@ export function BusinessOwnerView({
           </div>
         </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12">
           <div className="mx-auto max-w-3xl space-y-4">
             {showUploadZone && (
               <div className="space-y-6">

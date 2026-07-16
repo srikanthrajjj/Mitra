@@ -63,7 +63,7 @@ export function SearchView({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12">
         {results.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             {normalized ? `No results for “${query.trim()}”.` : 'No projects yet.'}

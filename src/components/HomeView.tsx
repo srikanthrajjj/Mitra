@@ -155,7 +155,7 @@ export default function HomeView({
 
   return (
     <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
-      <div className="flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-12">
+      <div className="flex-1 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
         <div className="relative mx-auto w-full max-w-4xl">
           <div className="pointer-events-none absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px]" />
 

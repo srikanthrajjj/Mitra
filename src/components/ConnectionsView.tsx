@@ -242,10 +242,10 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
 
   return (
     <div className={cn(
-      'flex-1 flex flex-col min-h-0 h-full overflow-hidden p-6 md:p-8',
+      'flex-1 flex flex-col min-h-0 h-full overflow-hidden',
       isDark ? 'bg-mitra-bg' : 'bg-[#fafbfa]'
     )}>
-      <div className="max-w-5xl mx-auto w-full flex-1 flex flex-col min-h-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
         
         {/* Top Header Row */}
         <div className="flex items-center justify-between gap-4 pb-4 mb-6">
