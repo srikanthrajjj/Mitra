@@ -13,7 +13,7 @@
 /* --- Boxed variant (artifact panel style) --- */
 .mitra-tab-bar--boxed {
   border-radius: 0.5rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--mitra-border, var(--border));
   padding: 0.125rem;
 }
 

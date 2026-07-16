@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
-import { Button } from '@/src/components/ui/button';
 import {
   Users,
   Code2,
@@ -295,20 +294,21 @@ export default function DashboardView({ theme }: DashboardViewProps) {
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 md:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl space-y-6">
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex min-w-0 gap-0.5 rounded-lg border border-mitra-border p-0.5">
             {TABS.map((tab) => (
-              <Button
+              <button
                 key={tab}
                 type="button"
-                variant={activeTab === tab ? 'cta' : 'ghost'}
-                size="sm"
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  activeTab === tab && 'shadow-sm',
+                  'flex min-w-0 flex-1 items-center justify-center rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
+                  activeTab === tab
+                    ? 'bg-brand-green/10 text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {tab}
-              </Button>
+                <span className="truncate">{tab}</span>
+              </button>
             ))}
           </div>
 
