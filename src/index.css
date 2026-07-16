@@ -4029,6 +4029,11 @@ button.rounded-full {
   filter: drop-shadow(0 0 6px rgba(139, 234, 60, 0.5));
 }
 
+.eco-core-text {
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 12px rgba(139, 234, 60, 0.6);
+}
+
 .eco-core-inner-glow {
   position: absolute;
   inset: 12%;
