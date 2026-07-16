@@ -6,7 +6,8 @@ export type DevComponentId =
   | 'todo-card'
   | 'streaming-text'
   | 'chat-bubble'
-  | 'entry-chips';
+  | 'entry-chips'
+  | 'tab-bar';
 
 export interface DevComponentMeta {
   id: DevComponentId;

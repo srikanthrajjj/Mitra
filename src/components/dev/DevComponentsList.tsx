@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { ChevronRight, Code, ListTodo, MessageSquare, MessagesSquare, Sparkles, Type } from 'lucide-react';
+import { ChevronRight, Code, ListTodo, MessageSquare, MessagesSquare, Sparkles, Type, LayoutGrid } from 'lucide-react';
 import { DEV_COMPONENTS, type DevComponentId } from './components';
 
 interface DevComponentsListProps {
@@ -12,6 +12,7 @@ const COMPONENT_ICONS: Record<DevComponentId, FC<{ className?: string }>> = {
   'streaming-text': Type,
   'chat-bubble': MessagesSquare,
   'entry-chips': Sparkles,
+  'tab-bar': LayoutGrid,
 };
 
 export function DevComponentsList({ onSelect }: DevComponentsListProps) {

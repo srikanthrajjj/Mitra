@@ -1,0 +1,145 @@
+/* ============================================
+   mitra-tab-bar — Reusable tab navigation
+   Variants: boxed, underline, cta
+   ============================================ */
+
+/* --- Base container --- */
+.mitra-tab-bar {
+  display: flex;
+  width: 100%;
+  gap: 0.125rem;
+}
+
+/* --- Boxed variant (artifact panel style) --- */
+.mitra-tab-bar--boxed {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  padding: 0.125rem;
+}
+
+.mitra-tab-bar--boxed .mitra-tab-bar__tab {
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.625rem;
+}
+
+.mitra-tab-bar--boxed .mitra-tab-bar__tab--active {
+  background: rgba(50, 215, 75, 0.1);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Underline variant --- */
+.mitra-tab-bar--underline {
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.mitra-tab-bar--underline .mitra-tab-bar__tab {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.mitra-tab-bar--underline .mitra-tab-bar__tab--active {
+  color: var(--foreground);
+  border-bottom-color: #32d74b;
+}
+
+/* --- CTA variant (button style) --- */
+.mitra-tab-bar--cta {
+  gap: 0.5rem;
+}
+
+.mitra-tab-bar--cta .mitra-tab-bar__tab {
+  border-radius: var(--radius-button);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.mitra-tab-bar--cta .mitra-tab-bar__tab--active {
+  background: #32d74b;
+  color: #030d0a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mitra-tab-bar--cta .mitra-tab-bar__tab--active:hover {
+  background: #28c840;
+}
+
+/* --- Tab button base --- */
+.mitra-tab-bar__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
+  color: var(--foreground);
+}
+
+.mitra-tab-bar__tab:focus-visible {
+  outline: 2px solid hsl(var(--ring) / 0.5);
+  outline-offset: -2px;
+}
+
+/* --- Icon --- */
+.mitra-tab-bar__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.mitra-tab-bar__tab--active .mitra-tab-bar__icon {
+  opacity: 1;
+}
+
+/* --- Count badge --- */
+.mitra-tab-bar__count {
+  font-size: 0.5625rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  opacity: 0.7;
+}
+
+/* --- Light theme overrides --- */
+.mitra-tab-bar--boxed.mitra-tab-bar--light {
+  border-color: var(--border);
+}
+
+.mitra-tab-bar--boxed.mitra-tab-bar--light .mitra-tab-bar__tab--active {
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.mitra-tab-bar--underline.mitra-tab-bar--light .mitra-tab-bar__tab--active {
+  color: var(--foreground);
+}
+
+.mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
+  background: var(--accent);
+}
+
+.mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab--active {
+  background: #24b346;
+  color: #030d0a;
+}

@@ -92,6 +92,7 @@ Copy-paste-ready components with live preview at `/dev`. Always use these instea
 | Streaming Text | `src/components/dev/streaming-text/` | Token reveal with breathing cursor |
 | Entry Chips | `src/components/dev/entry-chips/` | Cold-start prompt chips for new conversations |
 | Chat Loader | `src/components/dev/chat-loader/` | 4 thinking indicator variants (grid dots, typing dots, shimmer, glow pulse) |
+| Tab Bar | `src/components/dev/tab-bar/` | Reusable tab navigation with boxed, underline, and CTA variants |
 
 ### Usage Rules
 - Always pass `isDark` prop using `isDarkTheme(theme)` from `src/utils/theme.ts`
