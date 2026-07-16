@@ -3,7 +3,6 @@ import {
   Star,
   MoreVertical,
   ChevronDown,
-  LayoutDashboard,
 } from 'lucide-react';
 import {
   SearchIcon as AnimatedSearchIcon,
@@ -12,6 +11,7 @@ import {
   LinkIcon as AnimatedLinkIcon,
   StarIcon as AnimatedStarIcon,
   ZapIcon as AnimatedZapIcon,
+  DashboardIcon as AnimatedDashboardIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
@@ -319,12 +319,6 @@ export function ArchitectSidebar({
 
   const navItems: NavItemConfig[] = [
     {
-      id: 'analytics',
-      label: 'Dashboard',
-      icon: LayoutDashboard as unknown as NavItemConfig['icon'],
-      tab: 'analytics',
-    },
-    {
       id: 'search',
       label: 'Search',
       icon: AnimatedSearchIcon,
@@ -357,6 +351,12 @@ export function ArchitectSidebar({
       label: 'Favourites',
       icon: AnimatedStarIcon,
       tab: 'favourites',
+    },
+    {
+      id: 'analytics',
+      label: 'Dashboard',
+      icon: AnimatedDashboardIcon,
+      tab: 'analytics',
     },
   ];
 
