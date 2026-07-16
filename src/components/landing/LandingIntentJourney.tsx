@@ -261,10 +261,8 @@ export function LandingIntentJourney() {
                   className="absolute bottom-1 left-[3px] top-1 w-px overflow-hidden bg-white/[0.06]"
                   aria-hidden
                 >
-                  <motion.div
-                    className="w-full bg-[#8BEA3C]/70"
-                    animate={{ height: `${progress}%` }}
-                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  <div
+                    className="w-full bg-[#8BEA3C]/70 transition-all duration-500 ease-out"
                     style={{ height: `${progress}%` }}
                   />
                 </div>
@@ -281,24 +279,24 @@ export function LandingIntentJourney() {
                           type="button"
                           onClick={() => scrollToBlock(block.id)}
                           className={cn(
-                            'group relative flex w-full items-center gap-2.5 py-1 text-left transition-colors',
+                            'group relative flex w-full items-center gap-2.5 py-1 text-left transition-colors duration-300',
                             isActive ? 'text-white' : 'text-white/30 hover:text-white/55',
                           )}
                           aria-current={isActive ? 'true' : undefined}
                         >
-                          {isActive && (
-                            <motion.span
-                              layoutId="wwd-rail-dot"
-                              className="absolute -left-4 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-[#8BEA3C]"
-                              transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-                            />
-                          )}
-                          {!isActive && isPast && (
-                            <span className="absolute -left-[0.9rem] top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-[#8BEA3C]/35" />
-                          )}
+                          <span
+                            className={cn(
+                              'absolute -left-4 top-1/2 -translate-y-1/2 rounded-full transition-all duration-300',
+                              isActive
+                                ? 'h-1.5 w-1.5 bg-[#8BEA3C]'
+                                : isPast
+                                  ? 'h-1 w-1 bg-[#8BEA3C]/35'
+                                  : 'h-1 w-1 bg-white/15',
+                            )}
+                          />
                           <Icon
                             className={cn(
-                              'h-4 w-4 shrink-0 transition-colors',
+                              'h-4 w-4 shrink-0 transition-colors duration-300',
                               isActive ? 'text-[#8BEA3C]' : 'text-white/25 group-hover:text-white/45',
                             )}
                             strokeWidth={1.75}
