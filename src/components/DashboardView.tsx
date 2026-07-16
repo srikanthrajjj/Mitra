@@ -285,9 +285,6 @@ export default function DashboardView({ theme }: DashboardViewProps) {
           <h1 className="font-display text-2xl font-bold text-foreground">
             Mitra Insights
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Platform analytics and usage insights
-          </p>
         </div>
       </div>
 
