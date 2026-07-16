@@ -79,11 +79,11 @@ function AnimatedSidebarNavIcon({
 
   useEffect(() => {
     if (animate) {
-      iconRef.current?.startAnimation();
+      iconRef.current?.startAnimation?.();
       return;
     }
 
-    iconRef.current?.stopAnimation();
+    iconRef.current?.stopAnimation?.();
   }, [animate]);
 
   return <Icon ref={iconRef} size={16} className={className} />;
