@@ -3,6 +3,7 @@ import {
   Star,
   MoreVertical,
   ChevronDown,
+  LayoutDashboard,
 } from 'lucide-react';
 import {
   SearchIcon as AnimatedSearchIcon,
@@ -317,6 +318,12 @@ export function ArchitectSidebar({
   };
 
   const navItems: NavItemConfig[] = [
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard as unknown as NavItemConfig['icon'],
+      tab: 'dashboard',
+    },
     {
       id: 'search',
       label: 'Search',

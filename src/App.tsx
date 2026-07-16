@@ -46,6 +46,7 @@ import { GuestStakeholderView } from './components/GuestStakeholderView';
 import { AdminPanelView } from './components/AdminPanelView';
 import { DeveloperWorkspaceView } from './components/DeveloperWorkspaceView';
 import { BusinessOwnerView } from './components/BusinessOwnerView';
+import DashboardView from './components/DashboardView';
 import {
   buildExecutiveSummary,
   canRoleApproveReview,
@@ -2545,17 +2546,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           )}
 
           {activeTab === 'dashboard' && (
-            <HomeView
-              appVersion={appVersion}
-              theme={resolvedTheme}
-              onSelectAction={handleHomeAction}
-              onSendMessage={(text) => {
-                if (!text.trim()) return;
-                handleNewChat(undefined, text);
-              }}
-              isServerConnected={isServerConnected}
-              onCreateConnection={handleOpenCreateConnection}
-            />
+            <DashboardView theme={resolvedTheme} />
           )}
 
           {activeTab === 'artifact' && selectedArtifactId && (() => {
