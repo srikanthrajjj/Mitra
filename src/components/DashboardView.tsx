@@ -11,6 +11,7 @@ import {
   Clock,
   Activity,
   ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -34,34 +35,35 @@ interface StatCard {
   change: string;
   changeUp: boolean;
   icon: React.ElementType;
+  description?: string;
 }
 
 const EXECUTIVE_STATS: StatCard[] = [
-  { label: 'Total Active Users', value: 247, change: '+12% vs last month', changeUp: true, icon: Users },
-  { label: 'Monthly Active Developers', value: 89, change: '+8% vs last month', changeUp: true, icon: Code2 },
-  { label: 'Total Conversations', value: 1842, change: '+23% vs last month', changeUp: true, icon: MessageSquare },
-  { label: 'Estimated Hours Saved', value: 342, suffix: 'hrs', change: '+18% vs last month', changeUp: true, icon: Clock },
+  { label: 'Total Active Users', value: 247, change: '+12% vs last month', changeUp: true, icon: Users, description: 'Across all ServiceNow instances' },
+  { label: 'Monthly Active Developers', value: 89, change: '+8% vs last month', changeUp: true, icon: Code2, description: 'Building with Mitra this month' },
+  { label: 'Total Conversations', value: 1842, change: '+23% vs last month', changeUp: true, icon: MessageSquare, description: 'AI-assisted sessions' },
+  { label: 'Estimated Hours Saved', value: 342, suffix: 'hrs', change: '+18% vs last month', changeUp: true, icon: Clock, description: 'Time saved on development tasks' },
 ];
 
 const PRODUCTIVITY_STATS: StatCard[] = [
-  { label: 'Avg Response Time', value: 2.3, suffix: 's', change: '-15% vs last month', changeUp: true, icon: Activity },
-  { label: 'Tasks Completed', value: 1247, change: '+31% vs last month', changeUp: true, icon: TrendingUp },
-  { label: 'Code Generations', value: 856, change: '+22% vs last month', changeUp: true, icon: Code2 },
-  { label: 'Skills Executed', value: 423, change: '+45% vs last month', changeUp: true, icon: Zap },
+  { label: 'Avg Response Time', value: 2.3, suffix: 's', change: '-15% vs last month', changeUp: true, icon: Activity, description: 'Faster than last month' },
+  { label: 'Tasks Completed', value: 1247, change: '+31% vs last month', changeUp: true, icon: TrendingUp, description: 'Workflow tasks automated' },
+  { label: 'Code Generations', value: 856, change: '+22% vs last month', changeUp: true, icon: Code2, description: 'Scripts & business rules created' },
+  { label: 'Skills Executed', value: 423, change: '+45% vs last month', changeUp: true, icon: Zap, description: 'Reusable skill invocations' },
 ];
 
 const TOKEN_STATS: StatCard[] = [
-  { label: 'Total Tokens Used', value: 2.4, suffix: 'M', change: '+18% vs last month', changeUp: true, icon: Zap },
-  { label: 'Avg Tokens/Conversation', value: 1247, change: '-5% vs last month', changeUp: true, icon: MessageSquare },
-  { label: 'Estimated Cost', value: 84, prefix: '$', change: '+12% vs last month', changeUp: false, icon: TrendingUp },
-  { label: 'Cache Hit Rate', value: 67, suffix: '%', change: '+8% vs last month', changeUp: true, icon: Activity },
+  { label: 'Total Tokens Used', value: 2.4, suffix: 'M', change: '+18% vs last month', changeUp: true, icon: Zap, description: 'Across all conversations' },
+  { label: 'Avg Tokens/Conversation', value: 1247, change: '-5% vs last month', changeUp: true, icon: MessageSquare, description: 'More efficient prompts' },
+  { label: 'Estimated Cost', value: 84, prefix: '$', change: '+12% vs last month', changeUp: false, icon: TrendingUp, description: 'Monthly AI spend' },
+  { label: 'Cache Hit Rate', value: 67, suffix: '%', change: '+8% vs last month', changeUp: true, icon: Activity, description: 'Reduced redundant calls' },
 ];
 
 const QUALITY_STATS: StatCard[] = [
-  { label: 'Success Rate', value: 94, suffix: '%', change: '+2% vs last month', changeUp: true, icon: Activity },
-  { label: 'Error Rate', value: 2.1, suffix: '%', change: '-0.5% vs last month', changeUp: true, icon: Activity },
-  { label: 'Avg Quality Score', value: 8.7, suffix: '/10', change: '+0.3 vs last month', changeUp: true, icon: TrendingUp },
-  { label: 'User Satisfaction', value: 92, suffix: '%', change: '+4% vs last month', changeUp: true, icon: Users },
+  { label: 'Success Rate', value: 94, suffix: '%', change: '+2% vs last month', changeUp: true, icon: Activity, description: 'Tasks completed without errors' },
+  { label: 'Error Rate', value: 2.1, suffix: '%', change: '-0.5% vs last month', changeUp: true, icon: Activity, description: 'Failed task attempts' },
+  { label: 'Avg Quality Score', value: 8.7, suffix: '/10', change: '+0.3 vs last month', changeUp: true, icon: TrendingUp, description: 'Based on user feedback' },
+  { label: 'User Satisfaction', value: 92, suffix: '%', change: '+4% vs last month', changeUp: true, icon: Users, description: 'Positive ratings received' },
 ];
 
 const MONTHLY_DATA = [
@@ -74,11 +76,21 @@ const MONTHLY_DATA = [
 ];
 
 const USE_CASE_DATA = [
-  { label: 'Code Generation', value: 35 },
-  { label: 'Documentation', value: 25 },
-  { label: 'Troubleshooting', value: 20 },
-  { label: 'Architecture', value: 12 },
-  { label: 'Testing', value: 8 },
+  { label: 'Incident Management', value: 32, count: 589 },
+  { label: 'Catalog Item Creation', value: 24, count: 442 },
+  { label: 'Workflow Automation', value: 21, count: 387 },
+  { label: 'Script Development', value: 15, count: 276 },
+  { label: 'Knowledge Articles', value: 8, count: 148 },
+];
+
+const WEEKLY_DATA = [
+  { day: 'Mon', conversations: 245, label: '245 chats' },
+  { day: 'Tue', conversations: 312, label: '312 chats' },
+  { day: 'Wed', conversations: 287, label: '287 chats' },
+  { day: 'Thu', conversations: 356, label: '356 chats' },
+  { day: 'Fri', conversations: 198, label: '198 chats' },
+  { day: 'Sat', conversations: 89, label: '89 chats' },
+  { day: 'Sun', conversations: 65, label: '65 chats' },
 ];
 
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
@@ -123,23 +135,6 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; s
   );
 }
 
-function MiniBarChart({ data, maxVal }: { data: number[]; maxVal: number }) {
-  return (
-    <div className="flex items-end gap-1 h-16">
-      {data.map((val, i) => (
-        <div
-          key={i}
-          className="flex-1 rounded-t bg-brand-green transition-all duration-500"
-          style={{
-            height: `${(val / maxVal) * 100}%`,
-            opacity: 0.4 + (i / data.length) * 0.6,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function HorizontalBarChart({ data, isDark }: { data: typeof USE_CASE_DATA; isDark: boolean }) {
   return (
     <div className="space-y-3">
@@ -147,7 +142,10 @@ function HorizontalBarChart({ data, isDark }: { data: typeof USE_CASE_DATA; isDa
         <div key={item.label} className="space-y-1">
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">{item.label}</span>
-            <span className="font-medium text-foreground">{item.value}%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted-foreground">{item.count.toLocaleString()} sessions</span>
+              <span className="font-medium text-foreground">{item.value}%</span>
+            </div>
           </div>
           <div className={cn('h-2 overflow-hidden rounded-full', isDark ? 'bg-mitra-surface' : 'bg-muted')}>
             <div
@@ -189,6 +187,11 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
         {[0, 30, 60, 90, 120].map((y) => (
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
+        {[0, 1, 2, 3, 4].map((i) => (
+          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" className="text-[8px] text-muted-foreground">
+            {Math.round((maxUsers / 4) * i)}
+          </text>
+        ))}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.users / maxUsers) * 100}`).join(' L ')} L 400,120 L 0,120 Z`}
           fill="url(#area-fill)"
@@ -200,15 +203,25 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           strokeWidth="2"
         />
         {data.map((d, i) => (
-          <circle
-            key={i}
-            cx={(i / (data.length - 1)) * 400}
-            cy={120 - (d.users / maxUsers) * 100}
-            r="3"
-            fill={brandGreen}
-            stroke={dotStroke}
-            strokeWidth="2"
-          />
+          <g key={i}>
+            <circle
+              cx={(i / (data.length - 1)) * 400}
+              cy={120 - (d.users / maxUsers) * 100}
+              r="3"
+              fill={brandGreen}
+              stroke={dotStroke}
+              strokeWidth="2"
+            />
+            <text
+              x={(i / (data.length - 1)) * 400}
+              y={120 - (d.users / maxUsers) * 100 - 8}
+              textAnchor="middle"
+              fill="currentColor"
+              className="text-[8px] text-muted-foreground"
+            >
+              {d.users}
+            </text>
+          </g>
         ))}
       </svg>
       <div className="flex justify-between mt-1">
@@ -238,6 +251,11 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
         {[0, 25, 50, 75, 100].map((y) => (
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
+        {[0, 1, 2, 3, 4].map((i) => (
+          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" className="text-[8px] text-muted-foreground">
+            {((maxTokens / 4) * i).toFixed(1)}M
+          </text>
+        ))}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${100 - (d.tokens / maxTokens) * 80}`).join(' L ')}`}
           fill="none"
@@ -246,15 +264,25 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           strokeLinecap="round"
         />
         {data.map((d, i) => (
-          <circle
-            key={i}
-            cx={(i / (data.length - 1)) * 400}
-            cy={100 - (d.tokens / maxTokens) * 80}
-            r="3"
-            fill={tokenColor}
-            stroke={dotStroke}
-            strokeWidth="2"
-          />
+          <g key={i}>
+            <circle
+              cx={(i / (data.length - 1)) * 400}
+              cy={100 - (d.tokens / maxTokens) * 80}
+              r="3"
+              fill={tokenColor}
+              stroke={dotStroke}
+              strokeWidth="2"
+            />
+            <text
+              x={(i / (data.length - 1)) * 400}
+              y={100 - (d.tokens / maxTokens) * 80 - 8}
+              textAnchor="middle"
+              fill="currentColor"
+              className="text-[8px] text-muted-foreground"
+            >
+              {d.tokens}M
+            </text>
+          </g>
         ))}
       </svg>
       <div className="flex justify-between mt-1">
@@ -326,7 +354,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                       'flex items-center gap-0.5 text-[11px] font-medium',
                       stat.changeUp ? 'text-brand-green' : 'text-foreground/60',
                     )}>
-                      <ArrowUpRight className="h-3 w-3" />
+                      {stat.changeUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                       {stat.change}
                     </span>
                   </div>
@@ -337,6 +365,11 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {stat.label}
                     </p>
+                    {stat.description && (
+                      <p className="mt-1 text-[10px] text-muted-foreground/60">
+                        {stat.description}
+                      </p>
+                    )}
                   </div>
                 </div>
               );
@@ -346,27 +379,25 @@ export default function DashboardView({ theme }: DashboardViewProps) {
           {/* Charts row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4">
                 <h3 className="text-sm font-semibold text-foreground">
                   Active Users Over Time
                 </h3>
-                <div className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-brand-green" />
-                  <span className="text-[10px] text-muted-foreground">Users</span>
-                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Monthly unique users across all ServiceNow instances
+                </p>
               </div>
               <AreaChart data={MONTHLY_DATA} isDark={isDark} />
             </div>
 
             <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4">
                 <h3 className="text-sm font-semibold text-foreground">
-                  Token Utilization (Millions)
+                  Token Utilization Trend
                 </h3>
-                <div className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-brand-green/60" />
-                  <span className="text-[10px] text-muted-foreground">Tokens</span>
-                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  AI tokens consumed per month (in millions)
+                </p>
               </div>
               <LineChart data={MONTHLY_DATA} isDark={isDark} />
             </div>
@@ -375,20 +406,39 @@ export default function DashboardView({ theme }: DashboardViewProps) {
           {/* Bottom row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5">
-              <h3 className="mb-4 text-sm font-semibold text-foreground">
-                Conversations by Use Case
-              </h3>
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-foreground">
+                  Top Use Cases
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  Most common ServiceNow tasks assisted by Mitra
+                </p>
+              </div>
               <HorizontalBarChart data={USE_CASE_DATA} isDark={isDark} />
             </div>
 
             <div className="rounded-xl border border-border bg-card p-5">
-              <h3 className="mb-4 text-sm font-semibold text-foreground">
-                Weekly Activity
-              </h3>
-              <MiniBarChart data={[65, 78, 82, 91, 74, 88, 95]} maxVal={100} />
-              <div className="flex justify-between mt-2">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-                  <span key={d} className="text-[10px] text-muted-foreground">{d}</span>
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-foreground">
+                  Conversations by Day
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  Weekly chat volume pattern
+                </p>
+              </div>
+              <div className="space-y-2">
+                {WEEKLY_DATA.map((d) => (
+                  <div key={d.day} className="flex items-center gap-3">
+                    <span className="w-8 text-[10px] text-muted-foreground text-right">{d.day}</span>
+                    <div className="flex-1 h-6 rounded bg-muted/50 overflow-hidden">
+                      <div
+                        className="h-full rounded bg-brand-green/80 transition-all duration-500 flex items-center justify-end pr-2"
+                        style={{ width: `${(d.conversations / 356) * 100}%` }}
+                      >
+                        <span className="text-[9px] font-medium text-foreground/80">{d.conversations}</span>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
