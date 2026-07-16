@@ -188,7 +188,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="6" className="text-muted-foreground">
+          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="5" className="text-muted-foreground">
             {Math.round((maxUsers / 4) * i)}
           </text>
         ))}
@@ -200,24 +200,24 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.users / maxUsers) * 100}`).join(' L ')}`}
           fill="none"
           stroke="url(#area-stroke)"
-          strokeWidth="2"
+          strokeWidth="1.5"
         />
         {data.map((d, i) => (
           <g key={i}>
             <circle
               cx={(i / (data.length - 1)) * 400}
               cy={120 - (d.users / maxUsers) * 100}
-              r="3"
+              r="2"
               fill={brandGreen}
               stroke={dotStroke}
-              strokeWidth="2"
+              strokeWidth="1.5"
             />
             <text
               x={(i / (data.length - 1)) * 400}
-              y={120 - (d.users / maxUsers) * 100 - 6}
+              y={120 - (d.users / maxUsers) * 100 - 5}
               textAnchor="middle"
               fill="currentColor"
-              fontSize="6"
+              fontSize="5"
               className="text-muted-foreground"
             >
               {d.users}
@@ -227,7 +227,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[8px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[7px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -253,7 +253,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="6" className="text-muted-foreground">
+          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="5" className="text-muted-foreground">
             {((maxTokens / 4) * i).toFixed(1)}M
           </text>
         ))}
@@ -261,7 +261,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${100 - (d.tokens / maxTokens) * 80}`).join(' L ')}`}
           fill="none"
           stroke="url(#token-stroke)"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
         />
         {data.map((d, i) => (
@@ -269,17 +269,17 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
             <circle
               cx={(i / (data.length - 1)) * 400}
               cy={100 - (d.tokens / maxTokens) * 80}
-              r="3"
+              r="2"
               fill={tokenColor}
               stroke={dotStroke}
-              strokeWidth="2"
+              strokeWidth="1.5"
             />
             <text
               x={(i / (data.length - 1)) * 400}
-              y={100 - (d.tokens / maxTokens) * 80 - 6}
+              y={100 - (d.tokens / maxTokens) * 80 - 5}
               textAnchor="middle"
               fill="currentColor"
-              fontSize="6"
+              fontSize="5"
               className="text-muted-foreground"
             >
               {d.tokens}M
@@ -289,7 +289,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[8px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[7px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
