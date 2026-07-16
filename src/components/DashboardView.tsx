@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/components/ui/card';
 import {
   Users,
   Code2,
@@ -181,16 +182,11 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
   const brandGreen = 'hsl(88, 65%, 49%)';
 
   return (
-    <div className="relative">
-      <svg viewBox="0 0 400 120" className="w-full h-32">
+    <div className="relative w-full">
+      <svg viewBox="0 0 400 120" className="w-full aspect-[10/3]">
         <ChartDefs gradId="area" colorVar={brandGreen} />
         {[0, 30, 60, 90, 120].map((y) => (
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
-        ))}
-        {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="5" className="text-muted-foreground">
-            {Math.round((maxUsers / 4) * i)}
-          </text>
         ))}
         <path
           d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.users / maxUsers) * 100}`).join(' L ')} L 400,120 L 0,120 Z`}
@@ -203,31 +199,20 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           strokeWidth="1.5"
         />
         {data.map((d, i) => (
-          <g key={i}>
-            <circle
-              cx={(i / (data.length - 1)) * 400}
-              cy={120 - (d.users / maxUsers) * 100}
-              r="2"
-              fill={brandGreen}
-              stroke={dotStroke}
-              strokeWidth="1.5"
-            />
-            <text
-              x={(i / (data.length - 1)) * 400}
-              y={120 - (d.users / maxUsers) * 100 - 5}
-              textAnchor="middle"
-              fill="currentColor"
-              fontSize="5"
-              className="text-muted-foreground"
-            >
-              {d.users}
-            </text>
-          </g>
+          <circle
+            key={i}
+            cx={(i / (data.length - 1)) * 400}
+            cy={120 - (d.users / maxUsers) * 100}
+            r="2.5"
+            fill={brandGreen}
+            stroke={dotStroke}
+            strokeWidth="1.5"
+          />
         ))}
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[7px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -241,55 +226,39 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
   const tokenColor = 'hsl(217, 70%, 60%)';
 
   return (
-    <div className="relative">
-      <svg viewBox="0 0 400 100" className="w-full h-28">
+    <div className="relative w-full">
+      <svg viewBox="0 0 400 120" className="w-full aspect-[10/3]">
         <defs>
           <linearGradient id="token-stroke" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor={tokenColor} stopOpacity="0.5" />
             <stop offset="100%" stopColor={tokenColor} stopOpacity="1" />
           </linearGradient>
         </defs>
-        {[0, 25, 50, 75, 100].map((y) => (
+        {[0, 30, 60, 90, 120].map((y) => (
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
-        {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="5" className="text-muted-foreground">
-            {((maxTokens / 4) * i).toFixed(1)}M
-          </text>
-        ))}
         <path
-          d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${100 - (d.tokens / maxTokens) * 80}`).join(' L ')}`}
+          d={`M ${data.map((d, i) => `${(i / (data.length - 1)) * 400},${120 - (d.tokens / maxTokens) * 100}`).join(' L ')}`}
           fill="none"
           stroke="url(#token-stroke)"
           strokeWidth="1.5"
           strokeLinecap="round"
         />
         {data.map((d, i) => (
-          <g key={i}>
-            <circle
-              cx={(i / (data.length - 1)) * 400}
-              cy={100 - (d.tokens / maxTokens) * 80}
-              r="2"
-              fill={tokenColor}
-              stroke={dotStroke}
-              strokeWidth="1.5"
-            />
-            <text
-              x={(i / (data.length - 1)) * 400}
-              y={100 - (d.tokens / maxTokens) * 80 - 5}
-              textAnchor="middle"
-              fill="currentColor"
-              fontSize="5"
-              className="text-muted-foreground"
-            >
-              {d.tokens}M
-            </text>
-          </g>
+          <circle
+            key={i}
+            cx={(i / (data.length - 1)) * 400}
+            cy={120 - (d.tokens / maxTokens) * 100}
+            r="2.5"
+            fill={tokenColor}
+            stroke={dotStroke}
+            strokeWidth="1.5"
+          />
         ))}
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[7px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -380,29 +349,25 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Charts row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-3">
-                <h3 className="text-xs font-semibold text-foreground">
-                  Active Users Over Time
-                </h3>
-                <p className="text-[10px] text-muted-foreground">
-                  Monthly unique users across all ServiceNow instances
-                </p>
-              </div>
-              <AreaChart data={MONTHLY_DATA} isDark={isDark} />
-            </div>
+            <Card className="border-0">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Active Users Over Time</CardTitle>
+                <CardDescription className="text-[10px]">Monthly unique users across all ServiceNow instances</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AreaChart data={MONTHLY_DATA} isDark={isDark} />
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="mb-3">
-                <h3 className="text-xs font-semibold text-foreground">
-                  Token Utilization Trend
-                </h3>
-                <p className="text-[10px] text-muted-foreground">
-                  AI tokens consumed per month (in millions)
-                </p>
-              </div>
-              <LineChart data={MONTHLY_DATA} isDark={isDark} />
-            </div>
+            <Card className="border-0">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs">Token Utilization Trend</CardTitle>
+                <CardDescription className="text-[10px]">AI tokens consumed per month (in millions)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LineChart data={MONTHLY_DATA} isDark={isDark} />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Bottom row */}
