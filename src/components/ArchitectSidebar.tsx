@@ -11,7 +11,7 @@ import {
   LinkIcon as AnimatedLinkIcon,
   StarIcon as AnimatedStarIcon,
   ZapIcon as AnimatedZapIcon,
-  DashboardIcon as AnimatedDashboardIcon,
+  ChartLineIcon as AnimatedChartLineIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
@@ -354,8 +354,8 @@ export function ArchitectSidebar({
     },
     {
       id: 'analytics',
-      label: 'Dashboard',
-      icon: AnimatedDashboardIcon,
+      label: 'Mitra Insights',
+      icon: AnimatedChartLineIcon,
       tab: 'analytics',
     },
   ];

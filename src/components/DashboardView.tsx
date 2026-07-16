@@ -284,7 +284,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
       <div className="shrink-0 px-4 pt-8 md:px-8 lg:px-12 pb-4">
         <div className="mx-auto max-w-6xl">
           <h1 className="font-display text-2xl font-bold text-foreground">
-            Dashboard
+            Mitra Insights
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Platform analytics and usage insights
