@@ -188,7 +188,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="7" className="text-muted-foreground">
+          <text key={i} x="-5" y={120 - i * 30 + 3} textAnchor="end" fill="currentColor" fontSize="6" className="text-muted-foreground">
             {Math.round((maxUsers / 4) * i)}
           </text>
         ))}
@@ -214,10 +214,10 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
             />
             <text
               x={(i / (data.length - 1)) * 400}
-              y={120 - (d.users / maxUsers) * 100 - 8}
+              y={120 - (d.users / maxUsers) * 100 - 6}
               textAnchor="middle"
               fill="currentColor"
-              fontSize="7"
+              fontSize="6"
               className="text-muted-foreground"
             >
               {d.users}
@@ -227,7 +227,7 @@ function AreaChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[8px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -253,7 +253,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
           <line key={y} x1="0" y1={y} x2="400" y2={y} stroke={gridColor} strokeWidth="1" />
         ))}
         {[0, 1, 2, 3, 4].map((i) => (
-          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="7" className="text-muted-foreground">
+          <text key={i} x="-5" y={100 - i * 25 + 3} textAnchor="end" fill="currentColor" fontSize="6" className="text-muted-foreground">
             {((maxTokens / 4) * i).toFixed(1)}M
           </text>
         ))}
@@ -276,10 +276,10 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
             />
             <text
               x={(i / (data.length - 1)) * 400}
-              y={100 - (d.tokens / maxTokens) * 80 - 8}
+              y={100 - (d.tokens / maxTokens) * 80 - 6}
               textAnchor="middle"
               fill="currentColor"
-              fontSize="7"
+              fontSize="6"
               className="text-muted-foreground"
             >
               {d.tokens}M
@@ -289,7 +289,7 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
       </svg>
       <div className="flex justify-between mt-1">
         {data.map((d) => (
-          <span key={d.month} className="text-[9px] text-muted-foreground">{d.month}</span>
+          <span key={d.month} className="text-[8px] text-muted-foreground">{d.month}</span>
         ))}
       </div>
     </div>
@@ -380,24 +380,24 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Charts row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-foreground">
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3">
+                <h3 className="text-xs font-semibold text-foreground">
                   Active Users Over Time
                 </h3>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   Monthly unique users across all ServiceNow instances
                 </p>
               </div>
               <AreaChart data={MONTHLY_DATA} isDark={isDark} />
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-foreground">
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3">
+                <h3 className="text-xs font-semibold text-foreground">
                   Token Utilization Trend
                 </h3>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   AI tokens consumed per month (in millions)
                 </p>
               </div>
@@ -407,24 +407,24 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Bottom row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-foreground">
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3">
+                <h3 className="text-xs font-semibold text-foreground">
                   Top Use Cases
                 </h3>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   Most common ServiceNow tasks assisted by Mitra
                 </p>
               </div>
               <HorizontalBarChart data={USE_CASE_DATA} isDark={isDark} />
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-foreground">
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-3">
+                <h3 className="text-xs font-semibold text-foreground">
                   Conversations by Day
                 </h3>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   Weekly chat volume pattern
                 </p>
               </div>
