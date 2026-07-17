@@ -1,9 +1,9 @@
 const DEFAULT_TITLE = 'Mitra';
-const THINKING_DOTS = '\u2022\u2022\u2022'; // ••• thinking dots
-const GREEN_DOT = '\u25CF'; // ●
 
 let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
+let blinkInterval: ReturnType<typeof setInterval> | null = null;
+let blinkVisible = true;
 
 function getFaviconLink(): HTMLLinkElement | null {
   return document.querySelector('link[rel="icon"]');
@@ -17,11 +17,52 @@ function createGreenDotFavicon(): string {
   if (!ctx) return '';
 
   ctx.beginPath();
-  ctx.arc(16, 16, 12, 0, Math.PI * 2);
+  ctx.arc(16, 16, 14, 0, Math.PI * 2);
   ctx.fillStyle = '#32d74b';
   ctx.fill();
 
   return canvas.toDataURL('image/png');
+}
+
+function createThinkingFavicon(): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '';
+
+  const dotRadius = 4;
+  const dotY = 16;
+  const positions = [9, 16, 23];
+
+  positions.forEach((x, i) => {
+    ctx.beginPath();
+    ctx.arc(x, dotY, dotRadius, 0, Math.PI * 2);
+    const opacity = blinkVisible ? (0.4 + (i * 0.2)) : (0.8 - (i * 0.2));
+    ctx.fillStyle = `rgba(50, 215, 75, ${opacity})`;
+    ctx.fill();
+  });
+
+  return canvas.toDataURL('image/png');
+}
+
+function startThinking() {
+  const link = getFaviconLink();
+  if (!link) return;
+
+  stopThinking();
+
+  blinkInterval = setInterval(() => {
+    link.href = createThinkingFavicon();
+    blinkVisible = !blinkVisible;
+  }, 500);
+}
+
+function stopThinking() {
+  if (blinkInterval) {
+    clearInterval(blinkInterval);
+    blinkInterval = null;
+  }
 }
 
 export function setRunningIndicator(isRunning: boolean) {
@@ -38,11 +79,10 @@ export function setRunningIndicator(isRunning: boolean) {
   }
 
   if (isRunning) {
-    // In progress: thinking dots favicon
     document.title = DEFAULT_TITLE;
-    link.href = createThinkingDotsFavicon();
+    startThinking();
   } else {
-    // Complete: green dot favicon for 3 seconds
+    stopThinking();
     document.title = DEFAULT_TITLE;
     link.href = createGreenDotFavicon();
 
@@ -51,27 +91,4 @@ export function setRunningIndicator(isRunning: boolean) {
       completionTimer = null;
     }, 3000);
   }
-}
-
-function createThinkingDotsFavicon(): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-
-  // Three green dots like the design system thinking indicator
-  const dotRadius = 4;
-  const dotY = 16;
-  const positions = [9, 16, 23];
-
-  positions.forEach((x, i) => {
-    ctx.beginPath();
-    ctx.arc(x, dotY, dotRadius, 0, Math.PI * 2);
-    const opacity = 0.4 + (i * 0.3);
-    ctx.fillStyle = `rgba(50, 215, 75, ${opacity})`;
-    ctx.fill();
-  });
-
-  return canvas.toDataURL('image/png');
 }
