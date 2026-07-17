@@ -231,6 +231,7 @@ export default function HomeView({
                       value={selectedInstanceId}
                       onChange={handleSelectInstance}
                       onCreateConnection={onCreateConnection}
+                      isConnected={isServerConnected}
                     />
                     <ComposerModeSelect
                       theme={theme}
@@ -238,21 +239,6 @@ export default function HomeView({
                       onChange={setComposerMode}
                     />
                   </div>
-
-                  <span
-                    className={`inline-flex items-center justify-center gap-1 justify-self-center text-[10px] ${
-                      'text-muted-foreground'
-                    }`}
-                    aria-label={isServerConnected ? 'Connected' : 'Offline'}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        isServerConnected ? 'bg-brand-green' : 'bg-muted-foreground'
-                      }`}
-                      aria-hidden="true"
-                    />
-                    <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
-                  </span>
 
                   <div className="flex items-center gap-1 justify-self-end">
                     <Button variant="ghost" size="icon" className="h-8 w-8">

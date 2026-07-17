@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Plus, Server } from 'lucide-react';
+import { Check, Plus, Server, Zap } from 'lucide-react';
 import {
   SERVICE_NOW_INSTANCES,
   ServiceNowInstance,
@@ -24,6 +24,7 @@ interface ComposerInstanceSelectProps {
   onChange: (instanceId: string) => void;
   onCreateConnection?: () => void;
   disabled?: boolean;
+  isConnected?: boolean;
 }
 
 export function ComposerInstanceSelect({
@@ -33,6 +34,7 @@ export function ComposerInstanceSelect({
   onChange,
   onCreateConnection,
   disabled = false,
+  isConnected = true,
 }: ComposerInstanceSelectProps) {
   const isDark = isDarkTheme(theme);
   const [open, setOpen] = useState(false);
@@ -78,17 +80,34 @@ export function ComposerInstanceSelect({
             />
           </span>
           {selected ? (
-            <span
-              className={cn(
-                strokePill(
-                  'max-w-[7.5rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
-                ),
-                open && openStroke,
-                'text-foreground',
-              )}
-            >
-              {selected.name}
-            </span>
+            <>
+              <span
+                className={cn(
+                  strokePill('inline-flex h-6 w-6 items-center justify-center'),
+                  open && openStroke,
+                  isConnected ? 'text-brand-green' : 'text-muted-foreground',
+                )}
+              >
+                <Zap
+                  className={cn(
+                    'h-3.5 w-3.5 shrink-0 transition-all duration-300',
+                    isConnected && 'drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
+                  )}
+                  fill={isConnected ? 'currentColor' : 'none'}
+                />
+              </span>
+              <span
+                className={cn(
+                  strokePill(
+                    'max-w-[7.5rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
+                  ),
+                  open && openStroke,
+                  'text-foreground',
+                )}
+              >
+                {selected.name}
+              </span>
+            </>
           ) : (
             <span
               className={cn(

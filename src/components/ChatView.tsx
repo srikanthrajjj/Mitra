@@ -972,6 +972,7 @@ export default function ChatView({
                   onChange={handleSelectInstance}
                   onCreateConnection={onCreateConnection}
                   disabled={isGeneratingMessage}
+                  isConnected={isServerConnected}
                 />
                 <ComposerModeSelect
                   theme={theme}
@@ -979,21 +980,6 @@ export default function ChatView({
                   onChange={setComposerMode}
                   disabled={isGeneratingMessage}
                 />
-              </div>
-
-              <div
-                className={`inline-flex items-center justify-center gap-1 justify-self-center text-[10px] ${
-                  isDark ? 'text-muted-foreground' : 'text-muted-foreground'
-                }`}
-                aria-label={isServerConnected ? 'Connected' : 'Offline'}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    isServerConnected ? 'bg-emerald-400/90' : 'bg-slate-400'
-                  }`}
-                  aria-hidden="true"
-                />
-                <span>{isServerConnected ? 'Connected' : 'Offline'}</span>
               </div>
 
               <div className="flex items-center gap-2 justify-self-end">
