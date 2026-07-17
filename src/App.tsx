@@ -186,6 +186,7 @@ import {
   isDarkTheme,
   THEME_STORAGE_KEY,
 } from './utils/theme';
+import { setRunningIndicator } from './utils/browserIndicator';
 // @ts-ignore
 import ambientMusic from './assets/leberch-ambient-electronics-524300.mp3';
 
@@ -402,6 +403,10 @@ export default function App() {
   const [isServerConnected, setIsServerConnected] = useState(
     () => (typeof navigator !== 'undefined' ? navigator.onLine : true),
   );
+
+  useEffect(() => {
+    setRunningIndicator(isGeneratingMessage);
+  }, [isGeneratingMessage]);
 
   const handleToggleArtifactPanelCollapse = useCallback(() => {
     setArtifactPanelCollapsed((prev) => {
