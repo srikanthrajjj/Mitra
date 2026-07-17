@@ -982,7 +982,7 @@ export default function ChatView({
                 />
               </div>
 
-              <div className="flex items-center gap-2 justify-self-end">
+              <div className="flex items-center gap-2 justify-self-end col-start-3">
                 <button
                   type="button"
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
