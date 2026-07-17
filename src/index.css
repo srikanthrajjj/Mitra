@@ -594,6 +594,19 @@ html, body, div, textarea, pre, select {
   animation: conversation-status-pulse 1.85s ease-in-out infinite;
 }
 
+@keyframes running-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.running-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #32d74b;
+  animation: running-blink 1.5s ease-in-out infinite;
+}
+
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }

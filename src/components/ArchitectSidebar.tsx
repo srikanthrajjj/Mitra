@@ -64,6 +64,7 @@ type NavItemConfig = {
   tab?: string;
   action?: () => void;
   badge?: number;
+  isRunning?: boolean;
 };
 
 function AnimatedSidebarNavIcon({
@@ -338,6 +339,7 @@ export function ArchitectSidebar({
       label: 'Projects',
       icon: AnimatedFolderIcon,
       tab: 'projects',
+      isRunning: true,
     },
     { id: 'connections', label: 'Connections', icon: AnimatedLinkIcon, tab: 'connections' },
     {
@@ -422,6 +424,9 @@ export function ArchitectSidebar({
                   )}
                 />
                 <span className="flex-1 text-left">{item.label}</span>
+                {item.isRunning && (
+                  <span className="running-dot ml-auto" />
+                )}
                 {item.badge !== undefined && (
                   <span className="architect-nav-badge ml-auto min-w-[1.25rem] rounded-md bg-muted px-1.5 py-0.5 text-center text-[10px] font-semibold tabular-nums leading-none">
                     {item.badge}
