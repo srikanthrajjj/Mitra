@@ -1,4 +1,6 @@
 const DEFAULT_TITLE = 'Mitra';
+const THINKING_DOTS = '\u2022\u2022\u2022'; // ••• thinking dots
+const GREEN_DOT = '\u25CF'; // ●
 
 let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
@@ -36,16 +38,40 @@ export function setRunningIndicator(isRunning: boolean) {
   }
 
   if (isRunning) {
-    document.title = `${DEFAULT_TITLE}`;
-    link.href = originalFaviconHref;
+    // In progress: thinking dots favicon
+    document.title = DEFAULT_TITLE;
+    link.href = createThinkingDotsFavicon();
   } else {
-    document.title = `${DEFAULT_TITLE}`;
+    // Complete: green dot favicon for 3 seconds
+    document.title = DEFAULT_TITLE;
     link.href = createGreenDotFavicon();
 
     completionTimer = setTimeout(() => {
-      document.title = DEFAULT_TITLE;
       link.href = originalFaviconHref!;
       completionTimer = null;
     }, 3000);
   }
+}
+
+function createThinkingDotsFavicon(): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '';
+
+  // Three green dots like the design system thinking indicator
+  const dotRadius = 4;
+  const dotY = 16;
+  const positions = [9, 16, 23];
+
+  positions.forEach((x, i) => {
+    ctx.beginPath();
+    ctx.arc(x, dotY, dotRadius, 0, Math.PI * 2);
+    const opacity = 0.4 + (i * 0.3);
+    ctx.fillStyle = `rgba(50, 215, 75, ${opacity})`;
+    ctx.fill();
+  });
+
+  return canvas.toDataURL('image/png');
 }
