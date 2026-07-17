@@ -83,29 +83,23 @@ export function ComposerInstanceSelect({
             <>
               <span
                 className={cn(
-                  strokePill('inline-flex h-6 w-6 items-center justify-center'),
-                  open && openStroke,
-                  isConnected ? 'text-brand-green' : 'text-muted-foreground',
-                )}
-              >
-                <Zap
-                  className={cn(
-                    'h-3.5 w-3.5 shrink-0 transition-all duration-300',
-                    isConnected && 'drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
-                  )}
-                  fill={isConnected ? 'currentColor' : 'none'}
-                />
-              </span>
-              <span
-                className={cn(
                   strokePill(
-                    'max-w-[7.5rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
+                    'max-w-[9rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
                   ),
                   open && openStroke,
                   'text-foreground',
                 )}
               >
-                {selected.name}
+                <span className="inline-flex items-center gap-1">
+                  <Zap
+                    className={cn(
+                      'h-3 w-3 shrink-0 transition-all duration-300',
+                      isConnected && 'text-brand-green drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
+                    )}
+                    fill={isConnected ? 'currentColor' : 'none'}
+                  />
+                  {selected.name}
+                </span>
               </span>
             </>
           ) : (
@@ -167,6 +161,15 @@ export function ComposerInstanceSelect({
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
+                  <Zap
+                    className={cn(
+                      'h-3 w-3 shrink-0',
+                      isSelected
+                        ? 'text-brand-green'
+                        : 'text-muted-foreground',
+                    )}
+                    fill={isSelected ? 'currentColor' : 'none'}
+                  />
                   <span className="truncate text-xs font-medium">{instance.name}</span>
                   <span
                     className={cn(
