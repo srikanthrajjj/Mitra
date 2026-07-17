@@ -275,4 +275,11 @@ export function persistChatCompletionSound(v: boolean): void {
   persistBool('chat_completion_sound', v);
 }
 
+export function readTaskCompleteNotification(): boolean {
+  return readBool('task_complete_notification', false);
+}
+export function persistTaskCompleteNotification(v: boolean): void {
+  persistBool('task_complete_notification', v);
+}
+
 export const FONT_SIZE_PX = [11, 12, 13, 14, 15, 16] as const;

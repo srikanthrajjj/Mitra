@@ -177,6 +177,8 @@ import {
   persistFontSizeLevel,
   readAmbientMusic,
   persistAmbientMusic,
+  readTaskCompleteNotification,
+  persistTaskCompleteNotification,
 } from './utils/settingsStorage';
 import { useChatCompletionSound } from './utils/chatCompletionSound';
 import {
@@ -186,7 +188,7 @@ import {
   isDarkTheme,
   THEME_STORAGE_KEY,
 } from './utils/theme';
-import { setRunningIndicator } from './utils/browserIndicator';
+import { setRunningIndicator, setNotificationsEnabled, requestNotificationPermission } from './utils/browserIndicator';
 // @ts-ignore
 import ambientMusic from './assets/leberch-ambient-electronics-524300.mp3';
 
@@ -235,6 +237,7 @@ export default function App() {
 
   const [fontSizeLevel, setFontSizeLevelState] = useState<number>(readFontSizeLevel);
   const [ambientMusicEnabled, setAmbientMusicEnabledState] = useState<boolean>(readAmbientMusic);
+  const [taskNotificationEnabled, setTaskNotificationEnabledState] = useState<boolean>(readTaskCompleteNotification);
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const [devModeEnabled, setDevModeEnabled] = useState<boolean>(() => {
@@ -271,6 +274,20 @@ export default function App() {
     setAmbientMusicEnabledState(value);
     persistAmbientMusic(value);
   }, []);
+
+  const setTaskNotificationEnabled = useCallback(async (value: boolean) => {
+    if (value) {
+      const granted = await requestNotificationPermission();
+      if (!granted) return;
+    }
+    setTaskNotificationEnabledState(value);
+    persistTaskCompleteNotification(value);
+    setNotificationsEnabled(value);
+  }, []);
+
+  useEffect(() => {
+    setNotificationsEnabled(taskNotificationEnabled);
+  }, [taskNotificationEnabled]);
 
   useEffect(() => {
     const audio = ambientAudioRef.current;
@@ -2541,6 +2558,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
               onFontSizeLevelChange={setFontSizeLevel}
               ambientMusic={ambientMusicEnabled}
               onAmbientMusicChange={setAmbientMusicEnabled}
+              taskNotification={taskNotificationEnabled}
+              onTaskNotificationChange={setTaskNotificationEnabled}
               onClose={handleCloseSettings}
             />
           )}

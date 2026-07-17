@@ -233,6 +233,8 @@ interface SettingsViewProps {
   onFontSizeLevelChange: (level: number) => void;
   ambientMusic: boolean;
   onAmbientMusicChange: (value: boolean) => void;
+  taskNotification: boolean;
+  onTaskNotificationChange: (value: boolean) => void;
   onClose: () => void;
 }
 
@@ -248,6 +250,8 @@ export function SettingsView({
   onFontSizeLevelChange,
   ambientMusic,
   onAmbientMusicChange,
+  taskNotification,
+  onTaskNotificationChange,
   onClose,
 }: SettingsViewProps) {
   const categories = PERSONA_SETTINGS_CATEGORIES[userRole];
@@ -399,6 +403,12 @@ export function SettingsView({
           }}
         />,
         'audio sound chat notification vr accessibility',
+      );
+      add(
+        'Task complete notification',
+        'Get a browser notification when Mitra finishes your task.',
+        <Switch checked={taskNotification} onCheckedChange={onTaskNotificationChange} />,
+        'notification alert remind browser',
       );
     }
 
