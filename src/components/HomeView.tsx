@@ -224,8 +224,8 @@ export default function HomeView({
 
                 <Separator className="my-2" />
 
-                <div className="grid grid-cols-3 items-center px-1">
-                  <div className="flex items-center gap-1.5 justify-self-start">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-1.5">
                     <ComposerInstanceSelect
                       theme={theme}
                       value={selectedInstanceId}
@@ -240,7 +240,7 @@ export default function HomeView({
                     />
                   </div>
 
-                  <div className="flex items-center gap-1 justify-self-end">
+                  <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <Mic className="h-4 w-4" />
                     </Button>
