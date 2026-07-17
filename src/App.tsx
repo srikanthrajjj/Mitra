@@ -282,10 +282,10 @@ export default function App() {
       audio.pause();
     }
   }, [ambientMusicEnabled]);
-  const [activeTab, setActiveTabState] = useState<string>(() => readStyleguideTabFromUrl() ?? readDevSpecsTabFromUrl() ?? 'dashboard');
-  const preStyleguideTabRef = useRef<string>('dashboard');
-  const preSettingsTabRef = useRef<string>('dashboard');
-  const preDevSpecsTabRef = useRef<string>('dashboard');
+  const [activeTab, setActiveTabState] = useState<string>(() => readStyleguideTabFromUrl() ?? readDevSpecsTabFromUrl() ?? 'new-chat');
+  const preStyleguideTabRef = useRef<string>('new-chat');
+  const preSettingsTabRef = useRef<string>('new-chat');
+  const preDevSpecsTabRef = useRef<string>('new-chat');
 
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState((prev) => {
@@ -531,18 +531,13 @@ export default function App() {
   const DEFAULT_MODEL = 'gemini-2.5-flash';
   const [welcomeComplete, setWelcomeComplete] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return true;
-    return localStorage.getItem('mitra_welcome_complete') === 'true';
+    return true;
   });
   const [showLanding, setShowLanding] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return false;
-    if (isLandingPath(window.location.pathname)) return true;
-    if (localStorage.getItem('mitra_welcome_complete') === 'true') return false;
-    return localStorage.getItem('mitra_landing_seen') !== 'true';
+    return false;
   });
-  const [simulationAlertOpen, setSimulationAlertOpen] = useState<boolean>(() => {
-    if (localStorage.getItem('mitra_welcome_complete') !== 'true') return false;
-    return localStorage.getItem('mitra_sim_ack') !== 'true';
-  });
+  const [simulationAlertOpen, setSimulationAlertOpen] = useState<boolean>(false);
   const [confirmDialog, setConfirmDialog] = useState<{
     title: string;
     message: string;
