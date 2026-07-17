@@ -1,11 +1,29 @@
 const DEFAULT_TITLE = 'Mitra';
-const COMPLETED_CHECK = '\u2713 '; // checkmark character
+const RUNNING_PREFIX = '\u25CF '; // green dot
+const COMPLETED_CHECK = '\u2713 '; // checkmark
 
 let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
+let blinkInterval: ReturnType<typeof setInterval> | null = null;
+let blinkVisible = true;
 
 function getFaviconLink(): HTMLLinkElement | null {
   return document.querySelector('link[rel="icon"]');
+}
+
+function createGreenDotFavicon(): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '';
+
+  ctx.beginPath();
+  ctx.arc(16, 16, 12, 0, Math.PI * 2);
+  ctx.fillStyle = '#32d74b';
+  ctx.fill();
+
+  return canvas.toDataURL('image/png');
 }
 
 function createCheckmarkFavicon(): string {
@@ -15,13 +33,11 @@ function createCheckmarkFavicon(): string {
   const ctx = canvas.getContext('2d');
   if (!ctx) return '';
 
-  // Green circle background
   ctx.beginPath();
   ctx.arc(16, 16, 14, 0, Math.PI * 2);
   ctx.fillStyle = '#32d74b';
   ctx.fill();
 
-  // White checkmark
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 3;
   ctx.lineCap = 'round';
@@ -35,6 +51,34 @@ function createCheckmarkFavicon(): string {
   return canvas.toDataURL('image/png');
 }
 
+function createTransparentFavicon(): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  return canvas.toDataURL('image/png');
+}
+
+function startBlinking() {
+  const link = getFaviconLink();
+  if (!link) return;
+
+  stopBlinking();
+  const greenDot = createGreenDotFavicon();
+  const transparent = createTransparentFavicon();
+
+  blinkInterval = setInterval(() => {
+    link.href = blinkVisible ? greenDot : transparent;
+    blinkVisible = !blinkVisible;
+  }, 800);
+}
+
+function stopBlinking() {
+  if (blinkInterval) {
+    clearInterval(blinkInterval);
+    blinkInterval = null;
+  }
+}
+
 export function setRunningIndicator(isRunning: boolean) {
   const link = getFaviconLink();
   if (!link) return;
@@ -43,20 +87,20 @@ export function setRunningIndicator(isRunning: boolean) {
     originalFaviconHref = link.href;
   }
 
-  // Clear any pending completion timer
   if (completionTimer) {
     clearTimeout(completionTimer);
     completionTimer = null;
   }
 
   if (isRunning) {
-    // Running state: show spinning indicator
-    document.title = `${DEFAULT_TITLE}`;
-    link.href = originalFaviconHref;
+    // In progress: blinking green dot + title
+    document.title = `${RUNNING_PREFIX}${DEFAULT_TITLE}`;
+    startBlinking();
   } else {
-    // Completed: show checkmark for 3 seconds
+    // Complete: stop blinking, hide favicon, checkmark in title
+    stopBlinking();
     document.title = `${COMPLETED_CHECK}${DEFAULT_TITLE}`;
-    link.href = createCheckmarkFavicon();
+    link.href = createTransparentFavicon();
 
     completionTimer = setTimeout(() => {
       document.title = DEFAULT_TITLE;
