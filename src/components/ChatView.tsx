@@ -964,8 +964,8 @@ export default function ChatView({
             />
 
             {/* Bottom Actions Row */}
-            <div className="mt-2 grid grid-cols-3 items-center pt-2 px-1">
-              <div className="flex items-center gap-2 justify-self-start">
+            <div className="mt-2 flex items-center justify-between pt-2 px-1">
+              <div className="flex items-center gap-2">
                 <ComposerInstanceSelect
                   theme={theme}
                   value={selectedInstanceId}
@@ -982,7 +982,7 @@ export default function ChatView({
                 />
               </div>
 
-              <div className="flex items-center gap-2 justify-self-end col-start-3">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
