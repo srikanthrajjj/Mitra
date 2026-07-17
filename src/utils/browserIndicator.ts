@@ -1,6 +1,4 @@
 const DEFAULT_TITLE = 'Mitra';
-const THINKING_DOTS = '... '; // thinking indicator
-const GREEN_DOT = '\u25CF '; // ● green dot
 
 let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
@@ -38,12 +36,10 @@ export function setRunningIndicator(isRunning: boolean) {
   }
 
   if (isRunning) {
-    // In progress: thinking dots + original favicon
-    document.title = `${THINKING_DOTS}${DEFAULT_TITLE}`;
+    document.title = `${DEFAULT_TITLE}`;
     link.href = originalFaviconHref;
   } else {
-    // Complete: green dot in title for 3 seconds
-    document.title = `${GREEN_DOT}${DEFAULT_TITLE}`;
+    document.title = `${DEFAULT_TITLE}`;
     link.href = createGreenDotFavicon();
 
     completionTimer = setTimeout(() => {
