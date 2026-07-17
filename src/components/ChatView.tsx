@@ -21,6 +21,7 @@ import StructuredMarkdown from './StructuredMarkdown';
 import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
+import { NotificationBanner } from './NotificationBanner';
 import {
   loadSelectedInstanceId,
   persistSelectedInstanceId,
@@ -46,6 +47,8 @@ interface ChatViewProps {
   onShareProject?: () => void;
   projectCollaboratorCount?: number;
   isServerConnected?: boolean;
+  taskNotificationEnabled?: boolean;
+  onTaskNotificationChange?: (value: boolean) => void;
 }
 
 function parseInlineMarkdown(text: string, isDark: boolean = true) {
@@ -228,6 +231,8 @@ export default function ChatView({
   onShareProject,
   projectCollaboratorCount = 0,
   isServerConnected = true,
+  taskNotificationEnabled = false,
+  onTaskNotificationChange,
 }: ChatViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
@@ -243,6 +248,7 @@ export default function ChatView({
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [notificationBannerDismissed, setNotificationBannerDismissed] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -906,6 +912,13 @@ export default function ChatView({
       {/* Composer — pinned below scroll area so responses stay visible above */}
       <div className="shrink-0 px-4 pt-2 pb-4 z-20 relative border-t border-transparent">
         <div className="max-w-3xl mx-auto w-full relative z-20">
+          {!taskNotificationEnabled && !notificationBannerDismissed && onTaskNotificationChange && (
+            <NotificationBanner
+              isDark={isDark}
+              onEnable={() => onTaskNotificationChange(true)}
+              onDismiss={() => setNotificationBannerDismissed(true)}
+            />
+          )}
           <SimulationComposerStack
             theme={theme}
             inputId="tour-input-bar"

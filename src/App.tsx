@@ -2575,6 +2575,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
               }}
               isServerConnected={isServerConnected}
               onCreateConnection={handleOpenCreateConnection}
+              taskNotificationEnabled={taskNotificationEnabled}
+              onTaskNotificationChange={setTaskNotificationEnabled}
             />
           )}
 
@@ -2708,6 +2710,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
                     }}
                     onShareProject={() => handleShareProject(activeSolution.id)}
                     isServerConnected={isServerConnected}
+                    taskNotificationEnabled={taskNotificationEnabled}
+                    onTaskNotificationChange={setTaskNotificationEnabled}
                   />
                   {showArtifactPanel && (
                     <RightSidebar

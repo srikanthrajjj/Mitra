@@ -9,6 +9,7 @@ import HomeActionCards from './HomeActionCards';
 import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
+import { NotificationBanner } from './NotificationBanner';
 import {
   loadSelectedInstanceId,
   persistSelectedInstanceId,
@@ -28,6 +29,8 @@ interface HomeViewProps {
   onSendMessage: (text: string) => void;
   isServerConnected?: boolean;
   onCreateConnection?: () => void;
+  taskNotificationEnabled?: boolean;
+  onTaskNotificationChange?: (value: boolean) => void;
 }
 
 export default function HomeView({
@@ -37,6 +40,8 @@ export default function HomeView({
   onSendMessage,
   isServerConnected = true,
   onCreateConnection,
+  taskNotificationEnabled = false,
+  onTaskNotificationChange,
 }: HomeViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
@@ -44,6 +49,7 @@ export default function HomeView({
   const [isFocused, setIsFocused] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
+  const [notificationBannerDismissed, setNotificationBannerDismissed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -197,6 +203,13 @@ export default function HomeView({
             onDragLeave={handleDrag}
             onDrop={handleDrop}
           >
+            {!taskNotificationEnabled && !notificationBannerDismissed && onTaskNotificationChange && (
+              <NotificationBanner
+                isDark={isDark}
+                onEnable={() => onTaskNotificationChange(true)}
+                onDismiss={() => setNotificationBannerDismissed(true)}
+              />
+            )}
             <SimulationComposerStack
               theme={theme}
               inputId="tour-input-bar"
