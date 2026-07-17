@@ -2,11 +2,16 @@ const DEFAULT_TITLE = 'Mitra';
 
 let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
-let blinkInterval: ReturnType<typeof setInterval> | null = null;
-let blinkVisible = true;
 
 function getFaviconLink(): HTMLLinkElement | null {
   return document.querySelector('link[rel="icon"]');
+}
+
+function createTransparentFavicon(): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  return canvas.toDataURL('image/png');
 }
 
 function createGreenDotFavicon(): string {
@@ -24,47 +29,6 @@ function createGreenDotFavicon(): string {
   return canvas.toDataURL('image/png');
 }
 
-function createThinkingFavicon(): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-
-  const dotRadius = 4;
-  const dotY = 16;
-  const positions = [9, 16, 23];
-
-  positions.forEach((x, i) => {
-    ctx.beginPath();
-    ctx.arc(x, dotY, dotRadius, 0, Math.PI * 2);
-    const opacity = blinkVisible ? (0.4 + (i * 0.2)) : (0.8 - (i * 0.2));
-    ctx.fillStyle = `rgba(50, 215, 75, ${opacity})`;
-    ctx.fill();
-  });
-
-  return canvas.toDataURL('image/png');
-}
-
-function startThinking() {
-  const link = getFaviconLink();
-  if (!link) return;
-
-  stopThinking();
-
-  blinkInterval = setInterval(() => {
-    link.href = createThinkingFavicon();
-    blinkVisible = !blinkVisible;
-  }, 500);
-}
-
-function stopThinking() {
-  if (blinkInterval) {
-    clearInterval(blinkInterval);
-    blinkInterval = null;
-  }
-}
-
 export function setRunningIndicator(isRunning: boolean) {
   const link = getFaviconLink();
   if (!link) return;
@@ -80,9 +44,8 @@ export function setRunningIndicator(isRunning: boolean) {
 
   if (isRunning) {
     document.title = DEFAULT_TITLE;
-    startThinking();
+    link.href = createTransparentFavicon();
   } else {
-    stopThinking();
     document.title = DEFAULT_TITLE;
     link.href = createGreenDotFavicon();
 
