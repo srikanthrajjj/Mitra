@@ -14,21 +14,6 @@ function createTransparentFavicon(): string {
   return canvas.toDataURL('image/png');
 }
 
-function createGreenDotFavicon(): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-
-  ctx.beginPath();
-  ctx.arc(16, 16, 14, 0, Math.PI * 2);
-  ctx.fillStyle = '#32d74b';
-  ctx.fill();
-
-  return canvas.toDataURL('image/png');
-}
-
 export function setRunningIndicator(isRunning: boolean) {
   const link = getFaviconLink();
   if (!link) return;
@@ -47,10 +32,9 @@ export function setRunningIndicator(isRunning: boolean) {
     link.href = createTransparentFavicon();
   } else {
     document.title = DEFAULT_TITLE;
-    link.href = createGreenDotFavicon();
+    link.href = originalFaviconHref!;
 
     completionTimer = setTimeout(() => {
-      link.href = originalFaviconHref!;
       completionTimer = null;
     }, 3000);
   }
