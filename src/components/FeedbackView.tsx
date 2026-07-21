@@ -30,14 +30,38 @@ type TypeFilter = FeedbackType | 'all';
 type PriorityFilter = FeedbackPriority | 'all';
 type ViewMode = 'cards' | 'list';
 
+/** Subtle orange → red accents for bugs / critical (keep soft, not alarm-red).
+ * Bug: fill #FFF5F2 / rgba(196,92,62,0.12) · border #F0C4B4 / 30% · text #C45C3E / #E8A090
+ * Critical: fill #FFF2F0 / rgba(185,74,60,0.12) · border #E8B4AA / 32% · text #B94A3C / #E59A8E
+ */
+
 function TypeIcon({ type, className }: { type: FeedbackType; className?: string }) {
   if (type === 'bug') return <Bug className={className} />;
   if (type === 'improvement') return <Lightbulb className={className} />;
   return <MessageCircle className={className} />;
 }
 
-function priorityChipClass(priority: FeedbackPriority): string {
-  if (priority === 'critical') return 'border-border bg-muted text-foreground';
+function typeIconClass(type: FeedbackType, isDark: boolean): string {
+  if (type === 'bug') return isDark ? 'text-[#E8A090]' : 'text-[#C45C3E]';
+  return 'text-brand-green';
+}
+
+function typeChipClass(type: FeedbackType, isDark: boolean): string {
+  if (type === 'bug') {
+    return isDark
+      ? 'border-[rgba(196,92,62,0.30)] bg-[rgba(196,92,62,0.12)] text-[#E8A090]'
+      : 'border-[#F0C4B4] bg-[#FFF5F2] text-[#C45C3E]';
+  }
+  if (type === 'improvement') return 'border-border bg-brand-green/10 text-brand-green';
+  return 'border-border bg-muted text-muted-foreground';
+}
+
+function priorityChipClass(priority: FeedbackPriority, isDark: boolean): string {
+  if (priority === 'critical') {
+    return isDark
+      ? 'border-[rgba(185,74,60,0.32)] bg-[rgba(185,74,60,0.12)] text-[#E59A8E]'
+      : 'border-[#E8B4AA] bg-[#FFF2F0] text-[#B94A3C]';
+  }
   if (priority === 'high') return 'border-border bg-brand-green/10 text-brand-green';
   return 'border-border bg-muted text-muted-foreground';
 }
@@ -76,15 +100,15 @@ function StatusSelect({
   );
 }
 
-function EntryTags({ entry }: { entry: FeedbackEntry }) {
+function EntryTags({ entry, isDark }: { entry: FeedbackEntry; isDark: boolean }) {
   const chipBase =
     'inline-flex items-center rounded-full border px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide leading-none';
   return (
     <div className="flex flex-wrap items-center gap-1">
-      <span className={cn(chipBase, 'border-border bg-muted text-foreground')}>
+      <span className={cn(chipBase, typeChipClass(entry.type, isDark))}>
         {FEEDBACK_TYPE_LABELS[entry.type]}
       </span>
-      <span className={cn(chipBase, priorityChipClass(entry.priority))}>
+      <span className={cn(chipBase, priorityChipClass(entry.priority, isDark))}>
         {FEEDBACK_PRIORITY_LABELS[entry.priority]}
       </span>
       <span className={cn(chipBase, statusChipClass(entry.status))}>
@@ -325,11 +349,11 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
                         isDark ? 'border-mitra-border bg-muted' : 'border-border bg-muted',
                       )}
                     >
-                      <TypeIcon type={entry.type} className="h-4 w-4 text-brand-green" />
+                      <TypeIcon type={entry.type} className={cn('h-4 w-4', typeIconClass(entry.type, isDark))} />
                     </div>
                     <StatusSelect entry={entry} isDark={isDark} onChange={handleStatusChange} />
                   </div>
-                  <EntryTags entry={entry} />
+                  <EntryTags entry={entry} isDark={isDark} />
                   <p className="mt-2.5 flex-1 text-sm leading-relaxed text-foreground line-clamp-4">
                     {entry.message}
                   </p>
@@ -357,11 +381,11 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
                       isDark ? 'border-mitra-border bg-muted' : 'border-border bg-muted',
                     )}
                   >
-                    <TypeIcon type={entry.type} className="h-3.5 w-3.5 text-brand-green" />
+                    <TypeIcon type={entry.type} className={cn('h-3.5 w-3.5', typeIconClass(entry.type, isDark))} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-                      <EntryTags entry={entry} />
+                      <EntryTags entry={entry} isDark={isDark} />
                     </div>
                     <p className="text-[13px] font-semibold leading-snug text-foreground line-clamp-2">
                       {entry.message}

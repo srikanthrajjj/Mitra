@@ -23,6 +23,8 @@ import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
 import { NotificationBanner } from './NotificationBanner';
 import { ProdInstanceBanner } from './ProdInstanceBanner';
+import { ComposerAttachmentPreview } from './ComposerAttachmentPreview';
+import { useComposerAttachments } from '../hooks/useComposerAttachments';
 import {
   getServiceNowInstance,
   instanceHostname,
@@ -247,6 +249,13 @@ export default function ChatView({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
   const selectedInstance = getServiceNowInstance(selectedInstanceId);
+  const {
+    attachments,
+    addFiles,
+    removeAttachment,
+    clearAttachments,
+    hasUploading,
+  } = useComposerAttachments();
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -323,9 +332,43 @@ export default function ChatView({
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setInputValue(`Analyze this requirements document: "${file.name}"`);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      addFiles(files);
+      if (!inputValue.trim()) {
+        const first = files[0];
+        const isImage = first.type.startsWith('image/');
+        setInputValue(
+          isImage
+            ? `Analyze this diagram or screenshot ("${first.name}") and describe the ServiceNow architecture it represents.`
+            : `Analyze this requirements document: "${first.name}"`,
+        );
+      }
+    }
+    e.target.value = '';
+  };
+
+  const handleSend = () => {
+    if (hasUploading) return;
+    const trimmed = inputValue.trim();
+    const readyNames = attachments.filter((a) => a.status === 'ready').map((a) => a.name);
+    if (!trimmed && readyNames.length === 0) return;
+
+    const message =
+      trimmed
+      || (readyNames.length === 1
+        ? `Analyze this requirements document: "${readyNames[0]}"`
+        : `Analyze these attached files: ${readyNames.map((n) => `"${n}"`).join(', ')}`);
+
+    onSendMessage(message);
+    setInputValue('');
+    clearAttachments();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -447,20 +490,6 @@ export default function ChatView({
     const timer = window.setTimeout(() => keepLastMessageVisible(true), 50);
     return () => window.clearTimeout(timer);
   }, [messages.length, streamSignature, isGeneratingMessage]);
-
-  const handleSend = () => {
-    if (inputValue.trim()) {
-      onSendMessage(inputValue.trim());
-      setInputValue('');
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -976,7 +1005,14 @@ export default function ChatView({
                 ref={fileInputRef} 
                 className="hidden" 
                 onChange={handleFileSelect}
-                accept=".txt,.json,.csv,.pdf,.doc,.docx"
+                accept=".txt,.json,.csv,.pdf,.doc,.docx,image/*"
+                multiple
+              />
+
+              <ComposerAttachmentPreview
+                isDark={isDark}
+                attachments={attachments}
+                onRemove={removeAttachment}
               />
 
               {/* Top typing area: Textarea */}
@@ -1057,9 +1093,9 @@ export default function ChatView({
                   <button
                     type="button"
                     onClick={handleSend}
-                    disabled={!inputValue.trim()}
+                    disabled={(!inputValue.trim() && attachments.length === 0) || hasUploading}
                     className={`w-7.5 h-7.5 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${
-                      inputValue.trim()
+                      (inputValue.trim() || attachments.length > 0) && !hasUploading
                         ? 'bg-brand-green hover:bg-brand-green-hover hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(79,207,54,0.45)] cursor-pointer'
                         : isDark
                           ? 'bg-muted text-muted-foreground opacity-40 cursor-not-allowed'
@@ -1067,7 +1103,7 @@ export default function ChatView({
                     }`}
                   >
                     <ArrowRight className={`w-3.5 h-3.5 transition-transform duration-300 stroke-[3.5] ${
-                      inputValue.trim() ? 'text-slate-950 font-bold' : 'text-slate-450'
+                      (inputValue.trim() || attachments.length > 0) && !hasUploading ? 'text-slate-950 font-bold' : 'text-slate-450'
                     }`} />
                   </button>
                 )}

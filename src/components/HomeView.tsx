@@ -11,6 +11,8 @@ import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
 import { NotificationBanner } from './NotificationBanner';
 import { ProdInstanceBanner } from './ProdInstanceBanner';
+import { ComposerAttachmentPreview } from './ComposerAttachmentPreview';
+import { useComposerAttachments } from '../hooks/useComposerAttachments';
 import {
   getServiceNowInstance,
   instanceHostname,
@@ -56,6 +58,13 @@ export default function HomeView({
   const [dragActive, setDragActive] = useState(false);
   const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
   const selectedInstance = getServiceNowInstance(selectedInstanceId);
+  const {
+    attachments,
+    addFiles,
+    removeAttachment,
+    clearAttachments,
+    hasUploading,
+  } = useComposerAttachments();
   const [notificationBannerDismissed, setNotificationBannerDismissed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -73,10 +82,20 @@ export default function HomeView({
   };
 
   const handleSend = () => {
-    if (inputValue.trim()) {
-      onSendMessage(inputValue.trim());
-      setInputValue('');
-    }
+    if (hasUploading) return;
+    const trimmed = inputValue.trim();
+    const readyNames = attachments.filter((a) => a.status === 'ready').map((a) => a.name);
+    if (!trimmed && readyNames.length === 0) return;
+
+    const message =
+      trimmed
+      || (readyNames.length === 1
+        ? `Uploaded document requirements: "${readyNames[0]}". Architect a solution based on this specification.`
+        : `Uploaded documents: ${readyNames.map((n) => `"${n}"`).join(', ')}. Architect a solution based on these specifications.`);
+
+    onSendMessage(message);
+    setInputValue('');
+    clearAttachments();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -101,21 +120,29 @@ export default function HomeView({
     e.stopPropagation();
     setDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      setInputValue(`Uploaded document requirements: "${file.name}". Architect a solution based on this specification.`);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      addFiles(e.dataTransfer.files);
+      if (!inputValue.trim()) {
+        const first = e.dataTransfer.files[0];
+        setInputValue(
+          `Uploaded document requirements: "${first.name}". Architect a solution based on this specification.`,
+        );
+      }
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const isImage = file.type.startsWith('image/');
-      setInputValue(
-        isImage
-          ? `Analyze this diagram or screenshot ("${file.name}") and describe the ServiceNow architecture it represents.`
-          : `Uploaded document requirements: "${file.name}". Architect a solution based on this specification.`,
-      );
+    if (e.target.files && e.target.files.length > 0) {
+      addFiles(e.target.files);
+      if (!inputValue.trim()) {
+        const first = e.target.files[0];
+        const isImage = first.type.startsWith('image/');
+        setInputValue(
+          isImage
+            ? `Analyze this diagram or screenshot ("${first.name}") and describe the ServiceNow architecture it represents.`
+            : `Uploaded document requirements: "${first.name}". Architect a solution based on this specification.`,
+        );
+      }
       e.target.value = '';
     }
   };
@@ -193,6 +220,7 @@ export default function HomeView({
               className="hidden"
               onChange={handleFileSelect}
               accept=".txt,.json,.csv,.pdf,.doc,.docx,image/*"
+              multiple
             />
             <div className="w-full flex justify-center">
               <HomeActionCards theme={theme} onActionCard={handleActionCard} onExampleClick={handleExampleClick} />
@@ -242,6 +270,12 @@ export default function HomeView({
                   </div>
                 )}
 
+                <ComposerAttachmentPreview
+                  isDark={isDark}
+                  attachments={attachments}
+                  onRemove={removeAttachment}
+                />
+
                 <textarea
                   ref={textareaRef}
                   value={inputValue}
@@ -282,7 +316,7 @@ export default function HomeView({
                     <Button
                       size="icon"
                       className="h-8 w-8 rounded-full"
-                      disabled={!inputValue.trim()}
+                      disabled={(!inputValue.trim() && attachments.length === 0) || hasUploading}
                       onClick={handleSend}
                     >
                       <ArrowRight className="h-3.5 w-3.5 stroke-[3]" />
