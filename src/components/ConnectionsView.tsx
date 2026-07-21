@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Button } from '@/src/components/ui/button';
@@ -105,6 +105,20 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
     { id: 'hist-13', connectionId: 'conn-4', type: 'tested', message: 'Connection test passed — API responded in 45ms', timestamp: '2 days ago' },
     { id: 'hist-14', connectionId: 'conn-4', type: 'connected', message: 'OAuth token refreshed automatically', timestamp: '6 days ago' },
   ]);
+
+  const connectionStats = useMemo(() => {
+    return connections.map(conn => {
+      const events = connectionHistory.filter(h => h.connectionId === conn.id);
+      const success = events.filter(e => e.type === 'connected' || e.type === 'tested').length;
+      const failed = events.filter(e => e.type === 'failed').length;
+      const warnings = events.filter(e => e.type === 'disconnected').length;
+      return { id: conn.id, success, failed, warnings };
+    });
+  }, [connections, connectionHistory]);
+
+  const getConnectionStats = (connId: string) => {
+    return connectionStats.find(s => s.id === connId) || { success: 0, failed: 0, warnings: 0 };
+  };
 
   // Project title and title editing
   const [projectTitle, setProjectTitle] = useState('Advance Solution Demo 19');
@@ -347,9 +361,35 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
                         'text-xs font-semibold',
                         conn.active ? 'text-brand-green' : 'text-muted-foreground'
                       )}>
-                        Active
+                        {conn.active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
+
+                    {conn.active && (() => {
+                      const stats = getConnectionStats(conn.id);
+                      return (
+                        <div className="flex items-center gap-2 text-xs">
+                          {stats.success > 0 && (
+                            <span className="flex items-center gap-0.5 text-emerald-600" title="Successful connections">
+                              <CheckCircle2 className="h-3 w-3" />
+                              <span>{stats.success}</span>
+                            </span>
+                          )}
+                          {stats.failed > 0 && (
+                            <span className="flex items-center gap-0.5 text-rose-500" title="Failed connections">
+                              <XCircle className="h-3 w-3" />
+                              <span>{stats.failed}</span>
+                            </span>
+                          )}
+                          {stats.warnings > 0 && (
+                            <span className="flex items-center gap-0.5 text-amber-500" title="Disconnected sessions">
+                              <AlertTriangle className="h-3 w-3" />
+                              <span>{stats.warnings}</span>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Context menu actions button */}
                     <DropdownMenu>

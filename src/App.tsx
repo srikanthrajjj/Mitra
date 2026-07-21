@@ -16,6 +16,7 @@ import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
 import SkillsView from './components/SkillsView';
+import FeedbackView from './components/FeedbackView';
 import SkillDetailModal from './components/SkillDetailModal';
 import FavouritesView from './components/FavouritesView';
 import { SearchView } from './components/SearchView';
@@ -188,7 +189,7 @@ import {
   isDarkTheme,
   THEME_STORAGE_KEY,
 } from './utils/theme';
-import { setRunningIndicator, setNotificationsEnabled, requestNotificationPermission } from './utils/browserIndicator';
+import { setRunningIndicator, setNotificationsEnabled, requestNotificationPermission, initNotificationsEnabled } from './utils/browserIndicator';
 // @ts-ignore
 import ambientMusic from './assets/leberch-ambient-electronics-524300.mp3';
 
@@ -417,13 +418,15 @@ export default function App() {
   const [artifactPanelCollapsed, setArtifactPanelCollapsed] = useState(readArtifactPanelCollapsed);
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(readLeftSidebarCollapsed);
   const [autoApprove, setAutoApprove] = useState(readAutoApprove);
+  const [showNotificationToast, setShowNotificationToast] = useState(false);
   const [isServerConnected, setIsServerConnected] = useState(
     () => (typeof navigator !== 'undefined' ? navigator.onLine : true),
   );
 
   useEffect(() => {
     setRunningIndicator(isGeneratingMessage);
-  }, [isGeneratingMessage]);
+    initNotificationsEnabled(taskNotificationEnabled);
+  }, [isGeneratingMessage, taskNotificationEnabled]);
 
   const handleToggleArtifactPanelCollapse = useCallback(() => {
     setArtifactPanelCollapsed((prev) => {
@@ -2516,6 +2519,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
           collapsed={leftSidebarCollapsed}
           onToggleCollapse={handleToggleLeftSidebarCollapse}
           generatingSolutionId={generatingSolutionId}
+          showNotificationToast={showNotificationToast}
+          onDismissNotificationToast={() => setShowNotificationToast(false)}
         />
         {!leftSidebarCollapsed && (
           <PanelResizeHandle
@@ -2577,6 +2582,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
               onCreateConnection={handleOpenCreateConnection}
               taskNotificationEnabled={taskNotificationEnabled}
               onTaskNotificationChange={setTaskNotificationEnabled}
+              onNotificationsEnabled={() => setShowNotificationToast(true)}
             />
           )}
 
@@ -2712,6 +2718,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                     isServerConnected={isServerConnected}
                     taskNotificationEnabled={taskNotificationEnabled}
                     onTaskNotificationChange={setTaskNotificationEnabled}
+                    onNotificationsEnabled={() => setShowNotificationToast(true)}
                   />
                   {showArtifactPanel && (
                     <RightSidebar
@@ -2777,6 +2784,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
               theme={resolvedTheme}
               onRunSkill={(skill) => setSelectedSkill(skill)}
             />
+          )}
+
+          {activeTab === 'feedback' && (
+            <FeedbackView theme={resolvedTheme} />
           )}
 
           {activeTab === 'styleguide' && (

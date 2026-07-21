@@ -67,6 +67,10 @@ export function getServiceNowInstance(instanceId: string): ServiceNowInstance | 
   return SERVICE_NOW_INSTANCES.find((instance) => instance.id === instanceId);
 }
 
+export function isProdInstance(instance: ServiceNowInstance | undefined): boolean {
+  return instance?.tag.trim().toUpperCase() === 'PROD';
+}
+
 export function instanceHostname(url: string): string {
   try {
     return new URL(url).hostname;

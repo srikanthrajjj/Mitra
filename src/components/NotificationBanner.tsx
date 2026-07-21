@@ -11,7 +11,7 @@ export function NotificationBanner({ isDark, onEnable, onDismiss }: Notification
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 rounded-xl px-3 py-2 mb-2 text-[12px]',
+        'flex items-center justify-between gap-3 rounded-xl px-3 py-2 mb-2 text-[12px] relative z-20',
         isDark
           ? 'bg-brand-green/10 border border-brand-green/20 text-foreground'
           : 'bg-brand-green/5 border border-brand-green/20 text-foreground',

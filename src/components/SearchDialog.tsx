@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, Star, MessageSquare, Plus, CornerDownLeft, X,
-  Settings, Link2, Folder, LayoutGrid
+  Settings, Link2, Folder, LayoutGrid, MessageCircle
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -140,6 +140,7 @@ export function SearchDialog({
       { title: 'Open Settings Configuration', match: 'go to view settings appearance theme high contrast audio', icon: Settings, action: () => { onNavigate('settings'); onClose(); } },
       { title: 'Show Favourites', match: 'go to view favorites starred bookmarked chats', icon: Star, action: () => { onNavigate('favourites'); onClose(); } },
       { title: 'Go to Projects Browser', match: 'go to view projects list solutions catalog templates', icon: Folder, action: () => { onSelectSolution(''); onNavigate('projects'); onClose(); } },
+      { title: 'Open Feedback', match: 'go to view feedback bugs improvements issues report priority', icon: MessageCircle, action: () => { onNavigate('feedback'); onClose(); } },
     ];
 
     commands.forEach((cmd, idx) => {

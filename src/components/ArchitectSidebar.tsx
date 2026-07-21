@@ -12,6 +12,7 @@ import {
   StarIcon as AnimatedStarIcon,
   ZapIcon as AnimatedZapIcon,
   ChartLineIcon as AnimatedChartLineIcon,
+  MessageCircleIcon as AnimatedMessageCircleIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
@@ -64,7 +65,6 @@ type NavItemConfig = {
   tab?: string;
   action?: () => void;
   badge?: number;
-  isRunning?: boolean;
 };
 
 function AnimatedSidebarNavIcon({
@@ -339,7 +339,6 @@ export function ArchitectSidebar({
       label: 'Projects',
       icon: AnimatedFolderIcon,
       tab: 'projects',
-      isRunning: true,
     },
     { id: 'connections', label: 'Connections', icon: AnimatedLinkIcon, tab: 'connections' },
     {
@@ -359,6 +358,12 @@ export function ArchitectSidebar({
       label: 'Mitra Insights',
       icon: AnimatedChartLineIcon,
       tab: 'analytics',
+    },
+    {
+      id: 'feedback',
+      label: 'Feedback',
+      icon: AnimatedMessageCircleIcon,
+      tab: 'feedback',
     },
   ];
 
@@ -395,7 +400,7 @@ export function ArchitectSidebar({
     <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
       <SidebarGroup className="shrink-0 px-2 pt-3 pb-2">
         <SidebarGroupContent className="space-y-0.5">
-          {navItems.map((item) => {
+{navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
             return (
@@ -413,7 +418,7 @@ export function ArchitectSidebar({
                       : 'bg-muted text-brand-green font-semibold border-brand-green'
                     : isDark
                       ? 'text-foreground/90 border-transparent hover:bg-brand-green/5 hover:text-brand-green'
-              : 'text-foreground/90 border-transparent hover:bg-accent/55 hover:text-brand-green',
+                  : 'text-foreground/90 border-transparent hover:bg-accent/55 hover:text-brand-green',
                 )}
               >
                 <AnimatedSidebarNavIcon

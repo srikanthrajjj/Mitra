@@ -22,7 +22,11 @@ import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
 import { NotificationBanner } from './NotificationBanner';
+import { ProdInstanceBanner } from './ProdInstanceBanner';
 import {
+  getServiceNowInstance,
+  instanceHostname,
+  isProdInstance,
   loadSelectedInstanceId,
   persistSelectedInstanceId,
 } from '../data/serviceNowInstances';
@@ -49,6 +53,7 @@ interface ChatViewProps {
   isServerConnected?: boolean;
   taskNotificationEnabled?: boolean;
   onTaskNotificationChange?: (value: boolean) => void;
+  onNotificationsEnabled?: () => void;
 }
 
 function parseInlineMarkdown(text: string, isDark: boolean = true) {
@@ -233,6 +238,7 @@ export default function ChatView({
   isServerConnected = true,
   taskNotificationEnabled = false,
   onTaskNotificationChange,
+  onNotificationsEnabled,
 }: ChatViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
@@ -240,6 +246,7 @@ export default function ChatView({
   const [isFocused, setIsFocused] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
+  const selectedInstance = getServiceNowInstance(selectedInstanceId);
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -915,7 +922,10 @@ export default function ChatView({
           {!taskNotificationEnabled && !notificationBannerDismissed && onTaskNotificationChange && (
             <NotificationBanner
               isDark={isDark}
-              onEnable={() => onTaskNotificationChange(true)}
+              onEnable={() => {
+                onTaskNotificationChange(true);
+                onNotificationsEnabled?.();
+              }}
               onDismiss={() => setNotificationBannerDismissed(true)}
             />
           )}
@@ -923,6 +933,15 @@ export default function ChatView({
             theme={theme}
             inputId="tour-input-bar"
             isActive={isFocused || inputValue.trim().length > 0}
+            attachedHeader={
+              isProdInstance(selectedInstance) && selectedInstance ? (
+                <ProdInstanceBanner
+                  isDark={isDark}
+                  instanceName={selectedInstance.name}
+                  hostname={instanceHostname(selectedInstance.url)}
+                />
+              ) : undefined
+            }
             cardClassName={`transition-colors duration-200 overflow-visible ${
               inputValue.trim().length > 0
                 ? isDark

@@ -10,7 +10,11 @@ import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
 import { NotificationBanner } from './NotificationBanner';
+import { ProdInstanceBanner } from './ProdInstanceBanner';
 import {
+  getServiceNowInstance,
+  instanceHostname,
+  isProdInstance,
   loadSelectedInstanceId,
   persistSelectedInstanceId,
 } from '../data/serviceNowInstances';
@@ -31,6 +35,7 @@ interface HomeViewProps {
   onCreateConnection?: () => void;
   taskNotificationEnabled?: boolean;
   onTaskNotificationChange?: (value: boolean) => void;
+  onNotificationsEnabled?: () => void;
 }
 
 export default function HomeView({
@@ -42,6 +47,7 @@ export default function HomeView({
   onCreateConnection,
   taskNotificationEnabled = false,
   onTaskNotificationChange,
+  onNotificationsEnabled,
 }: HomeViewProps) {
   const isDark = isDarkTheme(theme);
   const [inputValue, setInputValue] = useState('');
@@ -49,6 +55,7 @@ export default function HomeView({
   const [isFocused, setIsFocused] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [selectedInstanceId, setSelectedInstanceId] = useState(() => loadSelectedInstanceId());
+  const selectedInstance = getServiceNowInstance(selectedInstanceId);
   const [notificationBannerDismissed, setNotificationBannerDismissed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -204,16 +211,28 @@ export default function HomeView({
             onDrop={handleDrop}
           >
             {!taskNotificationEnabled && !notificationBannerDismissed && onTaskNotificationChange && (
-              <NotificationBanner
-                isDark={isDark}
-                onEnable={() => onTaskNotificationChange(true)}
-                onDismiss={() => setNotificationBannerDismissed(true)}
-              />
+            <NotificationBanner
+              isDark={isDark}
+              onEnable={() => {
+                onTaskNotificationChange(true);
+                onNotificationsEnabled?.();
+              }}
+              onDismiss={() => setNotificationBannerDismissed(true)}
+            />
             )}
             <SimulationComposerStack
               theme={theme}
               inputId="tour-input-bar"
               isActive={isFocused || inputValue.trim().length > 0}
+              attachedHeader={
+                isProdInstance(selectedInstance) && selectedInstance ? (
+                  <ProdInstanceBanner
+                    isDark={isDark}
+                    instanceName={selectedInstance.name}
+                    hostname={instanceHostname(selectedInstance.url)}
+                  />
+                ) : undefined
+              }
               cardClassName="bg-card transition-colors duration-200"
             >
               <div className="relative flex flex-col p-3">

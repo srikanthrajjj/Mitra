@@ -1,6 +1,6 @@
 import {
   Key, ChevronDown, LogOut, Settings, HelpCircle,
-  PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code
+  PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X
 } from 'lucide-react';
 import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -85,6 +85,8 @@ interface SidebarProps {
   devModeEnabled?: boolean;
   onToggleDevMode?: () => void;
   generatingSolutionId?: string | null;
+  showNotificationToast?: boolean;
+  onDismissNotificationToast?: () => void;
 }
 
 export default function Sidebar({
@@ -133,6 +135,8 @@ export default function Sidebar({
   devModeEnabled = false,
   onToggleDevMode,
   generatingSolutionId = null,
+  showNotificationToast = false,
+  onDismissNotificationToast,
 }: SidebarProps) {
   const isDark = isDarkTheme(theme);
   const navLogoAnimated = useNavLogoPulse();
@@ -388,6 +392,28 @@ export default function Sidebar({
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border px-2 py-1">
+        {showNotificationToast && (
+          <div className="mx-0.5 mb-2 relative">
+            <div className={cn(
+              'rounded-lg px-2.5 py-2 text-[10px] leading-tight',
+              isDark
+                ? 'bg-brand-green/10 border border-brand-green/20 text-foreground'
+                : 'bg-brand-green/5 border border-brand-green/20 text-foreground',
+            )}>
+              <p>You can turn off notifications from <span className="font-semibold">Settings</span>.</p>
+            </div>
+            <button
+              type="button"
+              onClick={onDismissNotificationToast}
+              className={cn(
+                'absolute top-1 right-1 p-0.5 rounded transition-colors cursor-pointer',
+                isDark ? 'text-muted-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button

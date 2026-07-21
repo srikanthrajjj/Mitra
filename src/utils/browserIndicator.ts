@@ -4,6 +4,10 @@ let originalFaviconHref: string | null = null;
 let completionTimer: ReturnType<typeof setTimeout> | null = null;
 let notificationsEnabled = false;
 
+export function initNotificationsEnabled(value: boolean) {
+  notificationsEnabled = value;
+}
+
 function getFaviconLink(): HTMLLinkElement | null {
   return document.querySelector('link[rel="icon"]');
 }
