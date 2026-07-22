@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Bug, LayoutGrid, Lightbulb, List, MessageCircle, Plus, Search } from 'lucide-react';
+import { Bug, CheckCircle2, LayoutGrid, Lightbulb, List, MessageCircle, Plus, Search } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { USER_DISPLAY_NAME } from '../constants/user';
@@ -67,9 +67,52 @@ function priorityChipClass(priority: FeedbackPriority, isDark: boolean): string 
 }
 
 function statusChipClass(status: FeedbackStatus): string {
-  if (status === 'resolved') return 'border-border bg-brand-green/10 text-brand-green';
+  if (status === 'resolved') return 'border-brand-green/30 bg-brand-green/10 text-brand-green';
   if (status === 'reviewing') return 'border-border bg-muted text-foreground';
   return 'border-border bg-muted text-muted-foreground';
+}
+
+function ResolvedBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-brand-green/30 bg-brand-green/10 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide leading-none text-brand-green">
+      <CheckCircle2 className="h-2.5 w-2.5" aria-hidden />
+      Resolved
+    </span>
+  );
+}
+
+function EntryIcon({
+  entry,
+  isDark,
+  size = 'md',
+}: {
+  entry: FeedbackEntry;
+  isDark: boolean;
+  size?: 'sm' | 'md';
+}) {
+  const box = size === 'sm' ? 'h-7 w-7 rounded-md' : 'h-8 w-8 rounded-lg';
+  const icon = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4';
+  const resolved = entry.status === 'resolved';
+
+  return (
+    <div
+      className={cn(
+        'mt-0.5 flex shrink-0 items-center justify-center border',
+        box,
+        resolved
+          ? 'border-brand-green/30 bg-brand-green/10'
+          : isDark
+            ? 'border-mitra-border bg-muted'
+            : 'border-border bg-muted',
+      )}
+    >
+      {resolved ? (
+        <CheckCircle2 className={cn(icon, 'text-brand-green')} aria-label="Resolved" />
+      ) : (
+        <TypeIcon type={entry.type} className={cn(icon, typeIconClass(entry.type, isDark))} />
+      )}
+    </div>
+  );
 }
 
 function StatusSelect({
@@ -103,6 +146,7 @@ function StatusSelect({
 function EntryTags({ entry, isDark }: { entry: FeedbackEntry; isDark: boolean }) {
   const chipBase =
     'inline-flex items-center rounded-full border px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide leading-none';
+  const resolved = entry.status === 'resolved';
   return (
     <div className="flex flex-wrap items-center gap-1">
       <span className={cn(chipBase, typeChipClass(entry.type, isDark))}>
@@ -111,9 +155,13 @@ function EntryTags({ entry, isDark }: { entry: FeedbackEntry; isDark: boolean })
       <span className={cn(chipBase, priorityChipClass(entry.priority, isDark))}>
         {FEEDBACK_PRIORITY_LABELS[entry.priority]}
       </span>
-      <span className={cn(chipBase, statusChipClass(entry.status))}>
-        {FEEDBACK_STATUS_LABELS[entry.status]}
-      </span>
+      {resolved ? (
+        <ResolvedBadge />
+      ) : (
+        <span className={cn(chipBase, statusChipClass(entry.status))}>
+          {FEEDBACK_STATUS_LABELS[entry.status]}
+        </span>
+      )}
     </div>
   );
 }
@@ -220,11 +268,11 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <div className="shrink-0">
-        <div className="px-4 pb-3 pt-6 md:px-8 lg:px-12">
+        <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-4 flex items-center justify-between gap-3">
               <h1 className="font-display text-2xl font-bold text-foreground">Feedback</h1>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <input
@@ -332,73 +380,89 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
             </div>
           ) : viewMode === 'cards' ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((entry) => (
+              {filtered.map((entry) => {
+                const resolved = entry.status === 'resolved';
+                return (
                 <article
                   key={entry.id}
                   className={cn(
                     'flex flex-col rounded-2xl border p-4 transition-colors',
-                    isDark
+                    resolved && 'border-brand-green/25 bg-brand-green/[0.04]',
+                    !resolved && (isDark
                       ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40',
+                      : 'border-border bg-card hover:bg-accent/40'),
+                    resolved && (isDark
+                      ? 'hover:bg-brand-green/[0.07]'
+                      : 'hover:bg-brand-green/[0.06]'),
                   )}
                 >
                   <div className="mb-3 flex items-start justify-between gap-2">
-                    <div
-                      className={cn(
-                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border',
-                        isDark ? 'border-mitra-border bg-muted' : 'border-border bg-muted',
-                      )}
-                    >
-                      <TypeIcon type={entry.type} className={cn('h-4 w-4', typeIconClass(entry.type, isDark))} />
-                    </div>
+                    <EntryIcon entry={entry} isDark={isDark} size="md" />
                     <StatusSelect entry={entry} isDark={isDark} onChange={handleStatusChange} />
                   </div>
                   <EntryTags entry={entry} isDark={isDark} />
-                  <p className="mt-2.5 flex-1 text-sm leading-relaxed text-foreground line-clamp-4">
+                  <p
+                    className={cn(
+                      'mt-2.5 flex-1 text-sm leading-relaxed line-clamp-4',
+                      resolved ? 'text-muted-foreground' : 'text-foreground',
+                    )}
+                  >
                     {entry.message}
                   </p>
                   <p className="mt-3 text-[11px] text-muted-foreground">
                     {entry.submittedBy} · {formatFeedbackDate(entry.submittedAt)}
                   </p>
                 </article>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="flex flex-col gap-2.5">
-              {filtered.map((entry) => (
+              {filtered.map((entry) => {
+                const resolved = entry.status === 'resolved';
+                return (
                 <article
                   key={entry.id}
                   className={cn(
                     'sn-list-row flex items-start gap-3 rounded-xl border px-3.5 py-3.5 transition-colors',
-                    isDark
+                    resolved && 'border-l-[3px] border-l-brand-green border-brand-green/20 bg-brand-green/[0.04]',
+                    !resolved && (isDark
                       ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40',
+                      : 'border-border bg-card hover:bg-accent/40'),
+                    resolved && (isDark
+                      ? 'hover:bg-brand-green/[0.07]'
+                      : 'hover:bg-brand-green/[0.06]'),
                   )}
                 >
-                  <div
-                    className={cn(
-                      'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border',
-                      isDark ? 'border-mitra-border bg-muted' : 'border-border bg-muted',
-                    )}
-                  >
-                    <TypeIcon type={entry.type} className={cn('h-3.5 w-3.5', typeIconClass(entry.type, isDark))} />
-                  </div>
+                  <EntryIcon entry={entry} isDark={isDark} size="sm" />
                   <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
                       <EntryTags entry={entry} isDark={isDark} />
                     </div>
-                    <p className="text-[13px] font-semibold leading-snug text-foreground line-clamp-2">
+                    <p
+                      className={cn(
+                        'text-[13px] font-semibold leading-snug line-clamp-2',
+                        resolved ? 'text-muted-foreground' : 'text-foreground',
+                      )}
+                    >
                       {entry.message}
                     </p>
                     <p className="mt-1.5 text-[11px] text-muted-foreground">
                       {entry.submittedBy} · {formatFeedbackDate(entry.submittedAt)}
+                      {resolved && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-brand-green">
+                          <CheckCircle2 className="h-3 w-3" aria-hidden />
+                          Resolved
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="shrink-0 pt-0.5">
                     <StatusSelect entry={entry} isDark={isDark} onChange={handleStatusChange} />
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

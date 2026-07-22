@@ -12,6 +12,10 @@ interface ProdInstanceBannerProps {
 /**
  * Status/warning strip that sits flush above the composer —
  * top corners more rounded than bottom so it merges into the input.
+ *
+ * Subtle orange → reddish warning accents (not alarm-red):
+ * Light: fill #FFF5F2 · border #F0C4B4 · icon #C45C3E
+ * Dark:  fill rgba(196,92,62,0.12) · border 30% · icon #E8A090
  */
 export function ProdInstanceBanner({
   isDark,
@@ -33,14 +37,14 @@ export function ProdInstanceBanner({
           ? 'rounded-t-2xl rounded-b-none border-b'
           : 'mb-2 rounded-xl border',
         isDark
-          ? 'border-white/[0.06] bg-[#1a1814]'
-          : 'border-amber-200/60 bg-[#f3eee4]',
+          ? 'border-[rgba(196,92,62,0.30)] bg-[rgba(196,92,62,0.12)]'
+          : 'border-[#F0C4B4] bg-[#FFF5F2]',
       )}
     >
       <AlertTriangle
         className={cn(
           'h-3.5 w-3.5 shrink-0',
-          isDark ? 'text-amber-400/75' : 'text-amber-600/80',
+          isDark ? 'text-[#E8A090]' : 'text-[#C45C3E]',
         )}
         aria-hidden
       />
