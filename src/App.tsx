@@ -551,13 +551,18 @@ export default function App() {
   const DEFAULT_MODEL = 'gemini-2.5-flash';
   const [welcomeComplete, setWelcomeComplete] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return true;
-    return true;
+    return localStorage.getItem('mitra_welcome_complete') === 'true';
   });
   const [showLanding, setShowLanding] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return false;
-    return false;
+    if (isLandingPath(window.location.pathname)) return true;
+    if (localStorage.getItem('mitra_welcome_complete') === 'true') return false;
+    return localStorage.getItem('mitra_landing_seen') !== 'true';
   });
-  const [simulationAlertOpen, setSimulationAlertOpen] = useState<boolean>(false);
+  const [simulationAlertOpen, setSimulationAlertOpen] = useState<boolean>(() => {
+    if (localStorage.getItem('mitra_welcome_complete') !== 'true') return false;
+    return localStorage.getItem('mitra_sim_ack') !== 'true';
+  });
   const [confirmDialog, setConfirmDialog] = useState<{
     title: string;
     message: string;
@@ -2704,7 +2709,11 @@ Pick a step below and I'll continue building — data model, scripts, and update
                     theme={resolvedTheme}
                     activeSolution={activeSolution}
                     onSendMessage={(text) => handleSendMessage(text)}
-                    isGeneratingMessage={isGeneratingMessage}
+                    isGeneratingMessage={
+                      isGeneratingMessage
+                      && !!activeSolution
+                      && activeSolution.id === generatingSolutionId
+                    }
                     onStopGeneration={stopGeneration}
                     onChoiceSelect={handleChoiceSelect}
                     onNavigate={(tab) => {
@@ -2723,7 +2732,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
                   {showArtifactPanel && (
                     <RightSidebar
                       blueprint={activeSolution.blueprint}
-                      isGeneratingMessage={isGeneratingMessage}
+                      isGeneratingMessage={
+                        isGeneratingMessage
+                        && activeSolution.id === generatingSolutionId
+                      }
                       chatHistory={activeSolution.chatHistory}
                       artifacts={findSolutionArtifacts(
                         activeSolution.id,

@@ -187,7 +187,6 @@ export function ArchitectSidebar({
             </div>
             
             <div className="flex items-center gap-0.5 shrink-0">
-
               {/* Favorite star */}
               <button
                 type="button"

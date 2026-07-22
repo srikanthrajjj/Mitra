@@ -50,6 +50,14 @@ function isAwaitingUserResponse(solution: Solution): boolean {
   return false;
 }
 
+export function isConversationBuilding(
+  solution: Solution,
+  options: ConversationStatusOptions = {},
+): boolean {
+  return isBuildInProgress(solution, options.generatingSolutionId)
+    || solution.projectStatus === 'building';
+}
+
 export function deriveConversationStatus(
   solution: Solution,
   options: ConversationStatusOptions = {},
@@ -64,7 +72,7 @@ export function deriveConversationStatus(
 }
 
 export const conversationStatusLabel: Record<ConversationIndicatorStatus, string> = {
-  active: 'Active',
+  active: 'Working in background',
   failed: 'Failed',
   awaiting: 'Awaiting response',
   idle: 'Ready',

@@ -115,6 +115,10 @@ function EntryIcon({
   );
 }
 
+function isOwnFeedback(entry: FeedbackEntry): boolean {
+  return entry.submittedBy === USER_DISPLAY_NAME;
+}
+
 function StatusSelect({
   entry,
   isDark,
@@ -124,6 +128,26 @@ function StatusSelect({
   isDark: boolean;
   onChange: (id: string, status: FeedbackStatus) => void;
 }) {
+  const canClose = isOwnFeedback(entry);
+
+  if (!canClose) {
+    return (
+      <span
+        className={cn(
+          'rounded-lg border px-2 py-1.5 text-[11px] font-medium',
+          entry.status === 'resolved'
+            ? 'border-brand-green/30 bg-brand-green/10 text-brand-green'
+            : isDark
+              ? 'border-mitra-border bg-mitra-input text-muted-foreground'
+              : 'border-border bg-muted text-muted-foreground',
+        )}
+        title="Only the author can update status"
+      >
+        {FEEDBACK_STATUS_LABELS[entry.status]}
+      </span>
+    );
+  }
+
   return (
     <select
       value={entry.status}
@@ -242,6 +266,8 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
   };
 
   const handleStatusChange = (id: string, status: FeedbackStatus) => {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry || !isOwnFeedback(entry)) return;
     setEntries(updateFeedbackStatus(id, status));
   };
 
