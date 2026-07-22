@@ -8,30 +8,18 @@ const BLOCK_COUNT = WHAT_WE_DO_BLOCKS.length;
 function WhatWeDoItemRow({
   title,
   desc,
-  isActive,
 }: {
   title: string;
   desc: string;
-  isActive: boolean;
 }) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <li className="py-3.5 md:py-4">
-      <motion.p
-        className="text-[15px] font-medium leading-snug md:text-base"
-        animate={{ color: isActive || reduceMotion ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)' }}
-        transition={{ duration: 0.35 }}
-      >
+      <p className="text-[15px] font-medium leading-snug text-white/90 md:text-base">
         {title}
-      </motion.p>
-      <motion.p
-        className="mt-1.5 text-sm font-light leading-relaxed"
-        animate={{ color: isActive || reduceMotion ? 'rgba(255,255,255,0.48)' : 'rgba(255,255,255,0.22)' }}
-        transition={{ duration: 0.35 }}
-      >
+      </p>
+      <p className="mt-1.5 text-sm font-light leading-relaxed text-white/45">
         {desc}
-      </motion.p>
+      </p>
     </li>
   );
 }
@@ -47,22 +35,23 @@ function WhatWeDoTimelineSection({
   isActive: boolean;
   registerRef: (id: string, el: HTMLElement | null) => void;
 }) {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <motion.article
+    <article
       ref={(el) => registerRef(block.id, el)}
       id={block.id}
-      animate={
-        reduceMotion
-          ? { opacity: 1 }
-          : { opacity: isActive ? 1 : 0.28 }
-      }
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="landing-wwd-timeline-section flex min-h-[72vh] scroll-mt-28 items-center py-10 md:min-h-[78vh] md:py-14 lg:scroll-mt-36"
+      aria-current={isActive ? 'true' : undefined}
+      className={cn(
+        'landing-wwd-timeline-section scroll-mt-28 py-14 md:scroll-mt-36 md:py-16 lg:py-20',
+        isActive && 'landing-wwd-timeline-section--active',
+      )}
     >
       <div className="w-full max-w-2xl">
-        <p className="text-[11px] font-medium tabular-nums tracking-[0.28em] text-white/22">
+        <p
+          className={cn(
+            'text-[11px] font-medium tabular-nums tracking-[0.28em] transition-colors duration-300',
+            isActive ? 'text-[#8BEA3C]/70' : 'text-white/22',
+          )}
+        >
           {String(index + 1).padStart(2, '0')}
         </p>
         <h3 className="mt-3 font-display text-2xl font-medium leading-tight tracking-tight text-white md:text-3xl lg:text-[2rem]">
@@ -77,12 +66,11 @@ function WhatWeDoTimelineSection({
               key={item.title}
               title={item.title}
               desc={item.desc}
-              isActive={isActive}
             />
           ))}
         </ul>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
@@ -92,7 +80,7 @@ export function LandingIntentJourney() {
   const asideRef = useRef<HTMLElement>(null);
   const blockRefs = useRef<Map<string, HTMLElement>>(new Map());
   const reduceMotion = useReducedMotion();
-  const headerInView = useInView(headerRef, { once: true, margin: '-10% 0px', amount: 0.4 });
+  const headerInView = useInView(headerRef, { once: true, margin: '-8% 0px', amount: 0.25 });
 
   const [activeId, setActiveId] = useState(WHAT_WE_DO_BLOCKS[0].id);
   const [railPin, setRailPin] = useState<'static' | 'fixed' | 'end'>('static');
@@ -109,15 +97,13 @@ export function LandingIntentJourney() {
 
   const scrollToBlock = useCallback((id: string) => {
     const el = blockRefs.current.get(id) ?? document.getElementById(id);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     setActiveId(id);
-  }, []);
+  }, [reduceMotion]);
 
   useEffect(() => {
-    if (reduceMotion) return;
-
     const updateActive = () => {
-      const marker = window.innerHeight * 0.42;
+      const marker = window.innerHeight * 0.35;
       let closestId = WHAT_WE_DO_BLOCKS[0].id;
       let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -125,7 +111,13 @@ export function LandingIntentJourney() {
         const el = blockRefs.current.get(block.id);
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        const anchor = rect.top + rect.height * 0.32;
+        // Prefer the section currently spanning the marker line
+        if (rect.top <= marker && rect.bottom >= marker) {
+          closestId = block.id;
+          closestDistance = 0;
+          return;
+        }
+        const anchor = rect.top + Math.min(rect.height * 0.2, 80);
         const distance = Math.abs(anchor - marker);
         if (distance < closestDistance) {
           closestDistance = distance;
@@ -143,7 +135,7 @@ export function LandingIntentJourney() {
       window.removeEventListener('scroll', updateActive);
       window.removeEventListener('resize', updateActive);
     };
-  }, [reduceMotion]);
+  }, []);
 
   useEffect(() => {
     const updateRail = () => {
@@ -191,9 +183,9 @@ export function LandingIntentJourney() {
       <div className="relative mx-auto max-w-6xl px-6 md:px-10">
         <motion.header
           ref={headerRef}
-          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-          animate={headerInView || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          animate={headerInView || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl pt-20 text-center md:max-w-3xl md:pt-28"
         >
           <p className="text-[11px] font-medium uppercase tracking-[0.38em] text-[#8BEA3C]/80">
@@ -207,7 +199,6 @@ export function LandingIntentJourney() {
           </p>
         </motion.header>
 
-        {/* Mobile stepper */}
         <nav
           className="landing-wwd-mobile-nav sticky top-[4.5rem] z-20 -mx-2 mt-10 overflow-x-auto px-2 py-3 lg:hidden"
           aria-label="What we do topics"
@@ -268,7 +259,7 @@ export function LandingIntentJourney() {
                 </div>
 
                 <ul className="relative space-y-5">
-                  {WHAT_WE_DO_BLOCKS.map((block, index) => {
+                  {WHAT_WE_DO_BLOCKS.map((block) => {
                     const Icon = block.icon;
                     const isActive = block.id === activeId;
 
@@ -300,7 +291,7 @@ export function LandingIntentJourney() {
             </nav>
           </aside>
 
-          <div className="landing-wwd-timeline-track pb-24 md:pb-32">
+          <div className="landing-wwd-timeline-track space-y-2 pb-20 md:pb-28">
             {WHAT_WE_DO_BLOCKS.map((block, index) => (
               <WhatWeDoTimelineSection
                 key={block.id}
