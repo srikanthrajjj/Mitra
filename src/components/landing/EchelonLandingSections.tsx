@@ -64,7 +64,7 @@ export function LandingNav({
                   className={cn(
                     'inline-flex items-center gap-1 text-[13px] transition-colors',
                     isV1
-                      ? 'font-semibold text-foreground hover:text-brand-green'
+                      ? 'font-semibold text-white/80 hover:text-brand-green'
                       : 'font-medium text-white/80 hover:text-[var(--landing-accent)]',
                   )}
                   aria-expanded={isOpen}
@@ -100,7 +100,7 @@ export function LandingNav({
                       'font-semibold',
                       link.accent
                         ? 'text-brand-green hover:text-brand-green'
-                        : 'text-foreground hover:text-brand-green',
+                        : 'text-white/80 hover:text-brand-green',
                     )
                   : cn(
                       'font-medium',
@@ -152,7 +152,7 @@ export function LandingNav({
 
   if (isV1) {
     return (
-      <header className="dark relative z-50 w-full border-b border-border/10 bg-[var(--landing-bg)]">
+      <header className="dark relative z-50 w-full bg-transparent">
         {navInner}
       </header>
     );
