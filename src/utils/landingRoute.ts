@@ -1,5 +1,14 @@
+const LANDING_SEGMENTS = new Set(['landing', 'landingpage']);
+
+function normalizePathname(pathname: string): string {
+  const trimmed = pathname.replace(/\/+$/, '') || '/';
+  return trimmed.toLowerCase();
+}
+
 export function isLandingPath(pathname: string): boolean {
-  return pathname === '/landing' || pathname.endsWith('/landing');
+  const normalized = normalizePathname(pathname);
+  if (LANDING_SEGMENTS.has(normalized.replace(/^\//, ''))) return true;
+  return [...LANDING_SEGMENTS].some((segment) => normalized.endsWith(`/${segment}`));
 }
 
 export function navigateToLandingUrl(): void {
