@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
-import { Search, Plus, Zap, Trash2, MoreVertical, Pencil } from 'lucide-react';
+import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, LayoutGrid, List } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill } from '../data/skills';
@@ -18,6 +18,10 @@ import SkillExecutionModal from './SkillExecutionModal';
 
 const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
 const DELETED_SKILLS_KEY = 'mitra-deleted-skills';
+const BUILTIN_OVERRIDES_KEY = 'mitra-builtin-overrides';
+
+type ViewMode = 'grid' | 'list';
+type SkillCard = Skill & { isCustom?: boolean; customData?: CustomSkill };
 
 function loadCustomSkills(): CustomSkill[] {
   try {
@@ -45,8 +49,6 @@ function saveDeletedSkillIds(ids: string[]) {
   localStorage.setItem(DELETED_SKILLS_KEY, JSON.stringify(ids));
 }
 
-const BUILTIN_OVERRIDES_KEY = 'mitra-builtin-overrides';
-
 function loadBuiltinOverrides(): Record<string, Partial<CustomSkill>> {
   try {
     const raw = localStorage.getItem(BUILTIN_OVERRIDES_KEY);
@@ -65,10 +67,66 @@ interface SkillsViewProps {
   onRunSkill: (skill: Skill) => void;
 }
 
+function SkillOverflowMenu({
+  isDark,
+  onEdit,
+  onDelete,
+}: {
+  isDark: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            'rounded-lg p-1.5 transition-colors',
+            isDark
+              ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          )}
+          aria-label="Skill options"
+        >
+          <MoreVertical className="h-4 w-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className={cn(
+          'w-40 rounded-xl border p-1',
+          isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card',
+        )}
+      >
+        <DropdownMenuItem
+          onClick={onEdit}
+          className={cn(
+            'gap-2 rounded-lg text-xs',
+            isDark ? 'focus:bg-accent' : 'focus:bg-muted',
+          )}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className={isDark ? 'bg-mitra-border' : 'bg-border'} />
+        <DropdownMenuItem
+          onClick={onDelete}
+          className="gap-2 rounded-lg text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const isDark = isDarkTheme(theme);
   const [search, setSearch] = useState('');
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
   const [deletedSkillIds, setDeletedSkillIds] = useState<string[]>(loadDeletedSkillIds);
@@ -152,12 +210,15 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     return list;
   }, [search, customSkills, selectedCategory]);
 
-  const allSkills = useMemo(() => {
-    const converted: (Skill & { isCustom?: boolean; customData?: CustomSkill })[] = [
-      ...filteredCustom.map((cs) => buildSkillForModal(cs)),
+  const allSkills = useMemo((): SkillCard[] => {
+    return [
+      ...filteredCustom.map((cs) => ({
+        ...buildSkillForModal(cs),
+        isCustom: true,
+        customData: cs,
+      })),
       ...builtinSkills,
     ];
-    return converted;
   }, [filteredCustom, builtinSkills]);
 
   const handleAddSkill = (skill: CustomSkill) => {
@@ -208,28 +269,85 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     );
   };
 
+  const openEdit = (skill: SkillCard) => {
+    if (skill.isCustom && skill.customData) {
+      setEditingSkill(skill.customData);
+    } else {
+      setEditingSkill(skillToCustomSkill(skill));
+    }
+  };
+
+  const handleDelete = (skill: SkillCard) => {
+    if (skill.isCustom && skill.customData) {
+      handleDeleteSkill(skill.id);
+    } else {
+      handleDeleteBuiltinSkill(skill.id);
+    }
+  };
+
+  const isDisabled = (skill: SkillCard) =>
+    Boolean(skill.isCustom && skill.customData && !skill.customData.enabled);
+
+  const viewToggleBtn = (mode: ViewMode) =>
+    cn(
+      'inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors',
+      viewMode === mode
+        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        : isDark
+          ? 'border-mitra-border text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
+  const categoryPill = (active: boolean) =>
+    cn(
+      'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+      active
+        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        : isDark
+          ? 'border-mitra-border bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
-      {/* Sticky header */}
       <div className="shrink-0">
-        <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
+        <div className="px-4 pb-4 pt-8 md:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h1 className={`font-display text-2xl font-bold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                Skills
-              </h1>
-              <Button
-                variant="cta"
-                size="sm"
-                onClick={() => setIsAddModalOpen(true)}
-                className="gap-1.5 text-xs"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add a new skill
-              </Button>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h1 className="font-display text-2xl font-bold text-foreground">Skills</h1>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1" role="group" aria-label="View mode">
+                  <button
+                    type="button"
+                    title="Grid view"
+                    aria-pressed={viewMode === 'grid'}
+                    className={viewToggleBtn('grid')}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    title="List view"
+                    aria-pressed={viewMode === 'list'}
+                    className={viewToggleBtn('list')}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <Button
+                  variant="cta"
+                  size="sm"
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="h-8 gap-1.5 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add a new skill
+                </Button>
+              </div>
             </div>
 
-            {/* Search */}
             <div className="relative mb-4">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -238,27 +356,19 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={cn(
-                  'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
+                  'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-colors',
                   isDark
-                    ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
-                    : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
+                    ? 'border-mitra-border bg-mitra-input text-foreground placeholder:text-muted-foreground focus:border-brand-green/40'
+                    : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand-green/50',
                 )}
               />
             </div>
 
-            {/* Category pills */}
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setSelectedCategory(null)}
-                className={cn(
-                  'rounded-full px-3 py-1 text-xs font-medium transition-all',
-                  selectedCategory === null
-                    ? 'bg-brand-green text-white'
-                    : isDark
-                      ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
-                )}
+                className={categoryPill(selectedCategory === null)}
               >
                 All
               </button>
@@ -267,14 +377,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                  className={cn(
-                    'rounded-full px-3 py-1 text-xs font-medium transition-all',
-                    selectedCategory === cat
-                      ? 'bg-brand-green text-white'
-                      : isDark
-                        ? 'bg-white/[0.06] text-white/60 hover:bg-white/[0.10] hover:text-white/80'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
-                  )}
+                  className={categoryPill(selectedCategory === cat)}
                 >
                   {cat}
                 </button>
@@ -290,37 +393,32 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         />
       </div>
 
-      {/* Scrollable content */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
+        className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-4 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-6xl">
           {allSkills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className={`text-sm ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
-                No skills match your search.
-              </p>
+              <p className="text-sm text-muted-foreground">No skills match your search.</p>
             </div>
-          ) : (
+          ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {allSkills.map((skill) => {
                 const custom = skill.isCustom;
                 const customData = skill.customData;
+                const disabled = isDisabled(skill);
 
                 return (
                   <div
                     key={skill.id}
                     className={cn(
                       'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
-                      custom && customData && !customData.enabled
-                        ? isDark
-                          ? 'border-white/[0.04] bg-card/50 opacity-60'
-                          : 'border-border bg-card/50 opacity-60'
-                        : isDark
-                          ? 'border-border bg-card hover:border-brand-green/30'
-                          : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
+                      disabled && 'opacity-60',
+                      isDark
+                        ? 'border-mitra-border bg-card hover:border-brand-green/30'
+                        : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
                     )}
                   >
                     <div>
@@ -328,66 +426,20 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
                           <skill.icon className="h-5 w-5 text-brand-green" />
                         </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              type="button"
-                              className={cn(
-                                'rounded-lg p-1.5 transition-colors',
-                                isDark ? 'text-white/30 hover:text-white/60 hover:bg-white/[0.06]' : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                              )}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className={cn(
-                              'w-40 rounded-xl border p-1',
-                              isDark
-                                ? 'border-white/[0.08] bg-[#1a1a1a]'
-                                : 'border-border bg-card',
-                            )}
-                          >
-                            <DropdownMenuItem
-                              onClick={() => {
-                                if (custom && customData) {
-                                  setEditingSkill(customData);
-                                } else {
-                                  setEditingSkill(skillToCustomSkill(skill));
-                                }
-                              }}
-                              className={cn(
-                                'gap-2 rounded-lg text-xs',
-                                isDark ? 'focus:bg-white/[0.06]' : 'focus:bg-muted',
-                              )}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className={isDark ? 'bg-white/[0.06]' : 'bg-border'} />
-                            <DropdownMenuItem
-                              onClick={() => custom && customData ? handleDeleteSkill(skill.id) : handleDeleteBuiltinSkill(skill.id)}
-                              className={cn(
-                                'gap-2 rounded-lg text-xs text-red-400 focus:bg-red-500/10 focus:text-red-400',
-                              )}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <SkillOverflowMenu
+                          isDark={isDark}
+                          onEdit={() => openEdit(skill)}
+                          onDelete={() => handleDelete(skill)}
+                        />
                       </div>
-                      <h3 className={`mb-1 text-sm font-semibold ${isDark ? 'text-white' : 'text-foreground'}`}>
-                        {skill.name}
-                      </h3>
-                      <p className="text-[12px] leading-relaxed text-muted-foreground line-clamp-2">
+                      <h3 className="mb-1 text-sm font-semibold text-foreground">{skill.name}</h3>
+                      <p className="line-clamp-2 text-[12px] leading-relaxed text-muted-foreground">
                         {skill.description}
                       </p>
                       <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         {skill.category}
                       </span>
-                      <p className={`mt-1.5 text-[10px] ${isDark ? 'text-white/30' : 'text-muted-foreground/60'}`}>
+                      <p className="mt-1.5 text-[10px] text-muted-foreground/70">
                         Created by {skill.createdBy}
                       </p>
                     </div>
@@ -398,7 +450,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                             checked={customData.enabled}
                             onCheckedChange={() => handleToggleSkill(customData.id)}
                           />
-                          <span className={`text-[11px] ${isDark ? 'text-white/40' : 'text-muted-foreground'}`}>
+                          <span className="text-[11px] text-muted-foreground">
                             {customData.enabled ? 'Active' : 'Inactive'}
                           </span>
                         </div>
@@ -414,6 +466,76 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                       )}
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {allSkills.map((skill) => {
+                const custom = skill.isCustom;
+                const customData = skill.customData;
+                const disabled = isDisabled(skill);
+
+                return (
+                  <article
+                    key={skill.id}
+                    className={cn(
+                      'sn-list-row flex items-center gap-3 rounded-xl border px-3.5 py-3 transition-colors',
+                      disabled && 'opacity-60',
+                      isDark
+                        ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
+                        : 'border-border bg-card hover:bg-accent/40',
+                    )}
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-green/10">
+                      <skill.icon className="h-4 w-4 text-brand-green" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate text-[13px] font-semibold text-foreground">
+                          {skill.name}
+                        </h3>
+                        <span className="rounded-full bg-muted px-2 py-px text-[10px] font-medium text-muted-foreground">
+                          {skill.category}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 line-clamp-1 text-[12px] text-muted-foreground">
+                        {skill.description}
+                      </p>
+                      <p className="mt-1 text-[10px] text-muted-foreground/70">
+                        Created by {skill.createdBy}
+                      </p>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      {custom && customData ? (
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={customData.enabled}
+                            onCheckedChange={() => handleToggleSkill(customData.id)}
+                          />
+                          <span className="hidden text-[11px] text-muted-foreground sm:inline">
+                            {customData.enabled ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="cta"
+                          size="sm"
+                          onClick={() => setSelectedSkill(skill)}
+                          className="h-8 text-xs"
+                        >
+                          Run Skill
+                        </Button>
+                      )}
+                      <SkillOverflowMenu
+                        isDark={isDark}
+                        onEdit={() => openEdit(skill)}
+                        onDelete={() => handleDelete(skill)}
+                      />
+                    </div>
+                  </article>
                 );
               })}
             </div>
@@ -441,7 +563,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         skill={selectedSkill}
         isOpen={selectedSkill !== null}
         onClose={() => setSelectedSkill(null)}
-        onRun={(skill, params, instanceId, connectionId) => {
+        onRun={(skill) => {
           onRunSkill(skill);
           setSelectedSkill(null);
         }}
