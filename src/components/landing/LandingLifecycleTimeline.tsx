@@ -224,7 +224,7 @@ export function AIImplementationJourney() {
                 )}
               </div>
 
-              <div className="rounded-[10px] border border-white/6 bg-[#0b0d10] p-4">
+              <div className="rounded-[10px] border border-white/6 bg-[var(--landing-bg-elevated)] p-4">
                 <motion.div
                   initial={false}
                   animate={{

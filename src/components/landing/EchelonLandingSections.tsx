@@ -14,6 +14,7 @@ import { LandingEcosystemOrbit } from './LandingEcosystemOrbit';
 import {
   NAV_LINKS,
   HERO,
+  HERO_STATS,
   LIFECYCLE_SECTION,
   CAPABILITIES_SECTION,
   CAPABILITIES,
@@ -61,7 +62,7 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
                   <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', isOpen && 'rotate-180')} />
                 </button>
                 {isOpen && (
-                  <div className="absolute left-1/2 top-[calc(100%+10px)] z-50 min-w-[11rem] -translate-x-1/2 rounded-xl border border-white/10 bg-[#0a0c0e]/95 p-1.5 shadow-xl backdrop-blur-md">
+                  <div className="absolute left-1/2 top-[calc(100%+10px)] z-50 min-w-[11rem] -translate-x-1/2 rounded-xl border border-white/10 bg-[var(--landing-bg-elevated)]/95 p-1.5 shadow-xl backdrop-blur-md">
                     {link.children.map((item) => (
                       <a
                         key={item.label}
@@ -123,7 +124,7 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
         <button
           type="button"
           onClick={onGetStarted}
-          className="rounded-full bg-[var(--landing-accent)] px-4 py-2 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
+          className="rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
         >
           {HERO.secondaryCta}
         </button>
@@ -142,12 +143,25 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
       <h1 className="mx-auto max-w-4xl font-display text-[2rem] font-medium leading-[1.15] tracking-tight text-white md:text-[2.75rem] lg:text-[3.25rem]">
         {HERO.title}
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-white/55 md:mt-7 md:text-lg">
+      <p className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-[var(--landing-muted)] md:mt-7 md:text-lg">
         {HERO.subtitle}
       </p>
 
-      <div className="mt-8 w-full max-w-lg">
-        <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-black/60 px-2 py-2 backdrop-blur-md shadow-[0_0_20px_rgba(0,255,102,0.08)]">
+      <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6">
+        {HERO_STATS.map((stat) => (
+          <div key={stat.label} className="text-center">
+            <p className="font-display text-3xl font-semibold tracking-tight text-[var(--landing-accent)] md:text-4xl">
+              {stat.target}
+              {stat.suffix}
+            </p>
+            <p className="mt-1.5 text-sm font-medium text-white">{stat.label}</p>
+            <p className="mt-1 text-xs leading-relaxed text-white/50">{stat.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-10 w-full max-w-lg">
+        <div className="landing-email-pill flex items-center gap-2 px-2 py-2">
           <div className="pl-3">
             <Mail className="h-4 w-4 text-white/40" />
           </div>
@@ -159,7 +173,7 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
           <button
             type="button"
             onClick={onGetStarted}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--landing-accent)] px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
           >
             Try IlluminAIte
             <ChevronRight className="h-4 w-4" />
@@ -175,7 +189,7 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
 
 export function LandingHowItWorks() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden bg-[#050608] px-6 py-18 md:py-26">
+    <section id="how-it-works" className="landing-section-surface relative overflow-hidden px-6 py-18 md:py-26">
       <div className="relative z-10 mx-auto max-w-6xl text-center">
         <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-16">
           {LIFECYCLE_SECTION.eyebrow}
@@ -195,7 +209,7 @@ export function LandingPlatformSection() {
 
 export function LandingCapabilities() {
   return (
-    <section className="bg-[#06080a] px-6 py-20 md:py-28">
+    <section className="landing-section-surface-elevated px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl text-center">
         <h2 className="font-display text-2xl font-medium text-white md:text-4xl">{CAPABILITIES_SECTION.title}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/45">{CAPABILITIES_SECTION.subtitle}</p>
@@ -221,7 +235,7 @@ export function LandingLandscape() {
 
 export function LandingAiAgents() {
   return (
-    <section className="bg-[#06080a] px-6 py-20 md:py-28">
+    <section className="landing-section-surface-elevated px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl text-center">
         <h2 className="font-display text-2xl font-medium text-white md:text-4xl">{AI_AGENTS_SECTION.title}</h2>
         <p className="mx-auto mt-4 max-w-xl text-sm text-white/45">{AI_AGENTS_SECTION.subtitle}</p>
@@ -247,7 +261,7 @@ export function LandingIndustrySolutions({ activeId, onSelect }: LandingIndustry
   const active = INDUSTRY_SOLUTIONS.find((s) => s.id === activeId) ?? INDUSTRY_SOLUTIONS[0];
 
   return (
-    <section id="industries" className="bg-[#030508] px-6 py-16 md:py-20">
+    <section id="industries" className="landing-section-surface px-6 py-16 md:py-20">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-center font-display text-2xl font-medium text-white md:text-4xl">{INDUSTRY_SECTION.title}</h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-sm text-white/40">{INDUSTRY_SECTION.subtitle}</p>
@@ -289,7 +303,7 @@ interface LandingInstanceDemoProps {
 
 export function LandingInstanceDemo({ onGetStarted }: LandingInstanceDemoProps) {
   return (
-    <section id="demo" className="border-t border-white/[0.04] bg-[#030508] px-6 py-20 md:py-28">
+    <section id="demo" className="landing-section-surface border-t border-white/[0.04] px-6 py-20 md:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
         <div>
           <h2 className="font-display text-2xl font-medium leading-snug text-white md:text-4xl">{DEMO_SECTION.title}</h2>
@@ -315,7 +329,7 @@ export function LandingCapabilitiesMarquee() {
   const doubled = [...CAPABILITY_TAGS, ...CAPABILITY_TAGS];
 
   return (
-    <section id="capabilities" className="overflow-hidden border-t border-white/[0.04] bg-[#06080a] py-16">
+    <section id="capabilities" className="landing-section-surface-elevated overflow-hidden border-t border-white/[0.04] py-16">
       <div className="landing-marquee">
         <div className="landing-marquee-track">
           {doubled.map((tag, i) => (
@@ -331,7 +345,7 @@ export function LandingCapabilitiesMarquee() {
 
 export function LandingSecurity() {
   return (
-    <section className="bg-[#030508] px-6 py-20 md:py-28">
+    <section className="landing-section-surface px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
@@ -362,16 +376,16 @@ interface LandingFinalCtaProps {
 
 export function LandingFinalCta({ onGetStarted }: LandingFinalCtaProps) {
   return (
-    <section id="cta" className="relative z-10 overflow-hidden border-t border-white/[0.04] bg-[#040608] px-6 py-20 md:py-24">
+    <section id="cta" className="landing-section-surface relative z-10 overflow-hidden border-t border-white/[0.04] px-6 py-20 md:py-24">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_36%_28%_at_50%_78%,rgba(139,234,60,0.08),transparent_74%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_36%_28%_at_50%_78%,rgba(50,215,75,0.1),transparent_74%)]"
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] opacity-[0.08]" aria-hidden>
-        <Threads color={[0.545, 0.918, 0.235]} amplitude={0.5} distance={0} enableMouseInteraction={false} />
+        <Threads color={[0.2, 0.84, 0.29]} amplitude={0.5} distance={0} enableMouseInteraction={false} />
       </div>
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] bg-gradient-to-t from-[#040608] via-transparent to-[#040608]/90"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] bg-gradient-to-t from-[var(--landing-bg)] via-transparent to-[var(--landing-bg)]/90"
         aria-hidden
       />
 

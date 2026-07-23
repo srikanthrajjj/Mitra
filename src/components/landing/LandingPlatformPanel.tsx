@@ -159,7 +159,7 @@ export function LandingPlatformPanel({
   return (
     <div
       ref={panelRef}
-      className="landing-platform-panel mt-12 overflow-hidden rounded-[1.75rem] border border-[var(--landing-accent)]/20 bg-[#060a08]"
+      className="landing-platform-panel mt-12 overflow-hidden rounded-[1.75rem] border border-[var(--landing-accent)]/20 bg-[var(--landing-bg-elevated)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}

@@ -71,14 +71,14 @@ export function LandingFooterReveal({ onGetStarted }: LandingFooterRevealProps) 
       <motion.footer
         ref={footerRef}
         style={{ opacity, y, scale, filter }}
-        className="fixed inset-x-0 bottom-0 z-0 overflow-hidden border-t border-white/[0.04] bg-[#020304] px-6 py-14 will-change-transform md:py-16"
+        className="fixed inset-x-0 bottom-0 z-0 overflow-hidden border-t border-white/[0.04] bg-[var(--landing-bg)] px-6 py-14 will-change-transform md:py-16"
       >
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-[-12rem] h-[26rem] bg-[radial-gradient(circle_at_center,rgba(0,255,102,0.34)_0%,rgba(0,255,102,0.18)_18%,rgba(0,255,102,0.08)_34%,transparent_68%)] blur-3xl"
+          className="pointer-events-none absolute inset-x-0 bottom-[-12rem] h-[26rem] bg-[radial-gradient(circle_at_center,rgba(50,215,75,0.28)_0%,rgba(0,201,160,0.12)_22%,rgba(50,215,75,0.06)_40%,transparent_68%)] blur-3xl"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-x-[22%] bottom-0 h-px bg-[rgba(0,255,102,0.28)] blur-sm"
+          className="pointer-events-none absolute inset-x-[22%] bottom-0 h-px bg-[rgba(50,215,75,0.28)] blur-sm"
           aria-hidden
         />
 

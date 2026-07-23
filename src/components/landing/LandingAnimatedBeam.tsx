@@ -72,7 +72,7 @@ export function LandingAnimatedBeam() {
   const outerRadius = 310;
 
   return (
-    <section className="bg-[#030508] px-6 py-24 md:py-32 overflow-hidden">
+    <section className="landing-section-surface px-6 py-24 md:py-32 overflow-hidden">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
           <h2 className="font-display text-3xl font-medium text-white md:text-5xl">

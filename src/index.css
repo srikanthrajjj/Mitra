@@ -3712,15 +3712,47 @@ button.rounded-full {
 
 /* ── Echelon-inspired layout (Illuminaite theme) ── */
 .landing-echelon {
-  --landing-accent: #4FCF36;
-  --landing-accent-deep: #00cc50;
+  --landing-bg: #050c0e;
+  --landing-bg-elevated: #071416;
+  --landing-bg-soft: #0a1816;
+  --landing-accent: #32d74b;
+  --landing-accent-deep: #1fad3a;
+  --landing-cyan: #00c9a0;
+  --landing-purple: #7c3aed;
+  --landing-muted: rgba(189, 195, 199, 0.72);
+  background-color: var(--landing-bg);
+  color: #ffffff;
+}
+
+.landing-echelon-atmosphere {
+  background:
+    radial-gradient(ellipse 75% 50% at 50% -8%, rgba(50, 215, 75, 0.16) 0%, transparent 58%),
+    radial-gradient(ellipse 45% 40% at 88% 35%, rgba(0, 201, 160, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 12% 70%, rgba(26, 90, 70, 0.18) 0%, transparent 60%),
+    var(--landing-bg);
+}
+
+.landing-echelon-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 70% 65% at 70% 40%, black 15%, transparent 72%);
+  opacity: 0.55;
+}
+
+.landing-section-surface {
+  background-color: var(--landing-bg);
+}
+
+.landing-section-surface-elevated {
+  background-color: var(--landing-bg-elevated);
 }
 
 .landing-echelon-hero-bg {
   height: 100vh;
   background:
-    radial-gradient(ellipse 70% 55% at 50% -10%, rgba(79, 207, 54, 0.14) 0%, transparent 65%),
-    #030508;
+    radial-gradient(ellipse 70% 55% at 50% -10%, rgba(50, 215, 75, 0.18) 0%, transparent 62%),
+    radial-gradient(ellipse 50% 45% at 85% 40%, rgba(0, 201, 160, 0.12) 0%, transparent 58%),
+    var(--landing-bg);
 }
 
 .landing-echelon-hero-bg .landing-hero-light-rays {
@@ -3733,17 +3765,17 @@ button.rounded-full {
 .landing-glow-word {
   color: var(--landing-accent);
   text-shadow:
-    0 0 24px rgba(79, 207, 54, 0.45),
-    0 0 48px rgba(79, 207, 54, 0.2);
+    0 0 24px rgba(50, 215, 75, 0.4),
+    0 0 48px rgba(50, 215, 75, 0.18);
 }
 
 .landing-email-pill {
   border-radius: 9999px;
-  border: 1px solid rgba(79, 207, 54, 0.35);
-  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(50, 215, 75, 0.35);
+  background: rgba(5, 12, 14, 0.7);
   box-shadow:
-    0 0 0 1px rgba(79, 207, 54, 0.08),
-    0 0 32px rgba(79, 207, 54, 0.12);
+    0 0 0 1px rgba(50, 215, 75, 0.08),
+    0 0 32px rgba(50, 215, 75, 0.12);
   backdrop-filter: blur(12px);
 }
 
@@ -3773,15 +3805,15 @@ button.rounded-full {
 .landing-platform-panel {
   position: relative;
   box-shadow:
-    0 0 0 1px rgba(79, 207, 54, 0.06) inset,
+    0 0 0 1px rgba(50, 215, 75, 0.06) inset,
     0 32px 80px rgba(0, 0, 0, 0.45),
-    0 0 60px rgba(79, 207, 54, 0.06);
+    0 0 60px rgba(50, 215, 75, 0.06);
 }
 
 .landing-platform-panel-glow {
   background:
-    radial-gradient(ellipse 70% 80% at 0% 50%, rgba(79, 207, 54, 0.07), transparent 55%),
-    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(79, 207, 54, 0.05), transparent 50%);
+    radial-gradient(ellipse 70% 80% at 0% 50%, rgba(50, 215, 75, 0.08), transparent 55%),
+    radial-gradient(ellipse 50% 60% at 100% 0%, rgba(0, 201, 160, 0.06), transparent 50%);
 }
 
 .landing-platform-feature-card {
@@ -3789,12 +3821,12 @@ button.rounded-full {
 }
 
 .landing-platform-feature-card:hover {
-  box-shadow: 0 8px 32px rgba(79, 207, 54, 0.08);
+  box-shadow: 0 8px 32px rgba(50, 215, 75, 0.08);
 }
 
 /* Intent journey — What We Do */
 .landing-intent-journey {
-  --journey-accent: #8bea3c;
+  --journey-accent: #32d74b;
 }
 
 .landing-journey-orb {

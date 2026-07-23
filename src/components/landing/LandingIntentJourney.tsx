@@ -49,7 +49,7 @@ function WhatWeDoTimelineSection({
         <p
           className={cn(
             'text-[11px] font-medium tabular-nums tracking-[0.28em] transition-colors duration-300',
-            isActive ? 'text-[#8BEA3C]/70' : 'text-white/22',
+            isActive ? 'text-[var(--landing-accent)]/70' : 'text-white/22',
           )}
         >
           {String(index + 1).padStart(2, '0')}
@@ -171,7 +171,7 @@ export function LandingIntentJourney() {
   return (
     <section
       id="platform"
-      className="landing-what-we-do relative scroll-mt-24 bg-[#050608]"
+      className="landing-what-we-do landing-section-surface relative scroll-mt-24"
       aria-label={PLATFORM_SECTION.eyebrow}
     >
       <div className="landing-wwd-dot-grid pointer-events-none absolute inset-0" aria-hidden />
