@@ -246,7 +246,7 @@ export function ArchitectSidebar({
                           No projects available
                         </div>
                       ) : (
-                        folders.map((folder) => (
+                        folders.filter((folder) => !folder.archived).map((folder) => (
                           <DropdownMenuItem
                             key={folder.id}
                             className={cn(

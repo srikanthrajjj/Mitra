@@ -5,12 +5,12 @@ import {
 } from 'lucide-react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { LandingHeroChatDemo } from '../LandingHeroChatDemo';
-import { Button } from '../ui/button';
-import Threads from '../ui/Threads';
 import { cn } from '@/lib/utils';
 import { LandingLifecycleTimeline } from './LandingLifecycleTimeline';
 import { LandingIntentJourney } from './LandingIntentJourney';
 import { LandingEcosystemOrbit } from './LandingEcosystemOrbit';
+import { useLandingDesign, type LandingDesign } from './LandingDesignContext';
+import { LandingDesignSwitcher } from './LandingDesignSwitcher';
 import {
   NAV_LINKS,
   HERO,
@@ -26,23 +26,32 @@ import {
   CAPABILITY_TAGS,
   SECURITY_SECTION,
   SECURITY_ITEMS,
-  FINAL_CTA,
 } from './echelonLandingData';
 
 interface LandingNavProps {
   onGetStarted: () => void;
   onSignIn?: () => void;
-  version?: 'v2' | 'v3';
-  setVersion?: (v: 'v2' | 'v3') => void;
+  landingDesign?: LandingDesign;
+  setLandingDesign?: (v: LandingDesign) => void;
 }
 
-export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: LandingNavProps) {
+export function LandingNav({
+  onGetStarted,
+  onSignIn,
+  landingDesign,
+  setLandingDesign,
+}: LandingNavProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const ctxDesign = useLandingDesign();
+  const design = landingDesign ?? ctxDesign;
+  const useAccentCta = design === 'v1' || design === 'v2' || design === 'v3';
+  const isV1 = design === 'v1';
 
   return (
-    <nav className="landing-echelon-nav relative z-50 mx-auto grid w-full max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-4 px-6 py-4 md:py-5">
-      <IlluminaiteLogo className="h-[26px] w-auto" />
-      <div className="hidden items-center justify-center gap-6 lg:flex">
+    <nav className="landing-echelon-nav relative z-50 mx-auto flex h-16 w-full max-w-6xl items-center px-6 md:h-[4.25rem]">
+      <IlluminaiteLogo className="relative z-10 h-[26px] w-auto shrink-0" />
+
+      <div className="absolute inset-x-0 hidden items-center justify-center gap-8 lg:flex">
         {NAV_LINKS.map((link) => {
           if (link.children) {
             const isOpen = openDropdown === link.label;
@@ -55,7 +64,12 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
               >
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 text-[13px] font-medium text-white/80 transition-colors hover:text-[var(--landing-accent)]"
+                  className={cn(
+                    'inline-flex items-center gap-1 text-[13px] transition-colors',
+                    isV1
+                      ? 'font-semibold text-white hover:text-[#1aaf00]'
+                      : 'font-medium text-white/80 hover:text-[var(--landing-accent)]',
+                  )}
                   aria-expanded={isOpen}
                 >
                   {link.label}
@@ -83,10 +97,15 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
               key={link.label}
               href={link.href}
               className={cn(
-                'text-[13px] font-medium transition-colors',
-                link.accent
-                  ? 'text-[var(--landing-accent)] hover:text-[var(--landing-accent)]'
-                  : 'text-white/80 hover:text-[var(--landing-accent)]',
+                'text-[13px] transition-colors',
+                isV1
+                  ? cn('font-semibold', link.accent ? 'text-[#1aaf00]' : 'text-white hover:text-[#1aaf00]')
+                  : cn(
+                      'font-medium',
+                      link.accent
+                        ? 'text-[var(--landing-accent)] hover:text-[var(--landing-accent)]'
+                        : 'text-white/80 hover:text-[var(--landing-accent)]',
+                    ),
               )}
             >
               {link.label}
@@ -94,29 +113,20 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
           );
         })}
       </div>
-      <div className="flex items-center gap-2.5">
-        {setVersion && (
-          <div className="mr-1 hidden items-center rounded-full border border-white/10 bg-white/[0.03] p-0.5 sm:flex">
-            {(['v2', 'v3'] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setVersion(v)}
-                className={cn(
-                  'rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-all',
-                  version === v ? 'bg-[var(--landing-accent)] text-black' : 'text-white/40 hover:text-white/70',
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+
+      <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2.5 sm:gap-3">
+        {setLandingDesign && (
+          <LandingDesignSwitcher
+            landingDesign={design}
+            setLandingDesign={setLandingDesign}
+            variant="nav"
+          />
         )}
         {onSignIn && (
           <button
             type="button"
             onClick={onSignIn}
-            className="hidden rounded-full border border-white/20 px-4 py-2 text-[13px] font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:inline-flex"
+            className="hidden text-[13px] font-semibold text-white transition-colors hover:text-[#1aaf00] md:inline-flex"
           >
             Sign in
           </button>
@@ -124,7 +134,14 @@ export function LandingNav({ onGetStarted, onSignIn, version, setVersion }: Land
         <button
           type="button"
           onClick={onGetStarted}
-          className="rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
+          className={cn(
+            'px-4 py-2 text-[13px] sm:px-5',
+            useAccentCta
+              ? design === 'v1'
+                ? 'landing-cta-v1-primary'
+                : 'landing-cta-primary'
+              : 'rounded-full bg-white font-semibold text-black transition-opacity hover:opacity-90',
+          )}
         >
           {HERO.secondaryCta}
         </button>
@@ -138,64 +155,227 @@ interface LandingHeroEchelonProps {
 }
 
 export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
-  return (
-    <section className="landing-echelon-hero relative flex min-h-[calc(100vh-88px)] flex-1 flex-col items-center justify-center px-6 pb-14 pt-8 text-center md:min-h-[calc(100vh-96px)] md:pb-18 md:pt-10">
-      <h1 className="mx-auto max-w-4xl font-display text-[2rem] font-medium leading-[1.15] tracking-tight text-white md:text-[2.75rem] lg:text-[3.25rem]">
-        {HERO.title}
-      </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-[var(--landing-muted)] md:mt-7 md:text-lg">
-        {HERO.subtitle}
-      </p>
+  const design = useLandingDesign();
+  const isV2 = design === 'v2';
+  const isV1 = design === 'v1';
+  const [titleLead, titleRest] = HERO.title.includes(',')
+    ? [HERO.title.slice(0, HERO.title.indexOf(',') + 1), HERO.title.slice(HERO.title.indexOf(',') + 1).trim()]
+    : [HERO.title, ''];
 
-      <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6">
-        {HERO_STATS.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <p className="font-display text-3xl font-semibold tracking-tight text-[var(--landing-accent)] md:text-4xl">
-              {stat.target}
-              {stat.suffix}
+  return (
+    <section
+      className={cn(
+        'landing-echelon-hero landing-band-hero relative flex min-h-[calc(100vh-88px)] flex-1 flex-col px-6 pb-14 pt-8 md:min-h-[calc(100vh-96px)] md:pb-18 md:pt-10',
+        isV2 ? 'items-stretch justify-center' : 'items-center justify-center text-center',
+      )}
+    >
+      <div
+        className={cn(
+          'mx-auto w-full',
+          isV1 ? 'max-w-7xl' : 'max-w-6xl',
+          isV2 && 'grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-14',
+        )}
+      >
+        <div className={cn(!isV2 && 'text-center')}>
+          <h1
+            className={cn(
+              'font-display tracking-tight text-white',
+              isV2
+                ? 'max-w-3xl text-[2.35rem] font-bold leading-[1.08] md:text-[3.25rem] lg:text-[3.75rem]'
+                : isV1
+                  ? 'mx-auto max-w-6xl text-[2.5rem] font-bold leading-[1.06] sm:text-[3rem] md:text-[3.75rem] lg:max-w-7xl lg:text-[4.25rem]'
+                  : 'mx-auto max-w-4xl text-[2rem] font-medium leading-[1.15] md:text-[2.75rem] lg:text-[3.25rem]',
+            )}
+          >
+            {isV2 || isV1 ? (
+              <>
+                {isV1 ? (
+                  <>
+                    <span className="block text-balance">AI-Powered ServiceNow Implementations,</span>
+                    <span className="block text-balance">Industry Specific Outcomes.</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="landing-glow-word">{titleLead}</span>
+                    {titleRest ? (
+                      <>
+                        <br className="hidden sm:block" />
+                        <span className="text-white"> {titleRest}</span>
+                      </>
+                    ) : null}
+                  </>
+                )}
+              </>
+            ) : (
+              HERO.title
+            )}
+          </h1>
+
+          {!isV2 && !isV1 && (
+            <p className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-[var(--landing-muted)] md:mt-7 md:text-lg">
+              {HERO.subtitle}
             </p>
-            <p className="mt-1.5 text-sm font-medium text-white">{stat.label}</p>
-            <p className="mt-1 text-xs leading-relaxed text-white/50">{stat.desc}</p>
+          )}
+
+          {isV1 && (
+            <p className="mx-auto mt-5 max-w-2xl text-base font-semibold text-white md:mt-6 md:text-lg lg:max-w-3xl">
+              Design, develop, test, and deploy ServiceNow — with AI.
+            </p>
+          )}
+        </div>
+
+        {isV2 && (
+          <div className="lg:pb-2">
+            <p className="landing-body-muted max-w-md text-base font-light leading-relaxed md:text-lg">
+              {HERO.subtitle}
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={onGetStarted}
+                className="landing-cta-primary inline-flex items-center gap-1 px-6 py-2.5 text-sm"
+              >
+                {HERO.primaryCta}
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={onGetStarted}
+                className="landing-cta-ghost px-6 py-2.5 text-sm"
+              >
+                {HERO.secondaryCta}
+              </button>
+            </div>
           </div>
-        ))}
+        )}
       </div>
 
-      <div className="mt-10 w-full max-w-lg">
-        <div className="landing-email-pill flex items-center gap-2 px-2 py-2">
-          <div className="pl-3">
-            <Mail className="h-4 w-4 text-white/40" />
-          </div>
-          <input
-            type="email"
-            placeholder="you@company.com"
-            className="flex-1 bg-transparent px-2 text-sm text-white placeholder:text-white/30 focus:outline-none"
-          />
+      {isV1 ? (
+        <div className="mx-auto mt-12 flex w-full max-w-4xl flex-wrap items-end justify-center gap-12 sm:gap-16 md:mt-16 lg:max-w-5xl">
+          {HERO_STATS.map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="landing-stat-analytics font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-[3.25rem]">
+                {stat.target}
+                {stat.suffix}
+              </p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div
+          className={cn(
+            'mx-auto mt-10 grid w-full max-w-3xl grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6',
+            isV2 && 'mt-14 max-w-6xl gap-4 sm:gap-4',
+          )}
+        >
+          {HERO_STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className={cn(isV2 ? 'landing-stat-card text-left' : 'text-center')}
+            >
+              <p
+                className={cn(
+                  'font-display tracking-tight md:text-4xl',
+                  isV2 ? 'landing-stat-value text-3xl font-bold' : 'text-3xl font-semibold text-[var(--landing-accent)]',
+                )}
+              >
+                {stat.target}
+                {stat.suffix}
+              </p>
+              <p className="mt-1.5 text-sm font-medium text-white">{stat.label}</p>
+              <p className={cn('mt-1 text-xs leading-relaxed', isV2 ? 'landing-body-muted opacity-80' : 'text-white/50')}>
+                {stat.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isV1 ? (
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-3 md:mt-14">
           <button
             type="button"
             onClick={onGetStarted}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+            className="landing-cta-v1-primary inline-flex items-center gap-1.5 px-8 py-3.5 text-sm"
           >
             Try IlluminAIte
             <ChevronRight className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            onClick={onGetStarted}
+            className="landing-cta-v1-ghost px-7 py-3.5 text-sm"
+          >
+            {HERO.secondaryCta}
+          </button>
         </div>
-        <p className="mt-3 text-center text-xs text-[var(--landing-accent)]">
-          Free trial - connect to your PDI in 5 minutes.
-        </p>
-      </div>
+      ) : !isV2 ? (
+        <div className="mt-10 w-full max-w-lg">
+          <div className="landing-email-pill flex items-center gap-2 px-2 py-2">
+            <div className="pl-3">
+              <Mail className="h-4 w-4 text-white/40" />
+            </div>
+            <input
+              type="email"
+              placeholder="you@company.com"
+              className="flex-1 bg-transparent px-2 text-sm text-white placeholder:text-white/30 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={onGetStarted}
+              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+            >
+              Try IlluminAIte
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-3 text-center text-xs text-[var(--landing-accent)]">
+            Free trial - connect to your PDI in 5 minutes.
+          </p>
+        </div>
+      ) : null}
     </section>
   );
 }
 
 export function LandingHowItWorks() {
+  const design = useLandingDesign();
+  const isV1 = design === 'v1';
+  const isV2 = design === 'v2';
+
   return (
-    <section id="how-it-works" className="landing-section-surface relative overflow-hidden px-6 py-18 md:py-26">
+    <section
+      id="how-it-works"
+      className={cn(
+        'relative overflow-hidden px-6 py-18 md:py-26',
+        isV2 ? 'landing-band-dark' : 'landing-section-surface',
+      )}
+    >
       <div className="relative z-10 mx-auto max-w-6xl text-center">
         <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-16">
           {LIFECYCLE_SECTION.eyebrow}
         </p>
-        <h2 className="mt-3 font-display text-2xl font-medium text-white md:text-4xl">{LIFECYCLE_SECTION.title}</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/45">{LIFECYCLE_SECTION.subtitle}</p>
+        <h2
+          className={cn(
+            'mt-3 font-display text-white',
+            isV1 && 'landing-v1-section-title',
+            isV2 && 'text-2xl font-bold md:text-[2.75rem]',
+            !isV1 && !isV2 && 'text-2xl font-medium md:text-4xl',
+          )}
+        >
+          {LIFECYCLE_SECTION.title}
+        </h2>
+        <p
+          className={cn(
+            'mx-auto mt-4 max-w-2xl text-sm leading-relaxed',
+            isV2 ? 'landing-body-muted' : 'text-white/45',
+          )}
+        >
+          {LIFECYCLE_SECTION.subtitle}
+        </p>
 
         <LandingLifecycleTimeline />
       </div>
@@ -302,22 +482,48 @@ interface LandingInstanceDemoProps {
 }
 
 export function LandingInstanceDemo({ onGetStarted }: LandingInstanceDemoProps) {
+  const design = useLandingDesign();
+  const isV1 = design === 'v1';
+  const isV2 = design === 'v2';
+
   return (
-    <section id="demo" className="landing-section-surface border-t border-white/[0.04] px-6 py-20 md:py-28">
+    <section
+      id="demo"
+      className={cn(
+        'border-t border-white/[0.04] px-6 py-20 md:py-28',
+        isV2 ? 'landing-band-product' : 'landing-section-surface',
+      )}
+    >
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
         <div>
-          <h2 className="font-display text-2xl font-medium leading-snug text-white md:text-4xl">{DEMO_SECTION.title}</h2>
-          <p className="mt-6 text-sm leading-relaxed text-white/55">{DEMO_SECTION.subtitle}</p>
+          <h2
+            className={cn(
+              'font-display text-white',
+              isV1 && 'landing-v1-section-title',
+              isV2 && 'text-2xl font-bold leading-snug md:text-[2.75rem]',
+              !isV1 && !isV2 && 'text-2xl font-medium leading-snug md:text-4xl',
+            )}
+          >
+            {DEMO_SECTION.title}
+          </h2>
+          <p className={cn('mt-6 text-sm leading-relaxed', isV2 ? 'landing-body-muted' : 'text-white/55')}>
+            {DEMO_SECTION.subtitle}
+          </p>
           <button
             type="button"
             onClick={onGetStarted}
-            className="mt-8 inline-flex items-center gap-1 rounded-full bg-[var(--landing-accent)] px-6 py-3 text-sm font-semibold text-black"
+            className={cn(
+              'mt-8 inline-flex items-center gap-1 px-6 py-3 text-sm font-semibold',
+              isV2
+                ? 'landing-cta-primary'
+                : 'rounded-full bg-[var(--landing-accent)] text-black',
+            )}
           >
             {DEMO_SECTION.primaryCta}
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-        <div className="min-w-0">
+        <div className={cn('min-w-0', isV2 && 'landing-product-shell p-3 md:p-4')}>
           <LandingHeroChatDemo />
         </div>
       </div>
@@ -366,72 +572,6 @@ export function LandingSecurity() {
           </div>
         </div>
       </div>
-    </section>
-  );
-}
-
-interface LandingFinalCtaProps {
-  onGetStarted: () => void;
-}
-
-export function LandingFinalCta({ onGetStarted }: LandingFinalCtaProps) {
-  return (
-    <section id="cta" className="landing-section-surface relative z-10 overflow-hidden border-t border-white/[0.04] px-6 py-20 md:py-24">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_36%_28%_at_50%_78%,rgba(50,215,75,0.1),transparent_74%)]"
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] opacity-[0.08]" aria-hidden>
-        <Threads color={[0.2, 0.84, 0.29]} amplitude={0.5} distance={0} enableMouseInteraction={false} />
-      </div>
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px] bg-gradient-to-t from-[var(--landing-bg)] via-transparent to-[var(--landing-bg)]/90"
-        aria-hidden
-      />
-
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative mx-auto max-w-3xl text-center"
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto font-display text-3xl font-medium leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[3.9rem]"
-        >
-          Ready to implement faster?
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.65, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/45 md:text-base"
-        >
-          Let IlluminAIte turn your ServiceNow requirements into deployment-ready delivery.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.65, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 flex items-center justify-center"
-        >
-          <Button
-            size="lg"
-            className="h-12 min-w-[170px] rounded-full bg-white px-8 text-sm font-semibold text-black shadow-[0_10px_35px_rgba(255,255,255,0.08)] hover:bg-white/95"
-            onClick={onGetStarted}
-          >
-            Get Started
-          </Button>
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

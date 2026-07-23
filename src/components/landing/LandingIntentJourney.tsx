@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { PLATFORM_SECTION, WHAT_WE_DO_BLOCKS, type WhatWeDoBlock } from './echelonLandingData';
+import { useLandingDesign } from './LandingDesignContext';
 
 const BLOCK_COUNT = WHAT_WE_DO_BLOCKS.length;
 
@@ -29,11 +30,13 @@ function WhatWeDoTimelineSection({
   index,
   isActive,
   registerRef,
+  isV1,
 }: {
   block: WhatWeDoBlock;
   index: number;
   isActive: boolean;
   registerRef: (id: string, el: HTMLElement | null) => void;
+  isV1: boolean;
 }) {
   return (
     <article
@@ -54,7 +57,14 @@ function WhatWeDoTimelineSection({
         >
           {String(index + 1).padStart(2, '0')}
         </p>
-        <h3 className="mt-3 font-display text-2xl font-medium leading-tight tracking-tight text-white md:text-3xl lg:text-[2rem]">
+        <h3
+          className={cn(
+            'mt-3 font-display leading-tight tracking-tight text-white',
+            isV1
+              ? 'text-2xl font-bold md:text-3xl lg:text-[2.15rem]'
+              : 'text-2xl font-medium md:text-3xl lg:text-[2rem]',
+          )}
+        >
           {block.title}
         </h3>
         <p className="mt-3 text-sm font-light leading-relaxed text-white/45 md:text-base">
@@ -75,6 +85,9 @@ function WhatWeDoTimelineSection({
 }
 
 export function LandingIntentJourney() {
+  const design = useLandingDesign();
+  const isV1 = design === 'v1';
+  const isV2 = design === 'v2';
   const headerRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLElement>(null);
@@ -171,7 +184,10 @@ export function LandingIntentJourney() {
   return (
     <section
       id="platform"
-      className="landing-what-we-do landing-section-surface relative scroll-mt-24"
+      className={cn(
+        'landing-what-we-do relative scroll-mt-24',
+        isV2 ? 'landing-band-elevated' : 'landing-section-surface',
+      )}
       aria-label={PLATFORM_SECTION.eyebrow}
     >
       <div className="landing-wwd-dot-grid pointer-events-none absolute inset-0" aria-hidden />
@@ -191,7 +207,13 @@ export function LandingIntentJourney() {
           <p className="text-[11px] font-medium uppercase tracking-[0.38em] text-[#8BEA3C]/80">
             {PLATFORM_SECTION.eyebrow}
           </p>
-          <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-white md:text-[2.75rem]">
+          <h2
+            className={cn(
+              'mt-4 font-display leading-tight tracking-tight text-white',
+              isV1 && 'landing-v1-section-title',
+              !isV1 && 'text-3xl font-medium md:text-[2.75rem]',
+            )}
+          >
             {PLATFORM_SECTION.title}
           </h2>
           <p className="mt-4 text-base font-light leading-relaxed text-white/45">
@@ -299,6 +321,7 @@ export function LandingIntentJourney() {
                 index={index}
                 isActive={block.id === activeId}
                 registerRef={registerRef}
+                isV1={isV1}
               />
             ))}
           </div>

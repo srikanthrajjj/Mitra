@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Folder, ChevronDown, Plus, Pencil, Trash2, Lock,
+  Folder, ChevronDown, Plus, Pencil, Trash2, Lock, Archive,
 } from 'lucide-react';
 import { ArtifactStatus, Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -91,11 +91,13 @@ function HoverRowActions({
   isDark,
   onRename,
   onDelete,
+  onArchive,
   editing,
 }: {
   isDark: boolean;
   onRename: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
+  onArchive?: () => void;
   editing?: boolean;
 }) {
   if (editing) return null;
@@ -105,9 +107,16 @@ function HoverRowActions({
       <RowActionButton title="Rename" onClick={onRename} isDark={isDark}>
         <Pencil className="w-3 h-3" />
       </RowActionButton>
-      <RowActionButton title="Delete" onClick={onDelete} isDark={isDark} danger>
-        <Trash2 className="w-3 h-3" />
-      </RowActionButton>
+      {onArchive && (
+        <RowActionButton title="Archive" onClick={onArchive} isDark={isDark}>
+          <Archive className="w-3 h-3" />
+        </RowActionButton>
+      )}
+      {onDelete && (
+        <RowActionButton title="Delete" onClick={onDelete} isDark={isDark} danger>
+          <Trash2 className="w-3 h-3" />
+        </RowActionButton>
+      )}
     </div>
   );
 }
@@ -200,6 +209,7 @@ export default function ProjectFolderList({
   const orderedFolders = sortProjectFolders(folders, solutions, sortMode);
 
   const visibleFolders = orderedFolders.filter((folder) => {
+    if (folder.archived) return false;
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -344,7 +354,7 @@ export default function ProjectFolderList({
                   isDark={isDark}
                   editing={isEditingFolder}
                   onRename={() => startEditingFolder(folder.id, folder.name)}
-                  onDelete={() => onDeleteFolder(folder.id)}
+                  onArchive={() => onDeleteFolder(folder.id)}
                 />
                 <button
                   type="button"
@@ -432,7 +442,7 @@ export default function ProjectFolderList({
                 isDark={isDark}
                 editing={isEditingFolder}
                 onRename={() => startEditingFolder(folder.id, folder.name)}
-                onDelete={() => onDeleteFolder(folder.id)}
+                onArchive={() => onDeleteFolder(folder.id)}
               />
               <button
                 type="button"

@@ -23,17 +23,17 @@ export interface NavLink {
 
 export const NAV_LINKS: NavLink[] = [
   { label: 'Home', href: '#', accent: true },
-  { label: 'About Us', href: '#about' },
-  { label: 'AI Solutions and Industries', href: '#platform' },
+  { label: 'About', href: '#about' },
+  { label: 'Solutions', href: '#platform' },
   {
-    label: 'Get Inspired',
+    label: 'Inspired',
     children: [
       { label: 'How It Works', href: '#how-it-works' },
       { label: 'What We Do', href: '#platform' },
       { label: 'ServiceNow Ecosystem', href: '#ecosystem' },
     ],
   },
-  { label: 'Contact Us', href: '#cta' },
+  { label: 'Contact', href: '#contact' },
 ];
 
 export const HERO = {
@@ -453,6 +453,16 @@ export const DEMO_SECTION = {
   primaryCta: 'Try IlluminAIte',
 };
 
+export const READY_CTA_SECTION = {
+  eyebrow: 'Take the next step',
+  titleLead: 'Ready to see',
+  titleAccent: 'in action?',
+  subtitle:
+    'Connect Mitra to your instance and watch intent become stories, flows, tests, and deployment-ready delivery — with your team in control.',
+  primaryCta: 'Try IlluminAIte',
+  secondaryCta: 'Get a demo',
+};
+
 export const CAPABILITY_TAGS = LANDSCAPE_MODULES.map((m) => m.name);
 
 export const SECURITY_SECTION = {
@@ -470,14 +480,6 @@ export const SECURITY_ITEMS = [
   'Enterprise SSO ready',
   'Governance-aligned change controls',
 ];
-
-export const FINAL_CTA = {
-  title: 'Run Your ServiceNow With IlluminAIte. Deliver Better Business Outcomes.',
-  subtitle:
-    'Discover how our AI technology is already transforming businesses across industries and helping individuals achieve more with less effort.',
-  primaryCta: 'Get Started',
-  secondaryCta: 'Book Demo',
-};
 
 export const FOOTER = {
   tagline:

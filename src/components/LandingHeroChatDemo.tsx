@@ -7,7 +7,6 @@ import type { MitraTodoItem } from '../types';
 import { USER_INITIALS } from '../constants/user';
 import { cn } from '@/lib/utils';
 import { motion } from 'motion/react';
-import replySoundUrl from '../assets/sound.mp3';
 
 type BubbleKind = 'user' | 'thinking' | 'todos' | 'assistant';
 
@@ -162,96 +161,6 @@ function UserAvatar() {
   );
 }
 
-let sharedAudioContext: AudioContext | null = null;
-
-// Global helper to unlock audio context on user gesture
-function getOrInitializeAudioContext(): AudioContext | null {
-  if (typeof window === 'undefined') return null;
-  if (!sharedAudioContext) {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (AudioContextClass) {
-      sharedAudioContext = new AudioContextClass();
-    }
-  }
-  if (sharedAudioContext && sharedAudioContext.state === 'suspended') {
-    sharedAudioContext.resume().catch(() => {});
-  }
-  return sharedAudioContext;
-}
-
-// Automatically try to unlock audio on first click, keypress, or touch
-if (typeof window !== 'undefined') {
-  const unlock = () => {
-    const ctx = getOrInitializeAudioContext();
-    if (ctx && ctx.state === 'suspended') {
-      ctx.resume().then(() => {
-        window.removeEventListener('click', unlock);
-        window.removeEventListener('keydown', unlock);
-        window.removeEventListener('touchstart', unlock);
-      }).catch(() => {});
-    } else if (ctx) {
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('touchstart', unlock);
-    }
-  };
-  window.addEventListener('click', unlock);
-  window.addEventListener('keydown', unlock);
-  window.addEventListener('touchstart', unlock);
-}
-
-// Subtle synthesized bubble pop sound using Web Audio API (gaming style)
-function playBubbleSound() {
-  try {
-    const ctx = getOrInitializeAudioContext();
-    if (!ctx) return;
-    
-    // Resume context if suspended
-    if (ctx.state === 'suspended') {
-      ctx.resume().catch(() => {});
-    }
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    
-    const now = ctx.currentTime;
-    
-    // Bubble sound frequency sweep: low to high (pop effect)
-    osc.frequency.setValueAtTime(320, now);
-    osc.frequency.exponentialRampToValueAtTime(1100, now + 0.12);
-    
-    // Subtle gain decay
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.015); // subtle but audible pop
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-    
-    osc.start(now);
-    osc.stop(now + 0.15);
-  } catch (e) {
-    // Suppress audio context restrictions
-  }
-}
-
-// Play custom sound.mp3 for assistant replies
-function playReplySound() {
-  try {
-    const audio = new Audio(replySoundUrl);
-    audio.volume = 0.17; // halved volume (reduced by 50% from 0.35)
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Safe fallback if user hasn't clicked yet
-      });
-    }
-  } catch (e) {
-    // Suppress audio context restrictions
-  }
-}
-
 interface LandingHeroChatDemoProps {
   isLight?: boolean;
 }
@@ -328,7 +237,6 @@ export function LandingHeroChatDemo({ isLight = false }: LandingHeroChatDemoProp
         }
 
         if (step.kind === 'todos') {
-          playReplySound();
           setBubbles((prev) => {
             const withoutThinking = prev.filter((b) => b.kind !== 'thinking');
             return [
@@ -343,11 +251,6 @@ export function LandingHeroChatDemo({ isLight = false }: LandingHeroChatDemoProp
             ];
           });
           return;
-        }
-
-        // Play reply sound for assistant messages only (no sound for user messages)
-        if (step.kind === 'assistant') {
-          playReplySound();
         }
 
         setBubbles((prev) => {

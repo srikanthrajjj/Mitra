@@ -6,6 +6,8 @@ export interface ProjectFolder {
   /** Demo seed status; derived from child solutions when omitted */
   status?: FolderStatus;
   updatedAt?: string;
+  /** Soft-removed from active lists; not permanently deleted */
+  archived?: boolean;
 }
 
 export const PROJECT_FOLDERS: ProjectFolder[] = [];

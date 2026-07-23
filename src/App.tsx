@@ -2257,20 +2257,23 @@ Pick a step below and I'll continue building — data model, scripts, and update
     setRenamingFolderId(null);
   };
 
-  const handleDeleteFolder = (folderId: string) => {
+  const handleArchiveFolder = (folderId: string) => {
+    const folder = folders.find((f) => f.id === folderId);
+    if (!folder || folder.archived) return;
     const folderThreads = solutions.filter((s) => s.folderId === folderId);
     const message =
       folderThreads.length > 0
-        ? `Delete "${folders.find((f) => f.id === folderId)?.name ?? 'folder'}" and ${folderThreads.length} thread(s)?`
-        : `Delete folder "${folders.find((f) => f.id === folderId)?.name ?? 'folder'}"?`;
+        ? `Archive "${folder.name}"? Its ${folderThreads.length} thread(s) stay attached and can be restored later.`
+        : `Archive project "${folder.name}"? You can restore it later.`;
     setConfirmDialog({
-      title: 'Delete folder?',
+      title: 'Archive project?',
       message,
-      confirmLabel: 'Delete',
-      variant: 'danger',
+      confirmLabel: 'Archive',
+      variant: 'warning',
       onConfirm: () => {
-        setFolders((prev) => prev.filter((f) => f.id !== folderId));
-        setSolutions((prev) => prev.filter((s) => s.folderId !== folderId));
+        setFolders((prev) =>
+          prev.map((f) => (f.id === folderId ? { ...f, archived: true } : f)),
+        );
         if (focusedFolderId === folderId) setFocusedFolderId('');
         if (folderThreads.some((s) => s.id === activeSolutionId)) {
           setActiveSolutionId('');
@@ -2503,7 +2506,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           onSelectSolution={handleSelectSolution}
           onCreateFolder={handleCreateFolder}
           onRenameFolder={handleRenameFolder}
-          onDeleteFolder={handleDeleteFolder}
+          onDeleteFolder={handleArchiveFolder}
           onRenameSolution={handleRenameSolution}
           onDeleteSolution={handleDeleteSolution}
           onMoveSolution={handleMoveSolution}

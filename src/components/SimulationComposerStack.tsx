@@ -80,9 +80,13 @@ export default function SimulationComposerStack({
         data-tour={dataTour}
         className={cn(
           'relative z-10 mt-3 overflow-hidden rounded-2xl border bg-transparent transition-colors duration-200',
-          isDark ? 'border-white/10' : 'border-slate-200/90',
-          !isActive && (isDark ? 'hover:border-white/22' : 'hover:border-slate-300'),
-          isActive && (isDark ? 'border-brand-green/45' : 'border-emerald-400/70'),
+          isDark
+            ? 'border-white/18 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.65),0_4px_14px_-6px_rgba(0,0,0,0.45)]'
+            : 'border-border shadow-[0_12px_36px_-14px_rgba(15,23,42,0.22),0_4px_12px_-6px_rgba(15,23,42,0.12)]',
+          !isActive && (isDark ? 'hover:border-white/28' : 'hover:border-border'),
+          isActive && (isDark
+            ? 'border-brand-green/50 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.65),0_0_0_1px_rgba(79,207,54,0.18)]'
+            : 'border-brand-green/55 shadow-[0_12px_36px_-14px_rgba(15,23,42,0.2),0_0_0_1px_rgba(4,120,87,0.12)]'),
         )}
       >
         {hasAttachedHeader && attachedHeader}
@@ -92,9 +96,6 @@ export default function SimulationComposerStack({
             'overflow-hidden',
             hasAttachedHeader ? 'rounded-b-[15px] rounded-t-none' : 'rounded-[15px]',
             innerClassName,
-            isDark
-              ? 'shadow-[0_10px_30px_-18px_rgba(0,0,0,0.55)]'
-              : 'shadow-[0_10px_28px_-18px_rgba(15,23,42,0.14)]',
           )}
         >
           {children}

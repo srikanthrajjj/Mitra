@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
+import { useLandingDesign } from './LandingDesignContext';
 
 const INNER_RING = [
   { name: 'ITSM', desc: 'Streamline IT service delivery with AI-powered incident, problem, and change management workflows.', angle: 0 },
@@ -68,14 +69,28 @@ function OrbitalNode({
 }
 
 export function LandingAnimatedBeam() {
+  const design = useLandingDesign();
+  const isV1 = design === 'v1';
+  const isV2 = design === 'v2';
   const innerRadius = 200;
   const outerRadius = 310;
 
   return (
-    <section className="landing-section-surface px-6 py-24 md:py-32 overflow-hidden">
+    <section
+      className={cn(
+        'overflow-hidden px-6 py-24 md:py-32',
+        isV2 ? 'landing-band-violet' : 'landing-section-surface',
+      )}
+    >
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="font-display text-3xl font-medium text-white md:text-5xl">
+          <h2
+            className={cn(
+              'font-display text-white',
+              isV1 && 'landing-v1-section-title',
+              !isV1 && 'text-3xl font-medium md:text-5xl',
+            )}
+          >
             AI-Implementation Across<br />ServiceNow Landscape
           </h2>
         </div>
