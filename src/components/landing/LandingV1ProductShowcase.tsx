@@ -9,7 +9,7 @@ export function LandingV1ProductShowcase() {
       aria-labelledby="v1-product-heading"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,rgba(26,175,0,0.08),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_35%,rgba(26,175,0,0.04),transparent_70%)]"
         aria-hidden
       />
 
@@ -19,12 +19,12 @@ export function LandingV1ProductShowcase() {
             Meet Mitra
           </p>
           <h2 id="v1-product-heading" className="landing-v1-section-title mt-4">
-            AI without workflows is just{' '}
-            <span className="landing-v1-accent-word">expensive advice</span>
+            ServiceNow delivery that{' '}
+            <span className="landing-v1-accent-word">ships past the brief</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/55">
-            Mitra turns intent into ServiceNow delivery — stories, catalogs, flows, tests, and
-            go-live packs — with humans in control.
+            Mitra converts stakeholder intent into stories, catalogs, flows, tests, and go-live
+            packs — structured for your platform teams, with humans approving every step.
           </p>
         </div>
 

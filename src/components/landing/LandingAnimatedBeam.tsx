@@ -77,6 +77,7 @@ export function LandingAnimatedBeam() {
 
   return (
     <section
+      id="ecosystem"
       className={cn(
         'overflow-hidden px-6 py-24 md:py-32',
         isV2 ? 'landing-band-violet' : 'landing-section-surface',

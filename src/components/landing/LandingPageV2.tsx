@@ -13,6 +13,8 @@ import { LandingLifecycleTimeline } from './LandingLifecycleTimeline';
 import { LandingIntentJourney } from './LandingIntentJourney';
 import { LandingHeroChatDemo } from '../LandingHeroChatDemo';
 
+const heroV2Image = `${import.meta.env.BASE_URL}landing/hero-v2.png`;
+
 interface LandingPageV2Props {
   onGetStarted: () => void;
   onSignIn?: () => void;
@@ -49,10 +51,10 @@ export function LandingPageV2({
   return (
     <div className="landing-page landing-echelon landing-design-v2 overflow-x-hidden text-white antialiased selection:bg-[var(--landing-accent)]/25 selection:text-white">
       {/* ── HERO: full-bleed graphic bg + left copy overlay (cards live in the image) ── */}
-      <section className="landing-v2-hero relative min-h-[100svh] w-full overflow-hidden">
+      <section id="home" className="landing-v2-hero relative min-h-[100svh] w-full overflow-hidden">
         <div className="landing-v2-hero-media absolute inset-0" aria-hidden>
           <img
-            src="/landing/hero-v2.png"
+            src={heroV2Image}
             alt=""
             className="landing-v2-hero-img absolute inset-0 h-full w-full max-w-none object-cover object-[58%_center]"
             decoding="async"
@@ -114,7 +116,7 @@ export function LandingPageV2({
       </section>
 
       {/* ── PRODUCT SHOWCASE (SN-style framed Mitra UI) ── */}
-      <section className="landing-band-violet relative overflow-hidden px-6 py-20 md:py-28">
+      <section id="about" className="landing-band-violet relative overflow-hidden px-6 py-20 md:py-28">
         <div className="relative z-10 mx-auto max-w-6xl">
           <SectionReveal className="mx-auto max-w-3xl text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">

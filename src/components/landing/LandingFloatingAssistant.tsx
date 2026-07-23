@@ -21,7 +21,7 @@ export function LandingFloatingAssistant({ onGetDemo }: LandingFloatingAssistant
     <div className="landing-floating-assistant pointer-events-none fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-3">
       {open && (
         <div
-          className="landing-floating-assistant-panel pointer-events-auto w-[min(100vw-2rem,22rem)] overflow-hidden rounded-2xl border border-white/12 bg-[#091d2b] shadow-[0_24px_64px_rgba(0,0,0,0.45)]"
+          className="landing-floating-assistant-panel pointer-events-auto w-[min(100vw-2rem,22rem)] overflow-hidden rounded-2xl border border-white/12 bg-[#051824] shadow-[0_24px_64px_rgba(0,0,0,0.45)]"
           role="dialog"
           aria-label="IlluminAIte assistant"
         >
@@ -73,7 +73,7 @@ export function LandingFloatingAssistant({ onGetDemo }: LandingFloatingAssistant
               <button
                 type="button"
                 onClick={onGetDemo}
-                className="rounded-lg bg-[#1aaf00] p-2 text-[#091d2b] transition-opacity hover:opacity-90"
+                className="rounded-lg bg-[#1aaf00] p-2 text-[#051824] transition-opacity hover:opacity-90"
                 aria-label="Send message"
               >
                 <Send className="h-4 w-4" />
@@ -87,7 +87,7 @@ export function LandingFloatingAssistant({ onGetDemo }: LandingFloatingAssistant
         <button
           type="button"
           onClick={onGetDemo}
-          className="rounded-full border border-white/25 bg-[#103b31]/90 px-5 py-2.5 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-[#103b31]"
+          className="rounded-full border border-white/25 bg-[#0b2d38]/90 px-5 py-2.5 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-[#0b2d38]"
         >
           Book A Demo
         </button>
@@ -97,8 +97,8 @@ export function LandingFloatingAssistant({ onGetDemo }: LandingFloatingAssistant
           className={cn(
             'flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all',
             open
-              ? 'bg-white text-[#091d2b]'
-              : 'bg-[#1aaf00] text-[#091d2b] hover:opacity-95',
+              ? 'bg-white text-[#051824]'
+              : 'bg-[#1aaf00] text-[#051824] hover:opacity-95',
           )}
           aria-label={open ? 'Close chat' : 'Open chat assistant'}
           aria-expanded={open}

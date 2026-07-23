@@ -3724,15 +3724,15 @@ button.rounded-full {
   color: #ffffff;
 }
 
-/* V1 — navy → forest teal gradient across entire page/sections */
+/* V1 — deep sea navy with subtle teal mid-tone across entire page/sections */
 .landing-echelon.landing-design-v1 {
-  --landing-bg: #091d2b;
-  --landing-bg-elevated: #103b31;
-  --landing-bg-soft: #0c2f28;
+  --landing-bg: #051824;
+  --landing-bg-elevated: #0b2d38;
+  --landing-bg-soft: #072230;
   --landing-accent: #1aaf00;
-  --landing-accent-deep: #091d2b;
+  --landing-accent-deep: #051824;
   --landing-muted: #ffffff;
-  --landing-v1-gradient: linear-gradient(165deg, #091d2b 0%, #103b31 48%, #091d2b 100%);
+  --landing-v1-gradient: linear-gradient(165deg, #051824 0%, #0b2d38 48%, #051824 100%);
   background: var(--landing-v1-gradient);
   background-attachment: fixed;
   color: #ffffff;
@@ -3759,12 +3759,12 @@ button.rounded-full {
 .landing-echelon.landing-design-v1 .landing-v1-content-curtain {
   position: relative;
   z-index: 10;
-  background: linear-gradient(165deg, #091d2b 0%, #103b31 48%, #091d2b 100%);
+  background: var(--landing-v1-gradient);
 }
 
 .landing-echelon.landing-design-v1 footer.fixed,
 .landing-echelon.landing-design-v1 .landing-footer-reveal {
-  background: linear-gradient(165deg, #091d2b 0%, #103b31 52%, #091d2b 100%) !important;
+  background: linear-gradient(165deg, #051824 0%, #0b2d38 52%, #051824 100%) !important;
 }
 
 .landing-echelon.landing-design-v1 .landing-echelon-nav,
@@ -3786,7 +3786,7 @@ button.rounded-full {
 .landing-echelon.landing-design-v1 .landing-cta-v1-primary {
   border-radius: 9999px;
   background: #1aaf00;
-  color: #091d2b;
+  color: #051824;
   font-weight: 700;
   transition: opacity 0.15s ease;
 }
