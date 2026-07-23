@@ -138,7 +138,7 @@ export function LandingNav({
           className={cn(
             'px-4 py-2 text-[13px] sm:px-5',
             isV1
-              ? 'rounded-full bg-card font-semibold text-foreground transition-opacity hover:opacity-90'
+              ? 'landing-cta-v1-ghost rounded-full px-5 py-2.5 text-sm font-bold'
               : useAccentCta
                 ? 'landing-cta-primary'
                 : 'rounded-full bg-card font-semibold text-foreground transition-opacity hover:opacity-90',

@@ -83,14 +83,7 @@ export function LandingFloatingAssistant({ onGetDemo }: LandingFloatingAssistant
         </div>
       )}
 
-      <div className="pointer-events-auto flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={onGetDemo}
-          className="rounded-full border border-white/25 bg-[#0b2d38]/90 px-5 py-2.5 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-colors hover:border-white/40 hover:bg-[#0b2d38]"
-        >
-          Book A Demo
-        </button>
+      <div className="pointer-events-auto">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
