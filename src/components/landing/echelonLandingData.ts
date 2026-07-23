@@ -22,18 +22,19 @@ export interface NavLink {
 }
 
 export const NAV_LINKS: NavLink[] = [
-  { label: 'Home', href: '#', accent: true },
-  { label: 'About', href: '#about' },
-  { label: 'Solutions', href: '#platform' },
+  { label: 'Home', href: '#home', accent: true },
+  { label: 'About Us', href: '#about' },
+  { label: 'AI Solutions and Industries', href: '#platform' },
+  { label: 'Mitra AI', href: '#demo' },
   {
-    label: 'Inspired',
+    label: 'Get Inspired',
     children: [
       { label: 'How It Works', href: '#how-it-works' },
       { label: 'What We Do', href: '#platform' },
       { label: 'ServiceNow Ecosystem', href: '#ecosystem' },
     ],
   },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Contact Us', href: '#contact' },
 ];
 
 export const HERO = {
@@ -41,7 +42,7 @@ export const HERO = {
   subtitle:
     'IlluminAIte offers AI agents that design, develop, test and deploy ServiceNow as per best practices and deliver industry specific outcomes.',
   primaryCta: 'Try IlluminAIte',
-  secondaryCta: 'Get a demo',
+  secondaryCta: 'Book A Demo',
 };
 
 export const HERO_STATS = [

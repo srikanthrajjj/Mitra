@@ -4,7 +4,7 @@ import { LandingMitraProductFrame } from './LandingMitraProductFrame';
 export function LandingV1ProductShowcase() {
   return (
     <section
-      id="product"
+      id="about"
       className="landing-section-surface relative overflow-x-clip px-6 py-16 md:py-24"
       aria-labelledby="v1-product-heading"
     >

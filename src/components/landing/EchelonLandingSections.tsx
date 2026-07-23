@@ -44,11 +44,11 @@ export function LandingNav({
   const useAccentCta = design === 'v1' || design === 'v2' || design === 'v3';
   const isV1 = design === 'v1';
 
-  return (
+  const navInner = (
     <nav className="landing-echelon-nav relative z-50 mx-auto flex h-16 w-full max-w-6xl items-center px-6 md:h-[4.25rem]">
       <IlluminaiteLogo className="relative z-10 h-[26px] w-auto shrink-0" />
 
-      <div className="absolute inset-x-0 hidden items-center justify-center gap-8 lg:flex">
+      <div className="absolute inset-x-0 hidden items-center justify-center gap-6 xl:gap-8 lg:flex">
         {NAV_LINKS.map((link) => {
           if (link.children) {
             const isOpen = openDropdown === link.label;
@@ -64,7 +64,7 @@ export function LandingNav({
                   className={cn(
                     'inline-flex items-center gap-1 text-[13px] transition-colors',
                     isV1
-                      ? 'font-semibold text-white hover:text-[#1aaf00]'
+                      ? 'font-semibold text-foreground hover:text-brand-green'
                       : 'font-medium text-white/80 hover:text-[var(--landing-accent)]',
                   )}
                   aria-expanded={isOpen}
@@ -73,12 +73,12 @@ export function LandingNav({
                   <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', isOpen && 'rotate-180')} />
                 </button>
                 {isOpen && (
-                  <div className="absolute left-1/2 top-[calc(100%+10px)] z-50 min-w-[11rem] -translate-x-1/2 rounded-xl border border-white/10 bg-[var(--landing-bg-elevated)]/95 p-1.5 shadow-xl backdrop-blur-md">
+                  <div className="absolute left-1/2 top-[calc(100%+10px)] z-50 min-w-[11rem] -translate-x-1/2 rounded-xl border border-mitra-border bg-mitra-surface/95 p-1.5 shadow-xl backdrop-blur-md">
                     {link.children.map((item) => (
                       <a
                         key={item.label}
                         href={item.href}
-                        className="block rounded-lg px-3 py-2 text-[13px] text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+                        className="block rounded-lg px-3 py-2 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                       >
                         {item.label}
                       </a>
@@ -94,9 +94,14 @@ export function LandingNav({
               key={link.label}
               href={link.href}
               className={cn(
-                'text-[13px] transition-colors',
+                'inline-flex items-center text-[13px] transition-colors',
                 isV1
-                  ? cn('font-semibold', link.accent ? 'text-[#1aaf00]' : 'text-white hover:text-[#1aaf00]')
+                  ? cn(
+                      'font-semibold',
+                      link.accent
+                        ? 'text-brand-green hover:text-brand-green'
+                        : 'text-foreground hover:text-brand-green',
+                    )
                   : cn(
                       'font-medium',
                       link.accent
@@ -105,6 +110,12 @@ export function LandingNav({
                     ),
               )}
             >
+              {link.accent && isV1 && (
+                <span
+                  className="mr-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-brand-green"
+                  aria-hidden
+                />
+              )}
               {link.label}
             </a>
           );
@@ -112,11 +123,11 @@ export function LandingNav({
       </div>
 
       <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2.5 sm:gap-3">
-        {onSignIn && (
+        {onSignIn && !isV1 && (
           <button
             type="button"
             onClick={onSignIn}
-            className="hidden text-[13px] font-semibold text-white transition-colors hover:text-[#1aaf00] md:inline-flex"
+            className="hidden text-[13px] font-semibold text-white transition-colors hover:text-[var(--landing-accent)] md:inline-flex"
           >
             Sign in
           </button>
@@ -126,11 +137,11 @@ export function LandingNav({
           onClick={onGetStarted}
           className={cn(
             'px-4 py-2 text-[13px] sm:px-5',
-            useAccentCta
-              ? design === 'v1'
-                ? 'landing-cta-v1-primary'
-                : 'landing-cta-primary'
-              : 'rounded-full bg-white font-semibold text-black transition-opacity hover:opacity-90',
+            isV1
+              ? 'rounded-full bg-card font-semibold text-foreground transition-opacity hover:opacity-90'
+              : useAccentCta
+                ? 'landing-cta-primary'
+                : 'rounded-full bg-card font-semibold text-foreground transition-opacity hover:opacity-90',
           )}
         >
           {HERO.secondaryCta}
@@ -138,6 +149,16 @@ export function LandingNav({
       </div>
     </nav>
   );
+
+  if (isV1) {
+    return (
+      <header className="dark relative z-50 w-full border-b border-border/10 bg-[var(--landing-bg)]">
+        {navInner}
+      </header>
+    );
+  }
+
+  return navInner;
 }
 
 interface LandingHeroEchelonProps {
@@ -154,6 +175,7 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
 
   return (
     <section
+      id="home"
       className={cn(
         'landing-echelon-hero landing-band-hero relative flex min-h-[calc(100vh-88px)] flex-1 flex-col px-6 pb-14 pt-8 md:min-h-[calc(100vh-96px)] md:pb-18 md:pt-10',
         isV2 ? 'items-stretch justify-center' : 'items-center justify-center text-center',
@@ -293,13 +315,6 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
           >
             Try IlluminAIte
             <ChevronRight className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={onGetStarted}
-            className="landing-cta-v1-ghost px-7 py-3.5 text-sm"
-          >
-            {HERO.secondaryCta}
           </button>
         </div>
       ) : !isV2 ? (
