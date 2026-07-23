@@ -32,10 +32,10 @@ function LandingScrollReveal({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.08, margin: '0px 0px -8% 0px' }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, amount: 0.12, margin: '0px 0px -6% 0px' }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -142,7 +142,9 @@ export default function LandingPage({
           <LandingScrollReveal delay={0.04}>
             <LandingHowItWorks />
           </LandingScrollReveal>
-          <LandingPlatformSection />
+          <LandingScrollReveal delay={0.04}>
+            <LandingPlatformSection />
+          </LandingScrollReveal>
           <LandingScrollReveal delay={0.04}>
             <LandingAnimatedBeam />
           </LandingScrollReveal>

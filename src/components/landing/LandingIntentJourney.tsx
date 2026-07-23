@@ -15,10 +15,10 @@ function WhatWeDoItemRow({
 }) {
   return (
     <li className="py-3.5 md:py-4">
-      <p className="text-[15px] font-medium leading-snug text-white/90 md:text-base">
+      <p className="text-[15px] font-semibold leading-snug text-white/90 md:text-lg">
         {title}
       </p>
-      <p className="mt-1.5 text-sm font-light leading-relaxed text-white/45">
+      <p className="mt-1.5 text-sm font-medium leading-relaxed text-white/50 md:text-base">
         {desc}
       </p>
     </li>
@@ -61,13 +61,20 @@ function WhatWeDoTimelineSection({
           className={cn(
             'mt-3 font-display leading-tight tracking-tight text-white',
             isV1
-              ? 'text-2xl font-bold md:text-3xl lg:text-[2.15rem]'
+              ? 'text-3xl font-extrabold md:text-4xl lg:text-[2.75rem]'
               : 'text-2xl font-medium md:text-3xl lg:text-[2rem]',
           )}
         >
           {block.title}
         </h3>
-        <p className="mt-3 text-sm font-light leading-relaxed text-white/45 md:text-base">
+        <p
+          className={cn(
+            'mt-3 leading-relaxed',
+            isV1
+              ? 'text-base font-medium text-white/60 md:text-lg'
+              : 'text-sm font-light text-white/45 md:text-base',
+          )}
+        >
           {block.subtitle}
         </p>
         <ul className="mt-8 md:mt-10">
@@ -202,21 +209,46 @@ export function LandingIntentJourney() {
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={headerInView || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto max-w-2xl pt-20 text-center md:max-w-3xl md:pt-28"
+          className={cn(
+            'mx-auto pt-20 text-center md:pt-28',
+            isV1 ? 'max-w-4xl md:max-w-5xl' : 'max-w-2xl md:max-w-3xl',
+          )}
         >
-          <p className="text-[11px] font-medium uppercase tracking-[0.38em] text-[#8BEA3C]/80">
+          <p
+            className={cn(
+              'uppercase tracking-[0.38em]',
+              isV1
+                ? 'text-xs font-bold text-[var(--landing-accent)] md:text-sm'
+                : 'text-[11px] font-medium text-[#8BEA3C]/80',
+            )}
+          >
             {PLATFORM_SECTION.eyebrow}
           </p>
           <h2
             className={cn(
               'mt-4 font-display leading-tight tracking-tight text-white',
-              isV1 && 'landing-v1-section-title',
+              isV1 && 'landing-v1-section-title mt-5',
               !isV1 && 'text-3xl font-medium md:text-[2.75rem]',
             )}
           >
-            {PLATFORM_SECTION.title}
+            {isV1 ? (
+              <>
+                {PLATFORM_SECTION.title}
+                <br />
+                <span className="landing-v1-accent-word">{PLATFORM_SECTION.titleAccent}</span>
+              </>
+            ) : (
+              <>
+                {PLATFORM_SECTION.title} {PLATFORM_SECTION.titleAccent}
+              </>
+            )}
           </h2>
-          <p className="mt-4 text-base font-light leading-relaxed text-white/45">
+          <p
+            className={cn(
+              'mx-auto mt-5 max-w-2xl leading-relaxed',
+              isV1 ? 'landing-v1-lead mt-6 max-w-3xl' : 'text-base font-light text-white/45',
+            )}
+          >
             {PLATFORM_SECTION.subtitle}
           </p>
         </motion.header>

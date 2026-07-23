@@ -1,4 +1,5 @@
 import { LandingMitraProductFrame } from './LandingMitraProductFrame';
+import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
 
 /** V1 product showcase — headline + Mitra dashboard in animated glass frame */
 export function LandingV1ProductShowcase() {
@@ -14,19 +15,27 @@ export function LandingV1ProductShowcase() {
       />
 
       <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
+        <LandingTextReveal className="mx-auto max-w-3xl text-center">
+          <LandingTextLine className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
             Meet Mitra
-          </p>
-          <h2 id="v1-product-heading" className="landing-v1-section-title mt-4">
-            ServiceNow delivery that{' '}
-            <span className="landing-v1-accent-word">ships past the brief</span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/55">
+          </LandingTextLine>
+          <LandingTextLine
+            as="h2"
+            className="landing-v1-section-title mt-4"
+          >
+            <span id="v1-product-heading">
+              ServiceNow delivery that{' '}
+              <span className="landing-v1-accent-word">ships past the brief</span>
+            </span>
+          </LandingTextLine>
+          <LandingTextLine
+            as="p"
+            className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/55"
+          >
             Mitra converts stakeholder intent into stories, catalogs, flows, tests, and go-live
             packs — structured for your platform teams, with humans approving every step.
-          </p>
-        </div>
+          </LandingTextLine>
+        </LandingTextReveal>
 
         <div className="mt-12 px-4 sm:mt-14 sm:px-8 md:px-12 lg:px-16">
           <div className="landing-glass-frame">

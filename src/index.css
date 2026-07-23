@@ -3810,11 +3810,28 @@ button.rounded-full {
 
 .landing-echelon.landing-design-v1 .landing-v1-section-title {
   font-family: var(--font-display);
-  font-size: clamp(1.875rem, 4.2vw, 3.25rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.35rem, 5.2vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: #ffffff;
+}
+
+/* Alias — keep one size system for all V1 section H2s */
+.landing-echelon.landing-design-v1 .landing-v1-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.35rem, 5.2vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.landing-echelon.landing-design-v1 .landing-v1-lead {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .landing-echelon.landing-design-v1 .landing-v1-accent-word {

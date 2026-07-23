@@ -26,6 +26,7 @@ import {
   SECURITY_SECTION,
   SECURITY_ITEMS,
 } from './echelonLandingData';
+import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
 
 interface LandingNavProps {
   onGetStarted: () => void;
@@ -195,7 +196,7 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
               isV2
                 ? 'max-w-3xl text-[2.35rem] font-bold leading-[1.08] md:text-[3.25rem] lg:text-[3.75rem]'
                 : isV1
-                  ? 'mx-auto max-w-6xl text-[2.5rem] font-bold leading-[1.06] sm:text-[3rem] md:text-[3.75rem] lg:max-w-7xl lg:text-[4.25rem]'
+                  ? 'mx-auto max-w-6xl text-[2.5rem] font-extrabold leading-[1.06] sm:text-[3rem] md:text-[3.75rem] lg:max-w-7xl lg:text-[4.25rem]'
                   : 'mx-auto max-w-4xl text-[2rem] font-medium leading-[1.15] md:text-[2.75rem] lg:text-[3.25rem]',
             )}
           >
@@ -355,32 +356,51 @@ export function LandingHowItWorks() {
     <section
       id="how-it-works"
       className={cn(
-        'relative overflow-hidden px-6 py-18 md:py-26',
+        'relative overflow-hidden px-6',
+        isV1 ? 'py-12 md:py-16' : 'py-18 md:py-26',
         isV2 ? 'landing-band-dark' : 'landing-section-surface',
       )}
     >
       <div className="relative z-10 mx-auto max-w-6xl text-center">
-        <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-16">
-          {LIFECYCLE_SECTION.eyebrow}
-        </p>
-        <h2
-          className={cn(
-            'mt-3 font-display text-white',
-            isV1 && 'landing-v1-section-title',
-            isV2 && 'text-2xl font-bold md:text-[2.75rem]',
-            !isV1 && !isV2 && 'text-2xl font-medium md:text-4xl',
-          )}
-        >
-          {LIFECYCLE_SECTION.title}
-        </h2>
-        <p
-          className={cn(
-            'mx-auto mt-4 max-w-2xl text-sm leading-relaxed',
-            isV2 ? 'landing-body-muted' : 'text-white/45',
-          )}
-        >
-          {LIFECYCLE_SECTION.subtitle}
-        </p>
+        {isV1 ? (
+          <LandingTextReveal>
+            <LandingTextLine className="mt-6 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-8">
+              {LIFECYCLE_SECTION.eyebrow}
+            </LandingTextLine>
+            <LandingTextLine as="h2" className="landing-v1-section-title mt-3">
+              {LIFECYCLE_SECTION.title}
+            </LandingTextLine>
+            <LandingTextLine
+              as="p"
+              className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/45"
+            >
+              {LIFECYCLE_SECTION.subtitle}
+            </LandingTextLine>
+          </LandingTextReveal>
+        ) : (
+          <>
+            <p className="mt-14 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-16">
+              {LIFECYCLE_SECTION.eyebrow}
+            </p>
+            <h2
+              className={cn(
+                'mt-3 font-display text-white',
+                isV2 && 'text-2xl font-bold md:text-[2.75rem]',
+                !isV2 && 'text-2xl font-medium md:text-4xl',
+              )}
+            >
+              {LIFECYCLE_SECTION.title}
+            </h2>
+            <p
+              className={cn(
+                'mx-auto mt-4 max-w-2xl text-sm leading-relaxed',
+                isV2 ? 'landing-body-muted' : 'text-white/45',
+              )}
+            >
+              {LIFECYCLE_SECTION.subtitle}
+            </p>
+          </>
+        )}
 
         <LandingLifecycleTimeline />
       </div>
@@ -500,34 +520,54 @@ export function LandingInstanceDemo({ onGetStarted }: LandingInstanceDemoProps) 
       )}
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
-        <div>
-          <h2
-            className={cn(
-              'font-display text-white',
-              isV1 && 'landing-v1-section-title',
-              isV2 && 'text-2xl font-bold leading-snug md:text-[2.75rem]',
-              !isV1 && !isV2 && 'text-2xl font-medium leading-snug md:text-4xl',
-            )}
-          >
-            {DEMO_SECTION.title}
-          </h2>
-          <p className={cn('mt-6 text-sm leading-relaxed', isV2 ? 'landing-body-muted' : 'text-white/55')}>
-            {DEMO_SECTION.subtitle}
-          </p>
-          <button
-            type="button"
-            onClick={onGetStarted}
-            className={cn(
-              'mt-8 inline-flex items-center gap-1 px-6 py-3 text-sm font-semibold',
-              isV2
-                ? 'landing-cta-primary'
-                : 'rounded-full bg-[var(--landing-accent)] text-black',
-            )}
-          >
-            {DEMO_SECTION.primaryCta}
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+        {isV1 ? (
+          <LandingTextReveal>
+            <LandingTextLine as="h2" className="landing-v1-section-title">
+              {DEMO_SECTION.title}
+            </LandingTextLine>
+            <LandingTextLine as="p" className="mt-6 text-sm leading-relaxed text-white/55">
+              {DEMO_SECTION.subtitle}
+            </LandingTextLine>
+            <LandingTextLine>
+              <button
+                type="button"
+                onClick={onGetStarted}
+                className="mt-8 inline-flex items-center gap-1 rounded-full bg-[var(--landing-accent)] px-6 py-3 text-sm font-semibold text-black"
+              >
+                {DEMO_SECTION.primaryCta}
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </LandingTextLine>
+          </LandingTextReveal>
+        ) : (
+          <div>
+            <h2
+              className={cn(
+                'font-display text-white',
+                isV2 && 'text-2xl font-bold leading-snug md:text-[2.75rem]',
+                !isV2 && 'text-2xl font-medium leading-snug md:text-4xl',
+              )}
+            >
+              {DEMO_SECTION.title}
+            </h2>
+            <p className={cn('mt-6 text-sm leading-relaxed', isV2 ? 'landing-body-muted' : 'text-white/55')}>
+              {DEMO_SECTION.subtitle}
+            </p>
+            <button
+              type="button"
+              onClick={onGetStarted}
+              className={cn(
+                'mt-8 inline-flex items-center gap-1 px-6 py-3 text-sm font-semibold',
+                isV2
+                  ? 'landing-cta-primary'
+                  : 'rounded-full bg-[var(--landing-accent)] text-black',
+              )}
+            >
+              {DEMO_SECTION.primaryCta}
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         <div className={cn('min-w-0', isV2 && 'landing-product-shell p-3 md:p-4')}>
           <LandingHeroChatDemo />
         </div>

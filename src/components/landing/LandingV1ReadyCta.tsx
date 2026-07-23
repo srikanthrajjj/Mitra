@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 import { READY_CTA_SECTION } from './echelonLandingData';
+import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
 
 interface LandingV1ReadyCtaProps {
   onGetStarted: () => void;
@@ -18,19 +19,24 @@ export function LandingV1ReadyCta({ onGetStarted }: LandingV1ReadyCtaProps) {
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-3xl text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
+      <LandingTextReveal className="relative mx-auto max-w-3xl text-center">
+        <LandingTextLine className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
           {READY_CTA_SECTION.eyebrow}
-        </p>
-        <h2 id="ready-cta-heading" className="landing-v1-section-title mt-4">
-          {READY_CTA_SECTION.titleLead}{' '}
-          <span className="landing-v1-accent-word">{READY_CTA_SECTION.titleAccent}</span>
-        </h2>
-        <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/55">
+        </LandingTextLine>
+        <LandingTextLine as="h2" className="landing-v1-section-title mt-4">
+          <span id="ready-cta-heading">
+            {READY_CTA_SECTION.titleLead}{' '}
+            <span className="landing-v1-accent-word">{READY_CTA_SECTION.titleAccent}</span>
+          </span>
+        </LandingTextLine>
+        <LandingTextLine
+          as="p"
+          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/55"
+        >
           {READY_CTA_SECTION.subtitle}
-        </p>
+        </LandingTextLine>
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <LandingTextLine className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={onGetStarted}
@@ -46,8 +52,8 @@ export function LandingV1ReadyCta({ onGetStarted }: LandingV1ReadyCtaProps) {
           >
             {READY_CTA_SECTION.secondaryCta}
           </button>
-        </div>
-      </div>
+        </LandingTextLine>
+      </LandingTextReveal>
     </section>
   );
 }

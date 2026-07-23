@@ -118,7 +118,8 @@ export const LIFECYCLE_STEPS = [
 
 export const PLATFORM_SECTION = {
   eyebrow: 'What We Do',
-  title: 'Enterprise ServiceNow, end to end.',
+  title: 'Enterprise ServiceNow,',
+  titleAccent: 'end to end.',
   subtitle: 'From AI-powered configuration to continuous platform intelligence.',
 };
 

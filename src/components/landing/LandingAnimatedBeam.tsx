@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { useLandingDesign } from './LandingDesignContext';
+import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
 
 const INNER_RING = [
   { name: 'ITSM', desc: 'Streamline IT service delivery with AI-powered incident, problem, and change management workflows.', angle: 0 },
@@ -85,15 +86,17 @@ export function LandingAnimatedBeam() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2
-            className={cn(
-              'font-display text-white',
-              isV1 && 'landing-v1-section-title',
-              !isV1 && 'text-3xl font-medium md:text-5xl',
-            )}
-          >
-            AI-Implementation Across<br />ServiceNow Landscape
-          </h2>
+          {isV1 ? (
+            <LandingTextReveal>
+              <LandingTextLine as="h2" className="landing-v1-section-title">
+                AI-Implementation Across<br />ServiceNow Landscape
+              </LandingTextLine>
+            </LandingTextReveal>
+          ) : (
+            <h2 className="font-display text-3xl font-medium text-white md:text-5xl">
+              AI-Implementation Across<br />ServiceNow Landscape
+            </h2>
+          )}
         </div>
 
         <div
