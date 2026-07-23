@@ -59,9 +59,9 @@ export default function LandingPage({
     try {
       const stored = localStorage.getItem(LANDING_DESIGN_KEY);
       if (stored === 'v1' || stored === 'v2' || stored === 'v3') return stored;
-      return 'v3';
+      return 'v1';
     } catch {
-      return 'v3';
+      return 'v1';
     }
   });
 
@@ -79,8 +79,6 @@ export default function LandingPage({
         <LandingPageV3
           onGetStarted={onGetStarted}
           onSignIn={onSignIn}
-          landingDesign={landingDesign}
-          setLandingDesign={setLandingDesign}
         />
       </LandingDesignContext.Provider>
     );
@@ -92,8 +90,6 @@ export default function LandingPage({
         <LandingPageV2
           onGetStarted={onGetStarted}
           onSignIn={onSignIn}
-          landingDesign={landingDesign}
-          setLandingDesign={setLandingDesign}
         />
       </LandingDesignContext.Provider>
     );
@@ -134,8 +130,6 @@ export default function LandingPage({
             <LandingNav
               onGetStarted={onGetStarted}
               onSignIn={onSignIn}
-              landingDesign={landingDesign}
-              setLandingDesign={setLandingDesign}
             />
             <LandingScrollReveal>
               <LandingHeroEchelon onGetStarted={onGetStarted} />

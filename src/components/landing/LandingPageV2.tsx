@@ -4,7 +4,6 @@ import { LandingFooterReveal } from './LandingFooterReveal';
 import { LandingMitraProductFrame } from './LandingMitraProductFrame';
 import { LandingAnimatedBeam } from './LandingAnimatedBeam';
 import { LandingNav } from './EchelonLandingSections';
-import type { LandingDesign } from './LandingDesignContext';
 import {
   HERO,
   LIFECYCLE_SECTION,
@@ -17,8 +16,6 @@ import { LandingHeroChatDemo } from '../LandingHeroChatDemo';
 interface LandingPageV2Props {
   onGetStarted: () => void;
   onSignIn?: () => void;
-  landingDesign: LandingDesign;
-  setLandingDesign: (v: LandingDesign) => void;
 }
 
 /** Matches screenshot line breaks: green lead, white rest. */
@@ -48,8 +45,6 @@ function SectionReveal({
 export function LandingPageV2({
   onGetStarted,
   onSignIn,
-  landingDesign,
-  setLandingDesign,
 }: LandingPageV2Props) {
   return (
     <div className="landing-page landing-echelon landing-design-v2 overflow-x-hidden text-white antialiased selection:bg-[var(--landing-accent)]/25 selection:text-white">
@@ -71,8 +66,6 @@ export function LandingPageV2({
           <LandingNav
             onGetStarted={onGetStarted}
             onSignIn={onSignIn}
-            landingDesign={landingDesign}
-            setLandingDesign={setLandingDesign}
           />
         </div>
 

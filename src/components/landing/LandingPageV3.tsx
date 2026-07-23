@@ -5,14 +5,11 @@ import { LandingMitraProductFrame } from './LandingMitraProductFrame';
 import { LandingNav } from './EchelonLandingSections';
 import { LandingIntentToDeploy } from './LandingIntentToDeploy';
 import { LandingHeroChatDemo } from '../LandingHeroChatDemo';
-import type { LandingDesign } from './LandingDesignContext';
 import { HERO, HERO_STATS, DEMO_SECTION } from './echelonLandingData';
 
 interface LandingPageV3Props {
   onGetStarted: () => void;
   onSignIn?: () => void;
-  landingDesign: LandingDesign;
-  setLandingDesign: (v: LandingDesign) => void;
 }
 
 function SectionReveal({
@@ -54,16 +51,12 @@ const CONTROL_TOWER = [
 export function LandingPageV3({
   onGetStarted,
   onSignIn,
-  landingDesign,
-  setLandingDesign,
 }: LandingPageV3Props) {
   return (
     <div className="landing-page landing-echelon landing-design-v3 overflow-x-hidden text-white antialiased selection:bg-[var(--landing-accent)]/25 selection:text-white">
       <LandingNav
         onGetStarted={onGetStarted}
         onSignIn={onSignIn}
-        landingDesign={landingDesign}
-        setLandingDesign={setLandingDesign}
       />
 
       {/* ── HERO: left copy + stats + white CTA | right intent→deploy panel ── */}

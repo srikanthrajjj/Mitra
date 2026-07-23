@@ -10,7 +10,6 @@ import { LandingLifecycleTimeline } from './LandingLifecycleTimeline';
 import { LandingIntentJourney } from './LandingIntentJourney';
 import { LandingEcosystemOrbit } from './LandingEcosystemOrbit';
 import { useLandingDesign, type LandingDesign } from './LandingDesignContext';
-import { LandingDesignSwitcher } from './LandingDesignSwitcher';
 import {
   NAV_LINKS,
   HERO,
@@ -32,14 +31,12 @@ interface LandingNavProps {
   onGetStarted: () => void;
   onSignIn?: () => void;
   landingDesign?: LandingDesign;
-  setLandingDesign?: (v: LandingDesign) => void;
 }
 
 export function LandingNav({
   onGetStarted,
   onSignIn,
   landingDesign,
-  setLandingDesign,
 }: LandingNavProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const ctxDesign = useLandingDesign();
@@ -115,13 +112,6 @@ export function LandingNav({
       </div>
 
       <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2.5 sm:gap-3">
-        {setLandingDesign && (
-          <LandingDesignSwitcher
-            landingDesign={design}
-            setLandingDesign={setLandingDesign}
-            variant="nav"
-          />
-        )}
         {onSignIn && (
           <button
             type="button"
