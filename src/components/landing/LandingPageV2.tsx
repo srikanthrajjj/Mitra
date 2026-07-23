@@ -105,7 +105,7 @@ export function LandingPageV2({
                   onClick={onGetStarted}
                   className="landing-cta-ghost px-7 py-3 text-sm"
                 >
-                  Request Demo
+                  {HERO.secondaryCta}
                 </button>
               </div>
             </div>
@@ -225,7 +225,7 @@ export function LandingPageV2({
               onClick={onGetStarted}
               className="landing-cta-ghost h-12 px-8 text-sm"
             >
-              Request Demo
+              {HERO.secondaryCta}
             </button>
           </div>
         </SectionReveal>

@@ -461,7 +461,7 @@ export const READY_CTA_SECTION = {
   subtitle:
     'Connect Mitra to your instance and watch intent become stories, flows, tests, and deployment-ready delivery — with your team in control.',
   primaryCta: 'Try IlluminAIte',
-  secondaryCta: 'Get a demo',
+  secondaryCta: 'Book A Demo',
 };
 
 export const CAPABILITY_TAGS = LANDSCAPE_MODULES.map((m) => m.name);
