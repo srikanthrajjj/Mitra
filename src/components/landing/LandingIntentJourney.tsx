@@ -3,6 +3,7 @@ import { motion, useInView, useReducedMotion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { PLATFORM_SECTION, WHAT_WE_DO_BLOCKS, type WhatWeDoBlock } from './echelonLandingData';
 import { useLandingDesign } from './LandingDesignContext';
+import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
 
 const BLOCK_COUNT = WHAT_WE_DO_BLOCKS.length;
 
@@ -204,54 +205,42 @@ export function LandingIntentJourney() {
       />
 
       <div className="relative mx-auto max-w-6xl px-6 md:px-10">
-        <motion.header
-          ref={headerRef}
-          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-          animate={headerInView || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className={cn(
-            'mx-auto pt-20 text-center md:pt-28',
-            isV1 ? 'max-w-4xl md:max-w-5xl' : 'max-w-2xl md:max-w-3xl',
-          )}
-        >
-          <p
-            className={cn(
-              'uppercase tracking-[0.38em]',
-              isV1
-                ? 'text-xs font-bold text-[var(--landing-accent)] md:text-sm'
-                : 'text-[11px] font-medium text-[#8BEA3C]/80',
-            )}
+        {isV1 ? (
+          <LandingTextReveal
+            className="mx-auto max-w-4xl pt-20 text-center md:max-w-5xl md:pt-28"
+            delay={0.04}
           >
-            {PLATFORM_SECTION.eyebrow}
-          </p>
-          <h2
-            className={cn(
-              'mt-4 font-display leading-tight tracking-tight text-white',
-              isV1 && 'landing-v1-section-title mt-5',
-              !isV1 && 'text-3xl font-medium md:text-[2.75rem]',
-            )}
+            <LandingTextLine className="text-xs font-bold uppercase tracking-[0.38em] text-[var(--landing-accent)] md:text-sm">
+              {PLATFORM_SECTION.eyebrow}
+            </LandingTextLine>
+            <LandingTextLine as="h2" className="landing-v1-section-title mt-5">
+              {PLATFORM_SECTION.title}
+              <br />
+              <span className="landing-v1-accent-word">{PLATFORM_SECTION.titleAccent}</span>
+            </LandingTextLine>
+            <LandingTextLine as="p" className="landing-v1-lead mx-auto mt-6 max-w-3xl">
+              {PLATFORM_SECTION.subtitle}
+            </LandingTextLine>
+          </LandingTextReveal>
+        ) : (
+          <motion.header
+            ref={headerRef}
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={headerInView || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto max-w-2xl pt-20 text-center md:max-w-3xl md:pt-28"
           >
-            {isV1 ? (
-              <>
-                {PLATFORM_SECTION.title}
-                <br />
-                <span className="landing-v1-accent-word">{PLATFORM_SECTION.titleAccent}</span>
-              </>
-            ) : (
-              <>
-                {PLATFORM_SECTION.title} {PLATFORM_SECTION.titleAccent}
-              </>
-            )}
-          </h2>
-          <p
-            className={cn(
-              'mx-auto mt-5 max-w-2xl leading-relaxed',
-              isV1 ? 'landing-v1-lead mt-6 max-w-3xl' : 'text-base font-light text-white/45',
-            )}
-          >
-            {PLATFORM_SECTION.subtitle}
-          </p>
-        </motion.header>
+            <p className="text-[11px] font-medium uppercase tracking-[0.38em] text-[#8BEA3C]/80">
+              {PLATFORM_SECTION.eyebrow}
+            </p>
+            <h2 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight text-white md:text-[2.75rem]">
+              {PLATFORM_SECTION.title} {PLATFORM_SECTION.titleAccent}
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base font-light leading-relaxed text-white/45">
+              {PLATFORM_SECTION.subtitle}
+            </p>
+          </motion.header>
+        )}
 
         <nav
           className="landing-wwd-mobile-nav sticky top-[4.5rem] z-20 -mx-2 mt-10 overflow-x-auto px-2 py-3 lg:hidden"

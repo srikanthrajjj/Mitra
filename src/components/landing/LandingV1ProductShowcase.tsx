@@ -9,13 +9,8 @@ export function LandingV1ProductShowcase() {
       className="landing-section-surface relative overflow-x-clip px-6 py-16 md:py-24"
       aria-labelledby="v1-product-heading"
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_35%,rgba(26,175,0,0.04),transparent_70%)]"
-        aria-hidden
-      />
-
       <div className="relative z-10 mx-auto max-w-6xl">
-        <LandingTextReveal className="mx-auto max-w-3xl text-center">
+        <LandingTextReveal className="mx-auto max-w-3xl text-center" delay={0.04}>
           <LandingTextLine className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
             Meet Mitra
           </LandingTextLine>

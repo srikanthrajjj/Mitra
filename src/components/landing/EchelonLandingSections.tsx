@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowRight, ChevronDown, ChevronRight, Quote, Shield, Mail,
@@ -27,6 +27,7 @@ import {
   SECURITY_ITEMS,
 } from './echelonLandingData';
 import { LandingTextLine, LandingTextReveal } from './LandingTextReveal';
+import { useLandingHeroAppear } from './LandingHeroAppear';
 
 interface LandingNavProps {
   onGetStarted: () => void;
@@ -170,12 +171,17 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
   const design = useLandingDesign();
   const isV2 = design === 'v2';
   const isV1 = design === 'v1';
+  const heroRef = useRef<HTMLElement | null>(null);
+  useLandingHeroAppear(heroRef, isV1);
   const [titleLead, titleRest] = HERO.title.includes(',')
     ? [HERO.title.slice(0, HERO.title.indexOf(',') + 1), HERO.title.slice(HERO.title.indexOf(',') + 1).trim()]
     : [HERO.title, ''];
 
   return (
     <section
+      ref={(el) => {
+        heroRef.current = el;
+      }}
       id="home"
       className={cn(
         'landing-echelon-hero landing-band-hero relative flex min-h-[calc(100vh-88px)] flex-1 flex-col px-6 pb-14 pt-8 md:min-h-[calc(100vh-96px)] md:pb-18 md:pt-10',
@@ -199,6 +205,7 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
                   ? 'mx-auto max-w-6xl text-[2.5rem] font-extrabold leading-[1.06] sm:text-[3rem] md:text-[3.75rem] lg:max-w-7xl lg:text-[4.25rem]'
                   : 'mx-auto max-w-4xl text-[2rem] font-medium leading-[1.15] md:text-[2.75rem] lg:text-[3.25rem]',
             )}
+            {...(isV1 ? { 'data-landing-hero-appear': 'title' } : {})}
           >
             {isV2 || isV1 ? (
               <>
@@ -231,7 +238,10 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
           )}
 
           {isV1 && (
-            <p className="mx-auto mt-5 max-w-2xl text-base font-semibold text-white md:mt-6 md:text-lg lg:max-w-3xl">
+            <p
+              className="mx-auto mt-5 max-w-2xl text-base font-semibold text-white md:mt-6 md:text-lg lg:max-w-3xl"
+              data-landing-hero-appear="subtitle"
+            >
               Design, develop, test, and deploy ServiceNow — with AI.
             </p>
           )}
@@ -264,7 +274,10 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
       </div>
 
       {isV1 ? (
-        <div className="mx-auto mt-12 flex w-full max-w-4xl flex-wrap items-end justify-center gap-12 sm:gap-16 md:mt-16 lg:max-w-5xl">
+        <div
+          className="mx-auto mt-12 flex w-full max-w-4xl flex-wrap items-end justify-center gap-12 sm:gap-16 md:mt-16 lg:max-w-5xl"
+          data-landing-hero-appear="visual"
+        >
           {HERO_STATS.map((stat) => (
             <div key={stat.label} className="text-center">
               <p className="landing-stat-analytics font-display text-4xl font-bold tracking-tight md:text-5xl lg:text-[3.25rem]">
@@ -308,7 +321,10 @@ export function LandingHeroEchelon({ onGetStarted }: LandingHeroEchelonProps) {
       )}
 
       {isV1 ? (
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3 md:mt-14">
+        <div
+          className="mt-12 flex flex-wrap items-center justify-center gap-3 md:mt-14"
+          data-landing-hero-appear="cta"
+        >
           <button
             type="button"
             onClick={onGetStarted}
@@ -363,7 +379,7 @@ export function LandingHowItWorks() {
     >
       <div className="relative z-10 mx-auto max-w-6xl text-center">
         {isV1 ? (
-          <LandingTextReveal>
+          <LandingTextReveal delay={0.04}>
             <LandingTextLine className="mt-6 text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--landing-accent)]/70 md:mt-8">
               {LIFECYCLE_SECTION.eyebrow}
             </LandingTextLine>
@@ -521,7 +537,7 @@ export function LandingInstanceDemo({ onGetStarted }: LandingInstanceDemoProps) 
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
         {isV1 ? (
-          <LandingTextReveal>
+          <LandingTextReveal delay={0.05}>
             <LandingTextLine as="h2" className="landing-v1-section-title">
               {DEMO_SECTION.title}
             </LandingTextLine>

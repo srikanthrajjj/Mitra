@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import LightRays from './LightRays';
-import { motion } from 'motion/react';
 import {
   LandingNav,
   LandingHeroEchelon,
@@ -19,28 +18,10 @@ import {
   LandingDesignContext,
   type LandingDesign,
 } from './landing/LandingDesignContext';
+import { LandingDesignSwitcher } from './landing/LandingDesignSwitcher';
 import { cn } from '@/lib/utils';
 
 const LANDING_DESIGN_KEY = 'mitra_landing_design';
-
-function LandingScrollReveal({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.12, margin: '0px 0px -6% 0px' }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 interface LandingPageProps {
   version?: 'v2' | 'v3';
@@ -73,6 +54,14 @@ export default function LandingPage({
     }
   }, [landingDesign]);
 
+  const designSwitcher = (
+    <LandingDesignSwitcher
+      landingDesign={landingDesign}
+      setLandingDesign={setLandingDesign}
+      variant="fixed"
+    />
+  );
+
   if (landingDesign === 'v3') {
     return (
       <LandingDesignContext.Provider value={landingDesign}>
@@ -80,6 +69,7 @@ export default function LandingPage({
           onGetStarted={onGetStarted}
           onSignIn={onSignIn}
         />
+        {designSwitcher}
       </LandingDesignContext.Provider>
     );
   }
@@ -91,6 +81,7 @@ export default function LandingPage({
           onGetStarted={onGetStarted}
           onSignIn={onSignIn}
         />
+        {designSwitcher}
       </LandingDesignContext.Provider>
     );
   }
@@ -131,33 +122,21 @@ export default function LandingPage({
               onGetStarted={onGetStarted}
               onSignIn={onSignIn}
             />
-            <LandingScrollReveal>
-              <LandingHeroEchelon onGetStarted={onGetStarted} />
-            </LandingScrollReveal>
+            <LandingHeroEchelon onGetStarted={onGetStarted} />
           </div>
 
-          <LandingScrollReveal delay={0.03}>
-            <LandingV1ProductShowcase />
-          </LandingScrollReveal>
-          <LandingScrollReveal delay={0.04}>
-            <LandingHowItWorks />
-          </LandingScrollReveal>
-          <LandingScrollReveal delay={0.04}>
-            <LandingPlatformSection />
-          </LandingScrollReveal>
-          <LandingScrollReveal delay={0.04}>
-            <LandingAnimatedBeam />
-          </LandingScrollReveal>
-          <LandingScrollReveal delay={0.06}>
-            <LandingInstanceDemo onGetStarted={onGetStarted} />
-          </LandingScrollReveal>
-          <LandingScrollReveal delay={0.07}>
-            <LandingV1ReadyCta onGetStarted={onGetStarted} />
-          </LandingScrollReveal>
+          {/* Mid-page sections own LandingTextReveal — avoid double fade-up */}
+          <LandingV1ProductShowcase />
+          <LandingHowItWorks />
+          <LandingPlatformSection />
+          <LandingAnimatedBeam />
+          <LandingInstanceDemo onGetStarted={onGetStarted} />
+          <LandingV1ReadyCta onGetStarted={onGetStarted} />
         </div>
 
         <LandingFooterReveal onGetStarted={onGetStarted} />
         <LandingFloatingAssistant onGetDemo={onGetStarted} />
+        {designSwitcher}
       </div>
     </LandingDesignContext.Provider>
   );

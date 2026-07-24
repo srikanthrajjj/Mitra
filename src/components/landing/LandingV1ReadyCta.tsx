@@ -19,7 +19,7 @@ export function LandingV1ReadyCta({ onGetStarted }: LandingV1ReadyCtaProps) {
         aria-hidden
       />
 
-      <LandingTextReveal className="relative mx-auto max-w-3xl text-center">
+      <LandingTextReveal className="relative mx-auto max-w-3xl text-center" delay={0.05}>
         <LandingTextLine className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--landing-accent)]">
           {READY_CTA_SECTION.eyebrow}
         </LandingTextLine>

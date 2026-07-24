@@ -3843,6 +3843,109 @@ button.rounded-full {
   text-shadow: none;
 }
 
+/* V1 / shared — ServiceNow landscape orbital diagram */
+.landing-orbit-stage {
+  isolation: isolate;
+}
+
+.landing-orbit-ring {
+  border-style: solid;
+  pointer-events: none;
+}
+
+.landing-orbit-ring--inner {
+  border-width: 1.5px;
+  border-color: rgba(26, 175, 0, 0.28);
+  box-shadow:
+    0 0 24px rgba(26, 175, 0, 0.12),
+    inset 0 0 24px rgba(26, 175, 0, 0.06);
+}
+
+.landing-orbit-ring--mid {
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 18px rgba(26, 175, 0, 0.05);
+}
+
+.landing-orbit-ring--outer {
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 28px rgba(26, 175, 0, 0.06);
+}
+
+.landing-orbit-glow {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(26, 175, 0, 0.16) 0%,
+    rgba(26, 175, 0, 0.05) 42%,
+    transparent 68%
+  );
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.landing-orbit-core-glow {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(26, 175, 0, 0.28) 0%,
+    rgba(26, 175, 0, 0.08) 45%,
+    transparent 70%
+  );
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.landing-orbit-label-text {
+  display: inline-block;
+  font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease,
+    text-shadow 0.3s ease;
+}
+
+.landing-orbit-label--idle .landing-orbit-label-text {
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 12px rgba(5, 24, 36, 0.55);
+}
+
+.landing-orbit-label--active .landing-orbit-label-text {
+  color: var(--landing-accent, #1aaf00);
+  transform: scale(1.08);
+  text-shadow:
+    0 0 18px rgba(26, 175, 0, 0.45),
+    0 0 4px rgba(26, 175, 0, 0.35);
+}
+
+.landing-orbit-label-underline {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--landing-accent, #1aaf00),
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(26, 175, 0, 0.4);
+}
+
+.landing-orbit-tooltip {
+  border: 1px solid rgba(26, 175, 0, 0.28);
+  background:
+    linear-gradient(165deg, rgba(11, 45, 56, 0.96) 0%, rgba(5, 24, 36, 0.98) 100%);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 28px rgba(26, 175, 0, 0.12);
+}
+
+.landing-orbit-tooltip-title {
+  color: var(--landing-accent, #1aaf00);
+}
+
 /* V1 glass product frame — animated transparent border */
 .landing-glass-frame {
   position: relative;
