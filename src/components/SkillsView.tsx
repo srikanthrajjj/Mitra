@@ -15,13 +15,16 @@ import {
 } from '@/src/components/ui/dropdown-menu';
 import AddSkillModal, { type CustomSkill } from './AddSkillModal';
 import SkillExecutionModal from './SkillExecutionModal';
+import SkillsManageView from './SkillsManageView';
+import { loadManagedSkills, type ManagedSkill } from '../data/skillManagement';
 
 const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
 const DELETED_SKILLS_KEY = 'mitra-deleted-skills';
 const BUILTIN_OVERRIDES_KEY = 'mitra-builtin-overrides';
 
 type ViewMode = 'grid' | 'list';
-type SkillCard = Skill & { isCustom?: boolean; customData?: CustomSkill };
+type SkillsWorkspace = 'use' | 'manage';
+type SkillCard = Skill & { isCustom?: boolean; customData?: CustomSkill; managed?: ManagedSkill };
 
 function loadCustomSkills(): CustomSkill[] {
   try {
@@ -124,6 +127,7 @@ function SkillOverflowMenu({
 
 export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const isDark = isDarkTheme(theme);
+  const [workspace, setWorkspace] = useState<SkillsWorkspace>('use');
   const [search, setSearch] = useState('');
   const [hasScrolled, setHasScrolled] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -135,6 +139,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [builtinOverrides, setBuiltinOverrides] = useState<Record<string, Partial<CustomSkill>>>(loadBuiltinOverrides);
+  const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>(loadManagedSkills);
 
   useEffect(() => {
     saveCustomSkills(customSkills);
@@ -147,6 +152,13 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   useEffect(() => {
     saveBuiltinOverrides(builtinOverrides);
   }, [builtinOverrides]);
+
+  // Refresh managed catalog when returning from Manage workspace
+  useEffect(() => {
+    if (workspace === 'use') {
+      setManagedSkills(loadManagedSkills());
+    }
+  }, [workspace]);
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -211,15 +223,54 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   }, [search, customSkills, selectedCategory]);
 
   const allSkills = useMemo((): SkillCard[] => {
-    return [
-      ...filteredCustom.map((cs) => ({
-        ...buildSkillForModal(cs),
+    const managedPublished = managedSkills
+      .filter((m) => m.status === 'published' && m.enabled)
+      .filter((m) => {
+        if (selectedCategory && m.category !== selectedCategory) return false;
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        return m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q);
+      })
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        description: m.description,
+        category: m.category,
+        icon: Zap,
+        whatItHelpsWith: m.instructions,
+        examplePrompt: m.instructions,
+        parameters: [],
+        createdBy: m.createdBy,
+        instanceId: m.instanceId,
         isCustom: true,
-        customData: cs,
-      })),
-      ...builtinSkills,
+        managed: m,
+        customData: {
+          id: m.id,
+          name: m.name,
+          description: m.description,
+          category: m.category,
+          instructions: m.instructions,
+          enabled: m.enabled,
+          createdBy: m.createdBy,
+          instanceId: m.instanceId,
+        },
+      }));
+
+    const customIds = new Set(filteredCustom.map((c) => c.id));
+    const managedIds = new Set(managedPublished.map((m) => m.id));
+
+    return [
+      ...managedPublished,
+      ...filteredCustom
+        .filter((cs) => !managedIds.has(cs.id))
+        .map((cs) => ({
+          ...buildSkillForModal(cs),
+          isCustom: true,
+          customData: cs,
+        })),
+      ...builtinSkills.filter((s) => !customIds.has(s.id) && !managedIds.has(s.id)),
     ];
-  }, [filteredCustom, builtinSkills]);
+  }, [filteredCustom, builtinSkills, managedSkills, search, selectedCategory]);
 
   const handleAddSkill = (skill: CustomSkill) => {
     setCustomSkills((prev) => [...prev, skill]);
@@ -270,6 +321,10 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   };
 
   const openEdit = (skill: SkillCard) => {
+    if (skill.managed) {
+      setWorkspace('manage');
+      return;
+    }
     if (skill.isCustom && skill.customData) {
       setEditingSkill(skill.customData);
     } else {
@@ -308,13 +363,48 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
+  if (workspace === 'manage') {
+    return (
+      <SkillsManageView
+        theme={theme}
+        onBack={() => setWorkspace('use')}
+      />
+    );
+  }
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <div className="shrink-0">
         <div className="px-4 pb-4 pt-8 md:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
             <div className="mb-4 flex items-center justify-between gap-3">
-              <h1 className="font-display text-2xl font-bold text-foreground">Skills</h1>
+              <div>
+                <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">Skills</h1>
+                <div className="mt-2 flex items-center gap-1 rounded-lg border border-border p-0.5 w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setWorkspace('use')}
+                    className={cn(
+                      'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                      workspace === 'use'
+                        ? 'bg-muted text-brand-green'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    Use
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWorkspace('manage')}
+                    className={cn(
+                      'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                      'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    Manage
+                  </button>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1" role="group" aria-label="View mode">
                   <button
@@ -336,6 +426,14 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     <List className="h-3.5 w-3.5" />
                   </button>
                 </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setWorkspace('manage')}
+                  className="h-8 gap-1.5 text-xs"
+                >
+                  Manage skills
+                </Button>
                 <Button
                   variant="cta"
                   size="sm"
