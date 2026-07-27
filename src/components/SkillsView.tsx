@@ -14,11 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
 import SkillExecutionModal from './SkillExecutionModal';
-import SkillEditorModal, {
+import SkillEditorPage, {
   ensureInitialVersion,
   skillToManagedDraft,
   type SkillEditorMode,
-} from './SkillEditorModal';
+} from './SkillEditorPage';
 import {
   type ManagedSkill,
   type SkillVersion,
@@ -303,6 +303,56 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
+  if (editorOpen) {
+    return (
+      <>
+        <SkillEditorPage
+          theme={theme}
+          mode={editorMode}
+          skill={editingManaged}
+          versions={editingVersions}
+          runSkill={editingRunSkill}
+          onBack={() => {
+            setEditorOpen(false);
+            setEditingManaged(null);
+          }}
+          onSaved={({ skill, version, isNew }) => {
+            setManagedSkills((prev) => {
+              if (isNew || !prev.some((m) => m.id === skill.id)) return [skill, ...prev];
+              return prev.map((m) => (m.id === skill.id ? skill : m));
+            });
+            setVersions((prev) => [version, ...prev]);
+            setEditingManaged(skill);
+            setEditorMode('edit');
+          }}
+          onDelete={(id) => {
+            const card = allSkills.find((s) => s.id === id);
+            if (card) handleDelete(card);
+            else {
+              setManagedSkills((prev) => prev.filter((m) => m.id !== id));
+              setVersions((prev) => prev.filter((v) => v.skillId !== id));
+              setEditorOpen(false);
+              setEditingManaged(null);
+            }
+          }}
+          onRun={(skill) => {
+            setRunSkill(skill);
+          }}
+        />
+        <SkillExecutionModal
+          theme={theme}
+          skill={runSkill}
+          isOpen={runSkill !== null}
+          onClose={() => setRunSkill(null)}
+          onRun={(skill) => {
+            onRunSkill(skill);
+            setRunSkill(null);
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <div className="shrink-0">
@@ -540,36 +590,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           )}
         </div>
       </div>
-
-      <SkillEditorModal
-        theme={theme}
-        isOpen={editorOpen}
-        mode={editorMode}
-        skill={editingManaged}
-        versions={editingVersions}
-        runSkill={editingRunSkill}
-        onClose={() => {
-          setEditorOpen(false);
-          setEditingManaged(null);
-        }}
-        onSaved={({ skill, version, isNew }) => {
-          setManagedSkills((prev) => {
-            if (isNew || !prev.some((m) => m.id === skill.id)) return [skill, ...prev];
-            return prev.map((m) => (m.id === skill.id ? skill : m));
-          });
-          setVersions((prev) => [version, ...prev.filter((v) => !(v.skillId === version.skillId && v.version === version.version && v.id !== version.id))]);
-          setEditingManaged(skill);
-          setEditorMode('edit');
-        }}
-        onDelete={(id) => {
-          const card = allSkills.find((s) => s.id === id);
-          if (card) handleDelete(card);
-        }}
-        onRun={(skill) => {
-          setEditorOpen(false);
-          setRunSkill(skill);
-        }}
-      />
 
       <SkillExecutionModal
         theme={theme}
