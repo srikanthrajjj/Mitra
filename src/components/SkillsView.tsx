@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
-import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, LayoutGrid, List } from 'lucide-react';
+import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, LayoutGrid, List, Play } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill } from '../data/skills';
@@ -13,31 +13,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import AddSkillModal, { type CustomSkill } from './AddSkillModal';
 import SkillExecutionModal from './SkillExecutionModal';
-import SkillsManageView from './SkillsManageView';
-import { loadManagedSkills, type ManagedSkill } from '../data/skillManagement';
+import SkillEditorModal, {
+  ensureInitialVersion,
+  skillToManagedDraft,
+  type SkillEditorMode,
+} from './SkillEditorModal';
+import {
+  type ManagedSkill,
+  type SkillVersion,
+  loadManagedSkills,
+  loadSkillVersions,
+  saveManagedSkills,
+  saveSkillVersions,
+  SKILL_STATUS_LABELS,
+  getVersionsForSkill,
+} from '../data/skillManagement';
 
-const CUSTOM_SKILLS_KEY = 'mitra-custom-skills';
 const DELETED_SKILLS_KEY = 'mitra-deleted-skills';
-const BUILTIN_OVERRIDES_KEY = 'mitra-builtin-overrides';
 
 type ViewMode = 'grid' | 'list';
-type SkillsWorkspace = 'use' | 'manage';
-type SkillCard = Skill & { isCustom?: boolean; customData?: CustomSkill; managed?: ManagedSkill };
 
-function loadCustomSkills(): CustomSkill[] {
-  try {
-    const raw = localStorage.getItem(CUSTOM_SKILLS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveCustomSkills(skills: CustomSkill[]) {
-  localStorage.setItem(CUSTOM_SKILLS_KEY, JSON.stringify(skills));
-}
+type SkillCard = Skill & {
+  managed: ManagedSkill;
+  disabled?: boolean;
+};
 
 function loadDeletedSkillIds(): string[] {
   try {
@@ -52,19 +52,6 @@ function saveDeletedSkillIds(ids: string[]) {
   localStorage.setItem(DELETED_SKILLS_KEY, JSON.stringify(ids));
 }
 
-function loadBuiltinOverrides(): Record<string, Partial<CustomSkill>> {
-  try {
-    const raw = localStorage.getItem(BUILTIN_OVERRIDES_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveBuiltinOverrides(overrides: Record<string, Partial<CustomSkill>>) {
-  localStorage.setItem(BUILTIN_OVERRIDES_KEY, JSON.stringify(overrides));
-}
-
 interface SkillsViewProps {
   theme: Theme;
   onRunSkill: (skill: Skill) => void;
@@ -74,10 +61,12 @@ function SkillOverflowMenu({
   isDark,
   onEdit,
   onDelete,
+  onRun,
 }: {
   isDark: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onRun: () => void;
 }) {
   return (
     <DropdownMenu>
@@ -91,6 +80,7 @@ function SkillOverflowMenu({
               : 'text-muted-foreground hover:bg-muted hover:text-foreground',
           )}
           aria-label="Skill options"
+          onClick={(e) => e.stopPropagation()}
         >
           <MoreVertical className="h-4 w-4" />
         </button>
@@ -103,18 +93,31 @@ function SkillOverflowMenu({
         )}
       >
         <DropdownMenuItem
-          onClick={onEdit}
-          className={cn(
-            'gap-2 rounded-lg text-xs',
-            isDark ? 'focus:bg-accent' : 'focus:bg-muted',
-          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className={cn('gap-2 rounded-lg text-xs', isDark ? 'focus:bg-accent' : 'focus:bg-muted')}
         >
           <Pencil className="h-3.5 w-3.5" />
           Edit
         </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onRun();
+          }}
+          className={cn('gap-2 rounded-lg text-xs', isDark ? 'focus:bg-accent' : 'focus:bg-muted')}
+        >
+          <Play className="h-3.5 w-3.5" />
+          Run
+        </DropdownMenuItem>
         <DropdownMenuSeparator className={isDark ? 'bg-mitra-border' : 'bg-border'} />
         <DropdownMenuItem
-          onClick={onDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
           className="gap-2 rounded-lg text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -125,40 +128,50 @@ function SkillOverflowMenu({
   );
 }
 
+function toSkillCard(managed: ManagedSkill, builtin?: Skill): SkillCard {
+  return {
+    id: managed.id,
+    name: managed.name,
+    description: managed.description,
+    category: managed.category,
+    icon: builtin?.icon ?? Zap,
+    whatItHelpsWith: managed.instructions,
+    examplePrompt: managed.instructions,
+    parameters: builtin?.parameters ?? [],
+    createdBy: managed.createdBy,
+    instanceId: managed.instanceId,
+    managed,
+    disabled: !managed.enabled,
+  };
+}
+
 export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const isDark = isDarkTheme(theme);
-  const [workspace, setWorkspace] = useState<SkillsWorkspace>('use');
   const [search, setSearch] = useState('');
   const [hasScrolled, setHasScrolled] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [customSkills, setCustomSkills] = useState<CustomSkill[]>(loadCustomSkills);
   const [deletedSkillIds, setDeletedSkillIds] = useState<string[]>(loadDeletedSkillIds);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingSkill, setEditingSkill] = useState<CustomSkill | null>(null);
-  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [builtinOverrides, setBuiltinOverrides] = useState<Record<string, Partial<CustomSkill>>>(loadBuiltinOverrides);
   const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>(loadManagedSkills);
+  const [versions, setVersions] = useState<SkillVersion[]>(loadSkillVersions);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorMode, setEditorMode] = useState<SkillEditorMode>('create');
+  const [editingManaged, setEditingManaged] = useState<ManagedSkill | null>(null);
+  const [runSkill, setRunSkill] = useState<Skill | null>(null);
 
   useEffect(() => {
-    saveCustomSkills(customSkills);
-  }, [customSkills]);
+    saveManagedSkills(managedSkills);
+  }, [managedSkills]);
+
+  useEffect(() => {
+    saveSkillVersions(versions);
+  }, [versions]);
 
   useEffect(() => {
     saveDeletedSkillIds(deletedSkillIds);
   }, [deletedSkillIds]);
-
-  useEffect(() => {
-    saveBuiltinOverrides(builtinOverrides);
-  }, [builtinOverrides]);
-
-  // Refresh managed catalog when returning from Manage workspace
-  useEffect(() => {
-    if (workspace === 'use') {
-      setManagedSkills(loadManagedSkills());
-    }
-  }, [workspace]);
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -166,188 +179,115 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     }
   }, []);
 
-  const buildSkillForModal = (custom: CustomSkill): Skill => ({
-    id: custom.id,
-    name: custom.name,
-    description: custom.description,
-    category: custom.category,
-    icon: Zap,
-    whatItHelpsWith: custom.instructions,
-    examplePrompt: custom.instructions,
-    parameters: [],
-    createdBy: custom.createdBy,
-    instanceId: custom.instanceId,
-  });
-
-  const builtinSkills = useMemo(() => {
-    let list = SKILLS.filter((s) => !deletedSkillIds.includes(s.id)).map((s) => {
-      const o = builtinOverrides[s.id];
-      if (!o) return s;
-      return {
-        ...s,
-        name: o.name ?? s.name,
-        description: o.description ?? s.description,
-        category: o.category ?? s.category,
-        whatItHelpsWith: o.instructions ?? s.whatItHelpsWith,
-        instanceId: o.instanceId ?? s.instanceId,
-      };
-    });
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q),
-      );
-    }
-    if (selectedCategory) {
-      list = list.filter((s) => s.category === selectedCategory);
-    }
-    return list;
-  }, [search, deletedSkillIds, selectedCategory, builtinOverrides]);
-
-  const filteredCustom = useMemo(() => {
-    let list = customSkills;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q),
-      );
-    }
-    if (selectedCategory) {
-      list = list.filter((s) => s.category === selectedCategory);
-    }
-    return list;
-  }, [search, customSkills, selectedCategory]);
-
   const allSkills = useMemo((): SkillCard[] => {
-    const managedPublished = managedSkills
-      .filter((m) => m.status === 'published' && m.enabled)
-      .filter((m) => {
-        if (selectedCategory && m.category !== selectedCategory) return false;
-        if (!search.trim()) return true;
-        const q = search.toLowerCase();
-        return m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q);
-      })
-      .map((m) => ({
-        id: m.id,
-        name: m.name,
-        description: m.description,
-        category: m.category,
-        icon: Zap,
-        whatItHelpsWith: m.instructions,
-        examplePrompt: m.instructions,
-        parameters: [],
-        createdBy: m.createdBy,
-        instanceId: m.instanceId,
-        isCustom: true,
-        managed: m,
-        customData: {
-          id: m.id,
-          name: m.name,
-          description: m.description,
-          category: m.category,
-          instructions: m.instructions,
-          enabled: m.enabled,
-          createdBy: m.createdBy,
-          instanceId: m.instanceId,
-        },
-      }));
+    const managedById = new Map(managedSkills.map((m) => [m.id, m]));
+    const cards: SkillCard[] = [];
 
-    const customIds = new Set(filteredCustom.map((c) => c.id));
-    const managedIds = new Set(managedPublished.map((m) => m.id));
+    // Builtins (unless deleted), overlay managed edits when present
+    for (const builtin of SKILLS) {
+      if (deletedSkillIds.includes(builtin.id)) continue;
+      const managed = managedById.get(builtin.id);
+      if (managed) {
+        cards.push(toSkillCard(managed, builtin));
+        managedById.delete(builtin.id);
+      } else {
+        cards.push(toSkillCard(skillToManagedDraft(builtin), builtin));
+      }
+    }
 
-    return [
-      ...managedPublished,
-      ...filteredCustom
-        .filter((cs) => !managedIds.has(cs.id))
-        .map((cs) => ({
-          ...buildSkillForModal(cs),
-          isCustom: true,
-          customData: cs,
-        })),
-      ...builtinSkills.filter((s) => !customIds.has(s.id) && !managedIds.has(s.id)),
-    ];
-  }, [filteredCustom, builtinSkills, managedSkills, search, selectedCategory]);
+    // Remaining managed (user-created)
+    for (const managed of managedById.values()) {
+      cards.push(toSkillCard(managed));
+    }
 
-  const handleAddSkill = (skill: CustomSkill) => {
-    setCustomSkills((prev) => [...prev, skill]);
+    let list = cards;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (s) => s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q),
+      );
+    }
+    if (selectedCategory) {
+      list = list.filter((s) => s.category === selectedCategory);
+    }
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  }, [managedSkills, deletedSkillIds, search, selectedCategory]);
+
+  const openCreate = () => {
+    setEditorMode('create');
+    setEditingManaged(null);
+    setEditorOpen(true);
   };
 
-  const handleUpdateSkill = (updated: CustomSkill) => {
-    setCustomSkills((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
-    setEditingSkill(null);
+  const openEdit = (card: SkillCard) => {
+    const existing = managedSkills.find((m) => m.id === card.managed.id);
+    const managed = existing ?? card.managed;
+    if (!existing && card.managed.isBuiltin) {
+      // Seed first version when opening a builtin for the first time
+      setManagedSkills((prev) => [...prev, managed]);
+      setVersions((prev) => {
+        if (prev.some((v) => v.skillId === managed.id)) return prev;
+        return [ensureInitialVersion(managed), ...prev];
+      });
+    }
+    setEditorMode('edit');
+    setEditingManaged(managed);
+    setEditorOpen(true);
   };
 
-  const handleDeleteSkill = (id: string) => {
-    setCustomSkills((prev) => prev.filter((s) => s.id !== id));
+  const handleDelete = (card: SkillCard) => {
+    const id = card.id;
+    setManagedSkills((prev) => prev.filter((m) => m.id !== id));
+    setVersions((prev) => prev.filter((v) => v.skillId !== id));
+    if (card.managed.isBuiltin || SKILLS.some((s) => s.id === id)) {
+      setDeletedSkillIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    }
+    if (editingManaged?.id === id) {
+      setEditorOpen(false);
+      setEditingManaged(null);
+    }
   };
 
-  const handleDeleteBuiltinSkill = (id: string) => {
-    setDeletedSkillIds((prev) => [...prev, id]);
-  };
-
-  const handleUpdateBuiltinSkill = (updated: CustomSkill) => {
-    setBuiltinOverrides((prev) => ({
-      ...prev,
-      [updated.id]: {
-        name: updated.name,
-        description: updated.description,
-        category: updated.category,
-        instructions: updated.instructions,
-        instanceId: updated.instanceId,
-      },
-    }));
-    setEditingSkill(null);
-  };
-
-  const skillToCustomSkill = (skill: Skill): CustomSkill => ({
-    id: skill.id,
-    name: skill.name,
-    description: skill.description,
-    category: skill.category,
-    instructions: skill.whatItHelpsWith,
-    enabled: true,
-    createdBy: skill.createdBy,
-    instanceId: skill.instanceId ?? '',
-  });
-
-  const handleToggleSkill = (id: string) => {
-    setCustomSkills((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)),
-    );
-  };
-
-  const openEdit = (skill: SkillCard) => {
-    if (skill.managed) {
-      setWorkspace('manage');
+  const handleToggle = (card: SkillCard, enabled: boolean) => {
+    const existing = managedSkills.find((m) => m.id === card.id);
+    if (existing) {
+      setManagedSkills((prev) =>
+        prev.map((m) => (m.id === card.id ? { ...m, enabled, updatedAt: new Date().toISOString() } : m)),
+      );
       return;
     }
-    if (skill.isCustom && skill.customData) {
-      setEditingSkill(skill.customData);
-    } else {
-      setEditingSkill(skillToCustomSkill(skill));
-    }
+    // First toggle on a builtin — persist as managed
+    setManagedSkills((prev) => [...prev, { ...card.managed, enabled }]);
+    setVersions((prev) => {
+      if (prev.some((v) => v.skillId === card.id)) return prev;
+      return [ensureInitialVersion({ ...card.managed, enabled }), ...prev];
+    });
   };
 
-  const handleDelete = (skill: SkillCard) => {
-    if (skill.isCustom && skill.customData) {
-      handleDeleteSkill(skill.id);
-    } else {
-      handleDeleteBuiltinSkill(skill.id);
-    }
-  };
+  const editingVersions = editingManaged
+    ? getVersionsForSkill(editingManaged.id, versions)
+    : [];
 
-  const isDisabled = (skill: SkillCard) =>
-    Boolean(skill.isCustom && skill.customData && !skill.customData.enabled);
+  const editingRunSkill: Skill | null = editingManaged
+    ? {
+        id: editingManaged.id,
+        name: editingManaged.name,
+        description: editingManaged.description,
+        category: editingManaged.category,
+        icon: SKILLS.find((s) => s.id === editingManaged.id)?.icon ?? Zap,
+        whatItHelpsWith: editingManaged.instructions,
+        examplePrompt: editingManaged.instructions,
+        parameters: SKILLS.find((s) => s.id === editingManaged.id)?.parameters ?? [],
+        createdBy: editingManaged.createdBy,
+        instanceId: editingManaged.instanceId,
+      }
+    : null;
 
   const viewToggleBtn = (mode: ViewMode) =>
     cn(
       'inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors',
       viewMode === mode
-        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        ? 'border-border bg-muted text-brand-green'
         : isDark
           ? 'border-mitra-border text-muted-foreground hover:bg-accent hover:text-foreground'
           : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground',
@@ -357,20 +297,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     cn(
       'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
       active
-        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        ? 'border-border bg-muted text-brand-green'
         : isDark
           ? 'border-mitra-border bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
           : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
     );
-
-  if (workspace === 'manage') {
-    return (
-      <SkillsManageView
-        theme={theme}
-        onBack={() => setWorkspace('use')}
-      />
-    );
-  }
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
@@ -380,30 +311,9 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">Skills</h1>
-                <div className="mt-2 flex items-center gap-1 rounded-lg border border-border p-0.5 w-fit">
-                  <button
-                    type="button"
-                    onClick={() => setWorkspace('use')}
-                    className={cn(
-                      'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                      workspace === 'use'
-                        ? 'bg-muted text-brand-green'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    Use
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setWorkspace('manage')}
-                    className={cn(
-                      'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                      'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    Manage
-                  </button>
-                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Click a skill to edit, version, or run. Add new skills anytime.
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1" role="group" aria-label="View mode">
@@ -426,22 +336,9 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     <List className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setWorkspace('manage')}
-                  className="h-8 gap-1.5 text-xs"
-                >
-                  Manage skills
-                </Button>
-                <Button
-                  variant="cta"
-                  size="sm"
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="h-8 gap-1.5 text-xs"
-                >
+                <Button variant="cta" size="sm" onClick={openCreate} className="h-8 gap-1.5 text-xs">
                   <Plus className="h-3.5 w-3.5" />
-                  Add a new skill
+                  Add skill
                 </Button>
               </div>
             </div>
@@ -500,170 +397,188 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           {allSkills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <p className="text-sm text-muted-foreground">No skills match your search.</p>
+              <Button variant="cta" size="sm" className="mt-4 gap-1.5" onClick={openCreate}>
+                <Plus className="h-3.5 w-3.5" />
+                Add skill
+              </Button>
             </div>
           ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {allSkills.map((skill) => {
-                const custom = skill.isCustom;
-                const customData = skill.customData;
-                const disabled = isDisabled(skill);
-
-                return (
-                  <div
-                    key={skill.id}
-                    className={cn(
-                      'group flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
-                      disabled && 'opacity-60',
-                      isDark
-                        ? 'border-mitra-border bg-card hover:border-brand-green/30'
-                        : 'border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:border-brand-green/30',
-                    )}
-                  >
-                    <div>
-                      <div className="mb-3 flex items-center justify-between">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
-                          <skill.icon className="h-5 w-5 text-brand-green" />
-                        </div>
-                        <SkillOverflowMenu
-                          isDark={isDark}
-                          onEdit={() => openEdit(skill)}
-                          onDelete={() => handleDelete(skill)}
-                        />
-                      </div>
-                      <h3 className="mb-1 text-sm font-semibold text-foreground">{skill.name}</h3>
-                      <p className="line-clamp-2 text-[12px] leading-relaxed text-muted-foreground">
-                        {skill.description}
-                      </p>
-                      <span className="mt-2 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {allSkills.map((skill) => (
+                <button
+                  key={skill.id}
+                  type="button"
+                  onClick={() => openEdit(skill)}
+                  className={cn(
+                    'group flex flex-col rounded-xl border p-4 text-left transition-colors',
+                    skill.disabled && 'opacity-60',
+                    isDark
+                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
+                      : 'border-border bg-card hover:bg-accent/40',
+                  )}
+                >
+                  <div className="mb-2 flex items-start justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
                         {skill.category}
                       </span>
-                      <p className="mt-1.5 text-[10px] text-muted-foreground/70">
-                        Created by {skill.createdBy}
-                      </p>
+                      <span
+                        className={cn(
+                          'rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase',
+                          skill.managed.status === 'published'
+                            ? 'border-border bg-brand-green/10 text-brand-green'
+                            : 'border-border bg-muted text-muted-foreground',
+                        )}
+                      >
+                        {SKILL_STATUS_LABELS[skill.managed.status]}
+                      </span>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        v{skill.managed.version}
+                      </span>
                     </div>
-                    <div className="mt-4">
-                      {custom && customData ? (
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={customData.enabled}
-                            onCheckedChange={() => handleToggleSkill(customData.id)}
-                          />
-                          <span className="text-[11px] text-muted-foreground">
-                            {customData.enabled ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-                      ) : (
-                        <Button
-                          variant="cta"
-                          size="sm"
-                          onClick={() => setSelectedSkill(skill)}
-                          className="w-full text-xs"
-                        >
-                          Run Skill
-                        </Button>
-                      )}
-                    </div>
+                    <SkillOverflowMenu
+                      isDark={isDark}
+                      onEdit={() => openEdit(skill)}
+                      onDelete={() => handleDelete(skill)}
+                      onRun={() => setRunSkill(skill)}
+                    />
                   </div>
-                );
-              })}
+                  <h3 className="text-[15px] font-semibold text-foreground">{skill.name}</h3>
+                  <p className="mt-1 line-clamp-2 flex-1 text-xs text-muted-foreground">{skill.description}</p>
+                  <div
+                    className="mt-3 flex items-center justify-between gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={!skill.disabled}
+                        onCheckedChange={(checked) => handleToggle(skill, checked)}
+                      />
+                      <span className="text-[11px] text-muted-foreground">
+                        {skill.disabled ? 'Off' : 'Active'}
+                      </span>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-8 gap-1.5 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRunSkill(skill);
+                      }}
+                    >
+                      <Play className="h-3.5 w-3.5" />
+                      Run
+                    </Button>
+                  </div>
+                </button>
+              ))}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {allSkills.map((skill) => {
-                const custom = skill.isCustom;
-                const customData = skill.customData;
-                const disabled = isDisabled(skill);
-
-                return (
-                  <article
-                    key={skill.id}
-                    className={cn(
-                      'sn-list-row flex items-center gap-3 rounded-xl border px-3.5 py-3 transition-colors',
-                      disabled && 'opacity-60',
-                      isDark
-                        ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                        : 'border-border bg-card hover:bg-accent/40',
-                    )}
+              {allSkills.map((skill) => (
+                <article
+                  key={skill.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openEdit(skill)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openEdit(skill);
+                    }
+                  }}
+                  className={cn(
+                    'sn-list-row flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-3 transition-colors',
+                    skill.disabled && 'opacity-60',
+                    isDark
+                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
+                      : 'border-border bg-card hover:bg-accent/40',
+                  )}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <h3 className="truncate text-[15px] font-semibold text-foreground">{skill.name}</h3>
+                      <span className="rounded-full bg-muted px-2 py-px text-[10px] font-medium text-muted-foreground">
+                        {skill.category}
+                      </span>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        v{skill.managed.version}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{skill.description}</p>
+                  </div>
+                  <div
+                    className="flex shrink-0 items-center gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-green/10">
-                      <skill.icon className="h-4 w-4 text-brand-green" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="truncate text-[13px] font-semibold text-foreground">
-                          {skill.name}
-                        </h3>
-                        <span className="rounded-full bg-muted px-2 py-px text-[10px] font-medium text-muted-foreground">
-                          {skill.category}
-                        </span>
-                      </div>
-                      <p className="mt-0.5 line-clamp-1 text-[12px] text-muted-foreground">
-                        {skill.description}
-                      </p>
-                      <p className="mt-1 text-[10px] text-muted-foreground/70">
-                        Created by {skill.createdBy}
-                      </p>
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-2">
-                      {custom && customData ? (
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={customData.enabled}
-                            onCheckedChange={() => handleToggleSkill(customData.id)}
-                          />
-                          <span className="hidden text-[11px] text-muted-foreground sm:inline">
-                            {customData.enabled ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-                      ) : (
-                        <Button
-                          variant="cta"
-                          size="sm"
-                          onClick={() => setSelectedSkill(skill)}
-                          className="h-8 text-xs"
-                        >
-                          Run Skill
-                        </Button>
-                      )}
-                      <SkillOverflowMenu
-                        isDark={isDark}
-                        onEdit={() => openEdit(skill)}
-                        onDelete={() => handleDelete(skill)}
-                      />
-                    </div>
-                  </article>
-                );
-              })}
+                    <Switch
+                      checked={!skill.disabled}
+                      onCheckedChange={(checked) => handleToggle(skill, checked)}
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-8 gap-1.5 text-xs"
+                      onClick={() => setRunSkill(skill)}
+                    >
+                      <Play className="h-3.5 w-3.5" />
+                      Run
+                    </Button>
+                    <SkillOverflowMenu
+                      isDark={isDark}
+                      onEdit={() => openEdit(skill)}
+                      onDelete={() => handleDelete(skill)}
+                      onRun={() => setRunSkill(skill)}
+                    />
+                  </div>
+                </article>
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      <AddSkillModal
+      <SkillEditorModal
         theme={theme}
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddSkill}
-      />
-
-      <AddSkillModal
-        theme={theme}
-        isOpen={editingSkill !== null}
-        onClose={() => setEditingSkill(null)}
-        onAdd={editingSkill && editingSkill.id.startsWith('custom-') ? handleUpdateSkill : handleUpdateBuiltinSkill}
-        initialSkill={editingSkill}
+        isOpen={editorOpen}
+        mode={editorMode}
+        skill={editingManaged}
+        versions={editingVersions}
+        runSkill={editingRunSkill}
+        onClose={() => {
+          setEditorOpen(false);
+          setEditingManaged(null);
+        }}
+        onSaved={({ skill, version, isNew }) => {
+          setManagedSkills((prev) => {
+            if (isNew || !prev.some((m) => m.id === skill.id)) return [skill, ...prev];
+            return prev.map((m) => (m.id === skill.id ? skill : m));
+          });
+          setVersions((prev) => [version, ...prev.filter((v) => !(v.skillId === version.skillId && v.version === version.version && v.id !== version.id))]);
+          setEditingManaged(skill);
+          setEditorMode('edit');
+        }}
+        onDelete={(id) => {
+          const card = allSkills.find((s) => s.id === id);
+          if (card) handleDelete(card);
+        }}
+        onRun={(skill) => {
+          setEditorOpen(false);
+          setRunSkill(skill);
+        }}
       />
 
       <SkillExecutionModal
         theme={theme}
-        skill={selectedSkill}
-        isOpen={selectedSkill !== null}
-        onClose={() => setSelectedSkill(null)}
+        skill={runSkill}
+        isOpen={runSkill !== null}
+        onClose={() => setRunSkill(null)}
         onRun={(skill) => {
           onRunSkill(skill);
-          setSelectedSkill(null);
+          setRunSkill(null);
         }}
       />
     </div>
