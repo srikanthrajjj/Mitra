@@ -1,5 +1,5 @@
 import {
-  Key, ChevronDown, LogOut, Settings, HelpCircle,
+  Key, ChevronDown, LogOut, Settings, HelpCircle, Building2,
   PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X
 } from 'lucide-react';
 import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme } from '../types';
@@ -247,6 +247,13 @@ export default function Sidebar({
                       <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
+                      onClick={() => setActiveTab('org-settings')}
+                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+                    >
+                      <Building2 className="h-4 w-4 opacity-70" />
+                      <span>Organizational settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={onOpenTour}
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
                     >
@@ -254,7 +261,7 @@ export default function Sidebar({
                       <span>Restart guide tour</span>
                     </DropdownMenuItem>
 
-<DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
+                    <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
                     <DropdownMenuItem
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
                     >
@@ -457,6 +464,13 @@ export default function Sidebar({
             >
               <Settings className="h-4 w-4 opacity-70" />
               <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setActiveTab('org-settings')}
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+            >
+              <Building2 className="h-4 w-4 opacity-70" />
+              <span>Organizational settings</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={onOpenTour}

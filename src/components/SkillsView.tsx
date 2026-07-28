@@ -268,21 +268,6 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     ? getVersionsForSkill(editingManaged.id, versions)
     : [];
 
-  const editingRunSkill: Skill | null = editingManaged
-    ? {
-        id: editingManaged.id,
-        name: editingManaged.name,
-        description: editingManaged.description,
-        category: editingManaged.category,
-        icon: SKILLS.find((s) => s.id === editingManaged.id)?.icon ?? Zap,
-        whatItHelpsWith: editingManaged.instructions,
-        examplePrompt: editingManaged.instructions,
-        parameters: SKILLS.find((s) => s.id === editingManaged.id)?.parameters ?? [],
-        createdBy: editingManaged.createdBy,
-        instanceId: editingManaged.instanceId,
-      }
-    : null;
-
   const viewToggleBtn = (mode: ViewMode) =>
     cn(
       'inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors',
@@ -305,51 +290,35 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
 
   if (editorOpen) {
     return (
-      <>
-        <SkillEditorPage
-          theme={theme}
-          mode={editorMode}
-          skill={editingManaged}
-          versions={editingVersions}
-          runSkill={editingRunSkill}
-          onBack={() => {
+      <SkillEditorPage
+        theme={theme}
+        mode={editorMode}
+        skill={editingManaged}
+        versions={editingVersions}
+        onBack={() => {
+          setEditorOpen(false);
+          setEditingManaged(null);
+        }}
+        onSaved={({ skill, version, isNew }) => {
+          setManagedSkills((prev) => {
+            if (isNew || !prev.some((m) => m.id === skill.id)) return [skill, ...prev];
+            return prev.map((m) => (m.id === skill.id ? skill : m));
+          });
+          setVersions((prev) => [version, ...prev]);
+          setEditingManaged(skill);
+          setEditorMode('edit');
+        }}
+        onDelete={(id) => {
+          const card = allSkills.find((s) => s.id === id);
+          if (card) handleDelete(card);
+          else {
+            setManagedSkills((prev) => prev.filter((m) => m.id !== id));
+            setVersions((prev) => prev.filter((v) => v.skillId !== id));
             setEditorOpen(false);
             setEditingManaged(null);
-          }}
-          onSaved={({ skill, version, isNew }) => {
-            setManagedSkills((prev) => {
-              if (isNew || !prev.some((m) => m.id === skill.id)) return [skill, ...prev];
-              return prev.map((m) => (m.id === skill.id ? skill : m));
-            });
-            setVersions((prev) => [version, ...prev]);
-            setEditingManaged(skill);
-            setEditorMode('edit');
-          }}
-          onDelete={(id) => {
-            const card = allSkills.find((s) => s.id === id);
-            if (card) handleDelete(card);
-            else {
-              setManagedSkills((prev) => prev.filter((m) => m.id !== id));
-              setVersions((prev) => prev.filter((v) => v.skillId !== id));
-              setEditorOpen(false);
-              setEditingManaged(null);
-            }
-          }}
-          onRun={(skill) => {
-            setRunSkill(skill);
-          }}
-        />
-        <SkillExecutionModal
-          theme={theme}
-          skill={runSkill}
-          isOpen={runSkill !== null}
-          onClose={() => setRunSkill(null)}
-          onRun={(skill) => {
-            onRunSkill(skill);
-            setRunSkill(null);
-          }}
-        />
-      </>
+          }
+        }}
+      />
     );
   }
 

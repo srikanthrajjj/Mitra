@@ -156,6 +156,7 @@ import {
 import { PanelResizeHandle } from './components/PanelResizeHandle';
 import { StyleguideView } from './components/StyleguideView';
 import { SettingsView } from './components/SettingsView';
+import { OrgSettingsView } from './components/OrgSettingsView';
 import {
   isStyleguidePath,
   leaveStyleguideUrl,
@@ -303,6 +304,7 @@ export default function App() {
   const [activeTab, setActiveTabState] = useState<string>(() => readStyleguideTabFromUrl() ?? readDevSpecsTabFromUrl() ?? 'new-chat');
   const preStyleguideTabRef = useRef<string>('new-chat');
   const preSettingsTabRef = useRef<string>('new-chat');
+  const preOrgSettingsTabRef = useRef<string>('new-chat');
   const preDevSpecsTabRef = useRef<string>('new-chat');
 
   const setActiveTab = useCallback((tab: string) => {
@@ -312,6 +314,9 @@ export default function App() {
       }
       if (tab === 'settings' && prev !== 'settings') {
         preSettingsTabRef.current = prev;
+      }
+      if (tab === 'org-settings' && prev !== 'org-settings') {
+        preOrgSettingsTabRef.current = prev;
       }
       if (tab === 'dev-specs' && prev !== 'dev-specs') {
         preDevSpecsTabRef.current = prev;
@@ -332,6 +337,10 @@ export default function App() {
 
   const handleCloseSettings = useCallback(() => {
     setActiveTab(preSettingsTabRef.current || 'dashboard');
+  }, [setActiveTab]);
+
+  const handleCloseOrgSettings = useCallback(() => {
+    setActiveTab(preOrgSettingsTabRef.current || 'dashboard');
   }, [setActiveTab]);
 
   const handleLeaveDevSpecs = useCallback(() => {
@@ -2575,6 +2584,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
               onTaskNotificationChange={setTaskNotificationEnabled}
               onClose={handleCloseSettings}
             />
+          )}
+
+          {activeTab === 'org-settings' && (
+            <OrgSettingsView theme={themePreference} onClose={handleCloseOrgSettings} />
           )}
 
           {(activeTab === 'dashboard' || activeTab === 'new-chat') && (

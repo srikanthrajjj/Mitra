@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, Star, MessageSquare, Plus, CornerDownLeft, X,
-  Settings, Link2, Folder, LayoutGrid, MessageCircle
+  Settings, Link2, Folder, LayoutGrid, MessageCircle, Building2
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -138,6 +138,7 @@ export function SearchDialog({
       { title: 'New Chat Thread', match: 'new chat thread create start', icon: Plus, action: () => { onNewChat(); onNavigate('projects'); onClose(); } },
       { title: 'View Connections Panel', match: 'go to view connections oauth integration instance status', icon: Link2, action: () => { onNavigate('connections'); onClose(); } },
       { title: 'Open Settings Configuration', match: 'go to view settings appearance theme high contrast audio', icon: Settings, action: () => { onNavigate('settings'); onClose(); } },
+      { title: 'Open Organizational Settings', match: 'go to view organization org settings billing users roles teams invite subdomain', icon: Building2, action: () => { onNavigate('org-settings'); onClose(); } },
       { title: 'Show Favourites', match: 'go to view favorites starred bookmarked chats', icon: Star, action: () => { onNavigate('favourites'); onClose(); } },
       { title: 'Go to Projects Browser', match: 'go to view projects list solutions catalog templates', icon: Folder, action: () => { onSelectSolution(''); onNavigate('projects'); onClose(); } },
       { title: 'Open Feedback', match: 'go to view feedback bugs improvements issues report priority', icon: MessageCircle, action: () => { onNavigate('feedback'); onClose(); } },

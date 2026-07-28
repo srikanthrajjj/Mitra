@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
+  ArrowLeftRight,
   Check,
   CheckCircle2,
   History,
-  Play,
   RotateCcw,
   Sparkles,
   Trash2,
+  X,
 } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -17,8 +18,8 @@ import { Switch } from '@/src/components/ui/switch';
 import { SERVICE_NOW_INSTANCES, loadSelectedInstanceId } from '../data/serviceNowInstances';
 import { SKILL_CATEGORIES, type Skill, type SkillCategory } from '../data/skills';
 import {
-  SKILL_STATUS_LABELS,
   type ManagedSkill,
+  type SkillFieldDiff,
   type SkillPublishStatus,
   type SkillVersion,
   applySkillUpdate,
@@ -26,7 +27,6 @@ import {
   diffSkillVersions,
   formatSkillDate,
   generateSkillFromPlainLanguage,
-  restoreFromVersion,
   snapshotFromSkill,
 } from '../data/skillManagement';
 
@@ -43,12 +43,12 @@ interface SkillEditorPageProps {
   mode: SkillEditorMode;
   skill?: ManagedSkill | null;
   versions?: SkillVersion[];
-  runSkill?: Skill | null;
   onBack: () => void;
   onSaved: (result: SkillEditorResult) => void;
   onDelete?: (skillId: string) => void;
-  onRun?: (skill: Skill) => void;
 }
+
+const WORKING_ID = '__working__';
 
 const inputClass = (isDark: boolean) =>
   cn(
@@ -58,16 +58,110 @@ const inputClass = (isDark: boolean) =>
       : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand-green/50',
   );
 
+function VersionComparePanel({
+  isDark,
+  leftLabel,
+  rightLabel,
+  diffs,
+  onClose,
+}: {
+  isDark: boolean;
+  leftLabel: string;
+  rightLabel: string;
+  diffs: SkillFieldDiff[];
+  onClose: () => void;
+}) {
+  const changed = diffs.filter((d) => d.changed);
+  const unchanged = diffs.filter((d) => !d.changed);
+
+  return (
+    <section className="flex min-h-0 flex-col border-b border-border p-4 lg:border-b-0 lg:border-r">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <ArrowLeftRight className="h-3.5 w-3.5" />
+            Version compare
+          </p>
+          <p className="mt-0.5 text-sm font-semibold text-foreground">
+            {leftLabel} → {rightLabel}
+          </p>
+        </div>
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 text-xs" onClick={onClose}>
+          <X className="h-3.5 w-3.5" />
+          Close compare
+        </Button>
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className={cn('rounded-lg border px-2.5 py-1.5', isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-muted')}>
+          {leftLabel}
+        </div>
+        <div className={cn('rounded-lg border px-2.5 py-1.5', isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-muted')}>
+          {rightLabel}
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+        {changed.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+            <p className="text-sm font-medium text-foreground">No differences</p>
+            <p className="mt-1 text-xs text-muted-foreground">These two versions match on all tracked fields.</p>
+          </div>
+        ) : (
+          changed.map((d) => (
+            <div key={d.field} className="overflow-hidden rounded-xl border border-border">
+              <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {d.label}
+                </span>
+                <span className="text-[10px] font-semibold text-brand-green">Changed</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2">
+                <div className={cn('border-b border-border p-3 sm:border-b-0 sm:border-r', isDark ? 'border-mitra-border' : '')}>
+                  <p className="mb-1 text-[10px] font-semibold uppercase text-muted-foreground">Before</p>
+                  <pre className="whitespace-pre-wrap break-words font-sans text-xs leading-relaxed text-muted-foreground">
+                    {d.before || '—'}
+                  </pre>
+                </div>
+                <div className="p-3">
+                  <p className="mb-1 text-[10px] font-semibold uppercase text-muted-foreground">After</p>
+                  <pre className="whitespace-pre-wrap break-words font-sans text-xs font-medium leading-relaxed text-foreground">
+                    {d.after || '—'}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+
+        {unchanged.length > 0 && (
+          <details className="rounded-xl border border-border px-3 py-2">
+            <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
+              Unchanged fields ({unchanged.length})
+            </summary>
+            <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+              {unchanged.map((d) => (
+                <li key={d.field}>
+                  <span className="font-semibold text-foreground">{d.label}:</span>{' '}
+                  <span className="line-clamp-2">{d.after || '—'}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function SkillEditorPage({
   theme,
   mode,
   skill = null,
   versions = [],
-  runSkill = null,
   onBack,
   onSaved,
   onDelete,
-  onRun,
 }: SkillEditorPageProps) {
   const isDark = isDarkTheme(theme);
   const isCreate = mode === 'create' || !skill;
@@ -85,7 +179,9 @@ export default function SkillEditorPage({
   const [builderBusy, setBuilderBusy] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
-  const [compareVersionId, setCompareVersionId] = useState<string | null>(null);
+  const [compareMode, setCompareMode] = useState(false);
+  const [leftVersionId, setLeftVersionId] = useState<string | null>(null);
+  const [rightVersionId, setRightVersionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (skill) {
@@ -111,7 +207,9 @@ export default function SkillEditorPage({
     setPlainPrompt('');
     setSaveError('');
     setSaveSuccess('');
-    setCompareVersionId(null);
+    setCompareMode(false);
+    setLeftVersionId(null);
+    setRightVersionId(null);
   }, [skill, mode]);
 
   useEffect(() => {
@@ -125,17 +223,66 @@ export default function SkillEditorPage({
     [versions],
   );
 
-  const compareVersion = useMemo(() => {
-    if (!sortedVersions.length) return null;
-    if (compareVersionId) return sortedVersions.find((v) => v.id === compareVersionId) ?? null;
-    if (!skill) return null;
-    return sortedVersions.find((v) => v.version !== skill.version) ?? null;
-  }, [sortedVersions, compareVersionId, skill]);
+  const workingCopy = useMemo((): SkillVersion => {
+    const stamp = new Date().toISOString();
+    return {
+      id: WORKING_ID,
+      skillId: skill?.id ?? 'new',
+      version: skill?.version ?? 0,
+      name,
+      description,
+      category,
+      instructions,
+      status,
+      changedBy: 'You',
+      changedAt: stamp,
+      changeNote: 'Working copy (unsaved)',
+    };
+  }, [skill, name, description, category, instructions, status]);
 
-  const diffs = useMemo(() => {
-    if (!skill || !compareVersion) return [];
-    return diffSkillVersions(compareVersion, skill).filter((d) => d.changed);
-  }, [skill, compareVersion]);
+  const compareOptions = useMemo(() => {
+    const opts: Array<{ id: string; label: string; version: SkillVersion }> = [
+      { id: WORKING_ID, label: 'Working copy', version: workingCopy },
+      ...sortedVersions.map((v) => ({
+        id: v.id,
+        label: `v${v.version}${skill && v.version === skill.version ? ' (saved)' : ''}`,
+        version: v,
+      })),
+    ];
+    return opts;
+  }, [workingCopy, sortedVersions, skill]);
+
+  // Default left = previous saved version, right = working copy
+  useEffect(() => {
+    if (!compareMode) return;
+    if (!leftVersionId) {
+      const prev = sortedVersions.find((v) => !skill || v.version !== skill.version) ?? sortedVersions[0];
+      setLeftVersionId(prev?.id ?? WORKING_ID);
+    }
+    if (!rightVersionId) {
+      setRightVersionId(WORKING_ID);
+    }
+  }, [compareMode, leftVersionId, rightVersionId, sortedVersions, skill]);
+
+  const leftVersion = useMemo(
+    () => compareOptions.find((o) => o.id === leftVersionId)?.version ?? null,
+    [compareOptions, leftVersionId],
+  );
+  const rightVersion = useMemo(
+    () => compareOptions.find((o) => o.id === rightVersionId)?.version ?? null,
+    [compareOptions, rightVersionId],
+  );
+
+  const compareDiffs = useMemo(() => {
+    if (!leftVersion || !rightVersion) return [];
+    return diffSkillVersions(leftVersion, rightVersion);
+  }, [leftVersion, rightVersion]);
+
+  const openCompare = (preferLeftId?: string) => {
+    if (preferLeftId) setLeftVersionId(preferLeftId);
+    setRightVersionId(WORKING_ID);
+    setCompareMode(true);
+  };
 
   const handleMitraGenerate = () => {
     if (!plainPrompt.trim()) {
@@ -155,16 +302,18 @@ export default function SkillEditorPage({
       setChangeNote('Drafted by Mitra from plain language');
       setBuilderBusy(false);
       setShowMitra(false);
-      setSaveSuccess('Draft filled in — review, then Save.');
+      setSaveSuccess('Draft filled in — review, then Publish to create a version.');
     }, 300);
   };
 
-  const handleSave = () => {
+  const handlePublish = () => {
     setSaveSuccess('');
     if (!name.trim() || !description.trim() || !instructions.trim()) {
-      setSaveError('Name, description, and instructions are required.');
+      setSaveError('Name, description, and instructions are required before publishing.');
       return;
     }
+
+    const publishStatus: SkillPublishStatus = 'published';
 
     if (isCreate || !skill) {
       const { skill: created, version } = createManagedSkill({
@@ -173,37 +322,58 @@ export default function SkillEditorPage({
         category,
         instructions,
         enabled,
-        status,
+        status: publishStatus,
         instanceId,
-        changeNote: changeNote.trim() || 'Created',
+        changeNote: changeNote.trim() || 'Published',
       });
       onSaved({ skill: created, version, isNew: true });
-      setSaveSuccess(`Saved as v${created.version} (${SKILL_STATUS_LABELS[created.status]}).`);
+      setStatus(publishStatus);
+      setSaveSuccess(`Published as v${created.version}. This version is now live.`);
+      setChangeNote('');
       return;
     }
 
     const { skill: updated, version } = applySkillUpdate(
       skill,
-      { name, description, category, instructions, enabled, status, instanceId },
-      changeNote.trim() || undefined,
+      {
+        name,
+        description,
+        category,
+        instructions,
+        enabled,
+        status: publishStatus,
+        instanceId,
+      },
+      changeNote.trim() || 'Published',
     );
     onSaved({ skill: updated, version, isNew: false });
-    setSaveSuccess(`Saved new version v${updated.version}.`);
+    setStatus(publishStatus);
+    setSaveSuccess(`Published v${updated.version}. Version history updated.`);
     setChangeNote('');
   };
 
   const handleRestore = (version: SkillVersion) => {
     if (!skill) return;
-    const { skill: updated, version: newVersion } = restoreFromVersion(skill, version);
-    onSaved({ skill: updated, version: newVersion, isNew: false });
-    setName(updated.name);
-    setDescription(updated.description);
-    setCategory(updated.category);
-    setInstructions(updated.instructions);
-    setEnabled(updated.enabled);
-    setStatus(updated.status);
-    setSaveSuccess(`Restored from v${version.version} → saved as v${updated.version}.`);
-    setCompareVersionId(null);
+    const { skill: restored, version: newVersion } = applySkillUpdate(
+      skill,
+      {
+        name: version.name,
+        description: version.description,
+        category: version.category,
+        instructions: version.instructions,
+        status: 'published',
+      },
+      `Restored from v${version.version} and published`,
+    );
+    onSaved({ skill: restored, version: newVersion, isNew: false });
+    setName(restored.name);
+    setDescription(restored.description);
+    setCategory(restored.category);
+    setInstructions(restored.instructions);
+    setEnabled(restored.enabled);
+    setStatus(restored.status);
+    setSaveSuccess(`Restored from v${version.version} → published as v${restored.version}.`);
+    setCompareMode(false);
   };
 
   return (
@@ -230,18 +400,12 @@ export default function SkillEditorPage({
               </h1>
               <p className="text-xs text-muted-foreground">
                 {isCreate
-                  ? 'Details on the left · Instructions in the center · Versions on the right'
-                  : `v${skill?.version ?? 1} · Saving creates a new version`}
+                  ? 'Edit freely — Publish creates v1 and makes it live'
+                  : `v${skill?.version ?? 1} · Publish creates the next version`}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {!isCreate && runSkill && onRun && (
-              <Button type="button" variant="secondary" size="sm" className="h-8 gap-1.5 text-xs" onClick={() => onRun(runSkill)}>
-                <Play className="h-3.5 w-3.5" />
-                Run
-              </Button>
-            )}
             {!isCreate && onDelete && skill && (
               <Button
                 type="button"
@@ -254,9 +418,9 @@ export default function SkillEditorPage({
                 Delete
               </Button>
             )}
-            <Button type="button" variant="cta" size="sm" className="h-8 gap-1.5 text-xs" onClick={handleSave}>
+            <Button type="button" variant="cta" size="sm" className="h-8 gap-1.5 text-xs" onClick={handlePublish}>
               <Check className="h-3.5 w-3.5" />
-              Save
+              Publish
             </Button>
           </div>
         </div>
@@ -373,126 +537,189 @@ export default function SkillEditorPage({
             </div>
             <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">Status</label>
-            <select className={inputClass(isDark)} value={status} onChange={(e) => setStatus(e.target.value as SkillPublishStatus)}>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
+          <div className="rounded-xl border border-border px-3 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</p>
+            <p className="mt-1 text-sm font-medium text-foreground">
+              {status === 'published' ? 'Published' : 'Draft — Publish to go live'}
+            </p>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">Change note</label>
+            <label className="text-xs font-semibold text-foreground">Publish note</label>
             <input
               className={inputClass(isDark)}
               value={changeNote}
               onChange={(e) => setChangeNote(e.target.value)}
-              placeholder="What changed?"
+              placeholder="What changed in this publish?"
             />
           </div>
         </aside>
 
-        {/* Center: large instructions column */}
-        <section className="flex min-h-0 flex-col border-b border-border p-4 lg:border-b-0 lg:border-r">
-          <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
-            <div>
+        {/* Center: instructions OR compare panel */}
+        {compareMode && leftVersion && rightVersion ? (
+          <VersionComparePanel
+            isDark={isDark}
+            leftLabel={compareOptions.find((o) => o.id === leftVersionId)?.label ?? 'Before'}
+            rightLabel={compareOptions.find((o) => o.id === rightVersionId)?.label ?? 'After'}
+            diffs={compareDiffs}
+            onClose={() => setCompareMode(false)}
+          />
+        ) : (
+          <section className="flex min-h-0 flex-col border-b border-border p-4 lg:border-b-0 lg:border-r">
+            <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Instructions
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Full skill prompt — Mitra follows this when the skill runs.
+                </p>
+              </div>
+              <span className="text-[11px] tabular-nums text-muted-foreground">
+                {instructions.length.toLocaleString()} chars
+              </span>
+            </div>
+            <textarea
+              className={cn(
+                inputClass(isDark),
+                'min-h-[50vh] flex-1 resize-none font-mono text-[13px] leading-relaxed lg:min-h-0',
+              )}
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="Write the full instructions here…"
+              spellCheck={false}
+            />
+          </section>
+        )}
+
+        {/* Right: versions + compare controls */}
+        <aside className={cn('min-h-0 overflow-y-auto p-4', isDark ? 'bg-background/40' : 'bg-muted/30')}>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <History className="h-3.5 w-3.5 text-muted-foreground" />
               <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Instructions
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Full skill prompt — Mitra follows this when the skill runs.
+                Versions
               </p>
             </div>
-            <span className="text-[11px] tabular-nums text-muted-foreground">
-              {instructions.length.toLocaleString()} chars
-            </span>
-          </div>
-          <textarea
-            className={cn(
-              inputClass(isDark),
-              'min-h-[50vh] flex-1 resize-none font-mono text-[13px] leading-relaxed lg:min-h-0',
+            {!isCreate && sortedVersions.length > 0 && (
+              <Button
+                type="button"
+                variant={compareMode ? 'cta' : 'secondary'}
+                size="sm"
+                className="h-7 gap-1 px-2 text-[11px]"
+                onClick={() => (compareMode ? setCompareMode(false) : openCompare())}
+              >
+                <ArrowLeftRight className="h-3 w-3" />
+                {compareMode ? 'Editing' : 'Compare'}
+              </Button>
             )}
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-            placeholder="Write the full instructions here…"
-            spellCheck={false}
-          />
-        </section>
-
-        {/* Right: versions */}
-        <aside className={cn('min-h-0 overflow-y-auto p-4', isDark ? 'bg-background/40' : 'bg-muted/30')}>
-          <div className="mb-3 flex items-center gap-1.5">
-            <History className="h-3.5 w-3.5 text-muted-foreground" />
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Versions
-            </p>
           </div>
+
+          {compareMode && (
+            <div className="mb-3 space-y-2 rounded-xl border border-border p-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Compare
+              </p>
+              <div className="space-y-1.5">
+                <label className="text-[11px] text-muted-foreground">From</label>
+                <select
+                  className={inputClass(isDark)}
+                  value={leftVersionId ?? ''}
+                  onChange={(e) => setLeftVersionId(e.target.value)}
+                >
+                  {compareOptions.map((o) => (
+                    <option key={`l-${o.id}`} value={o.id}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] text-muted-foreground">To</label>
+                <select
+                  className={inputClass(isDark)}
+                  value={rightVersionId ?? ''}
+                  onChange={(e) => setRightVersionId(e.target.value)}
+                >
+                  {compareOptions.map((o) => (
+                    <option key={`r-${o.id}`} value={o.id}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+              {leftVersion && rightVersion && (
+                <p className="text-[11px] text-muted-foreground">
+                  {compareDiffs.filter((d) => d.changed).length} field
+                  {compareDiffs.filter((d) => d.changed).length === 1 ? '' : 's'} changed
+                </p>
+              )}
+            </div>
+          )}
+
           {isCreate || sortedVersions.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border px-3 py-5 text-center">
               <p className="text-xs font-medium text-foreground">No versions yet</p>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Save to create v1. Later saves appear here for compare and restore.
+                Publish creates v1. After another publish, use Compare for side-by-side diffs.
               </p>
             </div>
           ) : (
             <div className="space-y-2">
               {sortedVersions.map((v) => {
                 const isCurrent = skill ? v.version === skill.version : false;
-                const isActive = compareVersion?.id === v.id;
+                const isLeft = leftVersionId === v.id;
+                const isRight = rightVersionId === v.id;
                 return (
                   <div
                     key={v.id}
                     className={cn(
                       'rounded-xl border px-3 py-2.5',
-                      isActive
+                      isLeft || isRight
                         ? 'border-border bg-muted'
                         : isDark
                           ? 'border-mitra-border bg-mitra-surface'
                           : 'border-border bg-card',
                     )}
                   >
-                    <button type="button" className="w-full text-left" onClick={() => setCompareVersionId(v.id)}>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-semibold text-foreground">v{v.version}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold text-foreground">v{v.version}</span>
+                      <div className="flex items-center gap-1">
                         {isCurrent && (
                           <span className="text-[10px] font-semibold uppercase text-brand-green">Current</span>
                         )}
+                        {isLeft && (
+                          <span className="rounded bg-muted px-1 text-[9px] font-semibold uppercase text-muted-foreground">From</span>
+                        )}
+                        {isRight && (
+                          <span className="rounded bg-muted px-1 text-[9px] font-semibold uppercase text-muted-foreground">To</span>
+                        )}
                       </div>
-                      <p className="mt-0.5 text-[11px] text-muted-foreground">
-                        {v.changedBy} · {formatSkillDate(v.changedAt)}
-                      </p>
-                      {v.changeNote && (
-                        <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{v.changeNote}</p>
-                      )}
-                    </button>
-                    {!isCurrent && (
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      {v.changedBy} · {formatSkillDate(v.changedAt)}
+                    </p>
+                    {v.changeNote && (
+                      <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{v.changeNote}</p>
+                    )}
+                    <div className="mt-2 flex flex-wrap gap-2">
                       <button
                         type="button"
-                        onClick={() => handleRestore(v)}
-                        className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-brand-green hover:text-brand-green-hover"
+                        onClick={() => openCompare(v.id)}
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-brand-green"
                       >
-                        <RotateCcw className="h-3 w-3" />
-                        Restore
+                        <ArrowLeftRight className="h-3 w-3" />
+                        Compare
                       </button>
-                    )}
+                      {!isCurrent && (
+                        <button
+                          type="button"
+                          onClick={() => handleRestore(v)}
+                          className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-green hover:text-brand-green-hover"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          Restore
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
-              {diffs.length > 0 && compareVersion && (
-                <div className="border-t border-border pt-3">
-                  <p className="mb-2 text-[11px] font-semibold text-foreground">
-                    Changed vs v{compareVersion.version}
-                  </p>
-                  {diffs.map((d) => (
-                    <div key={d.field} className="mb-2 rounded-lg border border-border px-2.5 py-2">
-                      <p className="text-[10px] font-semibold uppercase text-muted-foreground">{d.label}</p>
-                      <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-[11px] text-muted-foreground">
-                        <span className="font-medium text-foreground">Now: </span>
-                        {d.after || '—'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )}
         </aside>
