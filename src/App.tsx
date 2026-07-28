@@ -343,6 +343,30 @@ export default function App() {
     setActiveTab(preOrgSettingsTabRef.current || 'dashboard');
   }, [setActiveTab]);
 
+  const orgSettingsBackLabel = (() => {
+    const tab = preOrgSettingsTabRef.current || 'dashboard';
+    const labels: Record<string, string> = {
+      'new-chat': 'Home',
+      dashboard: 'Home',
+      projects: 'Projects',
+      search: 'Search',
+      settings: 'Settings',
+      skills: 'Skills',
+      connections: 'Connections',
+      feedback: 'Feedback',
+      favourites: 'Favourites',
+      styleguide: 'Styleguide',
+      'dev-specs': 'Dev Specs',
+      'business-owner': 'Business Owner',
+      'stakeholder-review': 'Reviews',
+      'security-review': 'Security Review',
+      'sponsor-review': 'Sponsor Review',
+      'admin-panel': 'Admin',
+      developer: 'Developer',
+    };
+    return labels[tab] ?? 'Mitra';
+  })();
+
   const handleLeaveDevSpecs = useCallback(() => {
     setActiveTab(preDevSpecsTabRef.current || 'dashboard');
   }, [setActiveTab]);
@@ -2480,6 +2504,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
     <div className={`h-screen w-full flex relative ${
       `${resolvedTheme} bg-background text-foreground`
     } ${highContrast ? 'high-contrast' : ''} ${fontSizeLevel > 0 ? `font-size-level-${fontSizeLevel}` : ''} font-sans overflow-hidden`}>
+      {activeTab !== 'org-settings' && (
       <div
         className={`relative shrink-0 ${isLeftSidebarResizing ? 'select-none' : ''}`}
         style={{ width: effectiveLeftSidebarWidth }}
@@ -2551,6 +2576,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           />
         )}
       </div>
+      )}
 
       <SidebarInset className="overflow-hidden">
         {isDarkTheme(resolvedTheme) && <VrBackground />}
@@ -2587,7 +2613,11 @@ Pick a step below and I'll continue building — data model, scripts, and update
           )}
 
           {activeTab === 'org-settings' && (
-            <OrgSettingsView theme={themePreference} onClose={handleCloseOrgSettings} />
+            <OrgSettingsView
+              theme={themePreference}
+              onClose={handleCloseOrgSettings}
+              backLabel={orgSettingsBackLabel}
+            />
           )}
 
           {(activeTab === 'dashboard' || activeTab === 'new-chat') && (

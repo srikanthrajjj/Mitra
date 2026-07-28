@@ -2076,8 +2076,13 @@ button.rounded-full {
   background: hsl(0 0% 7%);
 }
 
-.light .settings-nav {
+.light .settings-nav,
+.light .org-settings-nav {
   background: hsl(220 14% 97%);
+}
+
+.dark .org-settings-nav {
+  background: hsl(0 0% 7%);
 }
 
 .settings-row + .settings-row {

@@ -145,7 +145,7 @@ export function ArchitectSidebar({
           onNavigate('projects');
         }}
         className={cn(
-          'group flex w-full items-center justify-between gap-2 rounded-r-lg px-3 py-1.75 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none border-l-2',
+          'group flex w-full items-center justify-between gap-1.5 rounded-r-lg border-l-2 py-1.75 pl-[calc(0.375rem-2px)] pr-1.5 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none',
           isEditing ? 'cursor-default' : 'cursor-pointer',
           active
             ? isDark
@@ -181,7 +181,7 @@ export function ArchitectSidebar({
           />
         ) : (
           <>
-            <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 items-center gap-1.5">
               <ConversationStatusDot status={conversationStatus} />
               <span className="truncate text-left">{sol.name}</span>
             </div>
@@ -442,22 +442,24 @@ export function ArchitectSidebar({
       <div className="mx-3 h-px shrink-0 bg-border/60 dark:bg-white/[0.06]" />
 
       {/* Recents and Pinned list direct render without folders */}
-      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 scrollbar-thin">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 scrollbar-thin">
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
             <button
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
-              className="mb-1 flex w-full items-center gap-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+              className="mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
               aria-expanded={pinnedOpen}
             >
-              <ChevronDown
-                className={cn(
-                  'h-3 w-3 shrink-0 transition-transform duration-200',
-                  !pinnedOpen && '-rotate-90',
-                )}
-              />
+              <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
+                <ChevronDown
+                  className={cn(
+                    'h-3 w-3 transition-transform duration-200',
+                    !pinnedOpen && '-rotate-90',
+                  )}
+                />
+              </span>
               <span>Pinned</span>
             </button>
             {pinnedOpen ? (
@@ -471,25 +473,27 @@ export function ArchitectSidebar({
         {/* Recents section */}
         <div className="flex flex-col flex-1 space-y-0.5 pb-2">
           {pinnedSolutions.length > 0 && (
-            <div className="mx-3 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
+            <div className="mx-1.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
           )}
           <button
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
-            className="mb-1 mt-1 flex w-full items-center gap-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+            className="mb-1 mt-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
             aria-expanded={recentsOpen}
           >
-            <ChevronDown
-              className={cn(
-                'h-3 w-3 shrink-0 transition-transform duration-200',
-                !recentsOpen && '-rotate-90',
-              )}
-            />
+            <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
+              <ChevronDown
+                className={cn(
+                  'h-3 w-3 transition-transform duration-200',
+                  !recentsOpen && '-rotate-90',
+                )}
+              />
+            </span>
             <span>Recents</span>
           </button>
           {recentsOpen ? (
             recentSolutions.length === 0 ? (
-              <p className="px-3 py-2 text-[11px] text-muted-foreground/50">
+              <p className="px-1.5 py-2 text-[11px] text-muted-foreground/50">
                 No recent chats
               </p>
             ) : (

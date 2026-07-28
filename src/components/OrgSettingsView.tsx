@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
+  ArrowLeft,
   Building2,
   CreditCard,
   Globe,
   KeyRound,
   Mail,
+  Menu,
   Palette,
   Plus,
   Search,
@@ -156,6 +158,8 @@ const SECTION_META: Record<OrgSettingsSectionId, { title: string; description: s
 interface OrgSettingsViewProps {
   theme: Theme;
   onClose: () => void;
+  /** Friendly destination label for the sidebar back link, e.g. "Home". */
+  backLabel?: string;
 }
 
 function SectionCard({
@@ -232,11 +236,11 @@ function statusBadge(status: OrgUserStatus) {
   );
 }
 
-export function OrgSettingsView({ theme, onClose }: OrgSettingsViewProps) {
+export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSettingsViewProps) {
   const isDark = isDarkTheme(theme);
-  const panelRef = useRef<HTMLDivElement>(null);
   const [section, setSection] = useState<OrgSettingsSectionId>('organizations');
   const [navQuery, setNavQuery] = useState('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [orgs, setOrgs] = useState<Organization[]>(DEMO_ORGANIZATIONS);
   const [activeOrgId, setActiveOrgId] = useState(DEMO_ORGANIZATIONS[0].id);
   const [users, setUsers] = useState<OrgUser[]>(DEMO_USERS);
@@ -1042,47 +1046,124 @@ export function OrgSettingsView({ theme, onClose }: OrgSettingsViewProps) {
   };
 
   return (
-    <div className="settings-page flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 sm:p-5">
+    <div className="org-settings-page relative flex min-h-0 min-w-0 w-full flex-1 overflow-hidden bg-background">
+      {/* Mobile top bar */}
       <div
-        ref={panelRef}
-        className="settings-panel relative flex h-[min(860px,calc(100vh-1.5rem))] w-full max-w-6xl overflow-hidden"
+        className={cn(
+          'absolute inset-x-0 top-0 z-30 flex h-12 items-center gap-2 border-b border-border px-3 md:hidden',
+          isDark ? 'bg-background' : 'bg-background',
+        )}
       >
+        <button
+          type="button"
+          onClick={onClose}
+          className={cn(
+            'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors',
+            isDark
+              ? 'border-mitra-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
+              : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+          )}
+          aria-label={`Back to ${backLabel}`}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div className="min-w-0 flex-1 truncate text-center text-sm font-semibold text-foreground">
+          {meta.title}
+        </div>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="settings-close absolute right-4 top-4 z-10 h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
-          aria-label="Close organizational settings"
-          onClick={onClose}
+          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+          aria-label="Open sections"
+          onClick={() => setMobileNavOpen(true)}
         >
-          <X className="h-4 w-4" />
+          <Menu className="h-4 w-4" />
         </Button>
+      </div>
 
-        <aside className="settings-nav flex w-[240px] shrink-0 flex-col border-r border-border/60 pt-5">
-          <div className="shrink-0 px-4 pb-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Organization</p>
-            <p className="mt-1 truncate text-sm font-semibold text-foreground">{activeOrg.name}</p>
-            <p className="truncate text-[11px] text-muted-foreground">{activeOrg.slug}.mitra.ai</p>
+      {/* Mobile nav overlay */}
+      {mobileNavOpen && (
+        <button
+          type="button"
+          aria-label="Close sections"
+          className="fixed inset-0 z-40 bg-background/60 md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      <aside
+        className={cn(
+          'settings-nav org-settings-nav flex w-[240px] shrink-0 flex-col border-r border-border',
+          'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-xl',
+          'max-md:transition-transform max-md:duration-200',
+          mobileNavOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
+          'md:relative md:translate-x-0',
+        )}
+      >
+        <div className="shrink-0 border-b border-border px-3 pb-3 pt-3 md:pt-3.5">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="group hidden items-center gap-2 md:inline-flex"
+              aria-label={`Back to ${backLabel}`}
+            >
+              <span
+                className={cn(
+                  'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors',
+                  isDark
+                    ? 'border-mitra-border bg-card text-muted-foreground group-hover:bg-accent group-hover:text-foreground'
+                    : 'border-border bg-card text-muted-foreground group-hover:bg-accent group-hover:text-foreground',
+                )}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </span>
+              <span className="truncate text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                Back to {backLabel}
+              </span>
+            </button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="ml-auto h-7 w-7 text-muted-foreground hover:text-foreground md:hidden"
+              aria-label="Close sections menu"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
           </div>
 
-          <div className="shrink-0 px-3 pb-3">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={navQuery}
-                onChange={(e) => setNavQuery(e.target.value)}
-                placeholder="Search org settings…"
-                className={cn(inputClass, 'h-8 border-transparent bg-transparent pl-8 text-xs shadow-none')}
-              />
-            </div>
+          <div className="mb-3 min-w-0">
+            <p className="truncate text-sm font-semibold text-foreground">{activeOrg.name}</p>
+            <p className="truncate text-xs text-muted-foreground">{activeOrg.slug}.mitra.ai</p>
           </div>
 
-          <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
-            {filteredGroups.map((group) => (
-              <div key={group.label} className="mb-3">
-                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {group.label}
-                </p>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={navQuery}
+              onChange={(e) => setNavQuery(e.target.value)}
+              placeholder="Search org settings…"
+              aria-label="Search org settings"
+              className={cn(
+                'h-8 w-full rounded-md border pl-8 pr-3 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground',
+                isDark
+                  ? 'border-mitra-border bg-mitra-input focus:border-brand-green/40'
+                  : 'border-border bg-card shadow-sm focus:border-brand-green/50',
+              )}
+            />
+          </div>
+        </div>
+
+        <nav className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-3 pt-2" aria-label="Organizational settings">
+          {filteredGroups.map((group, groupIndex) => (
+            <div key={group.label} className={cn(groupIndex > 0 ? 'mt-5' : 'mt-0')}>
+              <p className="mb-0.5 px-2 text-[7px] font-medium uppercase leading-none tracking-normal text-muted-foreground">
+                {group.label}
+              </p>
+              <div className="space-y-0">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const active = section === item.id;
@@ -1090,44 +1171,55 @@ export function OrgSettingsView({ theme, onClose }: OrgSettingsViewProps) {
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() => setSection(item.id)}
+                      onClick={() => {
+                        setSection(item.id);
+                        setMobileNavOpen(false);
+                      }}
                       className={cn(
-                        'mb-0.5 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
+                        'flex h-7 w-full items-center gap-1.5 rounded-md px-2 py-0.5 text-left text-xs leading-none transition-colors',
                         active
-                          ? 'bg-accent font-medium text-accent-foreground'
-                          : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                          ? 'bg-muted font-medium text-foreground'
+                          : 'text-foreground hover:bg-muted/60',
                       )}
                     >
-                      <Icon className="h-4 w-4 shrink-0 opacity-70" />
+                      <Icon
+                        className={cn(
+                          'h-3 w-3 shrink-0',
+                          active ? 'text-foreground' : 'text-muted-foreground',
+                        )}
+                      />
                       <span className="truncate">{item.label}</span>
                     </button>
                   );
                 })}
               </div>
-            ))}
-          </nav>
-        </aside>
-
-        <main className="settings-content min-h-0 min-w-0 flex-1 overflow-y-auto pt-5">
-          <div className="px-6 pb-8 pr-14 sm:px-8">
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-extrabold tracking-tight text-foreground">{meta.title}</h2>
-              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{meta.description}</p>
             </div>
+          ))}
+        </nav>
+      </aside>
 
-            {flash && (
-              <div
-                role="status"
-                className="mb-4 rounded-xl border border-border bg-brand-green/10 px-3 py-2.5 text-sm text-foreground"
-              >
-                {flash}
-              </div>
-            )}
-
-            {renderSection()}
+      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto pt-12 md:pt-0">
+        <div className="mx-auto w-full max-w-3xl px-5 pb-10 pt-6 sm:px-8 sm:pt-8">
+          <div className="mb-6">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {NAV_GROUPS.find((g) => g.items.some((i) => i.id === section))?.label ?? 'Organization'}
+            </p>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground">{meta.title}</h1>
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{meta.description}</p>
           </div>
-        </main>
-      </div>
+
+          {flash && (
+            <div
+              role="status"
+              className="mb-4 rounded-xl border border-border bg-brand-green/10 px-3 py-2.5 text-sm text-foreground"
+            >
+              {flash}
+            </div>
+          )}
+
+          {renderSection()}
+        </div>
+      </main>
     </div>
   );
 }
