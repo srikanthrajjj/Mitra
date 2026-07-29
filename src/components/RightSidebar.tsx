@@ -233,7 +233,7 @@ function ArtifactsTab({
         {artifacts.map((artifact) => (
           <div
             key={artifact.id}
-            className="group flex items-center gap-2.5 rounded-lg border border-transparent bg-mitra-surface/30 px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:bg-mitra-highlight hover:shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
+            className="group flex items-center gap-2.5 rounded-lg border border-transparent bg-mitra-surface/30 px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:bg-mitra-highlight"
           >
             <ArtifactTypeIcon type={artifact.type} className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-green/80" />
             <div className="min-w-0 flex-1">
@@ -334,7 +334,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors ${
-        active ? 'bg-accent text-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+        active ? 'bg-accent text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -362,15 +362,13 @@ export default function RightSidebar({
   );
   const hasActivePipeline = activeIndex >= 0;
 
-  const sidebarShell = 'bg-mitra-bg';
+  const sidebarShell = 'pipeline-sidebar bg-card';
 
   if (isCollapsed) {
     return (
       <div
         onClick={onToggleCollapse}
-        className={`pipeline-sidebar h-full w-11 shrink-0 cursor-pointer flex flex-col items-center py-3 transition-all duration-300 group ${
-          hasActivePipeline ? 'bg-mitra-bg' : sidebarShell
-        }`}
+        className={`pipeline-sidebar h-full w-11 shrink-0 cursor-pointer flex flex-col items-center border-l border-border/60 py-3 transition-all duration-300 group ${sidebarShell}`}
         title="Expand panel"
       >
         <button
@@ -427,10 +425,10 @@ export default function RightSidebar({
 
   return (
     <div
-      className={`relative w-full lg:w-[300px] xl:w-[320px] shrink-0 h-full overflow-hidden flex flex-col ${sidebarShell}`}
+      className={`relative -ml-px z-10 w-full lg:w-[300px] xl:w-[320px] shrink-0 h-full overflow-hidden flex flex-col border-l border-border/60 ${sidebarShell}`}
     >
-      {/* Tab bar + collapse */}
-      <div className="flex items-center gap-2 border-b border-mitra-border px-2.5 py-2">
+      {/* Tab bar + collapse — 52px matches ChatView header for continuous grid line */}
+      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-border/60 px-2.5">
         <div className="flex min-w-0 flex-1 gap-0.5 rounded-lg bg-muted/30 p-0.5">
           <TabButton
             active={tab === 'artifacts'}

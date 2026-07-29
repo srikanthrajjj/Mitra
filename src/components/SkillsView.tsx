@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, LayoutGrid, List, Play } from 'lucide-react';
 import { Theme } from '../types';
-import { isDarkTheme } from '../utils/theme';
+import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { SKILLS, SKILL_CATEGORIES, type Skill } from '../data/skills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
@@ -29,10 +29,12 @@ import {
   SKILL_STATUS_LABELS,
   getVersionsForSkill,
 } from '../data/skillManagement';
+import { TabBar } from './dev/tab-bar/TabBar';
 
 const DELETED_SKILLS_KEY = 'mitra-deleted-skills';
 
 type ViewMode = 'grid' | 'list';
+type StatusTab = 'active' | 'inactive';
 
 type SkillCard = Skill & {
   managed: ManagedSkill;
@@ -145,6 +147,171 @@ function toSkillCard(managed: ManagedSkill, builtin?: Skill): SkillCard {
   };
 }
 
+function SkillsListContent({
+  skills,
+  viewMode,
+  isDark,
+  onEdit,
+  onDelete,
+  onToggle,
+  onRun,
+}: {
+  skills: SkillCard[];
+  viewMode: ViewMode;
+  isDark: boolean;
+  onEdit: (card: SkillCard) => void;
+  onDelete: (card: SkillCard) => void;
+  onToggle: (card: SkillCard, enabled: boolean) => void;
+  onRun: (card: SkillCard) => void;
+}) {
+  if (viewMode === 'grid') {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {skills.map((skill) => (
+          <button
+            key={skill.id}
+            type="button"
+            onClick={() => onEdit(skill)}
+            className={cn(
+              'group flex flex-col rounded-xl border-0 p-4 text-left',
+              skill.disabled && 'opacity-60',
+              cardSurfaceHover(isDark),
+            )}
+          >
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full border-0 bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                  {skill.category}
+                </span>
+                <span
+                  className={cn(
+                    'rounded-full border-0 px-2 py-0.5 text-[10px] font-semibold uppercase',
+                    skill.managed.status === 'published'
+                      ? 'bg-brand-green/10 text-brand-green'
+                      : 'bg-muted text-muted-foreground',
+                  )}
+                >
+                  {SKILL_STATUS_LABELS[skill.managed.status]}
+                </span>
+                <span className="text-[10px] font-semibold text-muted-foreground">
+                  v{skill.managed.version}
+                </span>
+              </div>
+              <SkillOverflowMenu
+                isDark={isDark}
+                onEdit={() => onEdit(skill)}
+                onDelete={() => onDelete(skill)}
+                onRun={() => onRun(skill)}
+              />
+            </div>
+            <h3 className="text-[15px] font-semibold text-foreground">{skill.name}</h3>
+            <p className="mt-1 line-clamp-2 flex-1 text-xs text-muted-foreground">{skill.description}</p>
+            <div
+              className="mt-3 flex items-center justify-between gap-2"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={!skill.disabled}
+                  onCheckedChange={(checked) => onToggle(skill, checked)}
+                />
+                <span className="text-[11px] text-muted-foreground">
+                  {skill.disabled ? 'Off' : 'Active'}
+                </span>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-8 gap-1.5 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRun(skill);
+                }}
+              >
+                <Play className="h-3.5 w-3.5" />
+                Run
+              </Button>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {skills.map((skill) => (
+        <article
+          key={skill.id}
+          role="button"
+          tabIndex={0}
+          onClick={() => onEdit(skill)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onEdit(skill);
+            }
+          }}
+          className={cn(
+            'flex cursor-pointer items-center gap-3 rounded-xl border-0 px-3.5 py-3',
+            skill.disabled && 'opacity-60',
+            cardSurfaceHover(isDark),
+          )}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <h3 className="truncate text-[15px] font-semibold text-foreground">{skill.name}</h3>
+              <span className="rounded-full bg-muted px-2 py-px text-[10px] font-medium text-muted-foreground">
+                {skill.category}
+              </span>
+              <span
+                className={cn(
+                  'rounded-full border-0 px-2 py-0.5 text-[10px] font-semibold uppercase',
+                  skill.managed.status === 'published'
+                    ? 'bg-brand-green/10 text-brand-green'
+                    : 'bg-muted text-muted-foreground',
+                )}
+              >
+                {SKILL_STATUS_LABELS[skill.managed.status]}
+              </span>
+              <span className="text-[10px] font-semibold text-muted-foreground">
+                v{skill.managed.version}
+              </span>
+            </div>
+            <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{skill.description}</p>
+          </div>
+          <div
+            className="flex shrink-0 items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <Switch
+              checked={!skill.disabled}
+              onCheckedChange={(checked) => onToggle(skill, checked)}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="h-8 gap-1.5 text-xs"
+              onClick={() => onRun(skill)}
+            >
+              <Play className="h-3.5 w-3.5" />
+              Run
+            </Button>
+            <SkillOverflowMenu
+              isDark={isDark}
+              onEdit={() => onEdit(skill)}
+              onDelete={() => onDelete(skill)}
+              onRun={() => onRun(skill)}
+            />
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const isDark = isDarkTheme(theme);
   const [search, setSearch] = useState('');
@@ -155,6 +322,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>(loadManagedSkills);
   const [versions, setVersions] = useState<SkillVersion[]>(loadSkillVersions);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [statusTab, setStatusTab] = useState<StatusTab>('active');
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<SkillEditorMode>('create');
@@ -212,6 +380,18 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
     }
     return list.sort((a, b) => a.name.localeCompare(b.name));
   }, [managedSkills, deletedSkillIds, search, selectedCategory]);
+
+  const { activeSkills, inactiveSkills } = useMemo(() => {
+    const active: SkillCard[] = [];
+    const inactive: SkillCard[] = [];
+    for (const skill of allSkills) {
+      if (skill.disabled) inactive.push(skill);
+      else active.push(skill);
+    }
+    return { activeSkills: active, inactiveSkills: inactive };
+  }, [allSkills]);
+
+  const visibleSkills = statusTab === 'active' ? activeSkills : inactiveSkills;
 
   const openCreate = () => {
     setEditorMode('create');
@@ -327,14 +507,29 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
       <div className="shrink-0">
         <div className="px-4 pb-4 pt-8 md:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+              <div className="min-w-0 flex-1">
                 <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">Skills</h1>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Click a skill to edit, version, or run. Add new skills anytime.
                 </p>
+                <div className="mt-3">
+                  <TabBar
+                    tabs={[
+                      { id: 'active', label: 'Active', count: activeSkills.length },
+                      { id: 'inactive', label: 'Inactive', count: inactiveSkills.length },
+                    ]}
+                    activeTab={statusTab}
+                    variant="pill"
+                    size="compact"
+                    fullWidth={false}
+                    isDark={isDark}
+                    ariaLabel="Skill status"
+                    onTabChange={(id) => setStatusTab(id as StatusTab)}
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                 <div className="flex items-center gap-1" role="group" aria-label="View mode">
                   <button
                     type="button"
@@ -413,148 +608,37 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-4 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-6xl">
-          {allSkills.length === 0 ? (
+          {visibleSkills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-sm text-muted-foreground">No skills match your search.</p>
-              <Button variant="cta" size="sm" className="mt-4 gap-1.5" onClick={openCreate}>
-                <Plus className="h-3.5 w-3.5" />
-                Add skill
-              </Button>
-            </div>
-          ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {allSkills.map((skill) => (
-                <button
-                  key={skill.id}
-                  type="button"
-                  onClick={() => openEdit(skill)}
-                  className={cn(
-                    'group flex flex-col rounded-xl border-0 p-4 text-left transition-colors',
-                    skill.disabled && 'opacity-60',
-                    isDark
-                      ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'bg-card hover:bg-accent/40',
-                  )}
-                >
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="rounded-full border-0 bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
-                        {skill.category}
-                      </span>
-                      <span
-                        className={cn(
-                          'rounded-full border-0 px-2 py-0.5 text-[10px] font-semibold uppercase',
-                          skill.managed.status === 'published'
-                            ? 'bg-brand-green/10 text-brand-green'
-                            : 'bg-muted text-muted-foreground',
-                        )}
-                      >
-                        {SKILL_STATUS_LABELS[skill.managed.status]}
-                      </span>
-                      <span className="text-[10px] font-semibold text-muted-foreground">
-                        v{skill.managed.version}
-                      </span>
-                    </div>
-                    <SkillOverflowMenu
-                      isDark={isDark}
-                      onEdit={() => openEdit(skill)}
-                      onDelete={() => handleDelete(skill)}
-                      onRun={() => setRunSkill(skill)}
-                    />
-                  </div>
-                  <h3 className="text-[15px] font-semibold text-foreground">{skill.name}</h3>
-                  <p className="mt-1 line-clamp-2 flex-1 text-xs text-muted-foreground">{skill.description}</p>
-                  <div
-                    className="mt-3 flex items-center justify-between gap-2"
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={!skill.disabled}
-                        onCheckedChange={(checked) => handleToggle(skill, checked)}
-                      />
-                      <span className="text-[11px] text-muted-foreground">
-                        {skill.disabled ? 'Off' : 'Active'}
-                      </span>
-                    </div>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-8 gap-1.5 text-xs"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setRunSkill(skill);
-                      }}
-                    >
-                      <Play className="h-3.5 w-3.5" />
-                      Run
-                    </Button>
-                  </div>
-                </button>
-              ))}
+              <p className="text-sm text-muted-foreground">
+                {allSkills.length === 0
+                  ? 'No skills match your search.'
+                  : statusTab === 'active'
+                    ? 'No active skills match your filters.'
+                    : 'No inactive skills match your filters.'}
+              </p>
+              {allSkills.length === 0 && (
+                <Button variant="cta" size="sm" className="mt-4 gap-1.5" onClick={openCreate}>
+                  <Plus className="h-3.5 w-3.5" />
+                  Add skill
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
-              {allSkills.map((skill) => (
-                <article
-                  key={skill.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => openEdit(skill)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openEdit(skill);
-                    }
-                  }}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-3 rounded-xl border-0 px-3.5 py-3 transition-colors',
-                    skill.disabled && 'opacity-60',
-                    isDark
-                      ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'bg-card hover:bg-accent/40',
-                  )}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <h3 className="truncate text-[15px] font-semibold text-foreground">{skill.name}</h3>
-                      <span className="rounded-full bg-muted px-2 py-px text-[10px] font-medium text-muted-foreground">
-                        {skill.category}
-                      </span>
-                      <span className="text-[10px] font-semibold text-muted-foreground">
-                        v{skill.managed.version}
-                      </span>
-                    </div>
-                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{skill.description}</p>
-                  </div>
-                  <div
-                    className="flex shrink-0 items-center gap-2"
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  >
-                    <Switch
-                      checked={!skill.disabled}
-                      onCheckedChange={(checked) => handleToggle(skill, checked)}
-                    />
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-8 gap-1.5 text-xs"
-                      onClick={() => setRunSkill(skill)}
-                    >
-                      <Play className="h-3.5 w-3.5" />
-                      Run
-                    </Button>
-                    <SkillOverflowMenu
-                      isDark={isDark}
-                      onEdit={() => openEdit(skill)}
-                      onDelete={() => handleDelete(skill)}
-                      onRun={() => setRunSkill(skill)}
-                    />
-                  </div>
-                </article>
-              ))}
+            <div
+              role="tabpanel"
+              id={`panel-${statusTab}`}
+              aria-labelledby={`tab-${statusTab}`}
+            >
+              <SkillsListContent
+                skills={visibleSkills}
+                viewMode={viewMode}
+                isDark={isDark}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+                onToggle={handleToggle}
+                onRun={setRunSkill}
+              />
             </div>
           )}
         </div>

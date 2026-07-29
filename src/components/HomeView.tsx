@@ -344,7 +344,7 @@ export default function HomeView({
                 <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
                     ? 'bg-mitra-surface hover:bg-muted'
-                    : 'bg-muted/60 hover:bg-accent'
+                    : 'bg-card hover:bg-accent'
                 }`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
                     isDark ? 'bg-muted' : 'bg-brand-green/10'
@@ -363,7 +363,7 @@ export default function HomeView({
                 <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
                     ? 'bg-mitra-surface hover:bg-muted'
-                    : 'bg-muted/60 hover:bg-accent'
+                    : 'bg-card hover:bg-accent'
                 }`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
                     isDark ? 'bg-muted' : 'bg-brand-green/10'
@@ -382,7 +382,7 @@ export default function HomeView({
                 <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
                     ? 'bg-mitra-surface hover:bg-muted'
-                    : 'bg-muted/60 hover:bg-accent'
+                    : 'bg-card hover:bg-accent'
                 }`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
                     isDark ? 'bg-muted' : 'bg-brand-green/10'

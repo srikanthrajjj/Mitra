@@ -16,7 +16,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
-import { isDarkTheme } from '../utils/theme';
+import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 
@@ -156,7 +156,7 @@ function ProjectDetailView({
               <div
                 className={cn(
                   'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
-                  isDark ? 'bg-mitra-surface' : 'bg-muted',
+                  isDark ? 'bg-mitra-surface' : 'bg-card',
                 )}
               >
                 <MessageCircle className="h-7 w-7 text-muted-foreground" />
@@ -200,10 +200,8 @@ function ProjectDetailView({
                 type="button"
                 onClick={() => onStartConversation(solution.id)}
                 className={cn(
-                  'group flex cursor-pointer items-center justify-between gap-4 rounded-xl border-0 px-5 py-4 text-left transition-colors',
-                  isDark
-                    ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                    : 'bg-card hover:bg-accent/40',
+                  'group flex cursor-pointer items-center justify-between gap-4 rounded-xl border-0 px-5 py-4 text-left',
+                  cardSurfaceHover(isDark),
                 )}
               >
                 <div className="min-w-0 flex-1">
@@ -421,7 +419,7 @@ export default function ProjectsView({
               <div
                 className={cn(
                   'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
-                  isDark ? 'bg-mitra-surface' : 'bg-muted',
+                  isDark ? 'bg-mitra-surface' : 'bg-card',
                 )}
               >
                 <FolderOpen className="h-7 w-7 text-muted-foreground" />
@@ -447,7 +445,7 @@ export default function ProjectsView({
               <div
                 className={cn(
                   'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
-                  isDark ? 'bg-mitra-surface' : 'bg-muted',
+                  isDark ? 'bg-mitra-surface' : 'bg-card',
                 )}
               >
                 <Search className="h-7 w-7 text-muted-foreground" />
@@ -481,10 +479,8 @@ export default function ProjectsView({
                     type="button"
                     onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
-                      'group relative flex items-center justify-between gap-3 rounded-xl border-0 px-4 py-3.5 text-left transition-colors cursor-pointer',
-                      isDark
-                        ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                        : 'bg-card hover:bg-accent/40',
+                      'group relative flex items-center justify-between gap-3 rounded-xl border-0 px-4 py-3.5 text-left cursor-pointer',
+                      cardSurfaceHover(isDark),
                     )}
                   >
                     <div className="min-w-0 flex-1">
@@ -534,10 +530,8 @@ export default function ProjectsView({
                     key={sol.id}
                     onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
-                      'group relative flex flex-col justify-between rounded-xl border-0 p-5 transition-colors cursor-pointer',
-                      isDark
-                        ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                        : 'bg-card hover:bg-accent/40',
+                      'group relative flex flex-col justify-between rounded-xl border-0 p-5 cursor-pointer',
+                      cardSurfaceHover(isDark),
                     )}
                   >
                     <div>

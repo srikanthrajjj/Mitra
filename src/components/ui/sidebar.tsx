@@ -101,7 +101,11 @@ function Sidebar({
   if (collapsible === 'none') {
     return (
       <div
-        className={cn('flex h-full w-full flex-col bg-sidebar text-sidebar-foreground', className)}
+        className={cn(
+          'flex h-full w-full flex-col bg-sidebar text-sidebar-foreground',
+          side === 'left' ? 'border-r border-border/60' : 'border-l border-border/60',
+          className,
+        )}
         {...props}
       >
         {children}
@@ -156,7 +160,10 @@ function Sidebar({
       >
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar"
+          className={cn(
+            'flex h-full w-full flex-col bg-sidebar',
+            side === 'left' ? 'border-r border-border/60' : 'border-l border-border/60',
+          )}
         >
           {children}
         </div>

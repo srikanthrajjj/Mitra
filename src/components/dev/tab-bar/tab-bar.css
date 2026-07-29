@@ -1,6 +1,6 @@
 /* ============================================
    mitra-tab-bar — Reusable tab navigation
-   Variants: boxed, underline, cta
+   Variants: boxed, underline, cta, pill
    ============================================ */
 
 /* --- Base container --- */
@@ -10,10 +10,45 @@
   gap: 0.125rem;
 }
 
+.mitra-tab-bar--inline {
+  width: auto;
+}
+
+.mitra-tab-bar--inline .mitra-tab-bar__tab {
+  flex: 0 1 auto;
+}
+
+/* --- Compact size --- */
+.mitra-tab-bar--compact .mitra-tab-bar__tab {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.mitra-tab-bar--compact.mitra-tab-bar--boxed {
+  padding: 0.0625rem;
+}
+
+.mitra-tab-bar--compact.mitra-tab-bar--boxed .mitra-tab-bar__tab {
+  border-radius: 0.25rem;
+}
+
+.mitra-tab-bar--compact.mitra-tab-bar--underline {
+  border-bottom: none;
+}
+
+.mitra-tab-bar--compact.mitra-tab-bar--underline .mitra-tab-bar__tab {
+  margin-bottom: 0;
+  border-bottom-width: 1.5px;
+}
+
+.mitra-tab-bar--compact .mitra-tab-bar__count {
+  font-size: 0.625rem;
+}
+
 /* --- Boxed variant (artifact panel style) --- */
 .mitra-tab-bar--boxed {
   border-radius: 0.5rem;
-  border: 1px solid var(--mitra-border, var(--border));
+  border: 1px solid var(--mitra-border-color, hsl(var(--border)));
   padding: 0.125rem;
 }
 
@@ -23,15 +58,15 @@
 }
 
 .mitra-tab-bar--boxed .mitra-tab-bar__tab--active {
-  background: rgba(50, 215, 75, 0.1);
-  color: var(--foreground);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--foreground));
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.05);
 }
 
 /* --- Underline variant --- */
 .mitra-tab-bar--underline {
   gap: 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .mitra-tab-bar--underline .mitra-tab-bar__tab {
@@ -41,8 +76,8 @@
 }
 
 .mitra-tab-bar--underline .mitra-tab-bar__tab--active {
-  color: var(--foreground);
-  border-bottom-color: #32d74b;
+  color: hsl(var(--foreground));
+  border-bottom-color: var(--color-brand-green);
 }
 
 /* --- CTA variant (button style) --- */
@@ -59,13 +94,41 @@
 }
 
 .mitra-tab-bar--cta .mitra-tab-bar__tab--active {
-  background: #32d74b;
+  background: var(--color-brand-green);
   color: #030d0a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.1);
 }
 
 .mitra-tab-bar--cta .mitra-tab-bar__tab--active:hover {
-  background: #28c840;
+  background: var(--color-brand-green-hover);
+}
+
+/* --- Pill variant (Mitra Insights style) --- */
+.mitra-tab-bar--pill {
+  gap: 0.5rem;
+}
+
+.mitra-tab-bar--pill .mitra-tab-bar__tab {
+  flex: 0 1 auto;
+  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  font-weight: 500;
+  /* Inactive: inherits muted-foreground from .mitra-tab-bar__tab base */
+}
+
+.mitra-tab-bar--pill .mitra-tab-bar__tab--active {
+  background: color-mix(in srgb, var(--color-brand-green) 10%, transparent);
+  color: var(--color-brand-green);
+  font-weight: 600;
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.06);
+}
+
+.mitra-tab-bar--pill .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
+  color: hsl(var(--foreground));
+}
+
+.mitra-tab-bar--compact.mitra-tab-bar--pill .mitra-tab-bar__tab {
+  padding: 0.25rem 0.625rem;
 }
 
 /* --- Tab button base --- */
@@ -78,17 +141,17 @@
   min-width: 0;
   background: transparent;
   border: none;
-  color: var(--muted-foreground);
+  color: hsl(var(--muted-foreground));
   font-family: var(--font-sans);
   font-size: 0.6875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
 }
 
 .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
-  color: var(--foreground);
+  color: hsl(var(--foreground));
 }
 
 .mitra-tab-bar__tab:focus-visible {
@@ -112,34 +175,53 @@
 .mitra-tab-bar__count {
   font-size: 0.5625rem;
   font-variant-numeric: tabular-nums;
-  color: var(--muted-foreground);
+  color: hsl(var(--muted-foreground));
   opacity: 0.7;
+}
+
+.mitra-tab-bar__tab--active .mitra-tab-bar__count {
+  color: inherit;
+  opacity: 0.8;
 }
 
 /* --- Light theme overrides --- */
 .mitra-tab-bar--boxed.mitra-tab-bar--light {
-  border-color: var(--border);
+  border-color: hsl(var(--border));
 }
 
 .mitra-tab-bar--boxed.mitra-tab-bar--light .mitra-tab-bar__tab--active {
-  background: var(--card);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: hsl(var(--primary) / 0.10);
+  color: hsl(var(--primary));
+  font-weight: 600;
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.08);
 }
 
 .mitra-tab-bar--underline.mitra-tab-bar--light .mitra-tab-bar__tab--active {
-  color: var(--foreground);
+  color: hsl(var(--primary));
+  font-weight: 600;
 }
 
 .mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab {
-  background: var(--muted);
-  color: var(--muted-foreground);
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 .mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
-  background: var(--accent);
+  background: hsl(var(--accent));
 }
 
 .mitra-tab-bar--cta.mitra-tab-bar--light .mitra-tab-bar__tab--active {
-  background: #24b346;
+  background: var(--color-brand-green);
   color: #030d0a;
+}
+
+/* Pill — light: darker primary green active, muted inactive (Insights parity) */
+.mitra-tab-bar--pill.mitra-tab-bar--light .mitra-tab-bar__tab--active {
+  background: hsl(var(--primary) / 0.10);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+.mitra-tab-bar--pill.mitra-tab-bar--light .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
+  color: hsl(var(--foreground));
 }

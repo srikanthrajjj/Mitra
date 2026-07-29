@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   ArrowLeft,
   ArrowLeftRight,
   Check,
   CheckCircle2,
-  History,
   RotateCcw,
   Sparkles,
   Trash2,
@@ -58,6 +57,97 @@ const inputClass = (isDark: boolean) =>
       : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand-green/50',
   );
 
+const SECTION_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted-foreground';
+
+const panelClass = (isDark: boolean) =>
+  cn('rounded-xl border bg-card p-3', isDark ? 'border-mitra-border' : 'border-border');
+
+function ColumnHeader({
+  title,
+  action,
+}: {
+  title: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-border px-4 md:px-5 lg:hidden">
+      <h2 className={SECTION_LABEL}>{title}</h2>
+      {action}
+    </div>
+  );
+}
+
+const SKILL_EDITOR_COLS =
+  'lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(240px,280px)]';
+
+function SkillEditorUnifiedHeader({
+  instructionsLength,
+  compareMode,
+  isCreate,
+  hasVersions,
+  onCompareToggle,
+  onCloseCompare,
+  isDark,
+}: {
+  instructionsLength: number;
+  compareMode: boolean;
+  isCreate: boolean;
+  hasVersions: boolean;
+  onCompareToggle: () => void;
+  onCloseCompare?: () => void;
+  isDark: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'hidden shrink-0 border-b border-border lg:grid',
+        SKILL_EDITOR_COLS,
+        isDark ? 'bg-mitra-surface' : 'bg-card',
+      )}
+    >
+      <div className="flex h-11 items-center border-r border-border px-4 md:px-5">
+        <h2 className={SECTION_LABEL}>Skill details</h2>
+      </div>
+      <div className="flex h-11 items-center justify-between gap-2 border-r border-border px-4 md:px-5">
+        <h2 className={SECTION_LABEL}>{compareMode ? 'Version compare' : 'Instructions'}</h2>
+        {compareMode ? (
+          onCloseCompare && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 px-2 text-[11px]"
+              onClick={onCloseCompare}
+            >
+              <X className="h-3 w-3" />
+              Close
+            </Button>
+          )
+        ) : (
+          <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+            {instructionsLength.toLocaleString()} chars
+          </span>
+        )}
+      </div>
+      <div className="flex h-11 items-center justify-between gap-2 px-4 md:px-5">
+        <h2 className={SECTION_LABEL}>Versions</h2>
+        {!isCreate && hasVersions && (
+          <Button
+            type="button"
+            variant={compareMode ? 'cta' : 'secondary'}
+            size="sm"
+            className="h-7 gap-1 px-2 text-[11px]"
+            onClick={onCompareToggle}
+          >
+            <ArrowLeftRight className="h-3 w-3" />
+            {compareMode ? 'Editing' : 'Compare'}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function VersionComparePanel({
   isDark,
   leftLabel,
@@ -75,24 +165,22 @@ function VersionComparePanel({
   const unchanged = diffs.filter((d) => !d.changed);
 
   return (
-    <section className="flex min-h-0 flex-col border-b border-border p-4 lg:border-b-0 lg:border-r">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            <ArrowLeftRight className="h-3.5 w-3.5" />
-            Version compare
-          </p>
-          <p className="mt-0.5 text-sm font-semibold text-foreground">
-            {leftLabel} → {rightLabel}
-          </p>
-        </div>
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 text-xs" onClick={onClose}>
-          <X className="h-3.5 w-3.5" />
-          Close compare
-        </Button>
-      </div>
+    <section className="flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r lg:bg-card">
+      <ColumnHeader
+        title="Version compare"
+        action={
+          <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-[11px]" onClick={onClose}>
+            <X className="h-3 w-3" />
+            Close
+          </Button>
+        }
+      />
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <p className="mb-3 text-sm font-semibold text-foreground">
+          {leftLabel} → {rightLabel}
+        </p>
 
-      <div className="mb-3 grid grid-cols-2 gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="mb-3 grid grid-cols-2 gap-2 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
         <div className={cn('rounded-lg border px-2.5 py-1.5', isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-muted')}>
           {leftLabel}
         </div>
@@ -111,20 +199,20 @@ function VersionComparePanel({
           changed.map((d) => (
             <div key={d.field} className="overflow-hidden rounded-xl border border-border">
               <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <span className={SECTION_LABEL}>
                   {d.label}
                 </span>
                 <span className="text-[10px] font-semibold text-brand-green">Changed</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 <div className={cn('border-b border-border p-3 sm:border-b-0 sm:border-r', isDark ? 'border-mitra-border' : '')}>
-                  <p className="mb-1 text-[10px] font-semibold uppercase text-muted-foreground">Before</p>
+                  <p className="mb-1 text-[10px] font-semibold uppercase text-secondary-foreground">Before</p>
                   <pre className="whitespace-pre-wrap break-words font-sans text-xs leading-relaxed text-muted-foreground">
                     {d.before || '—'}
                   </pre>
                 </div>
                 <div className="p-3">
-                  <p className="mb-1 text-[10px] font-semibold uppercase text-muted-foreground">After</p>
+                  <p className="mb-1 text-[10px] font-semibold uppercase text-secondary-foreground">After</p>
                   <pre className="whitespace-pre-wrap break-words font-sans text-xs font-medium leading-relaxed text-foreground">
                     {d.after || '—'}
                   </pre>
@@ -149,6 +237,7 @@ function VersionComparePanel({
             </ul>
           </details>
         )}
+      </div>
       </div>
     </section>
   );
@@ -452,19 +541,26 @@ export default function SkillEditorPage({
       </div>
 
       {/* Full-page columns: details | instructions | versions */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)_minmax(220px,260px)]">
+      <SkillEditorUnifiedHeader
+        instructionsLength={instructions.length}
+        compareMode={compareMode}
+        isCreate={isCreate}
+        hasVersions={sortedVersions.length > 0}
+        onCompareToggle={() => (compareMode ? setCompareMode(false) : openCompare())}
+        onCloseCompare={() => setCompareMode(false)}
+        isDark={isDark}
+      />
+      <div className={cn('grid min-h-0 flex-1 grid-cols-1 bg-background', SKILL_EDITOR_COLS)}>
         {/* Left: details */}
         <aside
           className={cn(
-            'min-h-0 space-y-3 overflow-y-auto border-b border-border p-4 lg:border-b-0 lg:border-r',
-            isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card',
+            'flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r',
+            isDark ? 'bg-mitra-surface' : 'bg-card',
           )}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Skill details
-          </p>
-
-          <div className="rounded-xl border border-border p-3">
+          <ColumnHeader title="Skill details" />
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 md:p-5">
+          <div className={panelClass(isDark)}>
             <button
               type="button"
               onClick={() => setShowMitra((v) => !v)}
@@ -530,16 +626,16 @@ export default function SkillEditorPage({
               ))}
             </select>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
+          <div className={cn('flex items-center justify-between', panelClass(isDark))}>
             <div>
               <p className="text-sm font-medium text-foreground">Enabled</p>
-              <p className="text-[11px] text-muted-foreground">Active in list</p>
+              <p className="text-xs text-muted-foreground">Active in list</p>
             </div>
             <Switch checked={enabled} onCheckedChange={setEnabled} />
           </div>
-          <div className="rounded-xl border border-border px-3 py-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</p>
-            <p className="mt-1 text-sm font-medium text-foreground">
+          <div className={panelClass(isDark)}>
+            <p className={SECTION_LABEL}>Status</p>
+            <p className="mt-2 text-sm font-medium text-foreground">
               {status === 'published' ? 'Published' : 'Draft — Publish to go live'}
             </p>
           </div>
@@ -551,6 +647,7 @@ export default function SkillEditorPage({
               onChange={(e) => setChangeNote(e.target.value)}
               placeholder="What changed in this publish?"
             />
+          </div>
           </div>
         </aside>
 
@@ -564,61 +661,56 @@ export default function SkillEditorPage({
             onClose={() => setCompareMode(false)}
           />
         ) : (
-          <section className="flex min-h-0 flex-col border-b border-border p-4 lg:border-b-0 lg:border-r">
-            <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Instructions
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Full skill prompt — Mitra follows this when the skill runs.
-                </p>
-              </div>
-              <span className="text-[11px] tabular-nums text-muted-foreground">
-                {instructions.length.toLocaleString()} chars
-              </span>
-            </div>
+          <section className={cn('flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r', isDark ? 'bg-mitra-surface' : 'bg-card')}>
+            <ColumnHeader
+              title="Instructions"
+              action={
+                <span className="text-[11px] tabular-nums text-muted-foreground">
+                  {instructions.length.toLocaleString()} chars
+                </span>
+              }
+            />
+            <div className="flex min-h-0 flex-1 flex-col p-4 md:p-5">
+              <p className="mb-3 text-xs text-muted-foreground">
+                Full skill prompt — Mitra follows this when the skill runs.
+              </p>
             <textarea
               className={cn(
                 inputClass(isDark),
-                'min-h-[50vh] flex-1 resize-none font-mono text-[13px] leading-relaxed lg:min-h-0',
+                'min-h-[50vh] flex-1 resize-none rounded-xl font-mono text-[13px] leading-relaxed lg:min-h-0',
               )}
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               placeholder="Write the full instructions here…"
               spellCheck={false}
             />
+            </div>
           </section>
         )}
 
         {/* Right: versions + compare controls */}
-        <aside className={cn('min-h-0 overflow-y-auto p-4', isDark ? 'bg-background/40' : 'bg-muted/30')}>
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <History className="h-3.5 w-3.5 text-muted-foreground" />
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Versions
-              </p>
-            </div>
-            {!isCreate && sortedVersions.length > 0 && (
-              <Button
-                type="button"
-                variant={compareMode ? 'cta' : 'secondary'}
-                size="sm"
-                className="h-7 gap-1 px-2 text-[11px]"
-                onClick={() => (compareMode ? setCompareMode(false) : openCompare())}
-              >
-                <ArrowLeftRight className="h-3 w-3" />
-                {compareMode ? 'Editing' : 'Compare'}
-              </Button>
-            )}
-          </div>
-
+        <aside className={cn('flex min-h-0 flex-col', isDark ? 'bg-mitra-surface' : 'bg-card')}>
+          <ColumnHeader
+            title="Versions"
+            action={
+              !isCreate && sortedVersions.length > 0 ? (
+                <Button
+                  type="button"
+                  variant={compareMode ? 'cta' : 'secondary'}
+                  size="sm"
+                  className="h-7 gap-1 px-2 text-[11px]"
+                  onClick={() => (compareMode ? setCompareMode(false) : openCompare())}
+                >
+                  <ArrowLeftRight className="h-3 w-3" />
+                  {compareMode ? 'Editing' : 'Compare'}
+                </Button>
+              ) : undefined
+            }
+          />
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-5">
           {compareMode && (
-            <div className="mb-3 space-y-2 rounded-xl border border-border p-2.5">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                Compare
-              </p>
+            <div className={cn('mb-3 space-y-2', panelClass(isDark))}>
+              <p className={SECTION_LABEL}>Compare</p>
               <div className="space-y-1.5">
                 <label className="text-[11px] text-muted-foreground">From</label>
                 <select
@@ -671,10 +763,11 @@ export default function SkillEditorPage({
                     className={cn(
                       'rounded-xl border px-3 py-2.5',
                       isLeft || isRight
-                        ? 'border-border bg-muted'
+                        ? 'border-border bg-muted/50'
                         : isDark
-                          ? 'border-mitra-border bg-mitra-surface'
+                          ? 'border-mitra-border bg-card'
                           : 'border-border bg-card',
+                      !isCurrent && !isLeft && !isRight && 'opacity-90',
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -722,6 +815,7 @@ export default function SkillEditorPage({
               })}
             </div>
           )}
+          </div>
         </aside>
       </div>
     </div>

@@ -281,8 +281,8 @@ export default function Sidebar({
         </>
       ) : (
         <>
-      <SidebarHeader className="px-4 py-3 shrink-0 flex flex-col gap-2.5">
-        <div className="flex items-center justify-between gap-2">
+      <SidebarHeader className="flex h-[52px] shrink-0 flex-row items-center border-b border-border/60 px-4 py-0">
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
             <div className="min-w-0">

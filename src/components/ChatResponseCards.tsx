@@ -39,15 +39,15 @@ export function ActionPillList({
             className={`w-full text-left inline-flex items-start gap-3 px-4 py-2.5 rounded-xl border text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed ${
               isSelected
                 ? isDark
-                  ? 'bg-brand-green/15 border-brand-green/40 text-brand-green shadow-[0_0_14px_rgba(50,215,75,0.18)]'
-                  : 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
+                  ? 'bg-brand-green/15 border-brand-green/40 text-brand-green'
+                  : 'bg-emerald-50 border-emerald-300 text-emerald-800'
                 : anySelected
                   ? isDark
                     ? 'bg-mitra-surface/30 border-white/[0.04] text-muted-foreground opacity-40'
                     : 'bg-muted border-border text-muted-foreground opacity-40'
                   : isDark
-                    ? 'bg-mitra-surface/60 border-white/[0.1] text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-white hover:shadow-[0_0_12px_rgba(50,215,75,0.12)] cursor-pointer active:scale-[0.99]'
-                    : 'bg-card border-mitra-border text-foreground hover:bg-accent hover:border-border hover:text-brand-green shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.99]'
+                    ? 'bg-mitra-surface/60 border-white/[0.1] text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-white cursor-pointer active:scale-[0.99]'
+                    : 'bg-card border-mitra-border text-foreground hover:bg-accent hover:border-border hover:text-brand-green cursor-pointer active:scale-[0.99]'
             }`}
           >
             {numbered ? (

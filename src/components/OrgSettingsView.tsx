@@ -1096,7 +1096,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       <aside
         className={cn(
-          'settings-nav org-settings-nav flex w-[240px] shrink-0 flex-col',
+          'settings-nav org-settings-nav flex w-[240px] shrink-0 flex-col border-r border-border/60',
           'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-xl',
           'max-md:transition-transform max-md:duration-200',
           mobileNavOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
@@ -1153,7 +1153,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                 'h-8 w-full rounded-md border pl-8 pr-3 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground',
                 isDark
                   ? 'border-mitra-border bg-mitra-input focus:border-brand-green/40'
-                  : 'border-border bg-card shadow-sm focus:border-brand-green/50',
+                  : 'border-border bg-card focus:border-brand-green/50',
               )}
             />
           </div>

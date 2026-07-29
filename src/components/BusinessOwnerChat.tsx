@@ -40,7 +40,7 @@ export function BusinessOwnerEntryTabs({
         className={cn(
           'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
           mode === 'upload'
-            ? 'bg-background text-foreground shadow-sm'
+            ? 'bg-background text-foreground'
             : 'text-muted-foreground hover:text-foreground',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
@@ -55,7 +55,7 @@ export function BusinessOwnerEntryTabs({
         className={cn(
           'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
           mode === 'chat'
-            ? 'bg-background text-foreground shadow-sm'
+            ? 'bg-background text-foreground'
             : 'text-muted-foreground hover:text-foreground',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
@@ -118,8 +118,8 @@ export function BusinessOwnerChatThread({
                 msg.sender === 'user'
                   ? 'bg-primary text-primary-foreground'
                   : isDark
-                    ? 'bg-card/80 text-foreground border border-border/50'
-                    : 'bg-card text-foreground border border-border shadow-sm',
+                    ? 'text-foreground'
+                    : 'text-foreground',
               )}
             >
               {msg.sender === 'mitra' ? parseBold(msg.text) : msg.text}
@@ -167,7 +167,7 @@ export function BusinessOwnerChatComposer({
         <div
           className={cn(
             'flex items-end gap-2 rounded-2xl border px-3 py-2',
-            isDark ? 'border-border/60 bg-card/40' : 'border-border bg-card shadow-sm',
+            isDark ? 'border-border/60 bg-card/40' : 'border-border bg-card',
           )}
         >
           <textarea

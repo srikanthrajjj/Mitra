@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bug, CheckCircle2, LayoutGrid, Lightbulb, List, MessageCircle, Plus, Search } from 'lucide-react';
 import { Theme } from '../types';
-import { isDarkTheme } from '../utils/theme';
+import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { USER_DISPLAY_NAME } from '../constants/user';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
@@ -97,13 +97,9 @@ function EntryIcon({
   return (
     <div
       className={cn(
-        'mt-0.5 flex shrink-0 items-center justify-center border',
+        'mt-0.5 flex shrink-0 items-center justify-center',
         box,
-        resolved
-          ? 'border-brand-green/30 bg-brand-green/10'
-          : isDark
-            ? 'border-mitra-border bg-muted'
-            : 'border-border bg-muted',
+        resolved ? 'bg-brand-green/10' : 'bg-muted',
       )}
     >
       {resolved ? (
@@ -273,22 +269,30 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
 
   const filterPill = (active: boolean) =>
     cn(
-      'shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors',
+      'shrink-0 rounded-full border-0 px-2.5 py-1 text-[11px] font-medium transition-colors',
       active
-        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        ? 'bg-brand-green/10 text-brand-green'
         : isDark
-          ? 'border-mitra-border bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
   const viewToggleBtn = (mode: ViewMode) =>
     cn(
-      'inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors',
+      'inline-flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors',
       viewMode === mode
-        ? 'border-brand-green bg-brand-green/10 text-brand-green'
+        ? 'bg-muted text-brand-green'
         : isDark
-          ? 'border-mitra-border text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
+  const entrySurfaceClass = (resolved: boolean) =>
+    cn(
+      'border-0',
+      resolved && 'bg-brand-green/[0.04]',
+      !resolved && cardSurfaceHover(isDark),
+      resolved && 'hover:bg-brand-green/[0.07] transition-colors',
     );
 
   return (
@@ -394,8 +398,10 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
           {filtered.length === 0 ? (
             <div
               className={cn(
-                'rounded-2xl border px-6 py-12 text-center',
-                isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card',
+                'rounded-2xl border-0 px-6 py-12 text-center',
+                isDark
+                  ? 'bg-mitra-surface'
+                  : 'bg-card',
               )}
             >
               <MessageCircle className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
@@ -411,16 +417,7 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
                 return (
                 <article
                   key={entry.id}
-                  className={cn(
-                    'flex flex-col rounded-2xl border p-4 transition-colors',
-                    resolved && 'border-brand-green/25 bg-brand-green/[0.04]',
-                    !resolved && (isDark
-                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40'),
-                    resolved && (isDark
-                      ? 'hover:bg-brand-green/[0.07]'
-                      : 'hover:bg-brand-green/[0.06]'),
-                  )}
+                  className={cn('flex flex-col rounded-2xl p-4', entrySurfaceClass(resolved))}
                 >
                   <div className="mb-3 flex items-start justify-between gap-2">
                     <EntryIcon entry={entry} isDark={isDark} size="md" />
@@ -450,14 +447,9 @@ export default function FeedbackView({ theme }: FeedbackViewProps) {
                 <article
                   key={entry.id}
                   className={cn(
-                    'sn-list-row flex items-start gap-3 rounded-xl border px-3.5 py-3.5 transition-colors',
-                    resolved && 'border-l-[3px] border-l-brand-green border-brand-green/20 bg-brand-green/[0.04]',
-                    !resolved && (isDark
-                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40'),
-                    resolved && (isDark
-                      ? 'hover:bg-brand-green/[0.07]'
-                      : 'hover:bg-brand-green/[0.06]'),
+                    'sn-list-row flex items-start gap-3 rounded-xl px-3.5 py-3.5',
+                    entrySurfaceClass(resolved),
+                    resolved && 'border-l-[3px] border-l-brand-green',
                   )}
                 >
                   <EntryIcon entry={entry} isDark={isDark} size="sm" />

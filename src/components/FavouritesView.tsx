@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { Star, ExternalLink } from 'lucide-react';
 import { Solution, Theme } from '../types';
-import { isDarkTheme } from '../utils/theme';
+import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
 
 interface FavouritesViewProps {
@@ -54,10 +54,8 @@ export default function FavouritesView({ solutions, theme, onSelect, onToggleFav
                 key={sol.id}
                 onClick={() => onSelect(sol.id)}
                 className={cn(
-                  'group relative flex flex-col justify-between rounded-xl border-0 p-5 transition-colors cursor-pointer',
-                  isDark
-                    ? 'bg-mitra-surface hover:bg-mitra-highlight text-foreground'
-                    : 'bg-card hover:bg-accent/40 text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                  'group relative flex flex-col justify-between rounded-xl border-0 p-5 cursor-pointer text-foreground',
+                  cardSurfaceHover(isDark),
                 )}
               >
                 <div>

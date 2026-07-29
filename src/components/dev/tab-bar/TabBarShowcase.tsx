@@ -27,7 +27,7 @@ function TabBar({
 }: {
   tabs: Tab[];
   activeTab: string;
-  variant?: 'boxed' | 'underline' | 'cta';
+  variant?: 'boxed' | 'underline' | 'cta' | 'pill';
   isDark?: boolean;
   onTabChange: (id: string) => void;
 }) {
@@ -121,6 +121,32 @@ function UnderlinePreview({ theme }: { theme: 'dark' | 'light' }) {
   );
 }
 
+function PillPreview({ theme }: { theme: 'dark' | 'light' }) {
+  const isDark = theme === 'dark';
+  const [tab, setTab] = useState('executive');
+
+  return (
+    <div className="w-full max-w-md">
+      <TabBar
+        tabs={[
+          { id: 'executive', label: 'Executive Adoption & ROI' },
+          { id: 'developer', label: 'Developer Productivity' },
+        ]}
+        activeTab={tab}
+        variant="pill"
+        isDark={isDark}
+        onTabChange={setTab}
+      />
+      <div className={cn(
+        'mt-3 p-4 text-xs',
+        isDark ? 'text-muted-foreground' : 'text-muted-foreground',
+      )}>
+        <p>Insights-style pill tab content for &quot;{tab}&quot;.</p>
+      </div>
+    </div>
+  );
+}
+
 function CtaPreview({ theme }: { theme: 'dark' | 'light' }) {
   const isDark = theme === 'dark';
   const [tab, setTab] = useState('executive');
@@ -150,11 +176,12 @@ export function TabBarShowcase() {
   return (
     <DevShowcaseShell
       title="Tab Bar"
-      description="Reusable tab navigation with 3 variants: boxed (panel tabs), underline (section nav), and CTA buttons (dashboard filters). Full ARIA semantics with role=tablist."
+      description="Reusable tab navigation with 4 variants: boxed (panel tabs), underline (section nav), pill (Insights-style), and CTA buttons (dashboard filters). Full ARIA semantics with role=tablist."
       notes={
         <ul className="list-disc space-y-2 pl-5">
           <li><strong>Boxed</strong> — artifact panel style with bordered pill container. Active: <code>bg-brand-green/10</code></li>
           <li><strong>Underline</strong> — bottom border indicator. Active: green bottom border</li>
+          <li><strong>Pill</strong> — Mitra Insights style. Active: rounded-full mint pill; inactive: plain muted green text</li>
           <li><strong>CTA</strong> — uses <code>variant="cta"</code> pattern. Active: solid green with black text</li>
           <li>Always include <code>role="tablist"</code>, <code>role="tab"</code>, <code>aria-selected</code></li>
           <li>Use <code>isDarkTheme(theme)</code> for theme detection</li>
@@ -168,6 +195,10 @@ export function TabBarShowcase() {
         {
           label: 'Underline (Section Nav)',
           content: (theme) => <UnderlinePreview theme={theme} />,
+        },
+        {
+          label: 'Pill (Insights Style)',
+          content: (theme) => <PillPreview theme={theme} />,
         },
         {
           label: 'CTA Buttons (Dashboard)',

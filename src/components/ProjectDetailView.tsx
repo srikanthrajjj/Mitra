@@ -75,7 +75,7 @@ export default function ProjectDetailView({ theme, solution, onBack }: ProjectDe
                 'rounded-xl border p-5',
                 isDark
                   ? 'bg-card border-border'
-                  : 'bg-card border-border shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                  : 'bg-card border-border',
               )}
             >
               <div className="mb-3 flex items-center justify-between">

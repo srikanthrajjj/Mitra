@@ -299,7 +299,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                 className={cn(
                   'flex min-w-0 flex-1 items-center justify-center rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
                   activeTab === tab
-                    ? 'bg-brand-green/10 text-foreground shadow-sm'
+                    ? 'bg-brand-green/10 text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
@@ -315,7 +315,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
               return (
                 <div
                   key={stat.label}
-                  className="rounded-xl bg-card p-4 transition-all hover:shadow-md"
+                  className="rounded-xl bg-card p-4 transition-colors hover:bg-muted"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-green/10">

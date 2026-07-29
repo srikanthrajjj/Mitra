@@ -131,8 +131,8 @@ function PanelTabBar({
               'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-[10px] font-medium transition-colors',
               selected
                 ? isDark
-                  ? 'bg-brand-green/10 text-foreground shadow-sm'
-                  : 'bg-card text-foreground shadow-sm'
+                  ? 'bg-brand-green/10 text-foreground'
+                  : 'bg-card text-foreground'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -162,7 +162,7 @@ function PanelHeader({
   onCollapse?: () => void;
 }) {
   return (
-    <div className="artifact-panel shrink-0 flex flex-col border-b border-border">
+    <div className="artifact-panel shrink-0 flex flex-col border-b border-border/60">
       {/* Top toolbar row matching 52px header line exactly */}
       <div className="flex min-w-0 h-[52px] items-center justify-between gap-1.5 pl-3 pr-3 w-full">
         <div className="min-w-0 flex-1">
@@ -537,8 +537,8 @@ export function ArtifactCardsPanel({
     <motion.aside
       style={{ width: panelWidth, maxWidth: panelWidth }}
       className={cn(
-        'artifact-panel relative box-border hidden shrink-0 overflow-hidden border-l xl:flex xl:min-h-0 xl:flex-col',
-        isDark ? 'border-border bg-sidebar' : 'border-border bg-sidebar/80',
+        'artifact-panel relative -ml-px z-10 box-border hidden shrink-0 overflow-hidden border-l border-border/60 xl:flex xl:min-h-0 xl:flex-col',
+        isDark ? 'bg-sidebar' : 'bg-sidebar/80',
         isResizing && !collapsed && 'select-none',
       )}
       initial={reducedMotion ? false : { opacity: 0, x: 16 }}

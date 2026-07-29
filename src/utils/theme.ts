@@ -29,3 +29,10 @@ export function isDarkTheme(theme: ResolvedTheme | Theme): boolean {
 export function portalThemeClass(theme: ResolvedTheme): ResolvedTheme {
   return theme;
 }
+
+/** Interactive card surface — neutral highlight on hover, no elevation shadow. */
+export function cardSurfaceHover(isDark: boolean): string {
+  return isDark
+    ? 'bg-mitra-surface hover:bg-mitra-highlight transition-colors'
+    : 'bg-card hover:bg-muted transition-colors';
+}

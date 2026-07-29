@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Theme } from '../types';
-import { isDarkTheme } from '../utils/theme';
+import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { Button } from '@/src/components/ui/button';
 import { 
   Plus, X, Edit, Key, MoreHorizontal, HelpCircle, History, CheckCircle2, XCircle, AlertTriangle
@@ -257,7 +257,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
   return (
     <div className={cn(
       'flex-1 flex flex-col min-h-0 h-full overflow-hidden',
-      isDark ? 'bg-mitra-bg' : 'bg-[#fafbfa]'
+      isDark ? 'bg-mitra-bg' : 'bg-background'
     )}>
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
         
@@ -335,10 +335,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               <div
                 key={conn.id}
                 className={cn(
-                  'rounded-xl border-0 p-6 transition-colors flex flex-col gap-4',
-                  isDark
-                    ? 'bg-mitra-surface hover:bg-mitra-highlight'
-                    : 'bg-card hover:bg-accent/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
+                  'rounded-xl border-0 p-6 flex flex-col gap-4',
+                  cardSurfaceHover(isDark),
                 )}
               >
                 {/* Top row: Tag on left, status + more menu on right */}

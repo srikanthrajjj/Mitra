@@ -188,7 +188,7 @@ function ThoughtDurationBadge({ isDark, durationMs }: { isDark: boolean; duratio
     <div
       className={cn(
         'mb-1 inline-flex items-center gap-1.5 text-[11px]',
-        isDark ? 'text-muted-foreground' : 'text-muted-foreground',
+        isDark ? 'text-muted-foreground' : 'text-brand-green',
       )}
     >
       <Lightbulb className="h-3.5 w-3.5 shrink-0" />
@@ -500,7 +500,7 @@ export default function ChatView({
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-transparent relative">
       {activeSolution && (
-        <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center justify-between gap-3 border-b border-border px-4 md:px-8 ${
+        <div className={`sticky top-0 z-20 flex h-[52px] shrink-0 items-center justify-between gap-3 border-b border-border/60 px-4 md:px-8 ${
           isDark ? 'bg-sidebar' : 'bg-sidebar/80'
         }`}>
           <h2
@@ -656,7 +656,7 @@ export default function ChatView({
                             : 'bg-transparent border-transparent'
                           : isDark
                             ? 'bg-mitra-surface text-brand-green'
-                            : 'bg-muted text-brand-green'
+                            : 'border border-border bg-card text-brand-green'
                     }`}>
                       {isMitra ? (
                         isSnUpdate ? (
@@ -676,15 +676,14 @@ export default function ChatView({
                   <div className="max-w-[85%] relative flex flex-col items-start">
 
                     {/* Body Text */}
-                    <div className={`break-words ${
-                      isMitra 
-                        ? isDark 
-                          ? 'text-foreground' 
-                          : 'text-foreground'
+                    <div className={cn(
+                      'break-words',
+                      isMitra
+                        ? 'text-foreground'
                         : isDark
-                          ? 'px-4 py-3 rounded-2xl bg-mitra-highlight/80 text-foreground font-medium'
-                          : 'px-5 py-3 rounded-[20px] rounded-tr-[4px] bg-muted text-foreground'
-                    }`}>
+                          ? 'rounded-2xl bg-mitra-highlight/80 px-4 py-3 font-medium text-foreground'
+                          : 'rounded-[20px] rounded-tr-[4px] border border-border bg-card px-5 py-3 font-medium text-foreground',
+                    )}>
                       {isMitra ? (
                         <>
                           {!showThinkingOnly && !isStreamingThisMessage && (
@@ -699,7 +698,7 @@ export default function ChatView({
                                 'mb-3 rounded-xl p-3',
                                 isDark
                                   ? 'bg-mitra-surface/50'
-                                  : 'bg-card shadow-sm',
+                                  : 'bg-card',
                               )}
                             >
                               <MitraTodos
@@ -781,15 +780,15 @@ export default function ChatView({
                                 className={`mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl border px-5 py-3.5 text-[14px] font-semibold transition-all duration-200 disabled:cursor-not-allowed ${
                                   isSelected
                                     ? isDark
-                                      ? 'border-brand-green/50 bg-brand-green/20 text-brand-green shadow-[0_0_20px_rgba(50,215,75,0.22)]'
-                                      : 'border-emerald-400 bg-muted text-emerald-800 shadow-md'
+                                      ? 'border-brand-green/50 bg-brand-green/20 text-brand-green'
+                                      : 'border-emerald-400 bg-muted text-emerald-800'
                                     : isAnySelected
                                       ? isDark
                                         ? 'border-mitra-border/40 bg-mitra-surface/30 text-muted-foreground opacity-40'
                                         : 'border-border bg-muted text-muted-foreground opacity-40'
                                       : isDark
-                                        ? 'border-brand-green/35 bg-brand-green/10 text-brand-green hover:bg-brand-green/18 hover:border-brand-green/50 hover:shadow-[0_0_18px_rgba(50,215,75,0.2)] cursor-pointer active:scale-[0.99]'
-                                        : 'border-emerald-300 bg-muted text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99]'
+                                        ? 'border-brand-green/35 bg-brand-green/10 text-brand-green hover:bg-brand-green/18 hover:border-brand-green/50 cursor-pointer active:scale-[0.99]'
+                                        : 'border-emerald-300 bg-muted text-emerald-800 hover:bg-emerald-100 hover:border-emerald-400 cursor-pointer active:scale-[0.99]'
                                 }`}
                               >
                                 {isSelected ? (
@@ -810,15 +809,15 @@ export default function ChatView({
                               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed ${
                                 isSelected
                                   ? isDark
-                                    ? 'bg-brand-green/15 text-brand-green shadow-[0_0_14px_rgba(50,215,75,0.18)]'
-                                      : 'bg-muted text-emerald-800 shadow-sm'
+                                    ? 'bg-brand-green/15 text-brand-green'
+                                      : 'bg-muted text-emerald-800'
                                   : isAnySelected
                                     ? isDark
                                       ? 'bg-mitra-surface/30 text-foreground opacity-40'
                                       : 'bg-muted text-foreground opacity-40'
                                       : isDark
-                                      ? 'bg-mitra-surface/60 text-foreground hover:bg-mitra-highlight hover:text-foreground hover:shadow-[0_0_12px_rgba(79,207,54,0.12)] cursor-pointer active:scale-[0.98]'
-                                      : 'bg-card text-foreground hover:bg-accent hover:text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
+                                      ? 'bg-mitra-surface/60 text-foreground hover:bg-mitra-highlight hover:text-foreground cursor-pointer active:scale-[0.98]'
+                                      : 'bg-card text-foreground hover:bg-accent hover:text-foreground cursor-pointer active:scale-[0.98]'
                               }`}
                             >
                               {isSelected ? (

@@ -67,7 +67,7 @@ export const MITRA_HEX_SURFACES = {
   brandGreen: { hex: '#32d74b' },
   vrCyan: { hex: '#00c9a0' },
   mitraBg: { dark: '#141414', blue: '#0e1117' },
-  lightCanvas: { hex: '#fafafa' },
+  lightCanvas: { hex: '#EBEBEB' },
 } as const;
 
 export const LANDING_TOKENS = {
