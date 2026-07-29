@@ -12,8 +12,8 @@ export default function StarterPromptsList({ theme, onSelect, disabled }: Starte
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'bg-mitra-surface/50 border-white/[0.08] text-foreground hover:bg-mitra-highlight hover:text-foreground hover:border-white/[0.12]'
-    : 'bg-card border-border text-foreground hover:bg-accent hover:text-foreground hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    ? 'chip-surface text-foreground'
+    : 'chip-surface text-foreground';
 
   return (
     <div className="w-full max-w-xl mx-auto text-center flex flex-col items-center">
@@ -27,7 +27,7 @@ export default function StarterPromptsList({ theme, onSelect, disabled }: Starte
             type="button"
             disabled={disabled}
             onClick={() => onSelect(item.prompt)}
-            className={`inline-flex items-center px-3.5 py-2 rounded-full border text-[13px] font-medium transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed cursor-pointer ${chipClass}`}
+            className={`inline-flex items-center px-3.5 py-2 rounded-full text-[13px] font-medium transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed cursor-pointer ${chipClass}`}
           >
             {item.label}
           </button>

@@ -272,11 +272,11 @@ export function DesignFeedbackWidget({
           type="button"
           onClick={onOpenDevSpecs}
           className={cn(
-            'inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium shadow-lg transition-all',
+            'inline-flex items-center gap-2 rounded-full border-0 px-3.5 py-2 text-sm font-medium shadow-lg transition-all',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
             isDark
-              ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-              : 'border-border bg-card text-foreground hover:bg-accent',
+              ? 'bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
+              : 'bg-card text-foreground hover:bg-accent',
           )}
         >
           <Code className="h-4 w-4 shrink-0 opacity-80" />
@@ -290,11 +290,11 @@ export function DesignFeedbackWidget({
         aria-controls="design-feedback-text"
         onClick={openPanel}
         className={cn(
-          'inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium shadow-lg transition-all',
+          'inline-flex items-center gap-2 rounded-full border-0 px-3.5 py-2 text-sm font-medium shadow-lg transition-all',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
           isDark
-            ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-            : 'border-border bg-card text-foreground hover:bg-accent',
+            ? 'bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
+            : 'bg-card text-foreground hover:bg-accent',
           open && 'ring-2 ring-ring/30',
         )}
       >
@@ -308,11 +308,11 @@ export function DesignFeedbackWidget({
         title="Toggle theme"
         aria-label="Toggle theme"
         className={cn(
-          'inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-lg transition-all',
+          'inline-flex h-9 w-9 items-center justify-center rounded-full border-0 shadow-lg transition-all',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 cursor-pointer',
           isDark
-            ? 'border-border bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
-            : 'border-border bg-card text-foreground hover:bg-accent',
+            ? 'bg-card/90 text-foreground backdrop-blur-md hover:bg-muted/80'
+            : 'bg-card text-foreground hover:bg-accent',
         )}
       >
         {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

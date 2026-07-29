@@ -7,6 +7,8 @@ interface ProdInstanceBannerProps {
   hostname?: string;
   /** When true, flush-attached to the composer below (default). */
   attached?: boolean;
+  /** When true, another strip (e.g. simulation note) sits above — square off top corners. */
+  stacked?: boolean;
 }
 
 /**
@@ -22,6 +24,7 @@ export function ProdInstanceBanner({
   instanceName,
   hostname,
   attached = true,
+  stacked = false,
 }: ProdInstanceBannerProps) {
   const title = hostname
     ? `Working with production instance · ${instanceName} (${hostname})`
@@ -34,7 +37,9 @@ export function ProdInstanceBanner({
       className={cn(
         'relative z-20 flex items-center gap-2 px-3.5 py-2 text-[12px]',
         attached
-          ? 'rounded-t-2xl rounded-b-none border-b'
+          ? stacked
+            ? 'rounded-none border-b'
+            : 'rounded-t-2xl rounded-b-none border-b'
           : 'mb-2 rounded-xl border',
         isDark
           ? 'border-[rgba(196,92,62,0.30)] bg-[rgba(196,92,62,0.12)]'
@@ -48,25 +53,25 @@ export function ProdInstanceBanner({
         )}
         aria-hidden
       />
-      <p className="min-w-0 truncate leading-none">
+      <p className="flex min-w-0 items-center gap-1.5 leading-snug">
         <span
           className={cn(
-            'font-semibold',
-            isDark ? 'text-white' : 'text-foreground',
+            'shrink-0 font-semibold',
+            isDark ? 'text-foreground' : 'text-foreground',
           )}
         >
           Working with production instance
         </span>
         <span
           className={cn(
-            'mx-1.5 inline-block translate-y-[-0.5px] text-[10px]',
-            isDark ? 'text-white/30' : 'text-muted-foreground/50',
+            'shrink-0 text-[10px]',
+            isDark ? 'text-muted-foreground/70' : 'text-muted-foreground/50',
           )}
           aria-hidden
         >
           ·
         </span>
-        <span className="font-medium text-brand-green">{instanceName}</span>
+        <span className="min-w-0 truncate font-medium text-brand-green">{instanceName}</span>
       </p>
     </div>
   );

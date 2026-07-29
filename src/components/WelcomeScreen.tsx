@@ -9,7 +9,7 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ onSignIn, onExploreGuest }: WelcomeScreenProps) {
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-mitra-bg relative overflow-hidden">
+    <div className="h-screen w-full flex items-center justify-center bg-dark-canvas relative overflow-hidden">
       <div className="relative z-10 flex flex-col items-center text-center px-6">
         <div className="relative mb-6 animate-welcome-in welcome-delay-1">
           <div className="absolute inset-0 -m-8 rounded-full bg-white/[0.03] blur-3xl pointer-events-none" aria-hidden />
@@ -34,7 +34,7 @@ export default function WelcomeScreen({ onSignIn, onExploreGuest }: WelcomeScree
 
           <button
             onClick={onExploreGuest}
-            className="w-full py-3 px-6 rounded-md text-[14px] font-semibold text-illuminate-muted border border-white/[0.06] bg-mitra-bg/80 hover:bg-mitra-surface hover:text-illuminate-text hover:border-white/[0.1] transition-all duration-300 cursor-pointer"
+            className="w-full py-3 px-6 rounded-[10px] text-[14px] font-semibold text-muted-foreground bg-mitra-surface hover:bg-muted hover:text-foreground transition-all duration-300 cursor-pointer"
           >
             Explore as guest
           </button>

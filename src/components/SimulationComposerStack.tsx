@@ -53,48 +53,78 @@ export default function SimulationComposerStack({
   const innerClassName = cleanCardClassName(cardClassName);
   const hasAttachedHeader = Boolean(attachedHeader);
 
+  const simulationNoteClassName = cn(
+    'px-3 py-1.5 text-center transition-colors duration-200',
+    isDark ? 'text-amber-600/45' : 'text-amber-700/55',
+  );
+
+  const simulationNoteText = (
+    <span className="text-[10px] font-normal tracking-[0.02em]">
+      {SIMULATION_INPUT_NOTE}
+    </span>
+  );
+
   return (
     <div className="relative w-full">
-      <div
-        role="note"
-        aria-label={SIMULATION_INPUT_NOTE}
-        className={cn(
-          'pointer-events-none absolute top-0 right-2.5 left-2.5 z-0 rounded-t-2xl border border-b-0 px-3 pt-[6px] pb-5 text-center transition-colors duration-200',
-          isDark
-            ? 'border-amber-900/20 bg-[#16140e]/90'
-            : 'border-amber-200/35 bg-[#f5f0e6]/95',
-        )}
-      >
-        <span
+      {!hasAttachedHeader && (
+        <div
+          role="note"
+          aria-label={SIMULATION_INPUT_NOTE}
           className={cn(
-            'text-[10px] font-normal tracking-[0.02em]',
-            isDark ? 'text-amber-600/45' : 'text-amber-700/55',
+            'pointer-events-none absolute top-0 right-2.5 left-2.5 z-0 rounded-t-2xl px-3 pt-[6px] pb-5 text-center transition-colors duration-200',
+            isDark
+              ? 'bg-mitra-surface'
+              : 'bg-[#f5f0e6]/95',
           )}
         >
-          Messages are simulated
-        </span>
-      </div>
+          <span
+            className={cn(
+              'text-[10px] font-normal tracking-[0.02em]',
+              isDark ? 'text-amber-600/45' : 'text-amber-700/55',
+            )}
+          >
+            {SIMULATION_INPUT_NOTE}
+          </span>
+        </div>
+      )}
 
       <div
         id={inputId}
         data-tour={dataTour}
         className={cn(
-          'relative z-10 mt-3 overflow-hidden rounded-2xl border bg-transparent transition-colors duration-200',
-          isDark
-            ? 'border-white/18 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.65),0_4px_14px_-6px_rgba(0,0,0,0.45)]'
-            : 'border-border shadow-[0_12px_36px_-14px_rgba(15,23,42,0.22),0_4px_12px_-6px_rgba(15,23,42,0.12)]',
-          !isActive && (isDark ? 'hover:border-white/28' : 'hover:border-border'),
-          isActive && (isDark
-            ? 'border-brand-green/50 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.65),0_0_0_1px_rgba(79,207,54,0.18)]'
-            : 'border-brand-green/55 shadow-[0_12px_36px_-14px_rgba(15,23,42,0.2),0_0_0_1px_rgba(4,120,87,0.12)]'),
+          'relative z-10 overflow-hidden bg-transparent transition-colors duration-200',
+          !hasAttachedHeader && 'mt-3',
+          'composer-surface',
+          isActive && 'composer-surface--active',
         )}
       >
-        {hasAttachedHeader && attachedHeader}
+        {hasAttachedHeader && (
+          <>
+            <div
+              role="note"
+              aria-label={SIMULATION_INPUT_NOTE}
+              className={cn(
+                simulationNoteClassName,
+                'rounded-t-2xl border-b',
+                isDark
+                  ? 'border-mitra-border bg-mitra-surface'
+                  : 'border-amber-200/35 bg-[#f5f0e6]/95',
+              )}
+            >
+              {simulationNoteText}
+            </div>
+            {React.isValidElement(attachedHeader)
+              ? React.cloneElement(attachedHeader as React.ReactElement<{ stacked?: boolean }>, {
+                  stacked: true,
+                })
+              : attachedHeader}
+          </>
+        )}
 
         <div
           className={cn(
             'overflow-hidden',
-            hasAttachedHeader ? 'rounded-b-[15px] rounded-t-none' : 'rounded-[15px]',
+            hasAttachedHeader ? 'rounded-b-[14px] rounded-t-none' : 'rounded-[14px]',
             innerClassName,
           )}
         >

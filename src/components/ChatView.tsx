@@ -79,8 +79,8 @@ function parseInlineMarkdown(text: string, isDark: boolean = true) {
       parts.push(
         <code key={match.index} className={`px-1.5 py-0.5 rounded font-mono text-[11.5px] mx-0.5 ${
           isDark
-            ? 'bg-muted text-brand-green border border-border'
-            : 'bg-muted text-brand-green border border-border'
+            ? 'bg-muted text-brand-green'
+            : 'bg-muted text-brand-green'
         }`}>
           {match[3]}
         </code>
@@ -143,7 +143,7 @@ function SnRecordUpdateShell({
   isDark: boolean;
 }) {
   return (
-    <div className="sn-record-update overflow-hidden rounded-xl border border-amber-300/80 bg-amber-50 dark:border-amber-500/25 dark:bg-amber-500/[0.06]">
+    <div className="sn-record-update overflow-hidden rounded-xl bg-amber-50 dark:bg-amber-500/[0.06]">
       <div className="flex items-center gap-2 border-b border-amber-200 bg-amber-100/70 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wide text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/[0.08] dark:text-amber-200/90">
         <ClipboardList className="h-3.5 w-3.5 shrink-0" />
         <span>ServiceNow · Record updated</span>
@@ -514,10 +514,10 @@ export default function ChatView({
               type="button"
               onClick={onShareProject}
               className={cn(
-                'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors',
+                'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors',
                 isDark
-                  ? 'border-mitra-border text-foreground hover:border-brand-green/30 hover:bg-brand-green/10 hover:text-foreground'
-                  : 'border-border text-muted-foreground hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800',
+                  ? 'text-foreground hover:bg-brand-green/10 hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-emerald-50 hover:text-emerald-800',
               )}
               title="Share project"
             >
@@ -558,19 +558,19 @@ export default function ChatView({
                 <div className="mb-5 flex justify-center">
                   <div className="relative">
                     <div className={`absolute inset-0 rounded-full blur-xl animate-pulse ${
-                      isDark ? 'bg-primary/15' : 'bg-emerald-400/15'
+                      isDark ? 'bg-muted' : 'bg-muted'
                     }`} />
-                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl border ${
+                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
                       isDark
-                        ? 'bg-card/80 border-mitra-border text-primary'
-                        : 'bg-muted border-border text-emerald-600'
+                        ? 'bg-card/80 text-primary'
+                        : 'bg-muted text-brand-green'
                     }`}>
                       <Sparkles className="h-7 w-7 animate-pulse text-primary" />
                     </div>
                   </div>
                 </div>
                 {appVersion === 'v3' && (
-                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground border border-emerald-500/25 animate-pulse font-mono">
+                  <span className="mb-3 inline-flex items-center gap-1.5 text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#4FCF36] shrink-0" />
                     v3 · Agentic Reasoner
                   </span>
@@ -646,17 +646,17 @@ export default function ChatView({
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isStreamingThisMessage 
                         ? isDark
-                            ? 'bg-brand-green/5 border border-brand-green/20 text-brand-green'
-                            : 'bg-muted border border-border text-emerald-600'
+                            ? 'bg-brand-green/5 text-brand-green'
+                            : 'bg-muted text-emerald-600'
                         : isMitra 
                           ? isSnUpdate
                             ? isDark
-                              ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
-                              : 'bg-amber-50 border border-amber-200 text-amber-700'
+                              ? 'bg-amber-500/10 text-amber-400'
+                              : 'bg-amber-50 text-amber-700'
                             : 'bg-transparent border-transparent'
                           : isDark
-                            ? 'bg-mitra-surface border border-mitra-border text-brand-green'
-                            : 'bg-muted border border-border text-brand-green'
+                            ? 'bg-mitra-surface text-brand-green'
+                            : 'bg-muted text-brand-green'
                     }`}>
                       {isMitra ? (
                         isSnUpdate ? (
@@ -682,8 +682,8 @@ export default function ChatView({
                           ? 'text-foreground' 
                           : 'text-foreground'
                         : isDark
-                          ? 'px-4 py-3 rounded-2xl border bg-mitra-highlight/80 border-mitra-border text-foreground font-medium'
-                          : 'px-5 py-3 rounded-[20px] rounded-tr-[4px] bg-muted border border-border text-foreground'
+                          ? 'px-4 py-3 rounded-2xl bg-mitra-highlight/80 text-foreground font-medium'
+                          : 'px-5 py-3 rounded-[20px] rounded-tr-[4px] bg-muted text-foreground'
                     }`}>
                       {isMitra ? (
                         <>
@@ -696,10 +696,10 @@ export default function ChatView({
                           {hasTodos && (
                             <div
                               className={cn(
-                                'mb-3 rounded-xl border p-3',
+                                'mb-3 rounded-xl p-3',
                                 isDark
-                                  ? 'border-mitra-border bg-mitra-surface/50'
-                                  : 'border-border bg-card shadow-sm',
+                                  ? 'bg-mitra-surface/50'
+                                  : 'bg-card shadow-sm',
                               )}
                             >
                               <MitraTodos
@@ -807,18 +807,18 @@ export default function ChatView({
                               type="button"
                               disabled={isGeneratingMessage || isAnySelected}
                               onClick={handleClick}
-                              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed ${
+                              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 disabled:cursor-not-allowed ${
                                 isSelected
                                   ? isDark
-                                    ? 'bg-brand-green/15 border-brand-green/40 text-brand-green shadow-[0_0_14px_rgba(50,215,75,0.18)]'
-                                      : 'bg-muted border-emerald-300 text-emerald-800 shadow-sm'
+                                    ? 'bg-brand-green/15 text-brand-green shadow-[0_0_14px_rgba(50,215,75,0.18)]'
+                                      : 'bg-muted text-emerald-800 shadow-sm'
                                   : isAnySelected
                                     ? isDark
-                                      ? 'bg-mitra-surface/30 border-mitra-border/40 text-foreground opacity-40'
-                                      : 'bg-muted border-border text-foreground opacity-40'
-                                    : isDark
-                                      ? 'bg-mitra-surface/60 border-mitra-border text-foreground hover:bg-mitra-highlight hover:border-brand-green/35 hover:text-foreground hover:shadow-[0_0_12px_rgba(79,207,54,0.12)] cursor-pointer active:scale-[0.98]'
-                                      : 'bg-card border-border text-foreground hover:bg-accent hover:border-border hover:text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
+                                      ? 'bg-mitra-surface/30 text-foreground opacity-40'
+                                      : 'bg-muted text-foreground opacity-40'
+                                      : isDark
+                                      ? 'bg-mitra-surface/60 text-foreground hover:bg-mitra-highlight hover:text-foreground hover:shadow-[0_0_12px_rgba(79,207,54,0.12)] cursor-pointer active:scale-[0.98]'
+                                      : 'bg-card text-foreground hover:bg-accent hover:text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md cursor-pointer active:scale-[0.98]'
                               }`}
                             >
                               {isSelected ? (
@@ -877,12 +877,12 @@ export default function ChatView({
                           <button
                             type="button"
                             onClick={() => handleLikeMessage(msg.id || `${i}`)}
-                            className={`p-1 rounded-md border transition-all duration-150 cursor-pointer active:scale-95 ${
+                            className={`p-1 rounded-md transition-all duration-150 cursor-pointer active:scale-95 ${
                               likedMessages[msg.id || `${i}`]
-                                ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30'
+                                ? 'text-emerald-500 bg-emerald-500/10'
                                 : isDark
-                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
-                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
+                                  ? 'text-muted-foreground hover:text-foreground bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground bg-card/95 hover:bg-accent'
                             }`}
                             title="Like"
                           >
@@ -891,12 +891,12 @@ export default function ChatView({
                           <button
                             type="button"
                             onClick={() => handleDislikeMessage(msg.id || `${i}`)}
-                            className={`p-1 rounded-md border transition-all duration-150 cursor-pointer active:scale-95 ${
+                            className={`p-1 rounded-md transition-all duration-150 cursor-pointer active:scale-95 ${
                               dislikedMessages[msg.id || `${i}`]
-                                ? 'text-rose-500 bg-rose-500/10 border-rose-500/30'
+                                ? 'text-rose-500 bg-rose-500/10'
                                 : isDark
-                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
-                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
+                                  ? 'text-muted-foreground hover:text-foreground bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground bg-card/95 hover:bg-accent'
                             }`}
                             title="Dislike"
                           >
@@ -905,12 +905,12 @@ export default function ChatView({
                           <button
                             type="button"
                             onClick={() => handleSpeakMessage(msg.text, msg.id || `${i}`)}
-                            className={`p-1 rounded-md border transition-all duration-150 cursor-pointer active:scale-95 ${
+                            className={`p-1 rounded-md transition-all duration-150 cursor-pointer active:scale-95 ${
                               speakingMessageId === (msg.id || `${i}`)
-                                ? 'text-primary bg-primary/10 border-primary/30 animate-pulse'
+                                ? 'text-primary bg-primary/10 animate-pulse'
                                 : isDark
-                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
-                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
+                                  ? 'text-muted-foreground hover:text-foreground bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground bg-card/95 hover:bg-accent'
                             }`}
                             title="Speak aloud"
                           >
@@ -919,12 +919,12 @@ export default function ChatView({
                           <button
                             type="button"
                             onClick={() => copyToClipboard(msg.text, msg.id || `${i}`)}
-                            className={`p-1 rounded-md border transition-all duration-150 cursor-pointer active:scale-95 ${
+                            className={`p-1 rounded-md transition-all duration-150 cursor-pointer active:scale-95 ${
                               copiedId === (msg.id || `${i}`)
-                                ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30'
+                                ? 'text-emerald-500 bg-emerald-500/10'
                                 : isDark
-                                  ? 'text-muted-foreground hover:text-foreground border-mitra-border bg-mitra-bg/90 hover:bg-mitra-surface'
-                                  : 'text-muted-foreground hover:text-foreground border-border bg-card/95 hover:bg-accent'
+                                  ? 'text-muted-foreground hover:text-foreground bg-mitra-bg/90 hover:bg-mitra-surface'
+                                  : 'text-muted-foreground hover:text-foreground bg-card/95 hover:bg-accent'
                             }`}
                             title="Copy text"
                           >
@@ -972,17 +972,7 @@ export default function ChatView({
               ) : undefined
             }
             cardClassName={`transition-colors duration-200 overflow-visible ${
-              inputValue.trim().length > 0
-                ? isDark
-                  ? 'bg-mitra-input'
-                  : 'bg-card'
-                : showInviteGlow
-                  ? isDark
-                    ? 'vr-glass-surface'
-                    : 'bg-card'
-                  : isDark
-                    ? 'vr-glass-surface'
-                    : 'bg-[#f3f4f6]'
+              isDark ? 'bg-mitra-input' : 'bg-card'
             }`}
           >
             <div className="flex flex-col p-3 relative overflow-visible">
@@ -1083,8 +1073,8 @@ export default function ChatView({
                     title="Stop response"
                     className={`w-7.5 h-7.5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
                       isDark
-                        ? 'bg-red-500/15 text-red-400 hover:bg-red-500/25 hover:text-red-300 border border-red-500/25'
-                        : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
+                        ? 'bg-red-500/15 text-red-400 hover:bg-red-500/25 hover:text-red-300'
+                        : 'bg-red-50 text-red-600 hover:bg-red-100'
                     }`}
                   >
                     <Square className="w-3 h-3 fill-current" />

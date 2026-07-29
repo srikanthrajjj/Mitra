@@ -156,7 +156,7 @@ function Sidebar({
       >
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar border-r border-sidebar-border"
+          className="flex h-full w-full flex-col bg-sidebar"
         >
           {children}
         </div>
@@ -188,7 +188,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
 function SidebarInset({ className, ...props }: React.ComponentProps<'main'>) {
   return (
     <main
-      className={cn('relative flex min-h-svh min-w-0 flex-1 flex-col bg-background', className)}
+      className={cn('relative flex min-h-svh min-w-0 flex-1 flex-col bg-transparent', className)}
       {...props}
     />
   );
@@ -236,7 +236,7 @@ const sidebarMenuButtonVariants = cva(
     variants: {
       variant: {
         default: 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-        outline: 'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+        outline: 'bg-background shadow-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
       },
       size: {
         default: 'h-8 text-sm',

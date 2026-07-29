@@ -31,13 +31,13 @@ export function ComposerModeSelect({
   const [open, setOpen] = useState(false);
   const current = COMPOSER_MODES.find((mode) => mode.id === value) ?? COMPOSER_MODES[0];
 
-  const strokePill = (extra?: string) =>
+  const pillSurface = (extra?: string) =>
     cn(
-      'rounded-full border bg-transparent border-mitra-border',
+      'rounded-full bg-muted',
       extra,
     );
 
-  const openStroke = isDark ? 'border-brand-green/35' : 'border-brand-green/80';
+  const openHighlight = isDark ? 'bg-accent' : 'bg-accent';
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -49,10 +49,10 @@ export function ComposerModeSelect({
         >
           <span
             className={cn(
-              strokePill(
+              pillSurface(
                 'inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-medium leading-none',
               ),
-              open && openStroke,
+              open && openHighlight,
               'text-foreground',
             )}
           >
@@ -67,8 +67,8 @@ export function ComposerModeSelect({
         sideOffset={6}
         className={cn(
           theme,
-          'min-w-[5.25rem] rounded-xl border p-1 backdrop-blur-md',
-          'border-mitra-border bg-mitra-surface/95 text-foreground',
+          'min-w-[5.25rem] rounded-xl border-0 p-1 backdrop-blur-md',
+          'bg-mitra-surface/95 text-foreground',
           isDark
             ? 'shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
             : 'shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
@@ -84,8 +84,8 @@ export function ComposerModeSelect({
                 'cursor-pointer rounded-lg px-2.5 py-1.5 text-[11px] font-medium capitalize outline-none',
                 selected
                   ? isDark
-                    ? 'bg-brand-green/10 text-brand-green focus:bg-brand-green/10 focus:text-brand-green'
-                    : 'bg-muted text-brand-green focus:bg-muted focus:text-brand-green'
+                    ? 'bg-accent text-foreground focus:bg-accent focus:text-foreground'
+                    : 'bg-muted text-foreground focus:bg-muted focus:text-foreground'
                   : 'text-muted-foreground focus:bg-mitra-surface focus:text-foreground',
               )}
             >

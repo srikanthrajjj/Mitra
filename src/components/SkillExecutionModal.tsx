@@ -116,8 +116,8 @@ export default function SkillExecutionModal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-2xl border shadow-2xl',
-          isDark ? 'border-white/[0.08] bg-[#111111]' : 'border-border bg-card',
+          'relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-2xl shadow-2xl',
+          isDark ? 'dark bg-card text-foreground' : 'light bg-card text-foreground',
         )}
         style={{ maxHeight: '80vh' }}
       >
@@ -158,14 +158,14 @@ export default function SkillExecutionModal({
           {/* Status banner */}
           <div
             className={cn(
-              'mb-4 flex items-center gap-3 rounded-xl border p-3',
+              'mb-4 flex items-center gap-3 rounded-xl p-3',
               phase === 'completed'
-                ? 'border-brand-green/30 bg-brand-green/5'
+                ? 'bg-brand-green/5'
                 : phase === 'failed'
-                  ? 'border-red-500/30 bg-red-500/5'
+                  ? 'bg-red-500/5'
                   : isDark
-                    ? 'border-white/[0.06] bg-white/[0.02]'
-                    : 'border-border bg-muted/40',
+                    ? 'bg-white/[0.02]'
+                    : 'bg-muted/40',
             )}
           >
             {phase === 'running' && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand-green" />}
@@ -194,7 +194,7 @@ export default function SkillExecutionModal({
           </div>
 
           {/* Live logs */}
-          <div className={cn('rounded-xl border', isDark ? 'border-white/[0.06] bg-white/[0.02]' : 'border-border bg-muted/40')}>
+          <div className={cn('rounded-xl', isDark ? 'bg-white/[0.02]' : 'bg-muted/40')}>
             <div className={cn('flex items-center gap-2 border-b px-3 py-2', isDark ? 'border-white/[0.06]' : 'border-border')}>
               <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
               <span className={`text-[11px] font-medium ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>Logs</span>
@@ -225,7 +225,7 @@ export default function SkillExecutionModal({
 
           {/* Result summary */}
           {phase === 'completed' && resultSummary && (
-            <div className="mt-4 rounded-xl border border-brand-green/30 bg-brand-green/5 p-3">
+            <div className="mt-4 rounded-xl bg-brand-green/5 p-3">
               <p className={`text-xs leading-relaxed ${isDark ? 'text-white/70' : 'text-foreground'}`}>{resultSummary}</p>
             </div>
           )}
@@ -234,7 +234,7 @@ export default function SkillExecutionModal({
           {phase === 'failed' && (
             <div className="mt-4 space-y-2">
               {logs.filter((l) => l.level === 'error').map((log, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+                <div key={i} className="flex items-start gap-2 rounded-xl bg-red-500/5 p-3">
                   <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-red-400" />
                   <p className="text-[11px] text-red-300">{log.message}</p>
                 </div>

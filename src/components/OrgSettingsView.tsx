@@ -178,8 +178,8 @@ function SectionCard({
   return (
     <section
       className={cn(
-        'rounded-xl border p-5',
-        isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card',
+        'rounded-xl p-5',
+        isDark ? 'bg-mitra-surface' : 'bg-card',
       )}
     >
       {(title || action) && (
@@ -487,12 +487,14 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                       type="button"
                       onClick={() => setActiveOrgId(org.id)}
                       className={cn(
-                        'flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-colors',
+                        'flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors',
                         active
-                          ? 'border-brand-green/40 bg-brand-green/10'
+                          ? isDark
+                            ? 'bg-accent'
+                            : 'bg-brand-green/10'
                           : isDark
-                            ? 'border-mitra-border hover:bg-accent'
-                            : 'border-border hover:bg-accent',
+                            ? 'hover:bg-muted'
+                            : 'hover:bg-accent',
                       )}
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-xs font-bold text-brand-green">
@@ -601,8 +603,8 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
             </Field>
             <div
               className={cn(
-                'mt-4 rounded-lg border px-3 py-2.5 text-sm',
-                isDark ? 'border-mitra-border bg-mitra-input' : 'border-border bg-muted',
+                'mt-4 rounded-lg px-3 py-2.5 text-sm',
+                isDark ? 'bg-mitra-input' : 'bg-muted',
               )}
             >
               <span className="text-muted-foreground">Preview: </span>
@@ -672,7 +674,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
               }
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-14 items-center justify-center rounded-md border border-border bg-muted text-[10px] font-bold text-foreground">
+                <div className="flex h-10 w-14 items-center justify-center rounded-md bg-muted text-[10px] font-bold text-foreground">
                   VISA
                 </div>
                 <div>
@@ -908,8 +910,8 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                   <div
                     key={team.id}
                     className={cn(
-                      'flex items-center justify-between gap-3 rounded-xl border px-3 py-3',
-                      isDark ? 'border-mitra-border' : 'border-border',
+                      'flex items-center justify-between gap-3 rounded-xl px-3 py-3',
+                      isDark ? 'bg-mitra-surface/50' : 'bg-muted/30',
                     )}
                   >
                     <div>
@@ -957,8 +959,8 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                       setSection('permissions');
                     }}
                     className={cn(
-                      'rounded-xl border px-3 py-3 text-left transition-colors hover:bg-accent',
-                      isDark ? 'border-mitra-border' : 'border-border',
+                      'rounded-xl px-3 py-3 text-left transition-colors hover:bg-accent',
+                      isDark ? 'bg-mitra-surface/50' : 'bg-muted/30',
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -999,7 +1001,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                   return (
                     <div
                       key={perm.id}
-                      className="flex items-center justify-between gap-3 rounded-lg border border-border px-3 py-2"
+                      className="flex items-center justify-between gap-3 rounded-lg px-3 py-2"
                     >
                       <div>
                         <p className="text-sm font-medium text-foreground">{perm.label}</p>
@@ -1021,7 +1023,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
               {policies.map((policy) => (
                 <div
                   key={policy.id}
-                  className="flex items-start justify-between gap-4 rounded-xl border border-border px-3 py-3"
+                  className="flex items-start justify-between gap-4 rounded-xl px-3 py-3"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground">{policy.name}</p>
@@ -1058,10 +1060,10 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
           type="button"
           onClick={onClose}
           className={cn(
-            'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors',
+            'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
             isDark
-              ? 'border-mitra-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
-              : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+              ? 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
+              : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
           )}
           aria-label={`Back to ${backLabel}`}
         >
@@ -1094,7 +1096,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       <aside
         className={cn(
-          'settings-nav org-settings-nav flex w-[240px] shrink-0 flex-col border-r border-border',
+          'settings-nav org-settings-nav flex w-[240px] shrink-0 flex-col',
           'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-xl',
           'max-md:transition-transform max-md:duration-200',
           mobileNavOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
@@ -1178,8 +1180,8 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                       className={cn(
                         'flex h-7 w-full items-center gap-1.5 rounded-md px-2 py-0.5 text-left text-xs leading-none transition-colors',
                         active
-                          ? 'bg-muted font-medium text-foreground'
-                          : 'text-foreground hover:bg-muted/60',
+                          ? 'bg-accent font-medium text-foreground'
+                          : 'text-foreground hover:bg-muted',
                       )}
                     >
                       <Icon
@@ -1211,7 +1213,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
           {flash && (
             <div
               role="status"
-              className="mb-4 rounded-xl border border-border bg-brand-green/10 px-3 py-2.5 text-sm text-foreground"
+              className="mb-4 rounded-xl bg-muted px-3 py-2.5 text-sm text-foreground"
             >
               {flash}
             </div>

@@ -54,10 +54,10 @@ export default function FavouritesView({ solutions, theme, onSelect, onToggleFav
                 key={sol.id}
                 onClick={() => onSelect(sol.id)}
                 className={cn(
-                  'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
+                  'group relative flex flex-col justify-between rounded-xl border-0 p-5 transition-colors cursor-pointer',
                   isDark
-                    ? 'bg-card hover:bg-card/60 border-border text-foreground hover:border-brand-green/30'
-                    : 'bg-card hover:bg-accent border-border text-foreground hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                    ? 'bg-mitra-surface hover:bg-mitra-highlight text-foreground'
+                    : 'bg-card hover:bg-accent/40 text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
                 )}
               >
                 <div>

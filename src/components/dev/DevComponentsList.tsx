@@ -56,10 +56,10 @@ const ComponentCard: FC<ComponentCardProps> = ({ component, Icon, onSelect }) =>
   };
 
   return (
-    <div className="group flex w-full items-start gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand-green/30 hover:bg-muted/20">
+    <div className="group flex w-full items-start gap-4 rounded-xl bg-card p-5 transition-colors hover:bg-muted/20">
       <span
         ref={iconRef}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-green/20 bg-brand-green/10"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green/10"
       >
         <Icon className="h-4.5 w-4.5 text-brand-green" />
       </span>
@@ -81,7 +81,7 @@ const ComponentCard: FC<ComponentCardProps> = ({ component, Icon, onSelect }) =>
           <button
             type="button"
             onClick={handleDownload}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-brand-green/20 bg-brand-green/5 px-2.5 py-1 text-[11px] font-medium text-brand-green transition-colors hover:bg-brand-green/10 cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-green/5 px-2.5 py-1 text-[11px] font-medium text-brand-green transition-colors hover:bg-brand-green/10 cursor-pointer"
             aria-label={`Download ${component.name} icon as SVG`}
           >
             {downloaded ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}

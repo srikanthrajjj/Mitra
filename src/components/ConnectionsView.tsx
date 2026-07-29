@@ -321,8 +321,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {connections.length === 0 ? (
             <div className={cn(
-              'border rounded-2xl p-10 text-center flex flex-col items-center justify-center',
-              isDark ? 'border-white/[0.06] bg-card/10' : 'border-border bg-card'
+              'rounded-2xl border-0 p-10 text-center flex flex-col items-center justify-center',
+              isDark ? 'bg-mitra-surface' : 'bg-card'
             )}>
               <HelpCircle className="h-8 w-8 text-muted-foreground/40 mb-3" />
               <h3 className="text-sm font-semibold text-foreground">No connections found</h3>
@@ -335,10 +335,10 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               <div
                 key={conn.id}
                 className={cn(
-                  'border rounded-xl p-6 transition-all duration-200 shadow-sm flex flex-col gap-4',
-                  isDark 
-                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60 hover:border-white/[0.1]' 
-                    : 'bg-card border-border hover:border-border'
+                  'rounded-xl border-0 p-6 transition-colors flex flex-col gap-4',
+                  isDark
+                    ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                    : 'bg-card hover:bg-accent/40 shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
                 )}
               >
                 {/* Top row: Tag on left, status + more menu on right */}

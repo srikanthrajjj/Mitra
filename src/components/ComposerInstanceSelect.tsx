@@ -40,13 +40,13 @@ export function ComposerInstanceSelect({
   const [open, setOpen] = useState(false);
   const selected = instances.find((instance) => instance.id === value);
 
-  const strokePill = (extra?: string) =>
+  const pillSurface = (extra?: string) =>
     cn(
-      'rounded-full border bg-transparent border-mitra-border',
+      'rounded-full bg-muted',
       extra,
     );
 
-  const openStroke = isDark ? 'border-brand-green/35' : 'border-brand-green/80';
+  const openHighlight = isDark ? 'bg-accent' : 'bg-accent';
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -67,8 +67,8 @@ export function ComposerInstanceSelect({
         >
           <span
             className={cn(
-              strokePill('inline-flex h-6 w-6 items-center justify-center'),
-              open && openStroke,
+              pillSurface('inline-flex h-6 w-6 items-center justify-center'),
+              open && openHighlight,
               'text-muted-foreground',
             )}
           >
@@ -83,10 +83,10 @@ export function ComposerInstanceSelect({
             <>
               <span
                 className={cn(
-                  strokePill(
+                  pillSurface(
                     'max-w-[9rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
                   ),
-                  open && openStroke,
+                  open && openHighlight,
                   'text-foreground',
                 )}
               >
@@ -105,8 +105,8 @@ export function ComposerInstanceSelect({
           ) : (
             <span
               className={cn(
-                strokePill('px-2 py-0.5 text-[10px] font-medium leading-none'),
-                open && openStroke,
+                pillSurface('px-2 py-0.5 text-[10px] font-medium leading-none'),
+                open && openHighlight,
                 'text-muted-foreground',
               )}
             >
@@ -120,8 +120,8 @@ export function ComposerInstanceSelect({
         align="start"
         className={cn(
           theme,
-          'w-64 rounded-xl border p-1 backdrop-blur-md',
-          'border-mitra-border bg-mitra-surface/95 text-foreground',
+          'w-64 rounded-xl border-0 p-1 backdrop-blur-md',
+          'bg-mitra-surface/95 text-foreground',
           isDark
             ? 'shadow-[0_10px_30px_rgba(0,0,0,0.45)]'
             : 'shadow-[0_10px_24px_rgba(15,23,42,0.08)]',
@@ -145,7 +145,7 @@ export function ComposerInstanceSelect({
                 'cursor-pointer rounded-lg px-2.5 py-2 outline-none',
                 isSelected
                   ? isDark
-                    ? 'bg-brand-green/10 focus:bg-brand-green/10'
+                    ? 'bg-accent focus:bg-accent'
                     : 'bg-muted focus:bg-muted'
                   : 'focus:bg-mitra-surface',
                 !instance.active && 'opacity-50',
@@ -173,9 +173,9 @@ export function ComposerInstanceSelect({
                   <span className="truncate text-xs font-medium">{instance.name}</span>
                   <span
                     className={cn(
-                      strokePill('shrink-0 px-1.5 py-px text-[9px] font-semibold uppercase'),
-                      isSelected && openStroke,
-              'text-muted-foreground',
+                      pillSurface('shrink-0 px-1.5 py-px text-[9px] font-semibold uppercase'),
+                      isSelected && openHighlight,
+                      'text-muted-foreground',
                     )}
                   >
                     {instance.tag}

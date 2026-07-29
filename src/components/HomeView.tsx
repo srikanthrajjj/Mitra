@@ -194,10 +194,10 @@ export default function HomeView({
   };
 
   return (
-    <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-1 flex-col h-full overflow-hidden bg-transparent">
       <div className="flex-1 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
         <div className="relative mx-auto w-full max-w-4xl">
-          <div className="pointer-events-none absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px]" />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted/20 blur-[100px]" />
 
           <div className="relative z-10 mb-8 text-center flex flex-col items-center justify-center">
             <h1 className="mb-3 flex items-center justify-center gap-2 text-3xl font-display font-semibold tracking-tight md:text-4xl">
@@ -261,7 +261,7 @@ export default function HomeView({
                   />
                 ) : undefined
               }
-              cardClassName="bg-card transition-colors duration-200"
+              cardClassName={isDark ? 'bg-mitra-input transition-colors duration-200' : 'bg-card transition-colors duration-200'}
             >
               <div className="relative flex flex-col p-3">
                 {dragActive && (
@@ -341,15 +341,17 @@ export default function HomeView({
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Feature 1 */}
-                <div className={`p-4 rounded-xl border transition-all duration-300 ${
+                <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
-                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
-                    : 'bg-muted/60 border-border hover:bg-accent'
+                    ? 'bg-mitra-surface hover:bg-muted'
+                    : 'bg-muted/60 hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
+                    isDark ? 'bg-muted' : 'bg-brand-green/10'
+                  }`}>
                     <Sparkles className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
+                  <h3 className="text-xs font-bold mb-1.5 text-foreground">
                     Multi-Agent Canvas
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -358,15 +360,17 @@ export default function HomeView({
                 </div>
 
                 {/* Feature 2 */}
-                <div className={`p-4 rounded-xl border transition-all duration-300 ${
+                <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
-                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
-                    : 'bg-muted/60 border-border hover:bg-accent'
+                    ? 'bg-mitra-surface hover:bg-muted'
+                    : 'bg-muted/60 hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
+                    isDark ? 'bg-muted' : 'bg-brand-green/10'
+                  }`}>
                     <FileText className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
+                  <h3 className="text-xs font-bold mb-1.5 text-foreground">
                     Schema Graph Mapper
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -375,15 +379,17 @@ export default function HomeView({
                 </div>
 
                 {/* Feature 3 */}
-                <div className={`p-4 rounded-xl border transition-all duration-300 ${
+                <div className={`p-4 rounded-[14px] transition-all duration-300 ${
                   isDark
-                    ? 'bg-mitra-surface/40 border-white/[0.06] hover:bg-mitra-surface/60'
-                    : 'bg-muted/60 border-border hover:bg-accent'
+                    ? 'bg-mitra-surface hover:bg-muted'
+                    : 'bg-muted/60 hover:bg-accent'
                 }`}>
-                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center mb-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${
+                    isDark ? 'bg-muted' : 'bg-brand-green/10'
+                  }`}>
                     <Terminal className="w-4 h-4 text-brand-green" />
                   </div>
-                  <h3 className={`text-xs font-bold mb-1.5 ${isDark ? 'text-white' : 'text-foreground'}`}>
+                  <h3 className="text-xs font-bold mb-1.5 text-foreground">
                     ATF Suite Generator
                   </h3>
                   <p className="text-[11px] leading-relaxed text-muted-foreground">

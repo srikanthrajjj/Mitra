@@ -55,7 +55,7 @@ function StudioStepper({ stage, isDark }: { stage: string; isDark: boolean }) {
                 done
                   ? isDark ? 'text-brand-green/80' : 'text-brand-green'
                   : active
-                    ? isDark ? 'bg-brand-green/12 text-brand-green border border-brand-green/25' : 'bg-brand-green/10 text-brand-green border border-brand-green/30'
+                    ? isDark ? 'bg-brand-green/12 text-brand-green' : 'bg-brand-green/10 text-brand-green'
                     : 'text-muted-foreground'
               }`}
             >
@@ -148,7 +148,7 @@ export default function ServiceNowStudio({
   );
 
   const shell = isDark
-    ? 'border-white/[0.06] bg-[#0a0a0a]/90'
+    ? 'border-mitra-border bg-mitra-surface/90'
     : 'border-border bg-muted/90';
 
   const tabs: { id: StudioTab; label: string; icon: React.ElementType }[] = [
@@ -253,7 +253,7 @@ export default function ServiceNowStudio({
       <div className="flex-1 overflow-y-auto p-3 min-h-0">
         {isGeneratingMessage && (
           <div className={`flex items-center gap-2 mb-3 px-2.5 py-1.5 rounded-lg text-[11px] ${
-            isDark ? 'bg-brand-green/8 text-brand-green border border-brand-green/15' : 'bg-brand-green/10 text-brand-green border border-brand-green/30'
+            isDark ? 'bg-brand-green/8 text-brand-green' : 'bg-brand-green/10 text-brand-green'
           }`}>
             <Loader2 className="w-3 h-3 animate-spin" />
             Building application artifacts…
@@ -294,7 +294,7 @@ export default function ServiceNowStudio({
               {blueprint.applicationMenu?.length ? (
                 <div className="space-y-1">
                   {blueprint.applicationMenu.map((mod) => (
-                    <div key={mod.title} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] ${isDark ? 'bg-white/[0.03]' : 'bg-card border border-border'}`}>
+                    <div key={mod.title} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] ${isDark ? 'bg-white/[0.03]' : 'bg-card'}`}>
                       <Table2 className="w-3 h-3 text-brand-green shrink-0" />
                       <span className="text-foreground">{mod.title}</span>
                       <span className={`ml-auto font-mono text-[9px] text-muted-foreground`}>{mod.table}</span>

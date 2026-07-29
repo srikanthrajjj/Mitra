@@ -213,8 +213,8 @@ export function SearchDialog({
         className={cn(
           "w-full max-w-2xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[65vh] animate-fade-in",
           isDark
-            ? "bg-mitra-bg border-mitra-border text-foreground"
-            : "bg-card border-border text-foreground"
+            ? "bg-mitra-bg text-foreground"
+            : "bg-card text-foreground"
         )}
       >
         {/* Top Input Bar */}
@@ -255,9 +255,9 @@ export function SearchDialog({
                 "px-2.5 py-1 text-[11px] font-semibold rounded-md uppercase tracking-wider transition-all cursor-pointer",
                 category === cat
                   ? isDark
-                    ? "bg-brand-green/12 text-brand-green border border-brand-green/20"
-                    : "bg-muted text-brand-green border border-brand-green/50"
-                  : "text-muted-foreground hover:text-foreground border border-transparent"
+                    ? "bg-brand-green/12 text-brand-green"
+                    : "bg-muted text-brand-green"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {cat}
@@ -286,8 +286,8 @@ export function SearchDialog({
                       "group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-all cursor-pointer select-none border border-transparent",
                       active
                         ? isDark
-                          ? "bg-mitra-surface border-mitra-border text-foreground"
-                          : "bg-muted border-border text-foreground"
+                          ? "bg-mitra-surface text-foreground"
+                          : "bg-muted text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -296,8 +296,8 @@ export function SearchDialog({
                         "p-1.5 rounded-lg shrink-0 border",
                         active
                           ? isDark
-                            ? "bg-mitra-bg border-mitra-border text-brand-green"
-                            : "bg-card border-border text-brand-green"
+                            ? "bg-mitra-bg text-brand-green"
+                            : "bg-card text-brand-green"
                           : "bg-muted/30 border-transparent text-muted-foreground/60"
                       )}>
                         <ItemIcon className="h-4 w-4" />

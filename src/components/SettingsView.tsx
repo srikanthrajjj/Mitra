@@ -985,7 +985,7 @@ export function SettingsView({
           <X className="h-4 w-4" />
         </Button>
 
-        <aside className="settings-nav flex w-[220px] shrink-0 flex-col border-r border-border/60 pt-12">
+        <aside className="settings-nav flex w-[220px] shrink-0 flex-col pt-12">
           <div className="shrink-0 px-3 pb-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />

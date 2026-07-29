@@ -142,10 +142,10 @@ export default function Sidebar({
   const navLogoAnimated = useNavLogoPulse();
 
   return (
-    <ShadcnSidebar collapsible="none" className="h-full w-full border-r border-sidebar-border">
+    <ShadcnSidebar collapsible="none" className="h-full w-full">
       {collapsed ? (
         <>
-          <SidebarHeader className="flex flex-col items-center gap-2 border-b border-sidebar-border px-1 py-3">
+          <SidebarHeader className="flex flex-col items-center gap-2 px-1 py-3">
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
             <Tooltip>
               <TooltipTrigger asChild>
@@ -190,7 +190,7 @@ export default function Sidebar({
             )}
           </SidebarContent>
 
-          <SidebarFooter className="flex flex-col items-center gap-1.5 border-t border-sidebar-border p-1.5">
+          <SidebarFooter className="flex flex-col items-center gap-1.5 p-1.5">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -231,10 +231,10 @@ export default function Sidebar({
                     align="end"
                     className={cn(
                       theme,
-                      'w-56 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
+                      'w-56 p-1.5 rounded-xl shadow-xl backdrop-blur-md transition-all duration-200',
                       isDark
-                        ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                        : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
+                        ? 'bg-mitra-surface/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                        : 'bg-card/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
                     )}
                   >
                     <DropdownMenuLabel className="text-xs font-semibold px-2.5 py-1.5 text-muted-foreground/80">Account</DropdownMenuLabel>
@@ -281,7 +281,7 @@ export default function Sidebar({
         </>
       ) : (
         <>
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-3 shrink-0 flex flex-col gap-2.5">
+      <SidebarHeader className="px-4 py-3 shrink-0 flex flex-col gap-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
@@ -291,7 +291,7 @@ export default function Sidebar({
                   Mitra
                 </span>
                 {version === 'v3' && (
-                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground border border-emerald-500/20 animate-pulse font-mono leading-none">
+                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono leading-none">
                     v3 Beta
                   </span>
                 )}
@@ -398,24 +398,28 @@ export default function Sidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border px-2 py-1">
+      <SidebarFooter
+        className={cn(
+          'shrink-0 gap-0 p-0',
+          isDark
+            ? 'border-t border-border/40 bg-mitra-input'
+            : 'border-t border-border/60 bg-muted/40',
+        )}
+      >
         {showNotificationToast && (
-          <div className="mx-0.5 mb-2 relative">
+          <div className="relative mx-3 mt-2.5">
             <div className={cn(
               'rounded-lg px-2.5 py-2 text-[10px] leading-tight',
               isDark
-                ? 'bg-brand-green/10 border border-brand-green/20 text-foreground'
-                : 'bg-brand-green/5 border border-brand-green/20 text-foreground',
+                ? 'bg-brand-green/10 text-foreground'
+                : 'bg-brand-green/5 text-foreground',
             )}>
               <p>You can turn off notifications from <span className="font-semibold">Settings</span>.</p>
             </div>
             <button
               type="button"
               onClick={onDismissNotificationToast}
-              className={cn(
-                'absolute top-1 right-1 p-0.5 rounded transition-colors cursor-pointer',
-                isDark ? 'text-muted-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground',
-              )}
+              className="absolute top-1 right-1 cursor-pointer rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="h-3 w-3" />
             </button>
@@ -426,11 +430,15 @@ export default function Sidebar({
             <button
               type="button"
               data-tour="profile"
-              className="mx-0.5 my-0 w-[calc(100%-0.25rem)] rounded-lg px-2 py-1.5 flex items-center gap-2 text-left transition-colors hover:bg-sidebar-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              className={cn(
+                'group flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors',
+                'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                isDark ? 'hover:bg-mitra-highlight' : 'hover:bg-accent/60',
+              )}
               aria-label="Account menu"
             >
-              <Avatar className="h-7 w-7 rounded-full shrink-0">
-                <AvatarFallback className="rounded-full bg-brand-green/10 text-brand-green font-semibold text-[9px]">
+              <Avatar className="h-8 w-8 shrink-0 rounded-full ring-1 ring-border/40">
+                <AvatarFallback className="rounded-full bg-muted text-[10px] font-medium text-foreground">
                   {userRole === 'architect' ? 'RC' : USER_INITIALS}
                 </AvatarFallback>
               </Avatar>
@@ -438,11 +446,19 @@ export default function Sidebar({
                 <div className="truncate text-[12px] font-semibold text-foreground">
                   {userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME}
                 </div>
-                <div className="truncate text-[10px] text-muted-foreground">
+                <div className={cn(
+                  'truncate text-[10px]',
+                  isDark ? 'text-secondary-foreground' : 'text-muted-foreground',
+                )}>
                   {userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]}
                 </div>
               </div>
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <ChevronDown className={cn(
+                'h-3.5 w-3.5 shrink-0 transition-colors',
+                isDark
+                  ? 'text-muted-foreground/55 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground',
+              )} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -452,7 +468,7 @@ export default function Sidebar({
               theme,
               'w-56 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
               isDark
-                ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                ? 'bg-mitra-surface/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
                 : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
             )}
           >

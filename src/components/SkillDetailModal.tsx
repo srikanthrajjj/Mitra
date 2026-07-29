@@ -29,10 +29,8 @@ export default function SkillDetailModal({ theme, skill, onClose, onRun }: Skill
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative z-10 w-full max-w-lg rounded-2xl border p-6 shadow-2xl transition-all',
-          isDark
-            ? 'border-white/[0.08] bg-[#111111]'
-            : 'border-border bg-card',
+          'relative z-10 w-full max-w-lg rounded-2xl p-6 shadow-2xl transition-all',
+          'bg-card',
         )}
       >
         {/* Close button */}
@@ -68,8 +66,8 @@ export default function SkillDetailModal({ theme, skill, onClose, onRun }: Skill
         {/* What it helps with */}
         <div
           className={cn(
-            'mb-4 rounded-xl border p-4',
-            isDark ? 'border-white/[0.06] bg-white/[0.02]' : 'border-border bg-muted/40',
+            'mb-4 rounded-xl p-4',
+            isDark ? 'bg-white/[0.02]' : 'bg-muted/40',
           )}
         >
           <h3 className={`mb-1.5 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>
@@ -83,8 +81,8 @@ export default function SkillDetailModal({ theme, skill, onClose, onRun }: Skill
         {/* Example prompt */}
         <div
           className={cn(
-            'mb-6 rounded-xl border p-4',
-            isDark ? 'border-white/[0.06] bg-white/[0.02]' : 'border-border bg-muted/40',
+            'mb-6 rounded-xl p-4',
+            isDark ? 'bg-white/[0.02]' : 'bg-muted/40',
           )}
         >
           <h3 className={`mb-1.5 text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-white/50' : 'text-muted-foreground'}`}>

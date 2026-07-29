@@ -25,8 +25,8 @@ export function ColdStartEntryChips({
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'bg-mitra-surface/50 border-mitra-border text-foreground hover:bg-mitra-highlight hover:text-foreground hover:border-brand-green/30'
-    : 'bg-card border-border text-foreground hover:bg-accent hover:text-foreground hover:border-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+    ? 'chip-surface text-foreground'
+    : 'chip-surface text-foreground';
 
   return (
     <div className="w-full max-w-xl mx-auto text-center flex flex-col items-center">
@@ -46,7 +46,7 @@ export function ColdStartEntryChips({
               }
               onSelect(action.prompt);
             }}
-            className={`inline-flex items-center px-3.5 py-2 rounded-full border text-[13px] font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${chipClass}`}
+            className={`inline-flex items-center px-3.5 py-2 rounded-full text-[13px] font-medium transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer ${chipClass}`}
           >
             {CHIP_LABELS[action.id]}
           </button>

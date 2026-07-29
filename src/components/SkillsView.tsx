@@ -88,8 +88,8 @@ function SkillOverflowMenu({
       <DropdownMenuContent
         align="end"
         className={cn(
-          'w-40 rounded-xl border p-1',
-          isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card',
+          'w-40 rounded-xl border-0 p-1 shadow-lg',
+          isDark ? 'bg-mitra-surface' : 'bg-card',
         )}
       >
         <DropdownMenuItem
@@ -270,22 +270,22 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
 
   const viewToggleBtn = (mode: ViewMode) =>
     cn(
-      'inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors',
+      'inline-flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors',
       viewMode === mode
-        ? 'border-border bg-muted text-brand-green'
+        ? 'bg-muted text-brand-green'
         : isDark
-          ? 'border-mitra-border text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
   const categoryPill = (active: boolean) =>
     cn(
-      'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+      'rounded-full border-0 px-3 py-1 text-xs font-medium transition-colors',
       active
-        ? 'border-border bg-muted text-brand-green'
+        ? 'bg-muted text-brand-green'
         : isDark
-          ? 'border-mitra-border bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
   if (editorOpen) {
@@ -370,10 +370,10 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={cn(
-                  'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-colors',
+                  'surface-inset w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors',
                   isDark
-                    ? 'border-mitra-border bg-mitra-input text-foreground placeholder:text-muted-foreground focus:border-brand-green/40'
-                    : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-brand-green/50',
+                    ? 'bg-mitra-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30'
+                    : 'bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30',
                 )}
               />
             </div>
@@ -429,24 +429,24 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                   type="button"
                   onClick={() => openEdit(skill)}
                   className={cn(
-                    'group flex flex-col rounded-xl border p-4 text-left transition-colors',
+                    'group flex flex-col rounded-xl border-0 p-4 text-left transition-colors',
                     skill.disabled && 'opacity-60',
                     isDark
-                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40',
+                      ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                      : 'bg-card hover:bg-accent/40',
                   )}
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                      <span className="rounded-full border-0 bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground">
                         {skill.category}
                       </span>
                       <span
                         className={cn(
-                          'rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase',
+                          'rounded-full border-0 px-2 py-0.5 text-[10px] font-semibold uppercase',
                           skill.managed.status === 'published'
-                            ? 'border-border bg-brand-green/10 text-brand-green'
-                            : 'border-border bg-muted text-muted-foreground',
+                            ? 'bg-brand-green/10 text-brand-green'
+                            : 'bg-muted text-muted-foreground',
                         )}
                       >
                         {SKILL_STATUS_LABELS[skill.managed.status]}
@@ -509,11 +509,11 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
                     }
                   }}
                   className={cn(
-                    'sn-list-row flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-3 transition-colors',
+                    'flex cursor-pointer items-center gap-3 rounded-xl border-0 px-3.5 py-3 transition-colors',
                     skill.disabled && 'opacity-60',
                     isDark
-                      ? 'border-mitra-border bg-mitra-surface hover:bg-mitra-highlight'
-                      : 'border-border bg-card hover:bg-accent/40',
+                      ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                      : 'bg-card hover:bg-accent/40',
                   )}
                 >
                   <div className="min-w-0 flex-1">

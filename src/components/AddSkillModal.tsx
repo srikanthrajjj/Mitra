@@ -91,10 +91,8 @@ export default function AddSkillModal({ theme, isOpen, onClose, onAdd, initialSk
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative z-10 w-full max-w-lg rounded-2xl border p-6 shadow-2xl transition-all',
-          isDark
-            ? 'border-white/[0.08] bg-[#111111]'
-            : 'border-border bg-card',
+          'relative z-10 w-full max-w-lg rounded-2xl p-6 shadow-2xl transition-all',
+          isDark ? 'bg-card' : 'bg-card',
         )}
       >
         <button

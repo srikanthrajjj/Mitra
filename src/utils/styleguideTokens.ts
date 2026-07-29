@@ -28,21 +28,21 @@ export interface ThemeTokenSet {
 
 export const THEME_TOKENS: Record<ThemeId, ThemeTokenSet> = {
   dark: {
-    background: { hsl: '210 18% 8%', hex: '#111417', utility: 'bg-background' },
-    foreground: { hsl: '210 15% 92%', hex: '#e8eaed', utility: 'text-foreground' },
-    card: { hsl: '210 16% 13%', hex: '#1d2227', utility: 'bg-card' },
-    popover: { hsl: '210 15% 16%', hex: '#232a30', utility: 'bg-popover' },
+    background: { hsl: '0 0% 8%', hex: '#141414', utility: 'bg-background' },
+    foreground: { hsl: '0 0% 95%', hex: '#f3f3f3', utility: 'text-foreground' },
+    card: { hsl: '0 0% 11%', hex: '#1c1c1c', utility: 'bg-card' },
+    popover: { hsl: '0 0% 13%', hex: '#212121', utility: 'bg-popover' },
     primary: { hsl: '135 66% 52%', hex: '#32d74b', utility: 'bg-primary' },
-    secondary: { hsl: '210 14% 16%', hex: '#232a30', utility: 'bg-secondary' },
-    muted: { hsl: '210 14% 16%', hex: '#232a30', utility: 'bg-muted' },
-    mutedForeground: { hsl: '210 10% 58%', hex: '#8b939a', utility: 'text-muted-foreground' },
-    accent: { hsl: '210 14% 18%', hex: '#282f36', utility: 'bg-accent' },
-    border: { hsl: '210 12% 24%', hex: '#3a4249', utility: 'border-border' },
-    input: { hsl: '210 14% 14%', hex: '#1f252a', utility: 'border-input' },
+    secondary: { hsl: '0 0% 13%', hex: '#212121', utility: 'bg-secondary' },
+    muted: { hsl: '0 0% 16.5%', hex: '#2a2a2a', utility: 'bg-muted' },
+    mutedForeground: { hsl: '0 0% 48%', hex: '#7a7a7a', utility: 'text-muted-foreground' },
+    accent: { hsl: '0 0% 19%', hex: '#313131', utility: 'bg-accent' },
+    border: { hsl: '0 0% 18%', hex: '#2d2d2d', utility: 'border-border' },
+    input: { hsl: '0 0% 13%', hex: '#212121', utility: 'border-input' },
     ring: { hsl: '135 66% 52%', hex: '#32d74b', utility: 'ring-ring' },
-    sidebar: { hsl: '210 16% 11%', hex: '#181c20', utility: 'bg-sidebar' },
-    sidebarForeground: { hsl: '210 15% 92%', hex: '#e8eaed', utility: 'text-sidebar-foreground' },
-    sidebarBorder: { hsl: '210 12% 22%', hex: '#333a41', utility: 'border-sidebar-border' },
+    sidebar: { hsl: '0 0% 9.4%', hex: '#181818', utility: 'bg-sidebar' },
+    sidebarForeground: { hsl: '0 0% 95%', hex: '#f3f3f3', utility: 'text-sidebar-foreground' },
+    sidebarBorder: { hsl: '0 0% 18%', hex: '#2d2d2d', utility: 'border-sidebar-border' },
   },
   blue: {
     background: { hsl: '216 25% 7%', hex: '#0d1017', utility: 'bg-background' },
@@ -66,7 +66,7 @@ export const THEME_TOKENS: Record<ThemeId, ThemeTokenSet> = {
 export const MITRA_HEX_SURFACES = {
   brandGreen: { hex: '#32d74b' },
   vrCyan: { hex: '#00c9a0' },
-  mitraBg: { dark: '#06080a', blue: '#0e1117' },
+  mitraBg: { dark: '#141414', blue: '#0e1117' },
   lightCanvas: { hex: '#fafafa' },
 } as const;
 

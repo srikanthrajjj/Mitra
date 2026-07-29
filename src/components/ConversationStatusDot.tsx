@@ -81,7 +81,7 @@ export function ConversationStatusDot({ status, className }: ConversationStatusD
             'inline-block h-[5px] w-[5px] rounded-full',
             status === 'failed' && 'bg-destructive',
             status === 'awaiting' && 'bg-amber-400',
-            status === 'idle' && 'bg-muted-foreground/40',
+            status === 'idle' && 'bg-muted-foreground/55',
           )}
         />
       )}

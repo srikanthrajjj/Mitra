@@ -46,8 +46,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
     <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
       
       {/* Modal Card frame */}
-      <div className={`w-full max-w-lg rounded-2xl border p-6 overflow-hidden relative shadow-2xl transition-all duration-300 ${
-        isDark ? 'glass-panel-dark border-mitra-border shadow-[0_20px_50px_rgba(0,0,0,0.5)]' : 'bg-card border-border'
+      <div className={`w-full max-w-lg rounded-2xl p-6 overflow-hidden relative shadow-2xl transition-all duration-300 ${
+        isDark ? 'glass-panel-dark shadow-[0_20px_50px_rgba(0,0,0,0.5)]' : 'bg-card'
       }`}>
         
         {/* Glow ambient circle */}
@@ -64,8 +64,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
           <button 
             type="button"
             onClick={onClose}
-            className={`p-1 rounded-lg border ${
-              isDark ? 'border-mitra-border text-muted-foreground hover:text-foreground hover:bg-mitra-surface' : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent'
+            className={`p-1 rounded-lg ${
+              isDark ? 'text-muted-foreground hover:text-foreground hover:bg-mitra-surface' : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >
             <X className="w-4.5 h-4.5" />
@@ -162,8 +162,8 @@ export default function NewSolutionModal({ theme, isOpen, onClose, onCreateSolut
 
           {/* Inheritance warning hint */}
           {extendsTable === 'task' && (
-            <div className={`p-3 rounded-lg flex items-start gap-2 border ${
-              isDark ? 'bg-mitra-surface/60 border-mitra-border' : 'bg-emerald-50/10 border-emerald-100'
+            <div className={`p-3 rounded-lg flex items-start gap-2 ${
+              isDark ? 'bg-mitra-surface/60' : 'bg-emerald-50/10'
             }`}>
               <AlertCircle className="w-4 h-4 text-brand-green shrink-0 mt-0.5" />
               <p className="text-[11px] text-muted-foreground leading-relaxed">

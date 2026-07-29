@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { SolutionArtifact, SolutionBlueprint } from '../types';
 import { ArtifactTypeIcon, ArtifactFormatBadge } from '../utils/artifactDisplay';
+import { cn } from '@/lib/utils';
 
 interface RightSidebarProps {
   blueprint: SolutionBlueprint | null;
@@ -84,24 +85,102 @@ function getStepTime(state: StepState): string {
 function StepNode({ state }: { state: StepState }) {
   if (state === 'completed') {
     return (
-      <div className="relative w-5 h-5 rounded-full flex items-center justify-center bg-mitra-surface text-muted-foreground border border-mitra-border">
-        <Check className="w-3 h-3 stroke-[3]" />
+      <div
+        className={cn(
+          'workflow-stepper-node workflow-stepper-node--complete',
+          'flex h-5 w-5 items-center justify-center rounded-full border border-border bg-muted text-brand-green',
+        )}
+      >
+        <Check className="h-3 w-3 stroke-[2.5]" aria-hidden />
       </div>
     );
   }
 
   if (state === 'in-progress') {
     return (
-      <div className="relative w-5 h-5 flex items-center justify-center">
-        <div className="relative w-5 h-5 rounded-full flex items-center justify-center bg-brand-green/12 text-brand-green border border-brand-green/25 shadow-sm">
-          <Loader2 className="w-3 h-3 animate-spin" />
+      <div className="relative flex h-5 w-5 items-center justify-center">
+        <div
+          className={cn(
+            'workflow-stepper-node workflow-stepper-node--active',
+            'relative flex h-5 w-5 items-center justify-center rounded-full border border-brand-green/40 bg-brand-green/10 text-brand-green',
+          )}
+        >
+          <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-4 h-4 rounded-full border border-mitra-border bg-mitra-surface" />
+    <div
+      className={cn(
+        'workflow-stepper-node workflow-stepper-node--pending',
+        'flex h-4 w-4 items-center justify-center rounded-full border border-border bg-transparent',
+      )}
+      aria-hidden
+    />
+  );
+}
+
+function WorkflowStepRow({
+  step,
+  state,
+  isLast,
+}: {
+  step: (typeof WORKFLOW_STEPS)[number];
+  state: StepState;
+  isLast: boolean;
+}) {
+  const isActive = state === 'in-progress';
+  const isComplete = state === 'completed';
+  const statusLabel = getStepTime(state);
+
+  return (
+    <div className="workflow-stepper-row">
+      {!isLast && (
+        <div
+          className={cn(
+            'workflow-stepper-connector',
+            isComplete ? 'bg-brand-green/35' : 'bg-border',
+          )}
+          aria-hidden
+        />
+      )}
+
+      <div className="relative z-10 shrink-0 pt-0.5">
+        <StepNode state={state} />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start gap-2">
+          <p
+            className={cn(
+              'min-w-0 flex-1 text-[12px] leading-snug',
+              isActive && 'font-semibold text-foreground',
+              isComplete && 'font-medium text-foreground/85',
+              state === 'pending' && 'font-medium text-muted-foreground',
+            )}
+          >
+            {step.label}
+          </p>
+          {state !== 'pending' && (
+            <span
+              className={cn(
+                'shrink-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wide',
+                isActive
+                  ? 'text-brand-green'
+                  : 'bg-muted text-muted-foreground',
+              )}
+            >
+              {statusLabel}
+            </span>
+          )}
+        </div>
+        <p className="mt-0.5 text-[10.5px] leading-snug text-muted-foreground">
+          {step.description}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -154,7 +233,7 @@ function ArtifactsTab({
         {artifacts.map((artifact) => (
           <div
             key={artifact.id}
-            className="group flex items-center gap-2.5 rounded-lg border border-transparent bg-mitra-surface/30 px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-green/40 hover:bg-mitra-surface hover:shadow-[0_4px_14px_rgba(0,0,0,0.10)]"
+            className="group flex items-center gap-2.5 rounded-lg border border-transparent bg-mitra-surface/30 px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:bg-mitra-highlight hover:shadow-[0_1px_2px_rgba(0,0,0,0.18)]"
           >
             <ArtifactTypeIcon type={artifact.type} className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-green/80" />
             <div className="min-w-0 flex-1">
@@ -174,7 +253,7 @@ function ArtifactsTab({
                 onClick={() => downloadArtifact(artifact)}
                 aria-label={`Download ${artifact.name}`}
                 title="Download file"
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-brand-green"
               >
                 <Download className="h-3.5 w-3.5" />
               </button>
@@ -183,7 +262,7 @@ function ArtifactsTab({
                 onClick={() => onShare?.(artifact)}
                 aria-label={`Share ${artifact.name}`}
                 title="Share artifact"
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-brand-green"
               >
                 <Share2 className="h-3.5 w-3.5" />
               </button>
@@ -213,48 +292,24 @@ function StatusTab({
   const phaseLabel = activeIndex < 0 ? '—' : Math.min(activeIndex + 1, 5);
 
   return (
-    <div className="flex-1 overflow-y-auto px-5 py-6">
-      <div className="relative pl-7">
-        <div className="absolute top-3 bottom-3 left-[9px] w-[2px] rounded-full bg-gradient-to-b from-brand-green/40 to-mitra-border/50" />
-
+    <div className="flex-1 overflow-y-auto px-4 py-5">
+      <ol className="workflow-stepper" aria-label="Implementation workflow steps">
         {WORKFLOW_STEPS.map((step, idx) => {
           const state = getStepState(idx, activeIndex);
-          const timeLabel = getStepTime(state);
 
           return (
-            <div
-              key={step.label}
-              className={`relative pb-6 last:pb-0 transition-all duration-500 ease-out ${
-                state === 'pending' ? 'opacity-50' : 'opacity-100'
-              }`}
-            >
-              <div className="absolute -left-7 top-0 flex items-center justify-center w-5 h-5 transition-all duration-400">
-                <StepNode state={state} />
-              </div>
-
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className={`text-[12px] font-semibold tracking-wide transition-colors duration-400 ${
-                    state === 'in-progress' ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                    {step.label}
-                  </div>
-                  <p className="text-[10.5px] mt-0.5 leading-snug text-muted-foreground/80">
-                    {step.description}
-                  </p>
-                </div>
-                <span className={`text-[9px] font-mono shrink-0 pt-0.5 uppercase tracking-wider transition-colors duration-400 ${
-                  state === 'in-progress' ? 'text-brand-green' : 'text-muted-foreground'
-                }`}>
-                  {timeLabel}
-                </span>
-              </div>
-            </div>
+            <li key={step.label}>
+              <WorkflowStepRow
+                step={step}
+                state={state}
+                isLast={idx === WORKFLOW_STEPS.length - 1}
+              />
+            </li>
           );
         })}
-      </div>
+      </ol>
 
-      <div className="mt-6 pt-3 border-t border-mitra-border/60 text-center">
+      <div className="mt-6 border-t border-border pt-3 text-center">
         <span className="text-[9px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
           Phase {phaseLabel} / 5
         </span>
@@ -279,7 +334,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors ${
-        active ? 'bg-brand-green/10 text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+        active ? 'bg-accent text-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -307,14 +362,14 @@ export default function RightSidebar({
   );
   const hasActivePipeline = activeIndex >= 0;
 
-  const sidebarShell = 'bg-mitra-bg border-sidebar-border';
+  const sidebarShell = 'bg-mitra-bg';
 
   if (isCollapsed) {
     return (
       <div
         onClick={onToggleCollapse}
-        className={`pipeline-sidebar h-full w-11 shrink-0 cursor-pointer flex flex-col items-center py-3 transition-all duration-300 border-l group ${
-          hasActivePipeline ? 'border-l-brand-green/25 bg-mitra-bg' : sidebarShell
+        className={`pipeline-sidebar h-full w-11 shrink-0 cursor-pointer flex flex-col items-center py-3 transition-all duration-300 group ${
+          hasActivePipeline ? 'bg-mitra-bg' : sidebarShell
         }`}
         title="Expand panel"
       >
@@ -334,7 +389,7 @@ export default function RightSidebar({
           <div
             className={`absolute top-3 bottom-3 left-1/2 -translate-x-1/2 w-px rounded-full ${
               hasActivePipeline
-                ? 'bg-gradient-to-b from-brand-green/40 via-mitra-surface/10 to-mitra-border/10'
+                ? 'bg-border'
                 : 'bg-mitra-border/30'
             }`}
           />
@@ -353,7 +408,7 @@ export default function RightSidebar({
                     </div>
                   )}
                   {state === 'pending' && (
-                    <div className="w-2 h-2 rounded-full border border-mitra-border bg-transparent" />
+                    <div className="w-2 h-2 rounded-full bg-mitra-border/40" />
                   )}
                 </div>
               );
@@ -372,11 +427,11 @@ export default function RightSidebar({
 
   return (
     <div
-      className={`relative w-full lg:w-[300px] xl:w-[320px] shrink-0 h-full overflow-hidden border-l flex flex-col ${sidebarShell}`}
+      className={`relative w-full lg:w-[300px] xl:w-[320px] shrink-0 h-full overflow-hidden flex flex-col ${sidebarShell}`}
     >
       {/* Tab bar + collapse */}
       <div className="flex items-center gap-2 border-b border-mitra-border px-2.5 py-2">
-        <div className="flex min-w-0 flex-1 gap-0.5 rounded-lg border border-mitra-border/60 p-0.5">
+        <div className="flex min-w-0 flex-1 gap-0.5 rounded-lg bg-muted/30 p-0.5">
           <TabButton
             active={tab === 'artifacts'}
             label="Artifacts"

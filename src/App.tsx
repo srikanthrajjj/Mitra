@@ -2502,7 +2502,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
       style={{ '--sidebar-width': `${effectiveLeftSidebarWidth}px` } as React.CSSProperties}
     >
     <div className={`h-screen w-full flex relative ${
-      `${resolvedTheme} bg-background text-foreground`
+      `${resolvedTheme} ${resolvedTheme === 'light' ? 'bg-light-canvas' : 'bg-dark-canvas'} text-foreground`
     } ${highContrast ? 'high-contrast' : ''} ${fontSizeLevel > 0 ? `font-size-level-${fontSizeLevel}` : ''} font-sans overflow-hidden`}>
       {activeTab !== 'org-settings' && (
       <div
@@ -2578,8 +2578,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
       </div>
       )}
 
-      <SidebarInset className="overflow-hidden">
-        {isDarkTheme(resolvedTheme) && <VrBackground />}
+      <SidebarInset className="overflow-hidden bg-transparent">
+        {resolvedTheme === 'blue' && <VrBackground />}
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden">
           {activeTab === 'search' && (
@@ -2878,7 +2878,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
             ) : (
               <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col items-center justify-center px-4 py-8 md:px-8 lg:px-12">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border bg-muted border-border text-muted-foreground">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-muted text-muted-foreground">
                   <Star className="w-8 h-8" />
                 </div>
                 <h2 className="text-xl font-display font-bold mb-2 text-foreground">

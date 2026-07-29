@@ -155,8 +155,8 @@ function ProjectDetailView({
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div
                 className={cn(
-                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
-                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
+                  isDark ? 'bg-mitra-surface' : 'bg-muted',
                 )}
               >
                 <MessageCircle className="h-7 w-7 text-muted-foreground" />
@@ -200,10 +200,10 @@ function ProjectDetailView({
                 type="button"
                 onClick={() => onStartConversation(solution.id)}
                 className={cn(
-                  'group flex items-center justify-between gap-4 rounded-xl border px-5 py-4 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
+                  'group flex cursor-pointer items-center justify-between gap-4 rounded-xl border-0 px-5 py-4 text-left transition-colors',
                   isDark
-                    ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
-                    : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                    ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                    : 'bg-card hover:bg-accent/40',
                 )}
               >
                 <div className="min-w-0 flex-1">
@@ -293,6 +293,26 @@ export default function ProjectsView({
     setFilter('all');
   };
 
+  const viewToggleBtn = (mode: ViewMode) =>
+    cn(
+      'inline-flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors',
+      viewMode === mode
+        ? 'bg-muted text-brand-green'
+        : isDark
+          ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
+  const filterPill = (active: boolean) =>
+    cn(
+      'rounded-full border-0 px-4 py-1.5 text-xs font-medium transition-colors',
+      active
+        ? 'bg-accent text-brand-green'
+        : isDark
+          ? 'bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
+          : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
   /* If viewing a specific project, show detail view */
   if (viewingProject) {
     return (
@@ -336,40 +356,29 @@ export default function ProjectsView({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className={cn(
-                    'w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm outline-none transition-all',
+                    'surface-inset w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors',
                     isDark
-                      ? 'border-white/[0.08] bg-white/[0.03] text-white placeholder:text-white/40 focus:border-white/[0.15]'
-                      : 'border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-border',
+                      ? 'bg-mitra-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30'
+                      : 'bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30',
                   )}
                 />
               </div>
-              <div className={cn(
-                'flex rounded-lg border p-0.5',
-                isDark ? 'border-white/[0.08] bg-white/[0.03]' : 'border-border bg-muted',
-              )}>
+              <div className="flex items-center gap-1" role="group" aria-label="View mode">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className={cn(
-                    'rounded-md p-1.5 transition-all',
-                    viewMode === 'list'
-                      ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-foreground',
-                  )}
+                  className={viewToggleBtn('list')}
                   aria-label="List view"
+                  aria-pressed={viewMode === 'list'}
                 >
                   <List className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setViewMode('grid')}
-                  className={cn(
-                    'rounded-md p-1.5 transition-all',
-                    viewMode === 'grid'
-                      ? isDark ? 'bg-white/[0.1] text-white' : 'bg-card text-foreground shadow-sm'
-                      : isDark ? 'text-white/40 hover:text-white/60' : 'text-muted-foreground hover:text-foreground',
-                  )}
+                  className={viewToggleBtn('grid')}
                   aria-label="Grid view"
+                  aria-pressed={viewMode === 'grid'}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </button>
@@ -383,14 +392,7 @@ export default function ProjectsView({
                   key={f}
                   type="button"
                   onClick={() => setFilter(f)}
-                  className={cn(
-                    'rounded-full px-4 py-1.5 text-xs font-medium transition-all',
-                    filter === f
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : isDark
-                        ? 'bg-white/[0.06] text-foreground hover:bg-white/[0.10] hover:text-foreground'
-                        : 'bg-muted text-foreground hover:bg-accent hover:text-foreground',
-                  )}
+                  className={filterPill(filter === f)}
                 >
                   {FILTER_LABELS[f]}
                 </button>
@@ -418,8 +420,8 @@ export default function ProjectsView({
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div
                 className={cn(
-                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
-                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
+                  isDark ? 'bg-mitra-surface' : 'bg-muted',
                 )}
               >
                 <FolderOpen className="h-7 w-7 text-muted-foreground" />
@@ -444,8 +446,8 @@ export default function ProjectsView({
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div
                 className={cn(
-                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border',
-                  isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-muted border-border',
+                  'mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-0',
+                  isDark ? 'bg-mitra-surface' : 'bg-muted',
                 )}
               >
                 <Search className="h-7 w-7 text-muted-foreground" />
@@ -479,10 +481,10 @@ export default function ProjectsView({
                     type="button"
                     onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
-                      'group relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 hover:shadow-md cursor-pointer',
+                      'group relative flex items-center justify-between gap-3 rounded-xl border-0 px-4 py-3.5 text-left transition-colors cursor-pointer',
                       isDark
-                        ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
-                        : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                        ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                        : 'bg-card hover:bg-accent/40',
                     )}
                   >
                     <div className="min-w-0 flex-1">
@@ -532,10 +534,10 @@ export default function ProjectsView({
                     key={sol.id}
                     onClick={() => setViewingProjectId(sol.id)}
                     className={cn(
-                      'group relative flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer',
+                      'group relative flex flex-col justify-between rounded-xl border-0 p-5 transition-colors cursor-pointer',
                       isDark
-                        ? 'bg-card hover:bg-white/[0.03] border-border hover:border-brand-green/30'
-                        : 'bg-card hover:bg-accent border-border hover:border-brand-green/30 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+                        ? 'bg-mitra-surface hover:bg-mitra-highlight'
+                        : 'bg-card hover:bg-accent/40',
                     )}
                   >
                     <div>

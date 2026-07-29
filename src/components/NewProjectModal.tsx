@@ -30,10 +30,10 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
   return (
     <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
       <div
-        className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all duration-300 ${
+        className={`w-full max-w-md rounded-2xl p-6 shadow-2xl transition-all duration-300 ${
           isDark
-            ? 'glass-panel-dark border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.5)]'
-            : 'bg-card border-border'
+            ? 'glass-panel-dark shadow-[0_20px_50px_rgba(0,0,0,0.5)]'
+            : 'bg-card'
         }`}
       >
         <div className="flex items-center justify-between mb-5">
@@ -46,10 +46,10 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
           <button
             type="button"
             onClick={onClose}
-            className={`p-1 rounded-lg border ${
+            className={`p-1 rounded-lg ${
               isDark
-                ? 'border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900'
-                : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent'
+                ? 'text-slate-400 hover:text-white hover:bg-slate-900'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >
             <X className="w-4 h-4" />

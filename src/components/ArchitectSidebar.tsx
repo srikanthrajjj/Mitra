@@ -145,15 +145,15 @@ export function ArchitectSidebar({
           onNavigate('projects');
         }}
         className={cn(
-          'group flex w-full items-center justify-between gap-1.5 rounded-r-lg border-l-2 py-1.75 pl-[calc(0.375rem-2px)] pr-1.5 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none',
+          'group flex w-full items-center justify-between gap-1.5 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none',
           isEditing ? 'cursor-default' : 'cursor-pointer',
           active
             ? isDark
-              ? 'bg-brand-green/10 text-brand-green border-brand-green'
-              : 'bg-muted text-brand-green border-brand-green'
+              ? 'bg-mitra-highlight text-brand-green'
+              : 'bg-muted text-brand-green'
             : isDark
-              ? 'text-foreground/90 border-transparent hover:bg-brand-green/5 hover:text-brand-green'
-              : 'text-foreground/90 border-transparent hover:bg-accent/55 hover:text-brand-green',
+              ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
+              : 'text-foreground/90 hover:bg-accent/55 hover:text-brand-green',
         )}
       >
         {isEditing ? (
@@ -225,7 +225,7 @@ export function ArchitectSidebar({
                 <DropdownMenuContent
                   align="end"
                   className={cn(
-                    isDark ? 'dark bg-mitra-sidebar border-mitra-border text-foreground' : 'light bg-card border-mitra-border text-foreground',
+                    isDark ? 'dark bg-mitra-sidebar text-foreground' : 'light bg-card text-foreground',
                     'w-40'
                   )}
                   onClick={(e) => e.stopPropagation()}
@@ -236,7 +236,7 @@ export function ArchitectSidebar({
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent
                       className={cn(
-                        isDark ? 'dark bg-mitra-surface border-mitra-border text-foreground' : 'light bg-card border-mitra-border text-foreground',
+                        isDark ? 'dark bg-mitra-surface text-foreground' : 'light bg-card text-foreground',
                         'w-48'
                       )}
                       onClick={(e) => e.stopPropagation()}
@@ -406,18 +406,19 @@ export function ArchitectSidebar({
               <button
                 key={item.id}
                 type="button"
+                data-active={active ? 'true' : undefined}
                 onClick={() => handleNavClick(item)}
                 onMouseEnter={() => setHoveredNavItemId(item.id)}
                 onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
-                  'architect-nav-item flex w-full items-center gap-3 rounded-r-lg px-3 py-2.5 text-[13px] font-medium leading-none transition-all duration-200 cursor-pointer border-l-2',
+                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] font-medium leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
-                      ? 'bg-brand-green/10 text-brand-green font-semibold border-brand-green'
-                      : 'bg-muted text-brand-green font-semibold border-brand-green'
+                      ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-semibold'
+                      : 'bg-muted text-foreground font-semibold'
                     : isDark
-                      ? 'text-foreground/90 border-transparent hover:bg-brand-green/5 hover:text-brand-green'
-                  : 'text-foreground/90 border-transparent hover:bg-accent/55 hover:text-brand-green',
+                      ? 'text-foreground/90 hover:bg-sidebar-accent hover:text-foreground'
+                  : 'text-foreground/90 hover:bg-accent/55 hover:text-foreground',
                 )}
               >
                 <AnimatedSidebarNavIcon
@@ -442,14 +443,20 @@ export function ArchitectSidebar({
       <div className="mx-3 h-px shrink-0 bg-border/60 dark:bg-white/[0.06]" />
 
       {/* Recents and Pinned list direct render without folders */}
-      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-1 scrollbar-thin">
+      <div className="relative mt-3 flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-1 pb-2 scrollbar-thin">
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
             <button
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
-              className="mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+              className={cn(
+                'mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                isDark
+                  ? 'text-illuminate-muted hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
               aria-expanded={pinnedOpen}
             >
               <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
@@ -471,14 +478,19 @@ export function ArchitectSidebar({
         )}
 
         {/* Recents section */}
-        <div className="flex flex-col flex-1 space-y-0.5 pb-2">
+        <div className="flex flex-1 flex-col space-y-0.5">
           {pinnedSolutions.length > 0 && (
             <div className="mx-1.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
           )}
           <button
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
-            className="mb-1 mt-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 transition-colors hover:text-foreground/80"
+            className={cn(
+              'mb-1 mt-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+              isDark
+                ? 'text-illuminate-muted hover:text-foreground'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
             aria-expanded={recentsOpen}
           >
             <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
@@ -491,9 +503,12 @@ export function ArchitectSidebar({
             </span>
             <span>Recents</span>
           </button>
-          {recentsOpen ? (
+            {recentsOpen ? (
             recentSolutions.length === 0 ? (
-              <p className="px-1.5 py-2 text-[11px] text-muted-foreground/50">
+              <p className={cn(
+                'px-1.5 py-2 text-[11px]',
+                isDark ? 'text-illuminate-muted' : 'text-muted-foreground',
+              )}>
                 No recent chats
               </p>
             ) : (
@@ -501,6 +516,13 @@ export function ArchitectSidebar({
             )
           ) : null}
         </div>
+        </div>
+        {isDark && (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-7 bg-gradient-to-b from-transparent to-mitra-sidebar"
+            aria-hidden
+          />
+        )}
       </div>
     </div>
   );

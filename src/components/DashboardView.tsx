@@ -290,7 +290,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 md:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl space-y-6">
           {/* Tabs */}
-          <div className="flex min-w-0 gap-0.5 rounded-lg border border-mitra-border p-0.5">
+          <div className="flex min-w-0 gap-0.5 rounded-lg bg-muted/30 p-0.5">
             {TABS.map((tab) => (
               <button
                 key={tab}
@@ -315,7 +315,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
               return (
                 <div
                   key={stat.label}
-                  className="rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md"
+                  className="rounded-xl bg-card p-4 transition-all hover:shadow-md"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-green/10">
@@ -372,7 +372,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
           {/* Bottom row */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="rounded-xl bg-card p-4">
               <div className="mb-3">
                 <h3 className="text-xs font-semibold text-foreground">
                   Top Use Cases
@@ -384,7 +384,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
               <HorizontalBarChart data={USE_CASE_DATA} isDark={isDark} />
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="rounded-xl bg-card p-4">
               <div className="mb-3">
                 <h3 className="text-xs font-semibold text-foreground">
                   Conversations by Day

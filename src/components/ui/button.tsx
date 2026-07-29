@@ -19,9 +19,9 @@ const buttonVariants = cva(
         cta:
           'bg-brand-green text-[#030d0a] font-semibold rounded-[var(--radius-button)] hover:bg-brand-green-hover active:scale-[0.98] focus-visible:ring-brand-green/40',
         secondary:
-          'bg-muted text-foreground border border-border rounded-[var(--radius-button)] hover:bg-accent',
+          'bg-muted text-foreground rounded-[var(--radius-button)] hover:bg-accent',
         outline:
-          'bg-transparent text-foreground border border-border rounded-[var(--radius-button)] hover:bg-muted',
+          'bg-transparent text-foreground rounded-[var(--radius-button)] hover:bg-muted',
         ghost:
           'bg-transparent text-foreground rounded-[var(--radius-button)] hover:bg-muted',
         destructive:
