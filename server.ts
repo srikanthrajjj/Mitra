@@ -68,6 +68,19 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+/** Demo signup lead capture — logs only, no persistence. */
+app.post("/api/signup", (req, res) => {
+  const body = req.body ?? {};
+  console.log("[signup]", {
+    path: body.path,
+    email: body.email,
+    fullName: body.fullName,
+    companyName: body.companyName,
+    industry: body.industry,
+  });
+  res.json({ ok: true });
+});
+
 function getLocalFallbackResponse(prompt: string, currentSolutionName?: string): any {
   const norm = prompt.toLowerCase();
 
@@ -1012,6 +1025,15 @@ async function startServer() {
       vite.middlewares(req, res, next);
     });
 
+    app.get("/signup", (req, res, next) => {
+      req.url = devBase.endsWith("/") ? `${devBase}signup` : `${devBase}/signup`;
+      vite.middlewares(req, res, next);
+    });
+    app.get("/sign-up", (req, res, next) => {
+      req.url = devBase.endsWith("/") ? `${devBase}signup` : `${devBase}/signup`;
+      vite.middlewares(req, res, next);
+    });
+
     app.use(vite.middlewares);
     app.get("/", (_req, res) => res.redirect(302, devBase));
   } else {
@@ -1031,6 +1053,12 @@ async function startServer() {
       res.sendFile(path.join(distPath, "index.html"));
     });
     app.get("/dev", (_req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+    app.get("/signup", (_req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+    app.get("/sign-up", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
     app.get("*", (req, res) => {

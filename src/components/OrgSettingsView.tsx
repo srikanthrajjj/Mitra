@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   ArrowLeft,
   Building2,
@@ -40,6 +40,14 @@ import {
   type OrgUserStatus,
   type Organization,
 } from '../data/orgSettings';
+import {
+  isSignupOrgSeeded,
+  markSignupOrgSeeded,
+  readSignupProfile,
+  seatsFromTeamSize,
+  slugFromName,
+  type SignupProfile,
+} from '../utils/signupStorage';
 
 export type OrgSettingsSectionId =
   | 'organizations'
@@ -162,6 +170,58 @@ interface OrgSettingsViewProps {
   backLabel?: string;
 }
 
+function buildOrgFromSignup(profile: SignupProfile): Organization {
+  const name =
+    profile.path === 'admin' && profile.companyName.trim()
+      ? profile.companyName.trim()
+      : `${profile.fullName.trim() || 'My'}'s workspace`;
+  const slug = slugFromName(name);
+  return {
+    id: `org-signup-${Date.now()}`,
+    name,
+    slug,
+    plan: 'Starter',
+    seats: seatsFromTeamSize(profile.teamSize),
+    seatsUsed: 1,
+    logoInitials: initialsFromName(name) || 'OR',
+    primaryColor: 'brand-green',
+    website: '',
+    industry: profile.industry || '',
+    createdAt: new Date().toISOString().slice(0, 10),
+  };
+}
+
+function buildOwnerFromSignup(profile: SignupProfile): OrgUser {
+  return {
+    id: `user-signup-${Date.now()}`,
+    name: profile.fullName.trim() || 'Admin',
+    email: profile.email.trim(),
+    roleId: 'role-admin',
+    teamIds: [],
+    status: 'active',
+    lastActive: 'Just now',
+  };
+}
+
+function peekSignupSeed(): {
+  orgs: Organization[];
+  activeOrgId: string;
+  users: OrgUser[];
+  flash: string;
+} | null {
+  if (isSignupOrgSeeded()) return null;
+  const profile = readSignupProfile();
+  if (!profile) return null;
+  const org = buildOrgFromSignup(profile);
+  const owner = buildOwnerFromSignup(profile);
+  return {
+    orgs: [org],
+    activeOrgId: org.id,
+    users: [owner],
+    flash: 'Organization ready — invite teammates to try Mitra.',
+  };
+}
+
 function SectionCard({
   isDark,
   title,
@@ -238,17 +298,29 @@ function statusBadge(status: OrgUserStatus) {
 
 export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSettingsViewProps) {
   const isDark = isDarkTheme(theme);
+  const seedRef = useRef(peekSignupSeed());
+  const seeded = seedRef.current;
   const [section, setSection] = useState<OrgSettingsSectionId>('organizations');
   const [navQuery, setNavQuery] = useState('');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [orgs, setOrgs] = useState<Organization[]>(DEMO_ORGANIZATIONS);
-  const [activeOrgId, setActiveOrgId] = useState(DEMO_ORGANIZATIONS[0].id);
-  const [users, setUsers] = useState<OrgUser[]>(DEMO_USERS);
+  const [orgs, setOrgs] = useState<Organization[]>(
+    () => seeded?.orgs ?? DEMO_ORGANIZATIONS,
+  );
+  const [activeOrgId, setActiveOrgId] = useState(
+    () => seeded?.activeOrgId ?? DEMO_ORGANIZATIONS[0].id,
+  );
+  const [users, setUsers] = useState<OrgUser[]>(
+    () => seeded?.users ?? DEMO_USERS,
+  );
   const [teams, setTeams] = useState<OrgTeam[]>(DEMO_TEAMS);
   const [roles, setRoles] = useState<OrgRole[]>(DEMO_ROLES);
   const [policies, setPolicies] = useState<AccessPolicy[]>(DEMO_ACCESS_POLICIES);
   const [userSearch, setUserSearch] = useState('');
-  const [flash, setFlash] = useState('');
+  const [flash, setFlash] = useState(seeded?.flash ?? '');
+
+  useEffect(() => {
+    if (seeded) markSignupOrgSeeded();
+  }, [seeded]);
 
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRoleId, setInviteRoleId] = useState('role-member');
@@ -467,6 +539,23 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
       case 'organizations':
         return (
           <div className="space-y-4">
+            {seeded && (
+              <div className="rounded-xl border border-border bg-card px-4 py-3">
+                <p className="text-sm font-medium text-foreground">Next: invite your team</p>
+                <p className="mt-1 text-[12px] text-muted-foreground">
+                  Your organization is ready. Open Invite users in the sidebar to add teammates.
+                </p>
+                <Button
+                  type="button"
+                  variant="cta"
+                  size="sm"
+                  className="mt-3 h-8 text-xs"
+                  onClick={() => setSection('invite')}
+                >
+                  Invite users
+                </Button>
+              </div>
+            )}
             <SectionCard
               isDark={isDark}
               title="Your organizations"
@@ -1137,9 +1226,9 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
             </Button>
           </div>
 
-          <div className="mb-3 min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">{activeOrg.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{activeOrg.slug}.mitra.ai</p>
+          <div className="mb-4 min-w-0 space-y-0.5">
+            <p className="truncate text-base font-semibold text-foreground">{activeOrg.name}</p>
+            <p className="truncate text-[11px] text-muted-foreground">{activeOrg.slug}.mitra.ai</p>
           </div>
 
           <div className="relative">
@@ -1150,7 +1239,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
               placeholder="Search org settings…"
               aria-label="Search org settings"
               className={cn(
-                'h-8 w-full rounded-md border pl-8 pr-3 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground',
+                'h-9 w-full rounded-lg border pl-8 pr-3 text-xs text-foreground outline-none transition-colors placeholder:text-muted-foreground',
                 isDark
                   ? 'border-mitra-border bg-mitra-input focus:border-brand-green/40'
                   : 'border-border bg-card focus:border-brand-green/50',
@@ -1159,13 +1248,13 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
           </div>
         </div>
 
-        <nav className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-3 pt-2" aria-label="Organizational settings">
+        <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-4 pt-3" aria-label="Organizational settings">
           {filteredGroups.map((group, groupIndex) => (
-            <div key={group.label} className={cn(groupIndex > 0 ? 'mt-5' : 'mt-0')}>
-              <p className="mb-0.5 px-2 text-[7px] font-medium uppercase leading-none tracking-normal text-muted-foreground">
+            <div key={group.label} className={cn(groupIndex > 0 ? 'mt-6' : 'mt-0')}>
+              <p className="mb-1.5 px-2 text-[9px] font-medium uppercase leading-none tracking-wide text-muted-foreground">
                 {group.label}
               </p>
-              <div className="space-y-0">
+              <div className="space-y-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const active = section === item.id;
@@ -1178,7 +1267,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                         setMobileNavOpen(false);
                       }}
                       className={cn(
-                        'flex h-7 w-full items-center gap-1.5 rounded-md px-2 py-0.5 text-left text-xs leading-none transition-colors',
+                        'flex min-h-8 w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[13px] leading-none transition-colors',
                         active
                           ? 'bg-accent font-medium text-foreground'
                           : 'text-foreground hover:bg-muted',
@@ -1186,7 +1275,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                     >
                       <Icon
                         className={cn(
-                          'h-3 w-3 shrink-0',
+                          'h-3.5 w-3.5 shrink-0',
                           active ? 'text-foreground' : 'text-muted-foreground',
                         )}
                       />

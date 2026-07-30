@@ -171,7 +171,18 @@ import { DeveloperSpecsPanel } from './components/DeveloperSpecsPanel';
 import {
   isLandingPath,
   leaveLandingUrl,
+  navigateToLandingUrl,
 } from './utils/landingRoute';
+import {
+  isSignupPath,
+  leaveSignupUrl,
+  navigateToSignupUrl,
+} from './utils/signupRoute';
+import { SignupPage } from './components/signup/SignupPage';
+import {
+  persistSignupProfile,
+  type SignupProfile,
+} from './utils/signupStorage';
 import {
   readHighContrast,
   persistHighContrast,
@@ -588,10 +599,14 @@ export default function App() {
   });
   const [showLanding, setShowLanding] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return false;
+    if (isSignupPath(window.location.pathname)) return false;
     if (isLandingPath(window.location.pathname)) return true;
     if (localStorage.getItem('mitra_welcome_complete') === 'true') return false;
     return localStorage.getItem('mitra_landing_seen') !== 'true';
   });
+  const [showSignup, setShowSignup] = useState<boolean>(() =>
+    isSignupPath(window.location.pathname),
+  );
   const [simulationAlertOpen, setSimulationAlertOpen] = useState<boolean>(() => {
     if (localStorage.getItem('mitra_welcome_complete') !== 'true') return false;
     return localStorage.getItem('mitra_sim_ack') !== 'true';
@@ -664,7 +679,41 @@ export default function App() {
 
   const enterWorkspace = (mode: 'signed-in' | 'guest' = 'guest') => {
     dismissLanding();
+    setShowSignup(false);
+    leaveSignupUrl();
     completeWelcome(mode);
+  };
+
+  const handleSignupComplete = (profile: SignupProfile) => {
+    persistSignupProfile(profile);
+    persistUserRole('admin');
+    setUserRole('admin');
+    setShowSignup(false);
+    leaveSignupUrl();
+    localStorage.setItem('mitra_landing_seen', 'true');
+    setShowLanding(false);
+    leaveLandingUrl();
+    localStorage.setItem('mitra_welcome_complete', 'true');
+    localStorage.setItem('mitra_auth_mode', 'signed-in');
+    setWelcomeComplete(true);
+    setIsTourOpen(false);
+    setActiveTab('org-settings');
+    if (localStorage.getItem('mitra_sim_ack') !== 'true') {
+      setSimulationAlertOpen(true);
+    }
+  };
+
+  const openSignup = () => {
+    navigateToSignupUrl();
+    setShowSignup(true);
+    setShowLanding(false);
+  };
+
+  const backToLandingFromSignup = () => {
+    setShowSignup(false);
+    leaveSignupUrl();
+    navigateToLandingUrl();
+    setShowLanding(true);
   };
 
   const completeWelcome = (mode: 'signed-in' | 'guest') => {
@@ -705,7 +754,11 @@ export default function App() {
       if (isDevSpecsPath(window.location.pathname)) {
         setActiveTabState('dev-specs');
       }
-      if (isLandingPath(window.location.pathname) && !parseGuestReviewFromHash()) {
+      const onSignup = isSignupPath(window.location.pathname);
+      setShowSignup(onSignup);
+      if (onSignup) {
+        setShowLanding(false);
+      } else if (isLandingPath(window.location.pathname) && !parseGuestReviewFromHash()) {
         setShowLanding(true);
       } else if (
         !isLandingPath(window.location.pathname) &&
@@ -2429,6 +2482,20 @@ Pick a step below and I'll continue building — data model, scripts, and update
   };
 
   if (
+    (showSignup || isSignupPath(window.location.pathname)) &&
+    !guestReviewId
+  ) {
+    return (
+      <SignupPage
+        theme={resolvedTheme}
+        onComplete={handleSignupComplete}
+        onGuest={() => enterWorkspace('guest')}
+        onBackToLanding={backToLandingFromSignup}
+      />
+    );
+  }
+
+  if (
     (showLanding || !welcomeComplete || isLandingPath(window.location.pathname)) &&
     !guestReviewId
   ) {
@@ -2436,7 +2503,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
       <LandingPage
         version={appVersion}
         setVersion={setAppVersion}
-        onGetStarted={() => enterWorkspace('guest')}
+        onGetStarted={openSignup}
         onSignIn={() => enterWorkspace('signed-in')}
       />
     );
