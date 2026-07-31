@@ -10,8 +10,8 @@ const SelectNative = React.forwardRef<
     <select
       ref={ref}
       className={cn(
-        'h-9 w-full min-w-0 appearance-none rounded-md border border-input bg-background px-3 py-1 pr-9 text-sm text-foreground shadow-sm transition-colors',
-        'cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+        'h-9 w-full min-w-0 appearance-none rounded-md border border-border bg-mitra-input px-3 py-1 pr-9 text-sm text-foreground transition-colors',
+        'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

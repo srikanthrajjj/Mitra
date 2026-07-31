@@ -22,6 +22,15 @@ import { Badge } from '@/src/components/ui/badge';
 import { Input } from '@/src/components/ui/input';
 import { Switch } from '@/src/components/ui/switch';
 import { Separator } from '@/src/components/ui/separator';
+import { SelectNative } from '@/src/components/ui/select-native';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu';
 
 interface DeveloperSpecsPanelProps {
   isOpen: boolean;
@@ -632,30 +641,80 @@ function BadgesSection() {
   );
 }
 
+function ExampleCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 sm:p-6">
+      <div className="mb-5">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {description && (
+          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+        )}
+      </div>
+      <div className="space-y-5">{children}</div>
+    </div>
+  );
+}
+
+function FieldExample({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      {children}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
+
 function InputsSection() {
   const [val, setVal] = useState('');
   const [show, setShow] = useState(false);
   const [searchVal, setSearchVal] = useState('');
+  const [module, setModule] = useState('hrsd');
+  const [notes, setNotes] = useState('');
+  const [agree, setAgree] = useState(true);
+  const [notify, setNotify] = useState(false);
+  const [priority, setPriority] = useState('medium');
+  const [menuAction, setMenuAction] = useState('None yet');
 
   return (
-    <div className="space-y-10">
-      <SectionHeader icon={Search} title="Inputs" subtitle="All input field states and variants — fully interactive." />
+    <div className="space-y-8">
+      <SectionHeader
+        icon={Search}
+        title="Inputs"
+        subtitle="Interactive examples for every form control — text fields, dropdowns, textarea, checkboxes, radios, and menus."
+      />
 
-      <div className="rounded-xl border border-border bg-card p-6 space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Default Input</label>
+      <ExampleCard
+        title="Text inputs"
+        description="Default Input component — filled surface with border for clear contrast on cards."
+      >
+        <FieldExample label="Default Input" hint={`Value: "${val}"`}>
           <Input
             value={val}
             onChange={(e) => setVal(e.target.value)}
             placeholder="Type something…"
           />
-          <p className="text-xs text-muted-foreground">Value: <code className="font-mono">"{val}"</code></p>
-        </div>
+        </FieldExample>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">With Leading Icon</label>
+        <FieldExample label="With Leading Icon">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
               value={searchVal}
@@ -663,32 +722,232 @@ function InputsSection() {
               placeholder="Search solutions…"
             />
           </div>
-        </div>
+        </FieldExample>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Password Field</label>
+        <FieldExample label="Password Field">
           <div className="relative">
-            <Input type={show ? 'text' : 'password'} placeholder="Enter password" className="pr-10" />
+            <Input
+              type={show ? 'text' : 'password'}
+              placeholder="Enter password"
+              className="pr-10"
+            />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setShow(!show)}
             >
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-        </div>
+        </FieldExample>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Disabled</label>
+        <FieldExample label="Disabled">
           <Input disabled placeholder="Cannot edit" value="Read-only value" />
-        </div>
+        </FieldExample>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Monospace / Code Input</label>
-          <Input className="font-mono text-xs text-brand-green" defaultValue="https://dev12345.service-now.com" />
-        </div>
-      </div>
+        <FieldExample label="Monospace / Code Input">
+          <Input
+            className="font-mono text-xs text-brand-green"
+            defaultValue="https://dev12345.service-now.com"
+          />
+        </FieldExample>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Dropdown / Select"
+        description="Native SelectNative control for forms — same fill and border treatment as text inputs."
+      >
+        <FieldExample label="Default dropdown" hint={`Selected: ${module}`}>
+          <SelectNative value={module} onChange={(e) => setModule(e.target.value)}>
+            <option value="hrsd">HRSD</option>
+            <option value="itsm">ITSM</option>
+            <option value="itam">ITAM</option>
+            <option value="csm">CSM</option>
+          </SelectNative>
+        </FieldExample>
+
+        <FieldExample label="With placeholder option">
+          <SelectNative defaultValue="">
+            <option value="" disabled>
+              Choose a role…
+            </option>
+            <option value="architect">Architect</option>
+            <option value="developer">Developer</option>
+            <option value="admin">Admin</option>
+            <option value="ba">Business Analyst</option>
+          </SelectNative>
+        </FieldExample>
+
+        <FieldExample label="Disabled dropdown">
+          <SelectNative disabled defaultValue="locked">
+            <option value="locked">Locked selection</option>
+          </SelectNative>
+        </FieldExample>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Menu dropdown"
+        description="Radix DropdownMenu for actions — trigger + popover list."
+      >
+        <FieldExample label="Actions menu" hint={`Last action: ${menuAction}`}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="sm" className="gap-1.5">
+                Open menu
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel>Project</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setMenuAction('Edit')}>
+                <Pencil className="h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setMenuAction('Duplicate')}>
+                <Copy className="h-4 w-4" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setMenuAction('Share')}>
+                <User className="h-4 w-4" />
+                Share
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={() => setMenuAction('Delete')}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </FieldExample>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Textarea"
+        description="Multi-line notes field using the same input surface tokens."
+      >
+        <FieldExample label="Notes" hint={`${notes.length} characters`}>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Describe the ServiceNow use case…"
+            rows={4}
+            className={cn(
+              'w-full resize-y rounded-md border border-border bg-mitra-input px-3 py-2 text-sm text-foreground',
+              'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+            )}
+          />
+        </FieldExample>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Checkbox"
+        description="Native checkboxes for agreements and multi-select options."
+      >
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={agree}
+            onChange={(e) => setAgree(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-border accent-[hsl(var(--brand-green))]"
+          />
+          <span>
+            I agree to the evaluation terms
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              {agree ? 'Checked' : 'Unchecked'}
+            </span>
+          </span>
+        </label>
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={notify}
+            onChange={(e) => setNotify(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-border accent-[hsl(var(--brand-green))]"
+          />
+          <span>
+            Email me when artifacts are ready
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              Optional notification preference
+            </span>
+          </span>
+        </label>
+        <label className="flex cursor-not-allowed items-start gap-2.5 text-sm text-muted-foreground opacity-60">
+          <input
+            type="checkbox"
+            disabled
+            checked
+            className="mt-0.5 h-4 w-4 rounded border-border accent-[hsl(var(--brand-green))]"
+          />
+          <span>Disabled checked state</span>
+        </label>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Radio group"
+        description="Single-choice options for priority or mode selection."
+      >
+        <FieldExample label="Priority" hint={`Selected: ${priority}`}>
+          <div className="flex flex-col gap-2.5">
+            {[
+              { value: 'low', label: 'Low' },
+              { value: 'medium', label: 'Medium' },
+              { value: 'high', label: 'High' },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={cn(
+                  'flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm transition-colors',
+                  priority === opt.value
+                    ? 'border-brand-green/40 bg-brand-green/10 text-foreground'
+                    : 'border-border bg-mitra-input text-foreground hover:bg-accent',
+                )}
+              >
+                <input
+                  type="radio"
+                  name="dev-specs-priority"
+                  value={opt.value}
+                  checked={priority === opt.value}
+                  onChange={() => setPriority(opt.value)}
+                  className="h-3.5 w-3.5 accent-[hsl(var(--brand-green))]"
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </FieldExample>
+      </ExampleCard>
+
+      <ExampleCard
+        title="Chip select"
+        description="Multi-purpose pill choices used in signup and discovery flows."
+      >
+        <FieldExample label="Modules">
+          <div className="flex flex-wrap gap-2">
+            {['HRSD', 'ITSM', 'ITAM', 'CSM', 'Other'].map((chip) => {
+              const active = module === chip.toLowerCase();
+              return (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => setModule(chip.toLowerCase())}
+                  className={cn(
+                    'rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors',
+                    active
+                      ? 'border-brand-green/40 bg-brand-green/10 text-brand-green'
+                      : 'border-border bg-mitra-input text-muted-foreground hover:bg-accent hover:text-foreground',
+                  )}
+                >
+                  {chip}
+                </button>
+              );
+            })}
+          </div>
+        </FieldExample>
+      </ExampleCard>
     </div>
   );
 }
