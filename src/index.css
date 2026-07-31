@@ -137,7 +137,7 @@ h6,
   --mitra-surface: #1C1C1C;
   --mitra-border-color: #2D2D2D;
   --mitra-highlight: #313131;
-  --mitra-input: #212121;
+  --mitra-input: #252525;
 
   --illuminate-text: #F3F3F3;
   --illuminate-muted: #7A7A7A;
@@ -163,8 +163,8 @@ h6,
   --accent-foreground: 120 30% 15%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 100 30% 88%;
-  --input: 95 40% 93%;
+  --border: 100 12% 82%;
+  --input: 0 0% 94%;
   --ring: 110 87% 34%;
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 120 30% 15%;
@@ -180,7 +180,7 @@ h6,
   --mitra-surface: #FFFFFF;
   --mitra-border-color: #DCF8D2;
   --mitra-highlight: #F2FDEA;
-  --mitra-input: #FFFFFF;
+  --mitra-input: #F4F4F4;
 
   --illuminate-text: #106F00;
   --illuminate-muted: #158F00;
@@ -224,7 +224,7 @@ h6,
   --mitra-surface: #1C1C1C;
   --mitra-border-color: #2D2D2D;
   --mitra-highlight: #313131;
-  --mitra-input: #212121;
+  --mitra-input: #252525;
 
   color: #CDD2D7;
 }

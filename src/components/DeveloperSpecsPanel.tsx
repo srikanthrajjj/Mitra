@@ -670,6 +670,7 @@ function InputsSection() {
           <div className="relative">
             <Input type={show ? 'text' : 'password'} placeholder="Enter password" className="pr-10" />
             <button
+              type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               onClick={() => setShow(!show)}
             >
