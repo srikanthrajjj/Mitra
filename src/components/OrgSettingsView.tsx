@@ -28,6 +28,7 @@ import {
   DEMO_ACCESS_POLICIES,
   DEMO_ORGANIZATIONS,
   DEMO_ROLES,
+  DEMO_SYSTEM_PROPERTIES,
   DEMO_TEAMS,
   DEMO_USERS,
   ORG_PERMISSIONS,
@@ -39,6 +40,8 @@ import {
   type OrgUser,
   type OrgUserStatus,
   type Organization,
+  type SystemProperty,
+  type SystemPropertyType,
 } from '../data/orgSettings';
 import {
   isSignupOrgSeeded,
@@ -296,6 +299,20 @@ function statusBadge(status: OrgUserStatus) {
   );
 }
 
+const PROPERTY_TYPE_LABELS: Record<SystemPropertyType, string> = {
+  string: 'String',
+  integer: 'Integer',
+  boolean: 'True / false',
+};
+
+function propertyTypeBadge(type: SystemPropertyType) {
+  return (
+    <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+      {PROPERTY_TYPE_LABELS[type]}
+    </span>
+  );
+}
+
 export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSettingsViewProps) {
   const isDark = isDarkTheme(theme);
   const seedRef = useRef(peekSignupSeed());
@@ -315,6 +332,9 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
   const [teams, setTeams] = useState<OrgTeam[]>(DEMO_TEAMS);
   const [roles, setRoles] = useState<OrgRole[]>(DEMO_ROLES);
   const [policies, setPolicies] = useState<AccessPolicy[]>(DEMO_ACCESS_POLICIES);
+  const [systemProperties, setSystemProperties] = useState<SystemProperty[]>(DEMO_SYSTEM_PROPERTIES);
+  const [savedSystemProperties, setSavedSystemProperties] = useState<SystemProperty[]>(DEMO_SYSTEM_PROPERTIES);
+  const [propertiesDirty, setPropertiesDirty] = useState(false);
   const [userSearch, setUserSearch] = useState('');
   const [flash, setFlash] = useState(seeded?.flash ?? '');
 
@@ -336,6 +356,13 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
   const [customRoleName, setCustomRoleName] = useState('');
   const [customRoleDesc, setCustomRoleDesc] = useState('');
   const [selectedRoleId, setSelectedRoleId] = useState('role-architect-lead');
+
+  const [propertySearch, setPropertySearch] = useState('');
+  const [newPropTitle, setNewPropTitle] = useState('');
+  const [newPropDescription, setNewPropDescription] = useState('');
+  const [newPropType, setNewPropType] = useState<SystemPropertyType>('string');
+  const [newPropValue, setNewPropValue] = useState('');
+  const [newPropBoolValue, setNewPropBoolValue] = useState(false);
 
   const activeOrg = orgs.find((o) => o.id === activeOrgId) ?? orgs[0];
   const selectedRole = roles.find((r) => r.id === selectedRoleId) ?? roles[0];
@@ -388,6 +415,17 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
         roleLabel(u.roleId, roles).toLowerCase().includes(q),
     );
   }, [userSearch, users, roles]);
+
+  const filteredProperties = useMemo(() => {
+    const q = propertySearch.trim().toLowerCase();
+    if (!q) return systemProperties;
+    return systemProperties.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.id.toLowerCase().includes(q),
+    );
+  }, [propertySearch, systemProperties]);
 
   const updateOrg = (patch: Partial<Organization>) => {
     setOrgs((prev) => prev.map((o) => (o.id === activeOrgId ? { ...o, ...patch } : o)));
@@ -511,6 +549,58 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
     );
   };
 
+  const addProperty = () => {
+    if (!newPropTitle.trim()) {
+      showFlash('Title is required.');
+      return;
+    }
+    const value: string | number | boolean =
+      newPropType === 'boolean'
+        ? newPropBoolValue
+        : newPropType === 'integer'
+          ? Number(newPropValue) || 0
+          : newPropValue.trim();
+    const newProp: SystemProperty = {
+      id: `mitra.custom.${Date.now()}`,
+      title: newPropTitle.trim(),
+      description: newPropDescription.trim() || 'Custom organization property.',
+      type: newPropType,
+      value,
+    };
+    const next = [newProp, ...systemProperties];
+    setSystemProperties(next);
+    setSavedSystemProperties(next);
+    setNewPropTitle('');
+    setNewPropDescription('');
+    setNewPropType('string');
+    setNewPropValue('');
+    setNewPropBoolValue(false);
+    showFlash('Property added.');
+  };
+
+  const updatePropertyValue = (id: string, value: string | number | boolean) => {
+    setSystemProperties((prev) => prev.map((p) => (p.id === id ? { ...p, value } : p)));
+    setPropertiesDirty(true);
+  };
+
+  const deleteProperty = (id: string) => {
+    const next = systemProperties.filter((p) => p.id !== id);
+    setSystemProperties(next);
+    setSavedSystemProperties(next);
+    showFlash('Property removed.');
+  };
+
+  const saveProperties = () => {
+    setSavedSystemProperties(systemProperties);
+    setPropertiesDirty(false);
+    showFlash('System properties saved.');
+  };
+
+  const discardPropertyChanges = () => {
+    setSystemProperties(savedSystemProperties);
+    setPropertiesDirty(false);
+  };
+
   const createOrg = () => {
     const id = `org-${Date.now()}`;
     const org: Organization = {
@@ -599,6 +689,176 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                     </button>
                   );
                 })}
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              isDark={isDark}
+              title="Add property"
+              description="Define a new configuration key available across this organization."
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Title">
+                  <input
+                    className={inputClass}
+                    value={newPropTitle}
+                    onChange={(e) => setNewPropTitle(e.target.value)}
+                    placeholder="e.g. Session timeout (minutes)"
+                  />
+                </Field>
+                <Field label="Description">
+                  <input
+                    className={inputClass}
+                    value={newPropDescription}
+                    onChange={(e) => setNewPropDescription(e.target.value)}
+                    placeholder="What this property controls"
+                  />
+                </Field>
+                <Field label="Type">
+                  <select
+                    className={inputClass}
+                    value={newPropType}
+                    onChange={(e) => setNewPropType(e.target.value as SystemPropertyType)}
+                  >
+                    <option value="string">String</option>
+                    <option value="integer">Integer</option>
+                    <option value="boolean">True / false</option>
+                  </select>
+                </Field>
+                <Field label="Value">
+                  {newPropType === 'boolean' ? (
+                    <div className="flex h-[38px] items-center">
+                      <Switch checked={newPropBoolValue} onCheckedChange={setNewPropBoolValue} />
+                    </div>
+                  ) : (
+                    <input
+                      type={newPropType === 'integer' ? 'number' : 'text'}
+                      className={inputClass}
+                      value={newPropValue}
+                      onChange={(e) => setNewPropValue(e.target.value)}
+                      placeholder={newPropType === 'integer' ? 'e.g. 60' : 'e.g. US/Eastern'}
+                    />
+                  )}
+                </Field>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button type="button" variant="cta" size="sm" className="h-8 gap-1.5 text-xs" onClick={addProperty}>
+                  <Plus className="h-3.5 w-3.5" />
+                  Add property
+                </Button>
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              isDark={isDark}
+              title="System properties"
+              description={`${systemProperties.length} configured`}
+              action={
+                <div className="flex items-center gap-2">
+                  {propertiesDirty && (
+                    <span className="inline-flex shrink-0 items-center rounded-full bg-brand-green/10 px-2 py-0.5 text-[10px] font-semibold text-brand-green">
+                      Unsaved changes
+                    </span>
+                  )}
+                  <div className="relative w-52">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      className={cn(inputClass, 'h-8 pl-8 text-xs')}
+                      value={propertySearch}
+                      onChange={(e) => setPropertySearch(e.target.value)}
+                      placeholder="Search properties…"
+                    />
+                  </div>
+                </div>
+              }
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <th className="pb-2 font-semibold">Title</th>
+                      <th className="pb-2 font-semibold">Description</th>
+                      <th className="pb-2 font-semibold">Type</th>
+                      <th className="pb-2 font-semibold">Value</th>
+                      <th className="pb-2 text-right font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProperties.map((prop) => (
+                      <tr key={prop.id} className="border-b border-border/60 last:border-0">
+                        <td className="py-3 pr-3 align-top">
+                          <p className="font-medium text-foreground">{prop.title}</p>
+                          <p className="font-mono text-[10px] text-muted-foreground">{prop.id}</p>
+                        </td>
+                        <td className="max-w-[220px] py-3 pr-3 align-top">
+                          <p className="text-xs text-muted-foreground">{prop.description}</p>
+                        </td>
+                        <td className="py-3 pr-3 align-top">{propertyTypeBadge(prop.type)}</td>
+                        <td className="py-3 pr-3 align-top">
+                          {prop.type === 'boolean' ? (
+                            <Switch
+                              checked={Boolean(prop.value)}
+                              onCheckedChange={(v) => updatePropertyValue(prop.id, v)}
+                            />
+                          ) : (
+                            <input
+                              type={prop.type === 'integer' ? 'number' : 'text'}
+                              className={cn(inputClass, 'h-8 w-40 py-1 text-xs')}
+                              value={String(prop.value)}
+                              onChange={(e) =>
+                                updatePropertyValue(
+                                  prop.id,
+                                  prop.type === 'integer' ? Number(e.target.value) || 0 : e.target.value,
+                                )
+                              }
+                            />
+                          )}
+                        </td>
+                        <td className="py-3 align-top text-right">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-[11px] text-destructive hover:text-destructive"
+                            onClick={() => deleteProperty(prop.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredProperties.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-6 text-center text-xs text-muted-foreground">
+                          No properties match your search.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 flex items-center justify-end gap-2">
+                {propertiesDirty && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={discardPropertyChanges}
+                  >
+                    Discard changes
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="cta"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={saveProperties}
+                  disabled={!propertiesDirty}
+                >
+                  Save changes
+                </Button>
               </div>
             </SectionCard>
           </div>

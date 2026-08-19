@@ -49,6 +49,16 @@ export interface AccessPolicy {
   enabled: boolean;
 }
 
+export type SystemPropertyType = 'string' | 'integer' | 'boolean';
+
+export interface SystemProperty {
+  id: string;
+  title: string;
+  description: string;
+  type: SystemPropertyType;
+  value: string | number | boolean;
+}
+
 export const ORG_PERMISSIONS = [
   { id: 'org.manage', label: 'Manage organization' },
   { id: 'billing.manage', label: 'Manage billing' },
@@ -223,6 +233,65 @@ export const DEMO_ACCESS_POLICIES: AccessPolicy[] = [
     name: 'Restrict artifact exports',
     description: 'Only Admins and above can download or export artifacts.',
     enabled: false,
+  },
+];
+
+export const DEMO_SYSTEM_PROPERTIES: SystemProperty[] = [
+  {
+    id: 'glide.ui.branding.name',
+    title: 'Instance branding name',
+    description: 'Display name shown in the browser tab and login page.',
+    type: 'string',
+    value: 'Acme Corp',
+  },
+  {
+    id: 'glide.sys.default.tz',
+    title: 'Default time zone',
+    description: 'Fallback time zone applied when a user has none set.',
+    type: 'string',
+    value: 'US/Eastern',
+  },
+  {
+    id: 'glide.session.timeout_minutes',
+    title: 'Session timeout (minutes)',
+    description: 'Idle time before a member is signed out automatically.',
+    type: 'integer',
+    value: 60,
+  },
+  {
+    id: 'glide.chat.max_upload_size_mb',
+    title: 'Max chat upload size (MB)',
+    description: 'Largest file Mitra will accept as chat context per upload.',
+    type: 'integer',
+    value: 25,
+  },
+  {
+    id: 'glide.attachment.max_size_mb',
+    title: 'Max attachment size (MB)',
+    description: 'Largest file allowed on artifact attachments.',
+    type: 'integer',
+    value: 10,
+  },
+  {
+    id: 'mitra.demo_mode.enabled',
+    title: 'Demo mode',
+    description: 'Show the "messages are simulated" banner and block live instance writes.',
+    type: 'boolean',
+    value: true,
+  },
+  {
+    id: 'mitra.auto_approve.enabled',
+    title: 'Auto-approve low-risk artifacts',
+    description: 'Skip manual stakeholder review for artifacts under the low-risk threshold.',
+    type: 'boolean',
+    value: false,
+  },
+  {
+    id: 'mitra.skills.marketplace_enabled',
+    title: 'Skill marketplace',
+    description: 'Allow members to publish and install skills shared across the organization.',
+    type: 'boolean',
+    value: true,
   },
 ];
 
