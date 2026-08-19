@@ -1,0 +1,193 @@
+/* Mitra stepper — vertical workflow progress indicator */
+
+.mitra-stepper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.mitra-stepper__row {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mitra-stepper__connector {
+  position: absolute;
+  left: 9px;
+  top: 22px;
+  bottom: -1.25rem;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mitra-stepper__connector--complete {
+  background: rgba(79, 207, 54, 0.35);
+}
+
+.mitra-stepper__node-slot {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.mitra-stepper__node {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  color: #4fcf36;
+}
+
+.mitra-stepper__node--complete {
+  border-color: rgba(79, 207, 54, 0.3);
+  background: rgba(79, 207, 54, 0.12);
+}
+
+.mitra-stepper__node--active {
+  border-color: rgba(79, 207, 54, 0.4);
+  background: rgba(79, 207, 54, 0.15);
+  box-shadow: 0 0 0 3px rgba(79, 207, 54, 0.12);
+}
+
+.mitra-stepper__node--blocked {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.mitra-stepper__node--pending {
+  width: 16px;
+  height: 16px;
+  margin: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+}
+
+.mitra-stepper__content {
+  min-width: 0;
+  flex: 1;
+  padding-bottom: 0.125rem;
+}
+
+.mitra-stepper__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mitra-stepper__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mitra-stepper__label--active,
+.mitra-stepper__label--complete {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mitra-stepper__status {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.mitra-stepper__status--complete {
+  color: rgba(79, 207, 54, 0.75);
+}
+
+.mitra-stepper__status--active {
+  color: #4fcf36;
+}
+
+.mitra-stepper__status--blocked {
+  color: #f59e0b;
+}
+
+.mitra-stepper__description {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mitra-stepper--light .mitra-stepper__connector {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+.mitra-stepper--light .mitra-stepper__node--pending {
+  border-color: rgba(15, 23, 42, 0.16);
+}
+
+.mitra-stepper--light .mitra-stepper__label {
+  color: rgba(100, 116, 139, 0.9);
+}
+
+.mitra-stepper--light .mitra-stepper__label--active,
+.mitra-stepper--light .mitra-stepper__label--complete {
+  color: rgba(15, 23, 42, 0.9);
+}
+
+.mitra-stepper--light .mitra-stepper__status {
+  color: rgba(100, 116, 139, 0.6);
+}
+
+.mitra-stepper--light .mitra-stepper__description {
+  color: rgba(100, 116, 139, 0.8);
+}
+
+/* Mitra stepper — horizontal compact dots */
+
+.mitra-stepper-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 180px;
+}
+
+.mitra-stepper-dots__label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mitra-stepper-dots__track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mitra-stepper-dots__node {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+}
+
+.mitra-stepper-dots__node--active {
+  width: 18px;
+  background: #4fcf36;
+}
+
+.mitra-stepper-dots__node--done {
+  background: rgba(79, 207, 54, 0.4);
+}
+
+.mitra-stepper-dots--light .mitra-stepper-dots__label {
+  color: rgba(100, 116, 139, 0.9);
+}
+
+.mitra-stepper-dots--light .mitra-stepper-dots__node {
+  background: rgba(15, 23, 42, 0.12);
+}

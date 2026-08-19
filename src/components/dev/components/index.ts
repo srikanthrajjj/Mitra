@@ -10,6 +10,7 @@ import { streamingTextEntry } from './streaming-text';
 import { chatBubbleEntry } from './chat-bubble';
 import { entryChipsEntry } from './entry-chips';
 import { tabBarEntry } from '../tab-bar';
+import { stepperEntry } from './stepper';
 
 export type { DevComponentEntry, DevComponentId, DevComponentMeta, DevShowcaseComponent };
 
@@ -20,6 +21,7 @@ export const DEV_COMPONENT_ENTRIES: DevComponentEntry[] = [
   chatBubbleEntry,
   entryChipsEntry,
   tabBarEntry,
+  stepperEntry,
 ];
 
 export const DEV_COMPONENTS: DevComponentMeta[] = DEV_COMPONENT_ENTRIES.map((entry) => entry.meta);
