@@ -13,6 +13,7 @@ import {
   ZapIcon as AnimatedZapIcon,
   ChartLineIcon as AnimatedChartLineIcon,
   MessageCircleIcon as AnimatedMessageCircleIcon,
+  SparklesIcon as AnimatedSparklesIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
@@ -345,6 +346,12 @@ export function ArchitectSidebar({
       label: 'Skills',
       icon: AnimatedZapIcon,
       tab: 'skills',
+    },
+    {
+      id: 'capabilities',
+      label: 'Capabilities',
+      icon: AnimatedSparklesIcon,
+      tab: 'capabilities',
     },
     {
       id: 'favourites',

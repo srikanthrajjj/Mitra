@@ -16,6 +16,7 @@ import NewProjectModal from './components/NewProjectModal';
 import TemplatesView from './components/TemplatesView';
 import ConnectionsView from './components/ConnectionsView';
 import SkillsView from './components/SkillsView';
+import CapabilitiesView from './components/CapabilitiesView';
 import FeedbackView from './components/FeedbackView';
 import SkillDetailModal from './components/SkillDetailModal';
 import FavouritesView from './components/FavouritesView';
@@ -43,6 +44,7 @@ import { ShareProjectModal } from './components/ShareProjectModal';
 import { CenterToast, type CenterToastData } from './components/CenterToast';
 import { DesignFeedbackWidget } from './components/DesignFeedbackWidget';
 import { WhatsNewModal, readWhatsNewDismissed } from './components/WhatsNewModal';
+import { AnnouncementBar, readAnnouncementDismissed, persistAnnouncementDismissed } from './components/AnnouncementBar';
 import { GuestStakeholderView } from './components/GuestStakeholderView';
 import { AdminPanelView } from './components/AdminPanelView';
 import { DeveloperWorkspaceView } from './components/DeveloperWorkspaceView';
@@ -363,6 +365,7 @@ export default function App() {
       search: 'Search',
       settings: 'Settings',
       skills: 'Skills',
+      capabilities: 'Capabilities',
       connections: 'Connections',
       feedback: 'Feedback',
       favourites: 'Favourites',
@@ -592,6 +595,11 @@ export default function App() {
     setIsTourOpen(true);
   }, [setActiveTab]);
   const [whatsNewOpen, setWhatsNewOpen] = useState<boolean>(false);
+  const [announcementDismissed, setAnnouncementDismissed] = useState<boolean>(readAnnouncementDismissed);
+  const dismissAnnouncement = useCallback(() => {
+    setAnnouncementDismissed(true);
+    persistAnnouncementDismissed(true);
+  }, []);
   const DEFAULT_MODEL = 'gemini-2.5-flash';
   const [welcomeComplete, setWelcomeComplete] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return true;
@@ -2568,9 +2576,11 @@ Pick a step below and I'll continue building — data model, scripts, and update
     <SidebarProvider
       style={{ '--sidebar-width': `${effectiveLeftSidebarWidth}px` } as React.CSSProperties}
     >
-    <div className={`h-screen w-full flex relative ${
+    <div className={`h-screen w-full flex flex-col relative ${
       `${resolvedTheme} ${resolvedTheme === 'light' ? 'bg-light-canvas' : 'bg-dark-canvas'} text-foreground`
     } ${highContrast ? 'high-contrast' : ''} ${fontSizeLevel > 0 ? `font-size-level-${fontSizeLevel}` : ''} font-sans overflow-hidden`}>
+      {!announcementDismissed && <AnnouncementBar onDismiss={dismissAnnouncement} />}
+      <div className="flex min-h-0 w-full flex-1 relative">
       {activeTab !== 'org-settings' && (
       <div
         className={`relative shrink-0 ${isLeftSidebarResizing ? 'select-none' : ''}`}
@@ -2911,6 +2921,13 @@ Pick a step below and I'll continue building — data model, scripts, and update
             />
           )}
 
+          {activeTab === 'capabilities' && (
+            <CapabilitiesView
+              theme={resolvedTheme}
+              onNavigate={setActiveTab}
+            />
+          )}
+
           {activeTab === 'feedback' && (
             <FeedbackView theme={resolvedTheme} />
           )}
@@ -2960,6 +2977,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           })()}
         </div>
       </SidebarInset>
+      </div>
 
       {/* modal block */}
       <SearchDialog

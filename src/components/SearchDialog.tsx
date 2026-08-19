@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, Star, MessageSquare, Plus, CornerDownLeft, X,
-  Settings, Link2, Folder, LayoutGrid, MessageCircle, Building2
+  Settings, Link2, Folder, LayoutGrid, MessageCircle, Building2, Sparkles
 } from 'lucide-react';
 import { Solution, Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -137,6 +137,7 @@ export function SearchDialog({
     const commands: { title: string; match: string; icon: any; action: () => void }[] = [
       { title: 'New Chat Thread', match: 'new chat thread create start', icon: Plus, action: () => { onNewChat(); onNavigate('projects'); onClose(); } },
       { title: 'View Connections Panel', match: 'go to view connections oauth integration instance status', icon: Link2, action: () => { onNavigate('connections'); onClose(); } },
+      { title: 'View Capabilities', match: 'go to view capabilities skills artifacts features what can mitra do', icon: Sparkles, action: () => { onNavigate('capabilities'); onClose(); } },
       { title: 'Open Settings Configuration', match: 'go to view settings appearance theme high contrast audio', icon: Settings, action: () => { onNavigate('settings'); onClose(); } },
       { title: 'Open Organizational Settings', match: 'go to view organization org settings billing users roles teams invite subdomain', icon: Building2, action: () => { onNavigate('org-settings'); onClose(); } },
       { title: 'Show Favourites', match: 'go to view favorites starred bookmarked chats', icon: Star, action: () => { onNavigate('favourites'); onClose(); } },
