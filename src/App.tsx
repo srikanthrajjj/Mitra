@@ -694,8 +694,8 @@ export default function App() {
 
   const handleSignupComplete = (profile: SignupProfile) => {
     persistSignupProfile(profile);
-    persistUserRole('admin');
-    setUserRole('admin');
+    persistUserRole('architect');
+    setUserRole('architect');
     setShowSignup(false);
     leaveSignupUrl();
     localStorage.setItem('mitra_landing_seen', 'true');
