@@ -12,6 +12,7 @@ import {
   Search,
   Shield,
   ShieldCheck,
+  SlidersHorizontal,
   Trash2,
   UserPlus,
   Users,
@@ -64,7 +65,8 @@ export type OrgSettingsSectionId =
   | 'teams'
   | 'roles'
   | 'permissions'
-  | 'policies';
+  | 'policies'
+  | 'system_properties';
 
 interface NavItem {
   id: OrgSettingsSectionId;
@@ -84,6 +86,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'organizations', label: 'Organizations', icon: Building2 },
       { id: 'profile', label: 'Profile & branding', icon: Palette },
       { id: 'subdomain', label: 'Custom subdomain', icon: Globe },
+      { id: 'system_properties', label: 'System Properties', icon: SlidersHorizontal },
     ],
   },
   {
@@ -127,6 +130,10 @@ const SECTION_META: Record<OrgSettingsSectionId, { title: string; description: s
   subdomain: {
     title: 'Custom subdomain',
     description: 'Give your team a branded Mitra URL like company.mitra.ai.',
+  },
+  system_properties: {
+    title: 'Manage system properties',
+    description: 'Global configuration key-value pairs — strings, integers, and toggles that control platform behavior.',
   },
   subscription: {
     title: 'Subscription & billing',
@@ -691,7 +698,12 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                 })}
               </div>
             </SectionCard>
+          </div>
+        );
 
+      case 'system_properties':
+        return (
+          <div className="space-y-4">
             <SectionCard
               isDark={isDark}
               title="Add property"
