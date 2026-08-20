@@ -113,14 +113,17 @@
   border-radius: 9999px;
   padding: 0.375rem 0.875rem;
   font-weight: 500;
-  /* Inactive: inherits muted-foreground from .mitra-tab-bar__tab base */
+  background: hsl(var(--card));
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.06);
 }
 
 .mitra-tab-bar--pill .mitra-tab-bar__tab--active {
-  background: color-mix(in srgb, var(--color-brand-green) 10%, transparent);
+  background: color-mix(in srgb, var(--color-brand-green) 18%, transparent);
   color: var(--color-brand-green);
-  font-weight: 600;
-  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.06);
+  font-weight: 700;
+  box-shadow:
+    0 1px 3px hsl(var(--foreground) / 0.1),
+    inset 0 0 0 1px color-mix(in srgb, var(--color-brand-green) 35%, transparent);
 }
 
 .mitra-tab-bar--pill .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {
@@ -217,9 +220,12 @@
 
 /* Pill — light: darker primary green active, muted inactive (Insights parity) */
 .mitra-tab-bar--pill.mitra-tab-bar--light .mitra-tab-bar__tab--active {
-  background: hsl(var(--primary) / 0.10);
+  background: hsl(var(--primary) / 0.16);
   color: hsl(var(--primary));
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow:
+    0 1px 3px hsl(var(--foreground) / 0.08),
+    inset 0 0 0 1px hsl(var(--primary) / 0.3);
 }
 
 .mitra-tab-bar--pill.mitra-tab-bar--light .mitra-tab-bar__tab:hover:not(.mitra-tab-bar__tab--active) {

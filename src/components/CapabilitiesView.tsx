@@ -7,15 +7,20 @@ import { SKILLS, SKILL_CATEGORIES } from '../data/skills';
 import { HOME_ACTIONS } from '../data/homeActions';
 import { ROLE_LABELS, ROLE_PROFILE_SUBTITLES } from '../constants/role';
 import { PERSONA_TONE_HINTS } from '../constants/personaTone';
+import { TabBar } from './dev/tab-bar/TabBar';
 
 interface CapabilitiesViewProps {
   theme: Theme;
   onNavigate?: (tab: string) => void;
 }
 
+type GroupId = 'start' | 'skills' | 'roles' | 'deliverables' | 'coverage' | 'features';
+
 interface CapabilityEntry {
   label: string;
   description: string;
+  /** Small pill shown above the label — used for role badges. */
+  eyebrow?: string;
   tab?: string;
 }
 
@@ -63,34 +68,27 @@ const FEATURES: CapabilityEntry[] = [
 
 const ROLES: UserRole[] = ['business_owner', 'architect', 'stakeholder', 'developer', 'security', 'admin', 'sponsor'];
 
-function SectionHeading({
-  title,
-  subtitle,
-  action,
-}: {
-  title: string;
-  subtitle?: string;
-  action?: { label: string; onClick: () => void };
-}) {
-  return (
-    <div className="mb-3">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-base font-semibold text-foreground">{title}</h2>
-        {action && (
-          <button
-            type="button"
-            onClick={action.onClick}
-            className="flex items-center gap-1 text-xs font-medium text-brand-green hover:text-brand-green-hover"
-          >
-            {action.label}
-            <ArrowRight className="h-3 w-3" />
-          </button>
-        )}
-      </div>
-      {subtitle && <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>}
-    </div>
-  );
-}
+const ROLE_ENTRIES: CapabilityEntry[] = ROLES.map((role) => ({
+  label: ROLE_PROFILE_SUBTITLES[role],
+  eyebrow: ROLE_LABELS[role],
+  description: PERSONA_TONE_HINTS[role],
+}));
+
+const SKILLS_BY_CATEGORY = SKILL_CATEGORIES.map((category) => ({
+  category,
+  entries: SKILLS.filter((s) => s.category === category).map(
+    (s): CapabilityEntry => ({ label: s.name, description: s.description }),
+  ),
+}));
+
+const GROUPS: { id: GroupId; label: string; count: number }[] = [
+  { id: 'start', label: 'Ways to Start', count: ENTRY_POINTS.length },
+  { id: 'skills', label: 'Skills', count: SKILLS.length },
+  { id: 'roles', label: 'Roles', count: ROLE_ENTRIES.length },
+  { id: 'deliverables', label: 'Deliverables', count: DELIVERABLES.length },
+  { id: 'coverage', label: 'Coverage', count: SERVICENOW_MODULES.length },
+  { id: 'features', label: 'Features', count: FEATURES.length },
+];
 
 function CapabilityCard({
   entry,
@@ -123,13 +121,18 @@ function CapabilityCard({
         cardSurfaceHover(isDark),
       )}
     >
+      {entry.eyebrow && (
+        <span className="mb-2 inline-flex rounded-full bg-brand-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-brand-green">
+          {entry.eyebrow}
+        </span>
+      )}
       <h3 className="text-[13px] font-semibold text-foreground">{entry.label}</h3>
       <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{entry.description}</p>
     </div>
   );
 }
 
-function CapabilityGrid({
+function CapabilityItems({
   entries,
   isDark,
   onNavigate,
@@ -150,6 +153,7 @@ function CapabilityGrid({
 export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesViewProps) {
   const isDark = isDarkTheme(theme);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [activeGroup, setActiveGroup] = useState<GroupId>('start');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
@@ -158,23 +162,45 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
     }
   }, []);
 
-  const skillsByCategory = SKILL_CATEGORIES.map((category) => ({
-    category,
-    skills: SKILLS.filter((s) => s.category === category),
-  }));
-
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       {/* Sticky header */}
       <div className="shrink-0">
-        <div className="px-4 pt-8 md:px-8 lg:px-12 pb-4">
+        <div className="px-4 pb-4 pt-8 md:px-8 lg:px-12">
           <div className="mx-auto max-w-6xl">
-            <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-              Capabilities
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Everything Mitra can do for you, organized by function.
-            </p>
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+              <div className="min-w-0 flex-1">
+                <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
+                  Capabilities
+                </h1>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Everything Mitra can do for you, organized by group.
+                </p>
+              </div>
+              {activeGroup === 'skills' && onNavigate && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate('skills')}
+                  className="flex shrink-0 items-center gap-1 text-xs font-medium text-brand-green hover:text-brand-green-hover"
+                >
+                  Manage in Skills
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            <div className="overflow-x-auto">
+              <TabBar
+                tabs={GROUPS.map((g) => ({ id: g.id, label: g.label, count: g.count }))}
+                activeTab={activeGroup}
+                variant="pill"
+                size="compact"
+                fullWidth={false}
+                isDark={isDark}
+                ariaLabel="Capability groups"
+                onTabChange={(id) => setActiveGroup(id as GroupId)}
+              />
+            </div>
           </div>
         </div>
         <div
@@ -191,80 +217,41 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
         onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto px-4 pb-12 pt-4 md:px-8 lg:px-12"
       >
-        <div className="mx-auto max-w-6xl space-y-10">
-          {/* Ways to Start */}
-          <section>
-            <SectionHeading title="Ways to Start" subtitle="Four entry points into a new solution, from a blank prompt to an existing app." />
-            <CapabilityGrid entries={ENTRY_POINTS} isDark={isDark} />
-          </section>
+        <div className="mx-auto max-w-6xl">
+          <div role="tabpanel" id={`panel-${activeGroup}`} aria-labelledby={`tab-${activeGroup}`}>
+            {activeGroup === 'start' && (
+              <CapabilityItems entries={ENTRY_POINTS} isDark={isDark} onNavigate={onNavigate} />
+            )}
 
-          {/* Skills */}
-          <section>
-            <SectionHeading
-              title="Skills"
-              subtitle="Reusable, parameterized AI actions grouped by discipline."
-              action={onNavigate ? { label: 'View all', onClick: () => onNavigate('skills') } : undefined}
-            />
-            <div className="space-y-5">
-              {skillsByCategory.map(({ category, skills }) => (
-                <div key={category}>
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    {category}
-                  </p>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {skills.map((skill) => (
-                      <div
-                        key={skill.id}
-                        className={cn('rounded-xl border-0 p-4', cardSurfaceHover(isDark))}
-                      >
-                        <h3 className="text-[13px] font-semibold text-foreground">{skill.name}</h3>
-                        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                          {skill.description}
-                        </p>
-                      </div>
-                    ))}
+            {activeGroup === 'skills' && (
+              <div className="space-y-5">
+                {SKILLS_BY_CATEGORY.map(({ category, entries }) => (
+                  <div key={category}>
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {category}
+                    </p>
+                    <CapabilityItems entries={entries} isDark={isDark} onNavigate={onNavigate} />
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            )}
 
-          {/* Roles */}
-          <section>
-            <SectionHeading
-              title="Roles"
-              subtitle="Mitra adapts tone, output, and gating logic to seven roles across the delivery lifecycle."
-            />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {ROLES.map((role) => (
-                <div key={role} className={cn('rounded-xl border-0 p-4', cardSurfaceHover(isDark))}>
-                  <span className="rounded-full bg-brand-green/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-brand-green">
-                    {ROLE_LABELS[role]}
-                  </span>
-                  <p className="mt-2 text-[11px] font-medium text-foreground">{ROLE_PROFILE_SUBTITLES[role]}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{PERSONA_TONE_HINTS[role]}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+            {activeGroup === 'roles' && (
+              <CapabilityItems entries={ROLE_ENTRIES} isDark={isDark} onNavigate={onNavigate} />
+            )}
 
-          {/* Deliverables */}
-          <section>
-            <SectionHeading title="Deliverables" subtitle="Artifact types Mitra produces as a solution moves through phases." />
-            <CapabilityGrid entries={DELIVERABLES} isDark={isDark} />
-          </section>
+            {activeGroup === 'deliverables' && (
+              <CapabilityItems entries={DELIVERABLES} isDark={isDark} onNavigate={onNavigate} />
+            )}
 
-          {/* Coverage */}
-          <section>
-            <SectionHeading title="Coverage" subtitle="ServiceNow modules Mitra can design, build, and govern across." />
-            <CapabilityGrid entries={SERVICENOW_MODULES} isDark={isDark} />
-          </section>
+            {activeGroup === 'coverage' && (
+              <CapabilityItems entries={SERVICENOW_MODULES} isDark={isDark} onNavigate={onNavigate} />
+            )}
 
-          {/* Features */}
-          <section>
-            <SectionHeading title="Features" subtitle="Workspace tools that support the build, beyond the chat itself." />
-            <CapabilityGrid entries={FEATURES} isDark={isDark} onNavigate={onNavigate} />
-          </section>
+            {activeGroup === 'features' && (
+              <CapabilityItems entries={FEATURES} isDark={isDark} onNavigate={onNavigate} />
+            )}
+          </div>
         </div>
       </div>
     </div>
