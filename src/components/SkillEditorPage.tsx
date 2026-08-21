@@ -4,6 +4,8 @@ import {
   ArrowLeftRight,
   Check,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   RotateCcw,
   Sparkles,
   Trash2,
@@ -70,80 +72,72 @@ function ColumnHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-border px-4 md:px-5 lg:hidden">
+    <div className="flex h-11 shrink-0 items-center justify-between gap-3 rounded-t-xl border-b border-border bg-brand-green/10 px-4 md:px-5">
       <h2 className={SECTION_LABEL}>{title}</h2>
       {action}
     </div>
   );
 }
 
-const SKILL_EDITOR_COLS =
-  'lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(240px,280px)]';
+const skillEditorCols = (versionsCollapsed: boolean) =>
+  versionsCollapsed
+    ? 'lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_44px]'
+    : 'lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(240px,280px)]';
 
-function SkillEditorUnifiedHeader({
-  instructionsLength,
+function VersionsSectionHeader({
+  collapsed,
+  onToggleCollapsed,
   compareMode,
   isCreate,
   hasVersions,
   onCompareToggle,
-  onCloseCompare,
-  isDark,
 }: {
-  instructionsLength: number;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
   compareMode: boolean;
   isCreate: boolean;
   hasVersions: boolean;
   onCompareToggle: () => void;
-  onCloseCompare?: () => void;
-  isDark: boolean;
 }) {
+  if (collapsed) {
+    return (
+      <div className="flex h-11 shrink-0 items-center justify-center rounded-t-xl border-b border-border bg-brand-green/10">
+        <button
+          type="button"
+          title="Expand versions"
+          onClick={onToggleCollapsed}
+          className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
   return (
-    <div
-      className={cn(
-        'hidden shrink-0 border-b border-border lg:grid',
-        SKILL_EDITOR_COLS,
-        isDark ? 'bg-mitra-surface' : 'bg-card',
-      )}
-    >
-      <div className="flex h-11 items-center border-r border-border px-4 md:px-5">
-        <h2 className={SECTION_LABEL}>Skill details</h2>
-      </div>
-      <div className="flex h-11 items-center justify-between gap-2 border-r border-border px-4 md:px-5">
-        <h2 className={SECTION_LABEL}>{compareMode ? 'Version compare' : 'Instructions'}</h2>
-        {compareMode ? (
-          onCloseCompare && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 gap-1 px-2 text-[11px]"
-              onClick={onCloseCompare}
-            >
-              <X className="h-3 w-3" />
-              Close
-            </Button>
-          )
-        ) : (
-          <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
-            {instructionsLength.toLocaleString()} chars
-          </span>
-        )}
-      </div>
-      <div className="flex h-11 items-center justify-between gap-2 px-4 md:px-5">
+    <div className="flex h-11 shrink-0 items-center justify-between gap-2 rounded-t-xl border-b border-border bg-brand-green/10 px-4 md:px-5">
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          title="Collapse versions"
+          onClick={onToggleCollapsed}
+          className="rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
         <h2 className={SECTION_LABEL}>Versions</h2>
-        {!isCreate && hasVersions && (
-          <Button
-            type="button"
-            variant={compareMode ? 'cta' : 'secondary'}
-            size="sm"
-            className="h-7 gap-1 px-2 text-[11px]"
-            onClick={onCompareToggle}
-          >
-            <ArrowLeftRight className="h-3 w-3" />
-            {compareMode ? 'Editing' : 'Compare'}
-          </Button>
-        )}
       </div>
+      {!isCreate && hasVersions && (
+        <Button
+          type="button"
+          variant={compareMode ? 'cta' : 'secondary'}
+          size="sm"
+          className="h-7 gap-1 px-2 text-[11px]"
+          onClick={onCompareToggle}
+        >
+          <ArrowLeftRight className="h-3 w-3" />
+          {compareMode ? 'Editing' : 'Compare'}
+        </Button>
+      )}
     </div>
   );
 }
@@ -165,7 +159,7 @@ function VersionComparePanel({
   const unchanged = diffs.filter((d) => !d.changed);
 
   return (
-    <section className="flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r lg:bg-card">
+    <section className="flex min-h-0 flex-col rounded-xl lg:bg-card">
       <ColumnHeader
         title="Version compare"
         action={
@@ -271,6 +265,7 @@ export default function SkillEditorPage({
   const [compareMode, setCompareMode] = useState(false);
   const [leftVersionId, setLeftVersionId] = useState<string | null>(null);
   const [rightVersionId, setRightVersionId] = useState<string | null>(null);
+  const [versionsCollapsed, setVersionsCollapsed] = useState(false);
 
   useEffect(() => {
     if (skill) {
@@ -541,20 +536,11 @@ export default function SkillEditorPage({
       </div>
 
       {/* Full-page columns: details | instructions | versions */}
-      <SkillEditorUnifiedHeader
-        instructionsLength={instructions.length}
-        compareMode={compareMode}
-        isCreate={isCreate}
-        hasVersions={sortedVersions.length > 0}
-        onCompareToggle={() => (compareMode ? setCompareMode(false) : openCompare())}
-        onCloseCompare={() => setCompareMode(false)}
-        isDark={isDark}
-      />
-      <div className={cn('grid min-h-0 flex-1 grid-cols-1 bg-background', SKILL_EDITOR_COLS)}>
+      <div className={cn('grid min-h-0 flex-1 grid-cols-1 gap-4 bg-background p-4', skillEditorCols(versionsCollapsed))}>
         {/* Left: details */}
         <aside
           className={cn(
-            'flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r',
+            'flex min-h-0 flex-col rounded-xl',
             isDark ? 'bg-mitra-surface' : 'bg-card',
           )}
         >
@@ -661,7 +647,7 @@ export default function SkillEditorPage({
             onClose={() => setCompareMode(false)}
           />
         ) : (
-          <section className={cn('flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r', isDark ? 'bg-mitra-surface' : 'bg-card')}>
+          <section className={cn('flex min-h-0 flex-col rounded-xl', isDark ? 'bg-mitra-surface' : 'bg-card')}>
             <ColumnHeader
               title="Instructions"
               action={
@@ -689,25 +675,16 @@ export default function SkillEditorPage({
         )}
 
         {/* Right: versions + compare controls */}
-        <aside className={cn('flex min-h-0 flex-col', isDark ? 'bg-mitra-surface' : 'bg-card')}>
-          <ColumnHeader
-            title="Versions"
-            action={
-              !isCreate && sortedVersions.length > 0 ? (
-                <Button
-                  type="button"
-                  variant={compareMode ? 'cta' : 'secondary'}
-                  size="sm"
-                  className="h-7 gap-1 px-2 text-[11px]"
-                  onClick={() => (compareMode ? setCompareMode(false) : openCompare())}
-                >
-                  <ArrowLeftRight className="h-3 w-3" />
-                  {compareMode ? 'Editing' : 'Compare'}
-                </Button>
-              ) : undefined
-            }
+        <aside className={cn('flex min-h-0 flex-col rounded-xl', isDark ? 'bg-mitra-surface' : 'bg-card')}>
+          <VersionsSectionHeader
+            collapsed={versionsCollapsed}
+            onToggleCollapsed={() => setVersionsCollapsed((v) => !v)}
+            compareMode={compareMode}
+            isCreate={isCreate}
+            hasVersions={sortedVersions.length > 0}
+            onCompareToggle={() => (compareMode ? setCompareMode(false) : openCompare())}
           />
-          <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-5">
+          <div className={cn('min-h-0 flex-1 overflow-y-auto p-4 md:p-5', versionsCollapsed && 'hidden')}>
           {compareMode && (
             <div className={cn('mb-3 space-y-2', panelClass(isDark))}>
               <p className={SECTION_LABEL}>Compare</p>
