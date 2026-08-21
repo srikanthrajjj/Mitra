@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 import { Theme, UserRole } from '../types';
 import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
@@ -81,13 +81,13 @@ const SKILLS_BY_CATEGORY = SKILL_CATEGORIES.map((category) => ({
   ),
 }));
 
-const GROUPS: { id: GroupId; label: string; count: number }[] = [
-  { id: 'start', label: 'Ways to Start', count: ENTRY_POINTS.length },
-  { id: 'skills', label: 'Skills', count: SKILLS.length },
-  { id: 'roles', label: 'Roles', count: ROLE_ENTRIES.length },
-  { id: 'deliverables', label: 'Deliverables', count: DELIVERABLES.length },
-  { id: 'coverage', label: 'Coverage', count: SERVICENOW_MODULES.length },
-  { id: 'features', label: 'Features', count: FEATURES.length },
+const GROUPS: { id: GroupId; label: string; entries: CapabilityEntry[] }[] = [
+  { id: 'start', label: 'Ways to Start', entries: ENTRY_POINTS },
+  { id: 'skills', label: 'Skills', entries: SKILLS_BY_CATEGORY.flatMap((c) => c.entries) },
+  { id: 'roles', label: 'Roles', entries: ROLE_ENTRIES },
+  { id: 'deliverables', label: 'Deliverables', entries: DELIVERABLES },
+  { id: 'coverage', label: 'Coverage', entries: SERVICENOW_MODULES },
+  { id: 'features', label: 'Features', entries: FEATURES },
 ];
 
 function CapabilityCard({
@@ -132,6 +132,27 @@ function CapabilityCard({
   );
 }
 
+function matchesSearch(entry: CapabilityEntry, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return (
+    entry.label.toLowerCase().includes(q) ||
+    entry.description.toLowerCase().includes(q) ||
+    Boolean(entry.eyebrow?.toLowerCase().includes(q))
+  );
+}
+
+function EmptySearchState({ query }: { query: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-xl py-16 text-center">
+      <p className="text-sm font-medium text-foreground">No matches</p>
+      <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+        Nothing in this group matches "{query}".
+      </p>
+    </div>
+  );
+}
+
 function CapabilityItems({
   entries,
   isDark,
@@ -154,6 +175,7 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
   const isDark = isDarkTheme(theme);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [activeGroup, setActiveGroup] = useState<GroupId>('start');
+  const [search, setSearch] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
@@ -191,7 +213,11 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
 
             <div className="overflow-x-auto">
               <TabBar
-                tabs={GROUPS.map((g) => ({ id: g.id, label: g.label, count: g.count }))}
+                tabs={GROUPS.map((g) => ({
+                  id: g.id,
+                  label: g.label,
+                  count: g.entries.filter((e) => matchesSearch(e, search)).length,
+                }))}
                 activeTab={activeGroup}
                 variant="pill"
                 size="compact"
@@ -199,6 +225,22 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
                 isDark={isDark}
                 ariaLabel="Capability groups"
                 onTabChange={(id) => setActiveGroup(id as GroupId)}
+              />
+            </div>
+
+            <div className="relative mt-3">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search this group…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={cn(
+                  'surface-inset w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors',
+                  isDark
+                    ? 'bg-mitra-input text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30'
+                    : 'bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/30',
+                )}
               />
             </div>
           </div>
@@ -219,38 +261,71 @@ export default function CapabilitiesView({ theme, onNavigate }: CapabilitiesView
       >
         <div className="mx-auto max-w-6xl">
           <div role="tabpanel" id={`panel-${activeGroup}`} aria-labelledby={`tab-${activeGroup}`}>
-            {activeGroup === 'start' && (
-              <CapabilityItems entries={ENTRY_POINTS} isDark={isDark} onNavigate={onNavigate} />
-            )}
+            {activeGroup === 'start' && (() => {
+              const filtered = ENTRY_POINTS.filter((e) => matchesSearch(e, search));
+              return filtered.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <CapabilityItems entries={filtered} isDark={isDark} onNavigate={onNavigate} />
+              );
+            })()}
 
-            {activeGroup === 'skills' && (
-              <div className="space-y-5">
-                {SKILLS_BY_CATEGORY.map(({ category, entries }) => (
-                  <div key={category}>
-                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      {category}
-                    </p>
-                    <CapabilityItems entries={entries} isDark={isDark} onNavigate={onNavigate} />
-                  </div>
-                ))}
-              </div>
-            )}
+            {activeGroup === 'skills' && (() => {
+              const filteredCategories = SKILLS_BY_CATEGORY.map(({ category, entries }) => ({
+                category,
+                entries: entries.filter((e) => matchesSearch(e, search)),
+              })).filter(({ entries }) => entries.length > 0);
+              return filteredCategories.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <div className="space-y-5">
+                  {filteredCategories.map(({ category, entries }) => (
+                    <div key={category}>
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {category}
+                      </p>
+                      <CapabilityItems entries={entries} isDark={isDark} onNavigate={onNavigate} />
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
 
-            {activeGroup === 'roles' && (
-              <CapabilityItems entries={ROLE_ENTRIES} isDark={isDark} onNavigate={onNavigate} />
-            )}
+            {activeGroup === 'roles' && (() => {
+              const filtered = ROLE_ENTRIES.filter((e) => matchesSearch(e, search));
+              return filtered.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <CapabilityItems entries={filtered} isDark={isDark} onNavigate={onNavigate} />
+              );
+            })()}
 
-            {activeGroup === 'deliverables' && (
-              <CapabilityItems entries={DELIVERABLES} isDark={isDark} onNavigate={onNavigate} />
-            )}
+            {activeGroup === 'deliverables' && (() => {
+              const filtered = DELIVERABLES.filter((e) => matchesSearch(e, search));
+              return filtered.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <CapabilityItems entries={filtered} isDark={isDark} onNavigate={onNavigate} />
+              );
+            })()}
 
-            {activeGroup === 'coverage' && (
-              <CapabilityItems entries={SERVICENOW_MODULES} isDark={isDark} onNavigate={onNavigate} />
-            )}
+            {activeGroup === 'coverage' && (() => {
+              const filtered = SERVICENOW_MODULES.filter((e) => matchesSearch(e, search));
+              return filtered.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <CapabilityItems entries={filtered} isDark={isDark} onNavigate={onNavigate} />
+              );
+            })()}
 
-            {activeGroup === 'features' && (
-              <CapabilityItems entries={FEATURES} isDark={isDark} onNavigate={onNavigate} />
-            )}
+            {activeGroup === 'features' && (() => {
+              const filtered = FEATURES.filter((e) => matchesSearch(e, search));
+              return filtered.length === 0 ? (
+                <EmptySearchState query={search} />
+              ) : (
+                <CapabilityItems entries={filtered} isDark={isDark} onNavigate={onNavigate} />
+              );
+            })()}
           </div>
         </div>
       </div>
