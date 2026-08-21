@@ -2397,6 +2397,12 @@ Pick a step below and I'll continue building — data model, scripts, and update
     );
   }, []);
 
+  const handleUpdateSolutionTags = useCallback((solutionId: string, tags: string[]) => {
+    setSolutions((prev) =>
+      prev.map((s) => (s.id === solutionId ? { ...s, tags } : s))
+    );
+  }, []);
+
   const handleDeleteSolution = (solutionId: string) => {
     const target = solutions.find((s) => s.id === solutionId);
     if (!target) return;
@@ -2621,6 +2627,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
           onRenameSolution={handleRenameSolution}
           onDeleteSolution={handleDeleteSolution}
           onMoveSolution={handleMoveSolution}
+          onUpdateTags={handleUpdateSolutionTags}
+          projectCollaborators={projectCollaborators}
           onNewChat={handleNewChat}
           onRenamingComplete={() => setRenamingFolderId(null)}
           statusOverrides={artifactStatusOverrides}

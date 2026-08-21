@@ -3,6 +3,9 @@ import {
   Star,
   MoreVertical,
   ChevronDown,
+  Tag,
+  Share2,
+  X,
 } from 'lucide-react';
 import {
   SearchIcon as AnimatedSearchIcon,
@@ -19,7 +22,8 @@ import type { IconHandle } from '@animateicons/react';
 import { ConversationStatusDot } from './ConversationStatusDot';
 import { deriveConversationStatus } from '../utils/conversationStatus';
 import { ProjectFolder } from '../data/folders';
-import { ArtifactStatus, Solution, Theme } from '../types';
+import { getCollaboratorsForSolution } from '../data/projectShares';
+import { ArtifactStatus, ProjectCollaborator, Solution, Theme } from '../types';
 import { SidebarGroup, SidebarGroupContent } from '@/src/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { isDarkTheme } from '../utils/theme';
@@ -50,6 +54,8 @@ interface ArchitectSidebarProps {
   onRenameSolution: (solutionId: string, name: string) => void;
   onDeleteSolution: (solutionId: string) => void;
   onMoveSolution?: (solutionId: string, folderId: string | undefined) => void;
+  onUpdateTags: (solutionId: string, tags: string[]) => void;
+  projectCollaborators?: ProjectCollaborator[];
   onNewChat: (folderId?: string) => string;
   onRenamingComplete: () => void;
   statusOverrides?: Record<string, ArtifactStatus>;
@@ -91,6 +97,13 @@ function AnimatedSidebarNavIcon({
   return <Icon ref={iconRef} size={16} className={className} />;
 }
 
+/** Tag-cloud pill size tier — more usages, larger text. */
+function tagSizeClass(count: number): string {
+  if (count >= 4) return 'text-[12px]';
+  if (count >= 2) return 'text-[10.5px]';
+  return 'text-[9.5px]';
+}
+
 export function ArchitectSidebar({
   theme,
   activeTab,
@@ -106,6 +119,8 @@ export function ArchitectSidebar({
   onRenameSolution,
   onDeleteSolution,
   onMoveSolution,
+  onUpdateTags,
+  projectCollaborators = [],
   generatingSolutionId = null,
 }: ArchitectSidebarProps) {
   const isDark = isDarkTheme(theme);
@@ -113,6 +128,9 @@ export function ArchitectSidebar({
   const [editName, setEditName] = useState('');
   const [pinnedOpen, setPinnedOpen] = useState(true);
   const [recentsOpen, setRecentsOpen] = useState(true);
+  const [tagsOpen, setTagsOpen] = useState(true);
+  const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
+  const [tagDraftBySolution, setTagDraftBySolution] = useState<Record<string, string>>({});
   const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
 
@@ -132,6 +150,40 @@ export function ArchitectSidebar({
 
   const cancelRename = () => {
     setEditingSolutionId(null);
+  };
+
+  const allTags = Array.from(
+    new Set(solutions.flatMap((s) => s.tags ?? [])),
+  ).sort((a, b) => a.localeCompare(b));
+
+  const tagCounts = solutions.reduce<Record<string, number>>((acc, s) => {
+    (s.tags ?? []).forEach((t) => {
+      acc[t] = (acc[t] ?? 0) + 1;
+    });
+    return acc;
+  }, {});
+
+  const addTag = (sol: Solution, rawTag: string) => {
+    const tag = rawTag.trim();
+    if (!tag) return;
+    const existing = sol.tags ?? [];
+    if (existing.some((t) => t.toLowerCase() === tag.toLowerCase())) {
+      setTagDraftBySolution((prev) => ({ ...prev, [sol.id]: '' }));
+      return;
+    }
+    onUpdateTags(sol.id, [...existing, tag]);
+    setTagDraftBySolution((prev) => ({ ...prev, [sol.id]: '' }));
+  };
+
+  const removeTag = (sol: Solution, tag: string) => {
+    onUpdateTags(sol.id, (sol.tags ?? []).filter((t) => t !== tag));
+  };
+
+  const tagSuggestions = (sol: Solution) => {
+    const draft = (tagDraftBySolution[sol.id] ?? '').trim().toLowerCase();
+    if (!draft) return [];
+    const existing = new Set((sol.tags ?? []).map((t) => t.toLowerCase()));
+    return allTags.filter((t) => !existing.has(t.toLowerCase()) && t.toLowerCase().includes(draft));
   };
 
   const renderSolutionRow = (sol: Solution) => {
@@ -186,8 +238,28 @@ export function ArchitectSidebar({
               <ConversationStatusDot status={conversationStatus} />
               <span className="truncate text-left">{sol.name}</span>
             </div>
-            
+
             <div className="flex items-center gap-0.5 shrink-0">
+              {sol.tags && sol.tags.length > 0 && (
+                <span
+                  title={sol.tags.join(', ')}
+                  className="flex items-center p-0.5 text-brand-green/70"
+                >
+                  <Tag className="h-3 w-3" />
+                </span>
+              )}
+
+              {getCollaboratorsForSolution(projectCollaborators, sol.id).length > 0 && (
+                <span
+                  title={`Shared with ${getCollaboratorsForSolution(projectCollaborators, sol.id)
+                    .map((c) => c.name)
+                    .join(', ')}`}
+                  className="flex items-center p-0.5 text-brand-green/70"
+                >
+                  <Share2 className="h-3 w-3" />
+                </span>
+              )}
+
               {/* Favorite star */}
               <button
                 type="button"
@@ -276,6 +348,89 @@ export function ArchitectSidebar({
                             Remove from project
                           </DropdownMenuItem>
                         </>
+                      )}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground">
+                      Add Tag
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent
+                      className={cn(
+                        isDark ? 'dark bg-mitra-surface text-foreground' : 'light bg-card text-foreground',
+                        'w-56 p-2'
+                      )}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {sol.tags && sol.tags.length > 0 && (
+                        <div className="mb-2 flex flex-wrap gap-1">
+                          {sol.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className={cn(
+                                'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium',
+                                isDark ? 'bg-mitra-highlight text-foreground' : 'bg-muted text-foreground',
+                              )}
+                            >
+                              {tag}
+                              <button
+                                type="button"
+                                title={`Remove ${tag}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeTag(sol, tag);
+                                }}
+                                className="text-muted-foreground hover:text-destructive"
+                              >
+                                <X className="h-2.5 w-2.5" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        value={tagDraftBySolution[sol.id] ?? ''}
+                        onChange={(e) =>
+                          setTagDraftBySolution((prev) => ({ ...prev, [sol.id]: e.target.value }))
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                          e.stopPropagation();
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addTag(sol, tagDraftBySolution[sol.id] ?? '');
+                          }
+                        }}
+                        placeholder="Add tag…"
+                        className={cn(
+                          'w-full rounded-md border px-2 py-1 text-[12px] outline-none',
+                          isDark
+                            ? 'border-white/[0.08] bg-mitra-input text-foreground placeholder:text-muted-foreground'
+                            : 'border-border bg-card text-foreground placeholder:text-muted-foreground',
+                        )}
+                      />
+                      {tagSuggestions(sol).length > 0 && (
+                        <div
+                          className={cn(
+                            'mt-1 flex flex-col overflow-hidden rounded-md border',
+                            isDark ? 'border-white/[0.08]' : 'border-border',
+                          )}
+                        >
+                          {tagSuggestions(sol).map((tag) => (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addTag(sol, tag);
+                              }}
+                              className="px-2 py-1 text-left text-[11.5px] text-foreground hover:bg-accent"
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
@@ -399,8 +554,11 @@ export function ArchitectSidebar({
     if (item.tab) onNavigate(item.tab);
   };
 
-  const pinnedSolutions = solutions.filter((sol) => sol.isPinned);
-  const recentSolutions = solutions.filter((sol) => !sol.isPinned);
+  const filterByTag = (list: Solution[]) =>
+    activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
+
+  const pinnedSolutions = filterByTag(solutions.filter((sol) => sol.isPinned));
+  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned));
 
   return (
     <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
@@ -452,6 +610,62 @@ export function ArchitectSidebar({
       {/* Recents and Pinned list direct render without folders */}
       <div className="relative mt-3 flex min-h-0 flex-1 flex-col">
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-1 pb-2 scrollbar-thin">
+        {/* Tags section — collapsible tag cloud, click a tag to filter Pinned/Recents below */}
+        {allTags.length > 0 && (
+          <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
+            <button
+              type="button"
+              onClick={() => setTagsOpen((open) => !open)}
+              className={cn(
+                'mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                isDark
+                  ? 'text-illuminate-muted hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              aria-expanded={tagsOpen}
+            >
+              <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
+                <ChevronDown
+                  className={cn(
+                    'h-3 w-3 transition-transform duration-200',
+                    !tagsOpen && '-rotate-90',
+                  )}
+                />
+              </span>
+              <span>Tags</span>
+              {activeTagFilter && (
+                <span className="normal-case tracking-normal text-brand-green">· {activeTagFilter}</span>
+              )}
+            </button>
+            {tagsOpen && (
+              <div className="flex flex-wrap gap-1.5 px-1.5 pb-1">
+                {allTags.map((tag) => {
+                  const isActiveTag = activeTagFilter === tag;
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setActiveTagFilter((current) => (current === tag ? null : tag))}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium leading-tight transition-colors',
+                        tagSizeClass(tagCounts[tag]),
+                        isActiveTag
+                          ? 'bg-brand-green/15 text-brand-green'
+                          : isDark
+                            ? 'bg-mitra-surface text-muted-foreground hover:text-foreground'
+                            : 'bg-muted text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      {tag}
+                      <span className="opacity-60">{tagCounts[tag]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
@@ -516,7 +730,7 @@ export function ArchitectSidebar({
                 'px-1.5 py-2 text-[11px]',
                 isDark ? 'text-illuminate-muted' : 'text-muted-foreground',
               )}>
-                No recent chats
+                {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No recent chats'}
               </p>
             ) : (
               recentSolutions.map((sol) => renderSolutionRow(sol))

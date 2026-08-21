@@ -407,6 +407,8 @@ export interface Solution {
   isPinned?: boolean;
   /** Set when the last generation attempt failed without a usable response */
   generationError?: boolean;
+  /** Free-form category labels — used to group and filter threads in the sidebar. */
+  tags?: string[];
 }
 
 export interface ServiceTemplate {

@@ -2,7 +2,7 @@ import {
   Key, ChevronDown, LogOut, Settings, HelpCircle, Building2,
   PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X
 } from 'lucide-react';
-import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme } from '../types';
+import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme, ProjectCollaborator } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { filterReviewsForRole } from '../utils/approvalFlow';
 import { ProjectFolder } from '../data/folders';
@@ -72,6 +72,8 @@ interface SidebarProps {
   onRenameSolution: (solutionId: string, name: string) => void;
   onDeleteSolution: (solutionId: string) => void;
   onMoveSolution?: (solutionId: string, folderId: string | undefined) => void;
+  onUpdateTags: (solutionId: string, tags: string[]) => void;
+  projectCollaborators?: ProjectCollaborator[];
   onNewChat: (folderId?: string) => string;
   onRenamingComplete: () => void;
   statusOverrides?: Record<string, import('../types').ArtifactStatus>;
@@ -122,6 +124,8 @@ export default function Sidebar({
   onRenameSolution,
   onDeleteSolution,
   onMoveSolution,
+  onUpdateTags,
+  projectCollaborators = [],
   onNewChat,
   onRenamingComplete,
   statusOverrides = {},
@@ -349,6 +353,8 @@ export default function Sidebar({
             onRenameSolution={onRenameSolution}
             onDeleteSolution={onDeleteSolution}
             onMoveSolution={onMoveSolution}
+            onUpdateTags={onUpdateTags}
+            projectCollaborators={projectCollaborators}
             onNewChat={onNewChat}
             onRenamingComplete={onRenamingComplete}
             statusOverrides={statusOverrides}
