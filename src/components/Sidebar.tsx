@@ -525,8 +525,7 @@ export default function Sidebar({
                   )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
-                  <Building2 className="h-2.5 w-2.5 shrink-0 text-brand-green/70" />
-                  <span className="truncate font-medium text-brand-green">
+                  <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
                     {activeOrg.name}
                   </span>
                 </div>

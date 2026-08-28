@@ -121,7 +121,7 @@ export default function ImpersonateUserModal({
           </div>
 
           <div className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
-            Team members
+            Recent impersonations
           </div>
 
           <div className="max-h-64 overflow-y-auto -mx-1.5 px-1.5 space-y-1">
