@@ -513,17 +513,17 @@ export default function Sidebar({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[12px] font-semibold text-foreground">
-                  {displayName}
-                </div>
-                {impersonatedUser && (
-                  <div className="mt-0.5 flex flex-wrap items-center gap-1">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-amber-600 dark:text-amber-400">
-                      <VenetianMask className="h-2.5 w-2.5 shrink-0" />
-                      Impersonating
-                    </span>
+                <div className="flex items-center gap-1 min-w-0">
+                  <div className="truncate text-[12px] font-semibold text-foreground">
+                    {displayName}
                   </div>
-                )}
+                  {impersonatedUser && (
+                    <VenetianMask
+                      className="h-[18px] w-[18px] shrink-0 text-amber-500"
+                      aria-label="Impersonating"
+                    />
+                  )}
+                </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
                   <Building2 className="h-2.5 w-2.5 shrink-0 text-brand-green/70" />
                   <span className="truncate font-medium text-brand-green">
