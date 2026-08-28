@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import {
   Key, ChevronDown, LogOut, Settings, HelpCircle, Building2,
-  PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X
+  PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X, VenetianMask, ArrowRightLeft
 } from 'lucide-react';
 import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme, ProjectCollaborator } from '../types';
 import { isDarkTheme } from '../utils/theme';
@@ -8,6 +9,10 @@ import { filterReviewsForRole } from '../utils/approvalFlow';
 import { ProjectFolder } from '../data/folders';
 import { USER_DISPLAY_NAME, USER_INITIALS } from '../constants/user';
 import { ROLE_PROFILE_SUBTITLES } from '../constants/role';
+import { INTERNAL_TEAM_MEMBERS, InternalTeamMember } from '../data/internalTeamMembers';
+import { DEMO_ORGANIZATIONS, Organization } from '../data/orgSettings';
+import ImpersonateUserModal from './ImpersonateUserModal';
+import SwitchOrganizationModal from './SwitchOrganizationModal';
 import { RoleSwitcher } from './RoleSwitcher';
 import { ArchitectSidebar } from './ArchitectSidebar';
 import { StakeholderSidebar } from './StakeholderSidebar';
@@ -144,8 +149,25 @@ export default function Sidebar({
 }: SidebarProps) {
   const isDark = isDarkTheme(theme);
   const navLogoAnimated = useNavLogoPulse();
+  const [impersonatedUser, setImpersonatedUser] = useState<InternalTeamMember | null>(null);
+  const [impersonateModalOpen, setImpersonateModalOpen] = useState(false);
+  const [activeOrgId, setActiveOrgId] = useState<string>(DEMO_ORGANIZATIONS[0].id);
+  const [switchOrgModalOpen, setSwitchOrgModalOpen] = useState(false);
+
+  const activeOrg = DEMO_ORGANIZATIONS.find((org) => org.id === activeOrgId) ?? DEMO_ORGANIZATIONS[0];
+
+  const displayName = impersonatedUser
+    ? impersonatedUser.name
+    : (userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME);
+  const displayInitials = impersonatedUser
+    ? impersonatedUser.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()
+    : (userRole === 'architect' ? 'RC' : USER_INITIALS);
+  const displaySubtitle = impersonatedUser
+    ? impersonatedUser.role
+    : (userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]);
 
   return (
+    <>
     <ShadcnSidebar collapsible="none" className="h-full w-full">
       {collapsed ? (
         <>
@@ -219,15 +241,20 @@ export default function Sidebar({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="relative h-8 w-8"
                       aria-label="Account menu"
                       data-tour="profile"
                     >
-                      <Avatar className="h-7 w-7 rounded-md">
+                      <Avatar className={cn('h-7 w-7 rounded-md', impersonatedUser && 'ring-2 ring-amber-500')}>
                         <AvatarFallback className="rounded-md bg-muted text-[10px] font-medium text-muted-foreground">
-                          {USER_INITIALS}
+                          {displayInitials}
                         </AvatarFallback>
                       </Avatar>
+                      {impersonatedUser && (
+                        <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-amber-500 ring-2 ring-background">
+                          <VenetianMask className="h-2 w-2 text-white" />
+                        </span>
+                      )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -235,13 +262,18 @@ export default function Sidebar({
                     align="end"
                     className={cn(
                       theme,
-                      'w-56 p-1.5 rounded-xl shadow-xl backdrop-blur-md transition-all duration-200',
+                      'w-56 p-1.5 rounded-xl border-0 shadow-xl backdrop-blur-md transition-all duration-200',
                       isDark
                         ? 'bg-mitra-surface/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
                         : 'bg-card/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]'
                     )}
                   >
                     <DropdownMenuLabel className="text-xs font-semibold px-2.5 py-1.5 text-muted-foreground/80">Account</DropdownMenuLabel>
+                    {impersonatedUser && (
+                      <div className="mx-1 mb-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+                        <span className="font-semibold">Impersonating</span> {impersonatedUser.name}
+                      </div>
+                    )}
                     <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
                     <DropdownMenuItem
                       onClick={() => setActiveTab('settings')}
@@ -258,13 +290,43 @@ export default function Sidebar({
                       <span>Organizational settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setSwitchOrgModalOpen(true);
+                      }}
+                      className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+                    >
+                      <ArrowRightLeft className="h-4 w-4 opacity-70" />
+                      <span>Switch organization</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={onOpenTour}
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
                     >
                       <HelpCircle className="h-4 w-4 opacity-70" />
                       <span>Restart guide tour</span>
                     </DropdownMenuItem>
-
+                    <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
+                    {impersonatedUser ? (
+                      <DropdownMenuItem
+                        onClick={() => setImpersonatedUser(null)}
+                        className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors"
+                      >
+                        <VenetianMask className="h-4 w-4 opacity-80" />
+                        <span>Stop impersonating</span>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setImpersonateModalOpen(true);
+                        }}
+                        className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+                      >
+                        <VenetianMask className="h-4 w-4 opacity-70" />
+                        <span>Impersonate user</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
                     <DropdownMenuItem
                       className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
@@ -277,7 +339,9 @@ export default function Sidebar({
               </TooltipTrigger>
               <TooltipContent side="right">
                 <div className="flex flex-col gap-0.5">
-                  <span className="font-semibold">{USER_DISPLAY_NAME}</span>
+                  <span className="font-semibold">{displayName}</span>
+                  <span className="text-[10px] text-muted-foreground">{activeOrg.name}</span>
+                  {impersonatedUser && <span className="text-amber-500 text-[10px]">Impersonating</span>}
                 </div>
               </TooltipContent>
             </Tooltip>
@@ -443,20 +507,34 @@ export default function Sidebar({
               )}
               aria-label="Account menu"
             >
-              <Avatar className="h-8 w-8 shrink-0 rounded-full ring-1 ring-border/40">
+              <Avatar className={cn('h-9 w-9 shrink-0 rounded-full ring-1 ring-border/40', impersonatedUser && 'ring-2 ring-amber-500')}>
                 <AvatarFallback className="rounded-full bg-muted text-[10px] font-medium text-foreground">
-                  {userRole === 'architect' ? 'RC' : USER_INITIALS}
+                  {displayInitials}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[12px] font-semibold text-foreground">
-                  {userRole === 'architect' ? 'Ravi Chaurasia' : USER_DISPLAY_NAME}
+                  {displayName}
+                </div>
+                {impersonatedUser && (
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-amber-600 dark:text-amber-400">
+                      <VenetianMask className="h-2.5 w-2.5 shrink-0" />
+                      Impersonating
+                    </span>
+                  </div>
+                )}
+                <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
+                  <Building2 className="h-2.5 w-2.5 shrink-0 text-brand-green/70" />
+                  <span className="truncate font-medium text-brand-green">
+                    {activeOrg.name}
+                  </span>
                 </div>
                 <div className={cn(
                   'truncate text-[10px]',
                   isDark ? 'text-secondary-foreground' : 'text-muted-foreground',
                 )}>
-                  {userRole === 'architect' ? 'Technical Consultant' : ROLE_PROFILE_SUBTITLES[userRole]}
+                  {displaySubtitle}
                 </div>
               </div>
               <ChevronDown className={cn(
@@ -479,6 +557,11 @@ export default function Sidebar({
             )}
           >
             <DropdownMenuLabel className="text-xs font-semibold px-2.5 py-1.5 text-muted-foreground/80">Account</DropdownMenuLabel>
+            {impersonatedUser && (
+              <div className="mx-1 mb-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+                <span className="font-semibold">Impersonating</span> {impersonatedUser.name} ({impersonatedUser.email})
+              </div>
+            )}
             <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
             <DropdownMenuItem
               onClick={() => setActiveTab('settings')}
@@ -495,12 +578,43 @@ export default function Sidebar({
               <span>Organizational settings</span>
             </DropdownMenuItem>
             <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setSwitchOrgModalOpen(true);
+              }}
+              className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+            >
+              <ArrowRightLeft className="h-4 w-4 opacity-70" />
+              <span>Switch organization</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={onOpenTour}
               className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
             >
               <HelpCircle className="h-4 w-4 opacity-70" />
               <span>Restart guide tour</span>
             </DropdownMenuItem>
+            <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
+            {impersonatedUser ? (
+              <DropdownMenuItem
+                onClick={() => setImpersonatedUser(null)}
+                className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors"
+              >
+                <VenetianMask className="h-4 w-4 opacity-80" />
+                <span>Stop impersonating</span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setImpersonateModalOpen(true);
+                }}
+                className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 focus:bg-brand-green/10 focus:text-brand-green transition-colors"
+              >
+                <VenetianMask className="h-4 w-4 opacity-70" />
+                <span>Impersonate user</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
             <DropdownMenuItem
               className="cursor-pointer text-[13px] rounded-lg px-2.5 py-2 gap-2.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-colors"
@@ -514,5 +628,22 @@ export default function Sidebar({
         </>
       )}
     </ShadcnSidebar>
+    <ImpersonateUserModal
+      theme={theme}
+      isOpen={impersonateModalOpen}
+      members={INTERNAL_TEAM_MEMBERS}
+      currentImpersonation={impersonatedUser}
+      onClose={() => setImpersonateModalOpen(false)}
+      onImpersonate={setImpersonatedUser}
+    />
+    <SwitchOrganizationModal
+      theme={theme}
+      isOpen={switchOrgModalOpen}
+      organizations={DEMO_ORGANIZATIONS}
+      currentOrgId={activeOrgId}
+      onClose={() => setSwitchOrgModalOpen(false)}
+      onSwitch={(org: Organization) => setActiveOrgId(org.id)}
+    />
+    </>
   );
 }

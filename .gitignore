@@ -10,3 +10,4 @@ tsc-*.txt
 build-*.txt
 .env*
 !.env.example
+.aider*
