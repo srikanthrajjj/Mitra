@@ -155,6 +155,7 @@ export default function Sidebar({
   const [switchOrgModalOpen, setSwitchOrgModalOpen] = useState(false);
 
   const activeOrg = DEMO_ORGANIZATIONS.find((org) => org.id === activeOrgId) ?? DEMO_ORGANIZATIONS[0];
+  const isOrgSwitched = activeOrgId !== DEMO_ORGANIZATIONS[0].id;
 
   const displayName = impersonatedUser
     ? impersonatedUser.name
@@ -245,7 +246,7 @@ export default function Sidebar({
                       aria-label="Account menu"
                       data-tour="profile"
                     >
-                      <Avatar className={cn('h-7 w-7 rounded-md', impersonatedUser && 'ring-2 ring-amber-500')}>
+                      <Avatar className={cn('h-7 w-7 rounded-md', impersonatedUser && 'ring-2 ring-amber-500', isOrgSwitched && 'ring-2 ring-brand-green')}>
                         <AvatarFallback className="rounded-md bg-muted text-[10px] font-medium text-muted-foreground">
                           {displayInitials}
                         </AvatarFallback>
@@ -253,6 +254,11 @@ export default function Sidebar({
                       {impersonatedUser && (
                         <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-amber-500 ring-2 ring-background">
                           <VenetianMask className="h-2 w-2 text-white" />
+                        </span>
+                      )}
+                      {isOrgSwitched && (
+                        <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-brand-green ring-2 ring-background">
+                          <Building2 className="h-2 w-2 text-white" />
                         </span>
                       )}
                     </Button>
@@ -272,6 +278,11 @@ export default function Sidebar({
                     {impersonatedUser && (
                       <div className="mx-1 mb-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600 dark:text-amber-400">
                         <span className="font-semibold">Impersonating</span> {impersonatedUser.name}
+                      </div>
+                    )}
+                    {isOrgSwitched && (
+                      <div className="mx-1 mb-1.5 rounded-lg bg-brand-green/10 px-2.5 py-1.5 text-[11px] text-brand-green">
+                        <span className="font-semibold">Switched to</span> {activeOrg.name}
                       </div>
                     )}
                     <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
@@ -342,6 +353,7 @@ export default function Sidebar({
                   <span className="font-semibold">{displayName}</span>
                   <span className="text-[10px] text-muted-foreground">{activeOrg.name}</span>
                   {impersonatedUser && <span className="text-amber-500 text-[10px]">Impersonating</span>}
+                  {isOrgSwitched && <span className="text-brand-green text-[10px]">Switched org</span>}
                 </div>
               </TooltipContent>
             </Tooltip>
@@ -523,6 +535,12 @@ export default function Sidebar({
                       aria-label="Impersonating"
                     />
                   )}
+                  {isOrgSwitched && (
+                    <Building2
+                      className="h-[18px] w-[18px] shrink-0 text-brand-green"
+                      aria-label="Switched organization"
+                    />
+                  )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
                   <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
@@ -559,6 +577,11 @@ export default function Sidebar({
             {impersonatedUser && (
               <div className="mx-1 mb-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600 dark:text-amber-400">
                 <span className="font-semibold">Impersonating</span> {impersonatedUser.name} ({impersonatedUser.email})
+              </div>
+            )}
+            {isOrgSwitched && (
+              <div className="mx-1 mb-1.5 rounded-lg bg-brand-green/10 px-2.5 py-1.5 text-[11px] text-brand-green">
+                <span className="font-semibold">Switched to</span> {activeOrg.name}
               </div>
             )}
             <DropdownMenuSeparator className={isDark ? 'bg-mitra-border/40' : 'bg-muted'} />
