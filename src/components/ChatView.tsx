@@ -22,13 +22,13 @@ import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
 import { ComposerActingUserPill } from './ComposerActingUserPill';
+import { ComposerStatusHeader } from './ComposerStatusHeader';
+import { useOrgSession } from '../contexts/OrgSessionContext';
 import { NotificationBanner } from './NotificationBanner';
-import { ProdInstanceBanner } from './ProdInstanceBanner';
 import { ComposerAttachmentPreview } from './ComposerAttachmentPreview';
 import { useComposerAttachments } from '../hooks/useComposerAttachments';
 import {
   getServiceNowInstance,
-  instanceHostname,
   isProdInstance,
   loadSelectedInstanceId,
   persistSelectedInstanceId,
@@ -244,6 +244,7 @@ export default function ChatView({
   onNotificationsEnabled,
 }: ChatViewProps) {
   const isDark = isDarkTheme(theme);
+  const { isOrgSwitched } = useOrgSession();
   const [inputValue, setInputValue] = useState('');
   const [composerMode, setComposerMode] = useState<ComposerModeId>('plan');
   const [isFocused, setIsFocused] = useState(false);
@@ -963,12 +964,8 @@ export default function ChatView({
             inputId="tour-input-bar"
             isActive={isFocused || inputValue.trim().length > 0}
             attachedHeader={
-              isProdInstance(selectedInstance) && selectedInstance ? (
-                <ProdInstanceBanner
-                  isDark={isDark}
-                  instanceName={selectedInstance.name}
-                  hostname={instanceHostname(selectedInstance.url)}
-                />
+              isOrgSwitched || isProdInstance(selectedInstance) ? (
+                <ComposerStatusHeader isDark={isDark} instance={selectedInstance} />
               ) : undefined
             }
             cardClassName={`transition-colors duration-200 overflow-visible ${
