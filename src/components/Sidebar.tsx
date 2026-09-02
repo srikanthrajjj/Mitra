@@ -537,16 +537,19 @@ export default function Sidebar({
                   )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
+                  <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
+                    {activeOrg.name}
+                  </span>
                   <Building2 className={cn(
                     'h-3 w-3 shrink-0',
                     isDark ? 'text-brand-green' : 'text-emerald-900',
                   )} />
-                  <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
-                    {activeOrg.name}
-                  </span>
                   {isOrgSwitched && (
                     <ArrowRightLeft
-                      className="h-3 w-3 shrink-0 text-amber-500"
+                      className={cn(
+                        'h-3 w-3 shrink-0',
+                        isDark ? 'text-brand-green' : 'text-emerald-900',
+                      )}
                       aria-label="Switched organization"
                     />
                   )}
