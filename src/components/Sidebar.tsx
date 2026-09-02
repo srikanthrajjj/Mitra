@@ -535,17 +535,21 @@ export default function Sidebar({
                       aria-label="Impersonating"
                     />
                   )}
-                  {isOrgSwitched && (
-                    <Building2
-                      className="h-[18px] w-[18px] shrink-0 text-brand-green"
-                      aria-label="Switched organization"
-                    />
-                  )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
+                  <Building2 className={cn(
+                    'h-3 w-3 shrink-0',
+                    isDark ? 'text-brand-green' : 'text-emerald-900',
+                  )} />
                   <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
                     {activeOrg.name}
                   </span>
+                  {isOrgSwitched && (
+                    <ArrowRightLeft
+                      className="h-3 w-3 shrink-0 text-amber-500"
+                      aria-label="Switched organization"
+                    />
+                  )}
                 </div>
                 <div className={cn(
                   'truncate text-[10px]',
