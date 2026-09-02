@@ -9,6 +9,7 @@ import HomeActionCards from './HomeActionCards';
 import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
+import { ComposerActingUserPill } from './ComposerActingUserPill';
 import { NotificationBanner } from './NotificationBanner';
 import { ProdInstanceBanner } from './ProdInstanceBanner';
 import { ComposerAttachmentPreview } from './ComposerAttachmentPreview';
@@ -304,6 +305,7 @@ export default function HomeView({
                       value={composerMode}
                       onChange={setComposerMode}
                     />
+                    <ComposerActingUserPill theme={theme} />
                   </div>
 
                   <div className="flex items-center gap-1">

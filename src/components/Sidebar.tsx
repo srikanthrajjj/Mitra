@@ -11,6 +11,7 @@ import { USER_DISPLAY_NAME, USER_INITIALS } from '../constants/user';
 import { ROLE_PROFILE_SUBTITLES } from '../constants/role';
 import { INTERNAL_TEAM_MEMBERS, InternalTeamMember } from '../data/internalTeamMembers';
 import { DEMO_ORGANIZATIONS, Organization } from '../data/orgSettings';
+import { useOrgSession } from '../contexts/OrgSessionContext';
 import ImpersonateUserModal from './ImpersonateUserModal';
 import SwitchOrganizationModal from './SwitchOrganizationModal';
 import { RoleSwitcher } from './RoleSwitcher';
@@ -149,13 +150,16 @@ export default function Sidebar({
 }: SidebarProps) {
   const isDark = isDarkTheme(theme);
   const navLogoAnimated = useNavLogoPulse();
-  const [impersonatedUser, setImpersonatedUser] = useState<InternalTeamMember | null>(null);
   const [impersonateModalOpen, setImpersonateModalOpen] = useState(false);
-  const [activeOrgId, setActiveOrgId] = useState<string>(DEMO_ORGANIZATIONS[0].id);
   const [switchOrgModalOpen, setSwitchOrgModalOpen] = useState(false);
-
-  const activeOrg = DEMO_ORGANIZATIONS.find((org) => org.id === activeOrgId) ?? DEMO_ORGANIZATIONS[0];
-  const isOrgSwitched = activeOrgId !== DEMO_ORGANIZATIONS[0].id;
+  const {
+    impersonatedUser,
+    setImpersonatedUser,
+    activeOrgId,
+    setActiveOrgId,
+    activeOrg,
+    isOrgSwitched,
+  } = useOrgSession();
 
   const displayName = impersonatedUser
     ? impersonatedUser.name

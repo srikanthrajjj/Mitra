@@ -21,6 +21,7 @@ import StructuredMarkdown from './StructuredMarkdown';
 import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
+import { ComposerActingUserPill } from './ComposerActingUserPill';
 import { NotificationBanner } from './NotificationBanner';
 import { ProdInstanceBanner } from './ProdInstanceBanner';
 import { ComposerAttachmentPreview } from './ComposerAttachmentPreview';
@@ -1037,6 +1038,7 @@ export default function ChatView({
                   onChange={setComposerMode}
                   disabled={isGeneratingMessage}
                 />
+                <ComposerActingUserPill theme={theme} />
               </div>
 
               <div className="flex items-center gap-2">
