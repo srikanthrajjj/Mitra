@@ -3,7 +3,6 @@ import {
   Star,
   MoreVertical,
   ChevronDown,
-  Tag,
   Share2,
   X,
 } from 'lucide-react';
@@ -96,6 +95,9 @@ function AnimatedSidebarNavIcon({
 
   return <Icon ref={iconRef} size={16} className={className} />;
 }
+
+/** Tags shown inline under a conversation name before collapsing into a +N. */
+const MAX_INLINE_TAGS = 2;
 
 /** Tag-cloud pill size tier — more usages, larger text. */
 function tagSizeClass(count: number): string {
@@ -234,21 +236,51 @@ export function ArchitectSidebar({
           />
         ) : (
           <>
-            <div className="flex min-w-0 flex-1 items-center gap-1.5">
-              <ConversationStatusDot status={conversationStatus} />
-              <span className="truncate text-left">{sol.name}</span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <ConversationStatusDot status={conversationStatus} />
+                <span className="truncate text-left">{sol.name}</span>
+              </div>
+
+              {sol.tags && sol.tags.length > 0 && (
+                <div className="flex min-w-0 flex-wrap items-center gap-1 pl-[13px]">
+                  {sol.tags.slice(0, MAX_INLINE_TAGS).map((tag) => {
+                    const isActiveTag = activeTagFilter === tag;
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        title={`Filter by ${tag}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTagFilter((current) => (current === tag ? null : tag));
+                        }}
+                        className={cn(
+                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[9.5px] font-medium leading-tight transition-colors',
+                          isActiveTag
+                            ? 'border-brand-green/30 bg-brand-green/15 text-brand-green'
+                            : isDark
+                              ? 'border-white/[0.07] bg-mitra-surface text-muted-foreground hover:text-foreground'
+                              : 'border-border/70 bg-muted text-muted-foreground hover:text-foreground',
+                        )}
+                      >
+                        <span className="truncate">{tag}</span>
+                      </button>
+                    );
+                  })}
+                  {sol.tags.length > MAX_INLINE_TAGS && (
+                    <span
+                      title={sol.tags.join(', ')}
+                      className="text-[9.5px] font-medium leading-tight text-muted-foreground/70"
+                    >
+                      +{sol.tags.length - MAX_INLINE_TAGS}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-0.5 shrink-0">
-              {sol.tags && sol.tags.length > 0 && (
-                <span
-                  title={sol.tags.join(', ')}
-                  className="flex items-center p-0.5 text-brand-green/70"
-                >
-                  <Tag className="h-3 w-3" />
-                </span>
-              )}
-
+            <div className="flex shrink-0 items-center gap-0.5 self-start">
               {getCollaboratorsForSolution(projectCollaborators, sol.id).length > 0 && (
                 <span
                   title={`Shared with ${getCollaboratorsForSolution(projectCollaborators, sol.id)
