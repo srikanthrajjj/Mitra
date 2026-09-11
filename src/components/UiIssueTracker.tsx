@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
@@ -28,6 +28,8 @@ type StatusAction = 'resolve' | 'approve';
 type NamePromptTarget = { action: StatusAction; issueId: string } | { action: 'change' };
 
 type ViewMode = 'list' | 'grid';
+
+type Screen = 'open' | 'review' | 'resolved';
 
 const STORAGE_KEY = 'mitra-ui-audit-v1';
 const NO_REFERENCE = 'No reference added';
@@ -103,6 +105,13 @@ function getReferenceUrl(reference: string) {
   if (/^https?:\/\//i.test(reference)) return reference;
   if (/^www\./i.test(reference)) return `https://${reference}`;
   return null;
+}
+
+// The review and resolved screens live at #review / #resolved so back/refresh keep you in place.
+function screenFromHash(): Screen {
+  if (typeof window === 'undefined') return 'open';
+  const hash = window.location.hash.replace('#', '');
+  return hash === 'review' || hash === 'resolved' ? hash : 'open';
 }
 
 const referencePillClass =
@@ -195,6 +204,8 @@ export function UiIssueTracker() {
   });
   const [namePrompt, setNamePrompt] = useState<NamePromptTarget | null>(null);
   const [nameDraft, setNameDraft] = useState('');
+  const [screen, setScreen] = useState<Screen>(screenFromHash);
+  const [notice, setNotice] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try {
       return localStorage.getItem(VIEW_MODE_KEY) === 'grid' ? 'grid' : 'list';
@@ -210,6 +221,22 @@ export function UiIssueTracker() {
       // Layout preference only; ignore storage failures.
     }
   }, [viewMode]);
+
+  useEffect(() => {
+    const syncScreen = () => setScreen(screenFromHash());
+    window.addEventListener('popstate', syncScreen);
+    window.addEventListener('hashchange', syncScreen);
+    return () => {
+      window.removeEventListener('popstate', syncScreen);
+      window.removeEventListener('hashchange', syncScreen);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   useEffect(() => {
     try {
@@ -315,12 +342,21 @@ export function UiIssueTracker() {
     setIssues((current) => current.map((item) => (item.id === issueId ? { ...item, ...changes } : item)));
   };
 
+  const openScreen = (next: Screen) => {
+    setScreen(next);
+    const url = next === 'open' ? `${window.location.pathname}${window.location.search}` : `#${next}`;
+    window.history.pushState(null, '', url);
+  };
+
   const applyStatusAction = (issueId: string, action: StatusAction, actor: string) => {
     const now = new Date().toISOString();
+    const issueName = issues.find((item) => item.id === issueId)?.name ?? 'Issue';
     if (action === 'resolve') {
       updateIssue(issueId, { status: 'review', resolvedBy: actor, resolvedAt: now, approvedBy: null, approvedAt: null });
+      setNotice(`"${issueName}" moved to Waiting for stakeholder review`);
     } else {
       updateIssue(issueId, { status: 'resolved', approvedBy: actor, approvedAt: now });
+      setNotice(`"${issueName}" moved to Resolved`);
     }
   };
 
@@ -336,6 +372,7 @@ export function UiIssueTracker() {
 
   const reopenIssue = (issue: UiIssue) => {
     updateIssue(issue.id, { status: 'open', resolvedBy: null, resolvedAt: null, approvedBy: null, approvedAt: null });
+    setNotice(`"${issue.name}" moved back to Open issues`);
   };
 
   const handleConfirmName = () => {
@@ -588,11 +625,17 @@ export function UiIssueTracker() {
     </div>
   );
 
-  const issueSections = [
-    { key: 'open', title: 'Open issues', items: openIssues, empty: 'No open issues.' },
-    { key: 'review', title: 'Waiting for stakeholder review', items: reviewIssues, empty: 'Nothing is waiting for review.' },
-    { key: 'resolved', title: 'Resolved', items: resolvedIssues, empty: 'Nothing resolved yet.' },
-  ];
+  const screenSections: Record<Screen, { title: string; items: UiIssue[]; empty: string }> = {
+    open: { title: 'Open issues', items: openIssues, empty: 'No open issues.' },
+    review: { title: 'Waiting for stakeholder review', items: reviewIssues, empty: 'Nothing is waiting for review.' },
+    resolved: { title: 'Resolved', items: resolvedIssues, empty: 'Nothing resolved yet.' },
+  };
+  const currentSection = screenSections[screen];
+
+  const screenButtons = [
+    { target: 'review', label: 'Waiting for review', count: reviewIssues.length, Icon: Clock },
+    { target: 'resolved', label: 'Resolved', count: resolvedIssues.length, Icon: CheckCircle2 },
+  ] as const;
 
   const stats = [
     { label: 'Total', value: issues.length },
@@ -608,13 +651,47 @@ export function UiIssueTracker() {
       <div className="w-full">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
+            {screen !== 'open' ? (
+              <button
+                type="button"
+                onClick={() => openScreen('open')}
+                className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to open issues
+              </button>
+            ) : null}
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
               UI audit
             </p>
-            <h1 className="mt-2 text-3xl font-semibold">Issue list</h1>
+            <h1 className="mt-2 text-3xl font-semibold">{screen === 'open' ? 'Issue list' : currentSection.title}</h1>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {screenButtons.map(({ target, label, count, Icon }) => (
+              <button
+                key={target}
+                type="button"
+                aria-pressed={screen === target}
+                onClick={() => openScreen(screen === target ? 'open' : target)}
+                className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                  screen === target
+                    ? 'border-[#030d0a] bg-[#030d0a] text-white'
+                    : 'border-border bg-card text-[#030d0a] hover:border-[#030d0a]/40'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    screen === target ? 'bg-white/15 text-white' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            ))}
+
             <div role="group" aria-label="Issue layout" className="inline-flex rounded-xl border border-border bg-card p-1">
               {(
                 [
@@ -658,41 +735,41 @@ export function UiIssueTracker() {
           </div>
         ) : null}
 
-        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{stat.label}</p>
-              <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="w-full space-y-8">
-          {issueSections.map((section) => (
-            <section key={section.key}>
-              <div className="mb-3 flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  {section.items.length}
-                </span>
+        {screen === 'open' ? (
+          <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label} className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{stat.label}</p>
+                <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
               </div>
+            ))}
+          </div>
+        ) : null}
 
-              {section.items.length > 0 ? (
-                viewMode === 'grid' ? (
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {section.items.map(renderIssueCard)}
-                  </div>
-                ) : (
-                  <div className="space-y-3">{section.items.map(renderIssueRow)}</div>
-                )
-              ) : (
-                <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                  {section.empty}
-                </p>
-              )}
-            </section>
-          ))}
-        </div>
+        <section className="w-full">
+          {screen === 'open' ? (
+            <div className="mb-3 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-foreground">{currentSection.title}</h2>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                {currentSection.items.length}
+              </span>
+            </div>
+          ) : null}
+
+          {currentSection.items.length > 0 ? (
+            viewMode === 'grid' ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {currentSection.items.map(renderIssueCard)}
+              </div>
+            ) : (
+              <div className="space-y-3">{currentSection.items.map(renderIssueRow)}</div>
+            )
+          ) : (
+            <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+              {currentSection.empty}
+            </p>
+          )}
+        </section>
       </div>
 
       {isModalOpen ? (
@@ -1002,6 +1079,15 @@ export function UiIssueTracker() {
               </button>
             </div>
           </form>
+        </div>
+      ) : null}
+
+      {notice ? (
+        <div
+          role="status"
+          className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-full bg-[#030d0a] px-4 py-2 text-sm font-medium text-white shadow-lg"
+        >
+          {notice}
         </div>
       ) : null}
     </div>
