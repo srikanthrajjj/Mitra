@@ -74,6 +74,15 @@ function normalizeIssue(value: Partial<UiIssue> & { title?: string; status?: str
   };
 }
 
+function getReferenceUrl(reference: string) {
+  if (/^https?:\/\//i.test(reference)) return reference;
+  if (/^www\./i.test(reference)) return `https://${reference}`;
+  return null;
+}
+
+const referencePillClass =
+  'inline-flex w-fit items-center rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-[#030d0a] hover:border-[#030d0a]/40';
+
 const issueTypes: { value: IssueType; label: string }[] = [
   { value: 'Improvement', label: 'Improvement' },
   { value: 'Bug', label: 'Bug' },
@@ -116,6 +125,7 @@ export function UiIssueTracker() {
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -164,6 +174,12 @@ export function UiIssueTracker() {
   };
 
   const handleImagePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    // Pasting a link copied from a browser can also carry an image; let the text land in the field.
+    const target = event.target;
+    const isTextField =
+      (target instanceof HTMLInputElement && target.type !== 'file') || target instanceof HTMLTextAreaElement;
+    if (isTextField && event.clipboardData.getData('text/plain').trim()) return;
+
     const imageItem = Array.from(event.clipboardData.items).find((item) => item.type.startsWith('image/'));
     const file = imageItem?.getAsFile();
     if (file) {
@@ -296,7 +312,14 @@ export function UiIssueTracker() {
                   <div>
                     <div className="flex items-center gap-3">
                       {issue.image ? (
-                        <img src={issue.image} alt="" className="h-10 w-10 rounded-lg border border-border object-cover" />
+                        <button
+                          type="button"
+                          aria-label={`View screenshot for ${issue.name}`}
+                          onClick={() => setPreviewImage(issue.image ?? null)}
+                          className="shrink-0"
+                        >
+                          <img src={issue.image} alt="" className="h-10 w-10 rounded-lg border border-border object-cover" />
+                        </button>
                       ) : null}
                       <div className="text-sm font-semibold text-foreground">{issue.name}</div>
                     </div>
@@ -312,17 +335,23 @@ export function UiIssueTracker() {
                   <p className="text-sm leading-6 text-muted-foreground">{issue.description}</p>
 
                   <div className="text-sm">
-                    {issue.reference.startsWith('http') ? (
+                    {getReferenceUrl(issue.reference) ? (
                       <a
-                        href={issue.reference}
+                        href={getReferenceUrl(issue.reference) ?? undefined}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex rounded-lg border border-border bg-muted px-2.5 py-1.5 text-xs font-medium text-brand-green hover:border-brand-green/40"
+                        className={referencePillClass}
                       >
-                        View ref
+                        View reference
                       </a>
+                    ) : issue.image ? (
+                      <button type="button" onClick={() => setPreviewImage(issue.image ?? null)} className={referencePillClass}>
+                        View reference
+                      </button>
+                    ) : issue.reference !== NO_REFERENCE ? (
+                      <span className={referencePillClass}>{issue.reference}</span>
                     ) : (
-                      <span className="text-muted-foreground">{issue.reference}</span>
+                      <span className="text-muted-foreground">{NO_REFERENCE}</span>
                     )}
                   </div>
 
@@ -514,6 +543,26 @@ export function UiIssueTracker() {
                 {editingIssueId ? 'Save changes' : 'Save issue'}
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {previewImage ? (
+        <div
+          role="dialog"
+          aria-label="Screenshot preview"
+          onClick={() => setPreviewImage(null)}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+        >
+          <div className="relative max-w-5xl" onClick={(event) => event.stopPropagation()}>
+            <img src={previewImage} alt="Screenshot reference" className="max-h-[85vh] w-auto rounded-2xl border border-border bg-card object-contain" />
+            <button
+              type="button"
+              onClick={() => setPreviewImage(null)}
+              className="absolute right-3 top-3 rounded-xl border border-border bg-card px-3 py-2 text-sm text-[#030d0a] hover:bg-muted"
+            >
+              Close
+            </button>
           </div>
         </div>
       ) : null}
