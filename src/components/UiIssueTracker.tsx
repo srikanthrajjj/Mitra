@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { CheckCircle2, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
@@ -18,10 +18,13 @@ type UiIssue = {
 
 type NamePromptTarget = { kind: 'issue'; issueId: string } | { kind: 'form' };
 
+type ViewMode = 'list' | 'grid';
+
 const STORAGE_KEY = 'mitra-ui-audit-v1';
 const NO_REFERENCE = 'No reference added';
 const MAX_IMAGE_DIMENSION = 1280;
 const USER_NAME_KEY = 'mitra-ui-audit-user';
+const VIEW_MODE_KEY = 'mitra-ui-audit-view';
 
 const emptyForm = {
   name: '',
@@ -144,6 +147,21 @@ export function UiIssueTracker() {
   });
   const [namePrompt, setNamePrompt] = useState<NamePromptTarget | null>(null);
   const [nameDraft, setNameDraft] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    try {
+      return localStorage.getItem(VIEW_MODE_KEY) === 'grid' ? 'grid' : 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, viewMode);
+    } catch {
+      // Layout preference only; ignore storage failures.
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     try {
@@ -356,6 +374,79 @@ export function UiIssueTracker() {
   const openIssues = issues.filter((issue) => !issue.resolved);
   const resolvedIssues = issues.filter((issue) => issue.resolved);
 
+  const renderIssueActions = (issue: UiIssue, className = '') => (
+    <div className={`flex items-center gap-3 ${className}`}>
+      <button
+        type="button"
+        onClick={() => {
+          setOpenMenuIssueId(null);
+          setViewingIssueId(issue.id);
+        }}
+        className={referencePillClass}
+      >
+        View issue
+      </button>
+
+      <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={issue.resolved}
+          onChange={() => toggleResolved(issue)}
+          className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
+        />
+        Resolved
+      </label>
+
+      <div className="relative">
+        <button
+          type="button"
+          aria-label={`Actions for ${issue.name}`}
+          aria-expanded={openMenuIssueId === issue.id}
+          onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
+          className="rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground"
+        >
+          <MoreVertical className="h-4 w-4" />
+        </button>
+
+        {openMenuIssueId === issue.id ? (
+          <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
+            <button
+              type="button"
+              onClick={() => handleEditIssue(issue)}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDeleteIssue(issue)}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-300"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const renderResolvedStrip = (issue: UiIssue) =>
+    issue.resolved ? (
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+        <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
+        {issue.resolvedBy ? (
+          <span>
+            Resolved by <span className="font-semibold text-foreground">{issue.resolvedBy}</span>
+          </span>
+        ) : (
+          <span>Resolved before names were tracked</span>
+        )}
+        {issue.resolvedAt ? <span>· {new Date(issue.resolvedAt).toLocaleString()}</span> : null}
+      </div>
+    ) : null;
+
   const renderIssueRow = (issue: UiIssue) => (
     <div key={issue.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
       <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
@@ -386,76 +477,41 @@ export function UiIssueTracker() {
 
         <div className="text-sm">{renderReference(issue)}</div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setOpenMenuIssueId(null);
-              setViewingIssueId(issue.id);
-            }}
-            className={referencePillClass}
-          >
-            View issue
-          </button>
-
-          <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={issue.resolved}
-              onChange={() => toggleResolved(issue)}
-              className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
-            />
-            Resolved
-          </label>
-
-          <div className="relative">
-            <button
-              type="button"
-              aria-label={`Actions for ${issue.name}`}
-              aria-expanded={openMenuIssueId === issue.id}
-              onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
-              className="rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground"
-            >
-              <MoreVertical className="h-4 w-4" />
-            </button>
-
-            {openMenuIssueId === issue.id ? (
-              <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => handleEditIssue(issue)}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteIssue(issue)}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-300"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Delete
-                </button>
-              </div>
-            ) : null}
-          </div>
-        </div>
+        {renderIssueActions(issue)}
       </div>
 
-      {issue.resolved ? (
-        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
-          <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
-          {issue.resolvedBy ? (
-            <span>
-              Resolved by <span className="font-semibold text-foreground">{issue.resolvedBy}</span>
-            </span>
-          ) : (
-            <span>Resolved before names were tracked</span>
-          )}
-          {issue.resolvedAt ? <span>· {new Date(issue.resolvedAt).toLocaleString()}</span> : null}
-        </div>
+      {renderResolvedStrip(issue)}
+    </div>
+  );
+
+  const renderIssueCard = (issue: UiIssue) => (
+    <div key={issue.id} className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm">
+      {issue.image ? (
+        <button
+          type="button"
+          aria-label={`View screenshot for ${issue.name}`}
+          onClick={() => setPreviewImage(issue.image ?? null)}
+          className="mb-3 block"
+        >
+          <img src={issue.image} alt="" className="h-36 w-full rounded-xl border border-border bg-muted object-cover" />
+        </button>
       ) : null}
+
+      <div className="flex items-center justify-between gap-2">
+        <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
+          {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
+        </span>
+        <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+          {new Date(issue.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+
+      <div className="mt-3 text-sm font-semibold text-foreground">{issue.name}</div>
+      <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">{issue.description}</p>
+      <div className="mt-3 text-sm">{renderReference(issue)}</div>
+
+      <div className="mt-auto pt-4">{renderIssueActions(issue, 'flex-wrap justify-between')}</div>
+      {renderResolvedStrip(issue)}
     </div>
   );
 
@@ -475,18 +531,42 @@ export function UiIssueTracker() {
             <h1 className="mt-2 text-3xl font-semibold">Issue list</h1>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setEditingIssueId(null);
-              setForm(emptyForm);
-              setFormError(null);
-              setIsModalOpen(true);
-            }}
-            className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] transition hover:bg-brand-green-hover"
-          >
-            Log a new issue
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div role="group" aria-label="Issue layout" className="inline-flex rounded-xl border border-border bg-card p-1">
+              {(
+                [
+                  { mode: 'list', label: 'List', Icon: List },
+                  { mode: 'grid', label: 'Grid', Icon: LayoutGrid },
+                ] as const
+              ).map(({ mode, label, Icon }) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={viewMode === mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                    viewMode === mode ? 'bg-[#030d0a] text-white' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEditingIssueId(null);
+                setForm(emptyForm);
+                setFormError(null);
+                setIsModalOpen(true);
+              }}
+              className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] transition hover:bg-brand-green-hover"
+            >
+              Log a new issue
+            </button>
+          </div>
         </div>
 
         {storageError ? (
@@ -521,7 +601,13 @@ export function UiIssueTracker() {
               </div>
 
               {section.items.length > 0 ? (
-                <div className="space-y-3">{section.items.map(renderIssueRow)}</div>
+                viewMode === 'grid' ? (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {section.items.map(renderIssueCard)}
+                  </div>
+                ) : (
+                  <div className="space-y-3">{section.items.map(renderIssueRow)}</div>
+                )
               ) : (
                 <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
                   {section.empty}
