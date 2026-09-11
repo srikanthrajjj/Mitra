@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
@@ -108,6 +109,8 @@ export function UiIssueTracker() {
     return defaultIssues;
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingIssueId, setEditingIssueId] = useState<string | null>(null);
+  const [openMenuIssueId, setOpenMenuIssueId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -148,20 +151,58 @@ export function UiIssueTracker() {
       return;
     }
 
-    const nextIssue: UiIssue = {
-      id: `audit-${Date.now()}`,
-      name,
-      type: form.type,
-      description,
-      reference,
-      image: form.image,
-      resolved: form.resolved,
-      createdAt: new Date().toISOString(),
-    };
+    setIssues((current) => {
+      if (editingIssueId) {
+        return current.map((issue) =>
+          issue.id === editingIssueId
+            ? { ...issue, name, type: form.type, description, reference, image: form.image, resolved: form.resolved }
+            : issue,
+        );
+      }
 
-    setIssues((current) => [nextIssue, ...current]);
+      return [
+        {
+          id: `audit-${Date.now()}`,
+          name,
+          type: form.type,
+          description,
+          reference,
+          image: form.image,
+          resolved: form.resolved,
+          createdAt: new Date().toISOString(),
+        },
+        ...current,
+      ];
+    });
+    setEditingIssueId(null);
     setForm(emptyForm);
     setIsModalOpen(false);
+  };
+
+  const handleEditIssue = (issue: UiIssue) => {
+    setEditingIssueId(issue.id);
+    setForm({
+      name: issue.name,
+      type: issue.type,
+      description: issue.description,
+      reference: issue.reference,
+      image: issue.image ?? null,
+      resolved: issue.resolved,
+    });
+    setOpenMenuIssueId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteIssue = (issue: UiIssue) => {
+    if (!window.confirm(`Delete "${issue.name}"?`)) return;
+    setIssues((current) => current.filter((item) => item.id !== issue.id));
+    setOpenMenuIssueId(null);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingIssueId(null);
+    setForm(emptyForm);
   };
 
   return (
@@ -177,7 +218,11 @@ export function UiIssueTracker() {
 
           <button
             type="button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingIssueId(null);
+              setForm(emptyForm);
+              setIsModalOpen(true);
+            }}
             className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] transition hover:bg-brand-green-hover"
           >
             Log a new issue
@@ -256,6 +301,39 @@ export function UiIssueTracker() {
                       />
                       Resolved
                     </label>
+
+                    <div className="relative">
+                      <button
+                        type="button"
+                        aria-label={`Actions for ${issue.name}`}
+                        aria-expanded={openMenuIssueId === issue.id}
+                        onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
+                        className="rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+
+                      {openMenuIssueId === issue.id ? (
+                        <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
+                          <button
+                            type="button"
+                            onClick={() => handleEditIssue(issue)}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteIssue(issue)}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-300"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -272,12 +350,16 @@ export function UiIssueTracker() {
           >
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">New issue</p>
-                <h3 className="mt-2 text-2xl font-semibold text-foreground">Log a new issue</h3>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  {editingIssueId ? 'Edit issue' : 'New issue'}
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold text-foreground">
+                  {editingIssueId ? 'Edit issue' : 'Log a new issue'}
+                </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleCloseModal}
                 className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground hover:bg-background"
               >
                 Close
@@ -367,7 +449,7 @@ export function UiIssueTracker() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleCloseModal}
                 className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-background"
               >
                 Cancel
@@ -377,7 +459,7 @@ export function UiIssueTracker() {
                 onClick={handleSubmitIssue}
                 className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover"
               >
-                Save issue
+                {editingIssueId ? 'Save changes' : 'Save issue'}
               </button>
             </div>
           </div>
