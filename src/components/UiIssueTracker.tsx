@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
+
+type IssueStatus = 'open' | 'review' | 'resolved';
 
 type UiIssue = {
   id: string;
@@ -10,13 +12,20 @@ type UiIssue = {
   description: string;
   reference: string;
   image?: string | null;
-  resolved: boolean;
+  status: IssueStatus;
   resolvedBy?: string | null;
   resolvedAt?: string | null;
+  approvedBy?: string | null;
+  approvedAt?: string | null;
   createdAt: string;
 };
 
-type NamePromptTarget = { kind: 'issue'; issueId: string } | { kind: 'form' };
+// Older saves used `resolved: boolean` (and earlier still, `title` / `status: 'Resolved'`).
+type StoredIssue = Omit<Partial<UiIssue>, 'status'> & { title?: string; status?: string; resolved?: boolean };
+
+type StatusAction = 'resolve' | 'approve';
+
+type NamePromptTarget = { action: StatusAction; issueId: string } | { action: 'change' };
 
 type ViewMode = 'list' | 'grid';
 
@@ -32,7 +41,6 @@ const emptyForm = {
   description: '',
   reference: '',
   image: null as string | null,
-  resolved: false,
 };
 
 const defaultIssues: UiIssue[] = [
@@ -43,7 +51,7 @@ const defaultIssues: UiIssue[] = [
     description: 'The CTA section feels too crowded on tablet layout and needs tighter spacing.',
     reference: 'https://example.com/checkout',
     image: null,
-    resolved: false,
+    status: 'open',
     createdAt: new Date().toISOString(),
   },
   {
@@ -53,12 +61,12 @@ const defaultIssues: UiIssue[] = [
     description: 'Primary action is hard to read on dark surfaces and needs stronger contrast.',
     reference: 'dark-mode-review',
     image: null,
-    resolved: true,
+    status: 'resolved',
     createdAt: new Date().toISOString(),
   },
 ];
 
-function normalizeIssue(value: Partial<UiIssue> & { title?: string; status?: string; image?: string | null }): UiIssue | null {
+function normalizeIssue(value: StoredIssue): UiIssue | null {
   const name = typeof value.name === 'string' ? value.name : value.title;
   const description = typeof value.description === 'string' ? value.description : '';
 
@@ -71,15 +79,22 @@ function normalizeIssue(value: Partial<UiIssue> & { title?: string; status?: str
     name,
     type: value.type === 'Improvement' || value.type === 'Bug' || value.type === 'Accessibility' || value.type === 'UI' || value.type === 'UX'
       ? value.type
-      : value.type === 'Content' || value.type === 'Flow'
+      : (value.type as string | undefined) === 'Content' || (value.type as string | undefined) === 'Flow'
         ? 'Improvement'
         : 'UI',
     description,
     reference: typeof value.reference === 'string' && value.reference ? value.reference : NO_REFERENCE,
     image: typeof value.image === 'string' ? value.image : null,
-    resolved: typeof value.resolved === 'boolean' ? value.resolved : value.status === 'Resolved',
+    status:
+      value.status === 'open' || value.status === 'review' || value.status === 'resolved'
+        ? value.status
+        : value.resolved === true || value.status === 'Resolved'
+          ? 'resolved'
+          : 'open',
     resolvedBy: typeof value.resolvedBy === 'string' ? value.resolvedBy : null,
     resolvedAt: typeof value.resolvedAt === 'string' ? value.resolvedAt : null,
+    approvedBy: typeof value.approvedBy === 'string' ? value.approvedBy : null,
+    approvedAt: typeof value.approvedAt === 'string' ? value.approvedAt : null,
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
   };
 }
@@ -109,6 +124,39 @@ const typeStyles: Record<IssueType, string> = {
   UX: 'bg-muted text-foreground',
 };
 
+const statusLabels: Record<IssueStatus, string> = {
+  open: 'Open',
+  review: 'Waiting for stakeholder review',
+  resolved: 'Resolved',
+};
+
+const statusStyles: Record<IssueStatus, string> = {
+  open: 'bg-muted text-foreground',
+  review: 'bg-yellow-500/10 text-yellow-700',
+  resolved: 'bg-brand-green/10 text-brand-green',
+};
+
+const namePromptCopy: Record<NamePromptTarget['action'], { eyebrow: string; title: string; body: string; submit: string }> = {
+  resolve: {
+    eyebrow: 'Mark as resolved',
+    title: "What's your name?",
+    body: "It's added to issues you mark as resolved or approve. We'll remember it in this browser, so you're only asked once.",
+    submit: 'Mark as resolved',
+  },
+  approve: {
+    eyebrow: 'Stakeholder review',
+    title: "What's your name?",
+    body: "It's added to issues you mark as resolved or approve. We'll remember it in this browser, so you're only asked once.",
+    submit: 'Approve',
+  },
+  change: {
+    eyebrow: 'Your name',
+    title: 'Change your name',
+    body: 'Used for issues you mark as resolved or approve from now on.',
+    submit: 'Save name',
+  },
+};
+
 export function UiIssueTracker() {
   const [issues, setIssues] = useState<UiIssue[]>(() => {
     try {
@@ -117,7 +165,7 @@ export function UiIssueTracker() {
         const parsed = JSON.parse(saved) as unknown;
         if (Array.isArray(parsed)) {
           const normalized = parsed
-            .map((issue) => (issue && typeof issue === 'object' ? normalizeIssue(issue as Partial<UiIssue> & { title?: string; status?: string; image?: string | null }) : null))
+            .map((issue) => (issue && typeof issue === 'object' ? normalizeIssue(issue as StoredIssue) : null))
             .filter((issue): issue is UiIssue => issue !== null);
           if (normalized.length > 0) {
             return normalized;
@@ -224,14 +272,6 @@ export function UiIssueTracker() {
     }
   };
 
-  const resolutionFor = (existing: UiIssue | null, resolved: boolean) => {
-    if (!resolved) return { resolved: false, resolvedBy: null, resolvedAt: null };
-    if (existing?.resolved) {
-      return { resolved: true, resolvedBy: existing.resolvedBy ?? null, resolvedAt: existing.resolvedAt ?? null };
-    }
-    return { resolved: true, resolvedBy: userName || null, resolvedAt: new Date().toISOString() };
-  };
-
   const handleSubmitIssue = () => {
     const name = form.name.trim();
     const description = form.description.trim();
@@ -246,15 +286,7 @@ export function UiIssueTracker() {
       if (editingIssueId) {
         return current.map((issue) =>
           issue.id === editingIssueId
-            ? {
-                ...issue,
-                name,
-                type: form.type,
-                description,
-                reference,
-                image: form.image,
-                ...resolutionFor(issue, form.resolved),
-              }
+            ? { ...issue, name, type: form.type, description, reference, image: form.image }
             : issue,
         );
       }
@@ -267,7 +299,7 @@ export function UiIssueTracker() {
           description,
           reference,
           image: form.image,
-          ...resolutionFor(null, form.resolved),
+          status: 'open',
           createdAt: new Date().toISOString(),
         },
         ...current,
@@ -279,29 +311,31 @@ export function UiIssueTracker() {
     setIsModalOpen(false);
   };
 
-  const setIssueResolved = (issueId: string, resolved: boolean, resolver: string) => {
-    setIssues((current) =>
-      current.map((item) =>
-        item.id === issueId
-          ? {
-              ...item,
-              resolved,
-              resolvedBy: resolved ? resolver : null,
-              resolvedAt: resolved ? new Date().toISOString() : null,
-            }
-          : item,
-      ),
-    );
+  const updateIssue = (issueId: string, changes: Partial<UiIssue>) => {
+    setIssues((current) => current.map((item) => (item.id === issueId ? { ...item, ...changes } : item)));
   };
 
-  const toggleResolved = (issue: UiIssue) => {
-    if (issue.resolved) {
-      setIssueResolved(issue.id, false, '');
+  const applyStatusAction = (issueId: string, action: StatusAction, actor: string) => {
+    const now = new Date().toISOString();
+    if (action === 'resolve') {
+      updateIssue(issueId, { status: 'review', resolvedBy: actor, resolvedAt: now, approvedBy: null, approvedAt: null });
+    } else {
+      updateIssue(issueId, { status: 'resolved', approvedBy: actor, approvedAt: now });
+    }
+  };
+
+  // Only ask for a name the first time; after that reuse the one remembered in this browser.
+  const requestStatusAction = (issue: UiIssue, action: StatusAction) => {
+    if (userName) {
+      applyStatusAction(issue.id, action, userName);
       return;
     }
-    // Always confirm who is resolving; prefill with the last name used in this browser.
-    setNameDraft(userName);
-    setNamePrompt({ kind: 'issue', issueId: issue.id });
+    setNameDraft('');
+    setNamePrompt({ action, issueId: issue.id });
+  };
+
+  const reopenIssue = (issue: UiIssue) => {
+    updateIssue(issue.id, { status: 'open', resolvedBy: null, resolvedAt: null, approvedBy: null, approvedAt: null });
   };
 
   const handleConfirmName = () => {
@@ -314,8 +348,7 @@ export function UiIssueTracker() {
       // Storage unavailable; the name still applies for this visit.
     }
     setUserName(name);
-    if (namePrompt.kind === 'issue') setIssueResolved(namePrompt.issueId, true, name);
-    if (namePrompt.kind === 'form') setForm((current) => ({ ...current, resolved: true }));
+    if (namePrompt.action !== 'change') applyStatusAction(namePrompt.issueId, namePrompt.action, name);
     setNamePrompt(null);
   };
 
@@ -352,7 +385,6 @@ export function UiIssueTracker() {
       description: issue.description,
       reference: issue.reference === NO_REFERENCE ? '' : issue.reference,
       image: issue.image ?? null,
-      resolved: issue.resolved,
     });
     setOpenMenuIssueId(null);
     setIsModalOpen(true);
@@ -371,11 +403,40 @@ export function UiIssueTracker() {
     setFormError(null);
   };
 
-  const openIssues = issues.filter((issue) => !issue.resolved);
-  const resolvedIssues = issues.filter((issue) => issue.resolved);
+  const openIssues = issues.filter((issue) => issue.status === 'open');
+  const reviewIssues = issues.filter((issue) => issue.status === 'review');
+  const resolvedIssues = issues.filter((issue) => issue.status === 'resolved');
 
-  const renderIssueActions = (issue: UiIssue, className = '') => (
-    <div className={`flex items-center gap-3 ${className}`}>
+  const renderStatusControls = (issue: UiIssue) => {
+    if (issue.status === 'open') {
+      return (
+        <button type="button" onClick={() => requestStatusAction(issue, 'resolve')} className={`${referencePillClass} gap-1.5`}>
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Mark as resolved
+        </button>
+      );
+    }
+
+    return (
+      <>
+        {issue.status === 'review' ? (
+          <button
+            type="button"
+            onClick={() => requestStatusAction(issue, 'approve')}
+            className="inline-flex items-center rounded-full bg-brand-green px-3 py-1.5 text-xs font-semibold text-[#030d0a] hover:bg-brand-green-hover"
+          >
+            Approve
+          </button>
+        ) : null}
+        <button type="button" onClick={() => reopenIssue(issue)} className={referencePillClass}>
+          Reopen
+        </button>
+      </>
+    );
+  };
+
+  const renderIssueActions = (issue: UiIssue) => (
+    <div className="flex flex-wrap items-center gap-2">
       <button
         type="button"
         onClick={() => {
@@ -387,17 +448,9 @@ export function UiIssueTracker() {
         View issue
       </button>
 
-      <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-        <input
-          type="checkbox"
-          checked={issue.resolved}
-          onChange={() => toggleResolved(issue)}
-          className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
-        />
-        Resolved
-      </label>
+      {renderStatusControls(issue)}
 
-      <div className="relative">
+      <div className="relative ml-auto">
         <button
           type="button"
           aria-label={`Actions for ${issue.name}`}
@@ -432,20 +485,40 @@ export function UiIssueTracker() {
     </div>
   );
 
-  const renderResolvedStrip = (issue: UiIssue) =>
-    issue.resolved ? (
-      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
-        <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
-        {issue.resolvedBy ? (
-          <span>
-            Resolved by <span className="font-semibold text-foreground">{issue.resolvedBy}</span>
-          </span>
-        ) : (
-          <span>Resolved before names were tracked</span>
-        )}
-        {issue.resolvedAt ? <span>· {new Date(issue.resolvedAt).toLocaleString()}</span> : null}
+  const renderStatusStrip = (issue: UiIssue) => {
+    if (issue.status === 'open') return null;
+
+    return (
+      <div className="mt-3 space-y-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          {issue.status === 'review' ? (
+            <Clock className="h-3.5 w-3.5 text-yellow-600" />
+          ) : (
+            <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
+          )}
+          {issue.resolvedBy ? (
+            <span>
+              Marked resolved by <span className="font-semibold text-foreground">{issue.resolvedBy}</span>
+            </span>
+          ) : (
+            <span>Resolved before names were tracked</span>
+          )}
+          {issue.resolvedAt ? <span>· {new Date(issue.resolvedAt).toLocaleString()}</span> : null}
+          {issue.status === 'review' ? <span className="font-medium text-yellow-700">· Waiting for stakeholder review</span> : null}
+        </div>
+
+        {issue.status === 'resolved' && issue.approvedBy ? (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
+            <span>
+              Approved by <span className="font-semibold text-foreground">{issue.approvedBy}</span>
+            </span>
+            {issue.approvedAt ? <span>· {new Date(issue.approvedAt).toLocaleString()}</span> : null}
+          </div>
+        ) : null}
       </div>
-    ) : null;
+    );
+  };
 
   const renderIssueRow = (issue: UiIssue) => (
     <div key={issue.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
@@ -480,7 +553,7 @@ export function UiIssueTracker() {
         {renderIssueActions(issue)}
       </div>
 
-      {renderResolvedStrip(issue)}
+      {renderStatusStrip(issue)}
     </div>
   );
 
@@ -510,15 +583,25 @@ export function UiIssueTracker() {
       <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">{issue.description}</p>
       <div className="mt-3 text-sm">{renderReference(issue)}</div>
 
-      <div className="mt-auto pt-4">{renderIssueActions(issue, 'flex-wrap justify-between')}</div>
-      {renderResolvedStrip(issue)}
+      <div className="mt-auto pt-4">{renderIssueActions(issue)}</div>
+      {renderStatusStrip(issue)}
     </div>
   );
 
   const issueSections = [
     { key: 'open', title: 'Open issues', items: openIssues, empty: 'No open issues.' },
+    { key: 'review', title: 'Waiting for stakeholder review', items: reviewIssues, empty: 'Nothing is waiting for review.' },
     { key: 'resolved', title: 'Resolved', items: resolvedIssues, empty: 'Nothing resolved yet.' },
   ];
+
+  const stats = [
+    { label: 'Total', value: issues.length },
+    { label: 'Open', value: openIssues.length },
+    { label: 'In review', value: reviewIssues.length },
+    { label: 'Resolved', value: resolvedIssues.length },
+  ];
+
+  const activePrompt = namePrompt ? namePromptCopy[namePrompt.action] : null;
 
   return (
     <div className="light min-h-screen w-full bg-light-canvas px-4 py-8 text-foreground md:px-6">
@@ -575,19 +658,13 @@ export function UiIssueTracker() {
           </div>
         ) : null}
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Total</p>
-            <p className="mt-3 text-2xl font-semibold">{issues.length}</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Open</p>
-            <p className="mt-3 text-2xl font-semibold">{issues.filter((issue) => !issue.resolved).length}</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Resolved</p>
-            <p className="mt-3 text-2xl font-semibold">{issues.filter((issue) => issue.resolved).length}</p>
-          </div>
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.label} className="rounded-2xl border border-border bg-card p-4">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{stat.label}</p>
+              <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
+            </div>
+          ))}
         </div>
 
         <div className="w-full space-y-8">
@@ -716,23 +793,6 @@ export function UiIssueTracker() {
                   <img src={form.image} alt="Screenshot preview" className="mt-3 h-40 w-full rounded-xl border border-border object-contain bg-muted" />
                 ) : null}
               </div>
-
-              <label className="flex items-center gap-3 text-sm font-medium text-foreground md:col-span-2">
-                <input
-                  type="checkbox"
-                  checked={form.resolved}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      setNameDraft(userName);
-                      setNamePrompt({ kind: 'form' });
-                      return;
-                    }
-                    setForm((current) => ({ ...current, resolved: event.target.checked }));
-                  }}
-                  className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
-                />
-                Mark as resolved
-              </label>
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-3">
@@ -789,23 +849,27 @@ export function UiIssueTracker() {
               <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[viewingIssue.type]}`}>
                 {issueTypes.find((type) => type.value === viewingIssue.type)?.label ?? viewingIssue.type}
               </span>
-              <span
-                className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${
-                  viewingIssue.resolved ? 'bg-brand-green/10 text-brand-green' : 'bg-yellow-500/10 text-yellow-700'
-                }`}
-              >
-                {viewingIssue.resolved ? 'Resolved' : 'Open'}
+              <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${statusStyles[viewingIssue.status]}`}>
+                {statusLabels[viewingIssue.status]}
               </span>
               <span className="text-xs text-muted-foreground">
                 Logged {new Date(viewingIssue.createdAt).toLocaleString()}
               </span>
             </div>
 
-            {viewingIssue.resolved ? (
-              <p className="mt-3 text-sm text-foreground">
-                Resolved by <span className="font-semibold">{viewingIssue.resolvedBy ?? 'unknown'}</span>
-                {viewingIssue.resolvedAt ? ` on ${new Date(viewingIssue.resolvedAt).toLocaleString()}` : ''}
-              </p>
+            {viewingIssue.status !== 'open' ? (
+              <div className="mt-3 space-y-1 text-sm text-foreground">
+                <p>
+                  Marked resolved by <span className="font-semibold">{viewingIssue.resolvedBy ?? 'unknown'}</span>
+                  {viewingIssue.resolvedAt ? ` on ${new Date(viewingIssue.resolvedAt).toLocaleString()}` : ''}
+                </p>
+                {viewingIssue.approvedBy ? (
+                  <p>
+                    Approved by <span className="font-semibold">{viewingIssue.approvedBy}</span>
+                    {viewingIssue.approvedAt ? ` on ${new Date(viewingIssue.approvedAt).toLocaleString()}` : ''}
+                  </p>
+                ) : null}
+              </div>
             ) : null}
 
             <div className="mt-5 space-y-5">
@@ -840,15 +904,7 @@ export function UiIssueTracker() {
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-              <label className="mr-auto flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={viewingIssue.resolved}
-                  onChange={() => toggleResolved(viewingIssue)}
-                  className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
-                />
-                Resolved
-              </label>
+              <div className="mr-auto flex flex-wrap items-center gap-2">{renderStatusControls(viewingIssue)}</div>
               <button
                 type="button"
                 onClick={() => handleEditIssue(viewingIssue)}
@@ -864,6 +920,22 @@ export function UiIssueTracker() {
                 Done
               </button>
             </div>
+
+            {userName ? (
+              <p className="mt-4 text-xs text-muted-foreground">
+                Acting as <span className="font-semibold text-foreground">{userName}</span> ·{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNameDraft(userName);
+                    setNamePrompt({ action: 'change' });
+                  }}
+                  className="font-medium text-[#030d0a] underline underline-offset-2"
+                >
+                  Change name
+                </button>
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -888,7 +960,7 @@ export function UiIssueTracker() {
         </div>
       ) : null}
 
-      {namePrompt ? (
+      {namePrompt && activePrompt ? (
         <div
           onClick={() => setNamePrompt(null)}
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
@@ -903,11 +975,9 @@ export function UiIssueTracker() {
             }}
             className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
           >
-            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Resolve issue</p>
-            <h3 className="mt-2 text-xl font-semibold text-foreground">Who is resolving this?</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Your name is saved on the issue. We'll remember it in this browser for next time.
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{activePrompt.eyebrow}</p>
+            <h3 className="mt-2 text-xl font-semibold text-foreground">{activePrompt.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{activePrompt.body}</p>
             <input
               autoFocus
               value={nameDraft}
@@ -928,7 +998,7 @@ export function UiIssueTracker() {
                 disabled={!nameDraft.trim()}
                 className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Resolve
+                {activePrompt.submit}
               </button>
             </div>
           </form>
