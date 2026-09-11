@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { CheckCircle2, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
@@ -11,12 +11,17 @@ type UiIssue = {
   reference: string;
   image?: string | null;
   resolved: boolean;
+  resolvedBy?: string | null;
+  resolvedAt?: string | null;
   createdAt: string;
 };
+
+type NamePromptTarget = { kind: 'issue'; issueId: string } | { kind: 'form' };
 
 const STORAGE_KEY = 'mitra-ui-audit-v1';
 const NO_REFERENCE = 'No reference added';
 const MAX_IMAGE_DIMENSION = 1280;
+const USER_NAME_KEY = 'mitra-ui-audit-user';
 
 const emptyForm = {
   name: '',
@@ -70,6 +75,8 @@ function normalizeIssue(value: Partial<UiIssue> & { title?: string; status?: str
     reference: typeof value.reference === 'string' && value.reference ? value.reference : NO_REFERENCE,
     image: typeof value.image === 'string' ? value.image : null,
     resolved: typeof value.resolved === 'boolean' ? value.resolved : value.status === 'Resolved',
+    resolvedBy: typeof value.resolvedBy === 'string' ? value.resolvedBy : null,
+    resolvedAt: typeof value.resolvedAt === 'string' ? value.resolvedAt : null,
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
   };
 }
@@ -128,6 +135,15 @@ export function UiIssueTracker() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [viewingIssueId, setViewingIssueId] = useState<string | null>(null);
   const viewingIssue = issues.find((issue) => issue.id === viewingIssueId) ?? null;
+  const [userName, setUserName] = useState<string>(() => {
+    try {
+      return localStorage.getItem(USER_NAME_KEY) ?? '';
+    } catch {
+      return '';
+    }
+  });
+  const [namePrompt, setNamePrompt] = useState<NamePromptTarget | null>(null);
+  const [nameDraft, setNameDraft] = useState('');
 
   useEffect(() => {
     try {
@@ -190,6 +206,14 @@ export function UiIssueTracker() {
     }
   };
 
+  const resolutionFor = (existing: UiIssue | null, resolved: boolean) => {
+    if (!resolved) return { resolved: false, resolvedBy: null, resolvedAt: null };
+    if (existing?.resolved) {
+      return { resolved: true, resolvedBy: existing.resolvedBy ?? null, resolvedAt: existing.resolvedAt ?? null };
+    }
+    return { resolved: true, resolvedBy: userName || null, resolvedAt: new Date().toISOString() };
+  };
+
   const handleSubmitIssue = () => {
     const name = form.name.trim();
     const description = form.description.trim();
@@ -204,7 +228,15 @@ export function UiIssueTracker() {
       if (editingIssueId) {
         return current.map((issue) =>
           issue.id === editingIssueId
-            ? { ...issue, name, type: form.type, description, reference, image: form.image, resolved: form.resolved }
+            ? {
+                ...issue,
+                name,
+                type: form.type,
+                description,
+                reference,
+                image: form.image,
+                ...resolutionFor(issue, form.resolved),
+              }
             : issue,
         );
       }
@@ -217,7 +249,7 @@ export function UiIssueTracker() {
           description,
           reference,
           image: form.image,
-          resolved: form.resolved,
+          ...resolutionFor(null, form.resolved),
           createdAt: new Date().toISOString(),
         },
         ...current,
@@ -229,10 +261,44 @@ export function UiIssueTracker() {
     setIsModalOpen(false);
   };
 
-  const toggleResolved = (issueId: string) => {
+  const setIssueResolved = (issueId: string, resolved: boolean, resolver: string) => {
     setIssues((current) =>
-      current.map((item) => (item.id === issueId ? { ...item, resolved: !item.resolved } : item)),
+      current.map((item) =>
+        item.id === issueId
+          ? {
+              ...item,
+              resolved,
+              resolvedBy: resolved ? resolver : null,
+              resolvedAt: resolved ? new Date().toISOString() : null,
+            }
+          : item,
+      ),
     );
+  };
+
+  const toggleResolved = (issue: UiIssue) => {
+    if (issue.resolved) {
+      setIssueResolved(issue.id, false, '');
+      return;
+    }
+    // Always confirm who is resolving; prefill with the last name used in this browser.
+    setNameDraft(userName);
+    setNamePrompt({ kind: 'issue', issueId: issue.id });
+  };
+
+  const handleConfirmName = () => {
+    const name = nameDraft.trim();
+    if (!name || !namePrompt) return;
+
+    try {
+      localStorage.setItem(USER_NAME_KEY, name);
+    } catch {
+      // Storage unavailable; the name still applies for this visit.
+    }
+    setUserName(name);
+    if (namePrompt.kind === 'issue') setIssueResolved(namePrompt.issueId, true, name);
+    if (namePrompt.kind === 'form') setForm((current) => ({ ...current, resolved: true }));
+    setNamePrompt(null);
   };
 
   const renderReference = (issue: UiIssue) => {
@@ -287,6 +353,117 @@ export function UiIssueTracker() {
     setFormError(null);
   };
 
+  const openIssues = issues.filter((issue) => !issue.resolved);
+  const resolvedIssues = issues.filter((issue) => issue.resolved);
+
+  const renderIssueRow = (issue: UiIssue) => (
+    <div key={issue.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+      <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
+        <div>
+          <div className="flex items-center gap-3">
+            {issue.image ? (
+              <button
+                type="button"
+                aria-label={`View screenshot for ${issue.name}`}
+                onClick={() => setPreviewImage(issue.image ?? null)}
+                className="shrink-0"
+              >
+                <img src={issue.image} alt="" className="h-10 w-10 rounded-lg border border-border object-cover" />
+              </button>
+            ) : null}
+            <div className="text-sm font-semibold text-foreground">{issue.name}</div>
+          </div>
+          <div className="mt-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+            {new Date(issue.createdAt).toLocaleDateString()}
+          </div>
+        </div>
+
+        <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
+          {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
+        </span>
+
+        <p className="text-sm leading-6 text-muted-foreground">{issue.description}</p>
+
+        <div className="text-sm">{renderReference(issue)}</div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setOpenMenuIssueId(null);
+              setViewingIssueId(issue.id);
+            }}
+            className={referencePillClass}
+          >
+            View issue
+          </button>
+
+          <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={issue.resolved}
+              onChange={() => toggleResolved(issue)}
+              className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
+            />
+            Resolved
+          </label>
+
+          <div className="relative">
+            <button
+              type="button"
+              aria-label={`Actions for ${issue.name}`}
+              aria-expanded={openMenuIssueId === issue.id}
+              onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
+              className="rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
+
+            {openMenuIssueId === issue.id ? (
+              <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => handleEditIssue(issue)}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteIssue(issue)}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-300"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Delete
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {issue.resolved ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+          <CheckCircle2 className="h-3.5 w-3.5 text-brand-green" />
+          {issue.resolvedBy ? (
+            <span>
+              Resolved by <span className="font-semibold text-foreground">{issue.resolvedBy}</span>
+            </span>
+          ) : (
+            <span>Resolved before names were tracked</span>
+          )}
+          {issue.resolvedAt ? <span>· {new Date(issue.resolvedAt).toLocaleString()}</span> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  const issueSections = [
+    { key: 'open', title: 'Open issues', items: openIssues, empty: 'No open issues.' },
+    { key: 'resolved', title: 'Resolved', items: resolvedIssues, empty: 'Nothing resolved yet.' },
+  ];
+
   return (
     <div className="light min-h-screen w-full bg-light-canvas px-4 py-8 text-foreground md:px-6">
       <div className="w-full">
@@ -333,100 +510,25 @@ export function UiIssueTracker() {
           </div>
         </div>
 
-        <div className="w-full">
-          <div className="space-y-3">
-            {issues.map((issue) => (
-              <div
-                key={issue.id}
-                className="rounded-2xl border border-border bg-card p-4 shadow-sm"
-              >
-                <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      {issue.image ? (
-                        <button
-                          type="button"
-                          aria-label={`View screenshot for ${issue.name}`}
-                          onClick={() => setPreviewImage(issue.image ?? null)}
-                          className="shrink-0"
-                        >
-                          <img src={issue.image} alt="" className="h-10 w-10 rounded-lg border border-border object-cover" />
-                        </button>
-                      ) : null}
-                      <div className="text-sm font-semibold text-foreground">{issue.name}</div>
-                    </div>
-                    <div className="mt-1 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-                      {new Date(issue.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
-                    {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
-                  </span>
-
-                  <p className="text-sm leading-6 text-muted-foreground">{issue.description}</p>
-
-                  <div className="text-sm">{renderReference(issue)}</div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenMenuIssueId(null);
-                        setViewingIssueId(issue.id);
-                      }}
-                      className={referencePillClass}
-                    >
-                      View issue
-                    </button>
-
-                    <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                      <input
-                        type="checkbox"
-                        checked={issue.resolved}
-                        onChange={() => toggleResolved(issue.id)}
-                        className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
-                      />
-                      Resolved
-                    </label>
-
-                    <div className="relative">
-                      <button
-                        type="button"
-                        aria-label={`Actions for ${issue.name}`}
-                        aria-expanded={openMenuIssueId === issue.id}
-                        onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
-                        className="rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-
-                      {openMenuIssueId === issue.id ? (
-                        <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
-                          <button
-                            type="button"
-                            onClick={() => handleEditIssue(issue)}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteIssue(issue)}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-300"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            Delete
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
+        <div className="w-full space-y-8">
+          {issueSections.map((section) => (
+            <section key={section.key}>
+              <div className="mb-3 flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                  {section.items.length}
+                </span>
               </div>
-            ))}
-          </div>
+
+              {section.items.length > 0 ? (
+                <div className="space-y-3">{section.items.map(renderIssueRow)}</div>
+              ) : (
+                <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                  {section.empty}
+                </p>
+              )}
+            </section>
+          ))}
         </div>
       </div>
 
@@ -533,7 +635,14 @@ export function UiIssueTracker() {
                 <input
                   type="checkbox"
                   checked={form.resolved}
-                  onChange={(event) => setForm((current) => ({ ...current, resolved: event.target.checked }))}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      setNameDraft(userName);
+                      setNamePrompt({ kind: 'form' });
+                      return;
+                    }
+                    setForm((current) => ({ ...current, resolved: event.target.checked }));
+                  }}
                   className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
                 />
                 Mark as resolved
@@ -606,6 +715,13 @@ export function UiIssueTracker() {
               </span>
             </div>
 
+            {viewingIssue.resolved ? (
+              <p className="mt-3 text-sm text-foreground">
+                Resolved by <span className="font-semibold">{viewingIssue.resolvedBy ?? 'unknown'}</span>
+                {viewingIssue.resolvedAt ? ` on ${new Date(viewingIssue.resolvedAt).toLocaleString()}` : ''}
+              </p>
+            ) : null}
+
             <div className="mt-5 space-y-5">
               <div>
                 <p className="text-sm font-medium text-foreground">Description</p>
@@ -642,7 +758,7 @@ export function UiIssueTracker() {
                 <input
                   type="checkbox"
                   checked={viewingIssue.resolved}
-                  onChange={() => toggleResolved(viewingIssue.id)}
+                  onChange={() => toggleResolved(viewingIssue)}
                   className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
                 />
                 Resolved
@@ -683,6 +799,53 @@ export function UiIssueTracker() {
               Close
             </button>
           </div>
+        </div>
+      ) : null}
+
+      {namePrompt ? (
+        <div
+          onClick={() => setNamePrompt(null)}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+        >
+          <form
+            role="dialog"
+            aria-label="Enter your name"
+            onClick={(event) => event.stopPropagation()}
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleConfirmName();
+            }}
+            className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Resolve issue</p>
+            <h3 className="mt-2 text-xl font-semibold text-foreground">Who is resolving this?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your name is saved on the issue. We'll remember it in this browser for next time.
+            </p>
+            <input
+              autoFocus
+              value={nameDraft}
+              onChange={(event) => setNameDraft(event.target.value)}
+              placeholder="Your name"
+              className="mt-4 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-brand-green"
+            />
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setNamePrompt(null)}
+                className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-background"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!nameDraft.trim()}
+                className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Resolve
+              </button>
+            </div>
+          </form>
         </div>
       ) : null}
     </div>
