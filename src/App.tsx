@@ -50,6 +50,7 @@ import { AdminPanelView } from './components/AdminPanelView';
 import { DeveloperWorkspaceView } from './components/DeveloperWorkspaceView';
 import { BusinessOwnerView } from './components/BusinessOwnerView';
 import DashboardView from './components/DashboardView';
+import { UiIssueTracker } from './components/UiIssueTracker';
 import {
   buildExecutiveSummary,
   canRoleApproveReview,
@@ -2494,6 +2495,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
   const markNotificationsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
+
+  const isAuditPath =
+    typeof window !== 'undefined' &&
+    ['/audit', '/ui'].includes(window.location.pathname.replace(/\/+$/, ''));
+
+  if (isAuditPath && !guestReviewId) {
+    return <UiIssueTracker />;
+  }
 
   if (
     (showSignup || isSignupPath(window.location.pathname)) &&
