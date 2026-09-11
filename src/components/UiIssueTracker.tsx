@@ -126,6 +126,8 @@ export function UiIssueTracker() {
   const [formError, setFormError] = useState<string | null>(null);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [viewingIssueId, setViewingIssueId] = useState<string | null>(null);
+  const viewingIssue = issues.find((issue) => issue.id === viewingIssueId) ?? null;
 
   useEffect(() => {
     try {
@@ -227,7 +229,37 @@ export function UiIssueTracker() {
     setIsModalOpen(false);
   };
 
+  const toggleResolved = (issueId: string) => {
+    setIssues((current) =>
+      current.map((item) => (item.id === issueId ? { ...item, resolved: !item.resolved } : item)),
+    );
+  };
+
+  const renderReference = (issue: UiIssue) => {
+    const referenceUrl = getReferenceUrl(issue.reference);
+
+    if (referenceUrl) {
+      return (
+        <a href={referenceUrl} target="_blank" rel="noreferrer" className={referencePillClass}>
+          View reference
+        </a>
+      );
+    }
+    if (issue.image) {
+      return (
+        <button type="button" onClick={() => setPreviewImage(issue.image ?? null)} className={referencePillClass}>
+          View reference
+        </button>
+      );
+    }
+    if (issue.reference !== NO_REFERENCE) {
+      return <span className={referencePillClass}>{issue.reference}</span>;
+    }
+    return <span className="text-muted-foreground">{NO_REFERENCE}</span>;
+  };
+
   const handleEditIssue = (issue: UiIssue) => {
+    setViewingIssueId(null);
     setEditingIssueId(issue.id);
     setFormError(null);
     setForm({
@@ -334,39 +366,25 @@ export function UiIssueTracker() {
 
                   <p className="text-sm leading-6 text-muted-foreground">{issue.description}</p>
 
-                  <div className="text-sm">
-                    {getReferenceUrl(issue.reference) ? (
-                      <a
-                        href={getReferenceUrl(issue.reference) ?? undefined}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={referencePillClass}
-                      >
-                        View reference
-                      </a>
-                    ) : issue.image ? (
-                      <button type="button" onClick={() => setPreviewImage(issue.image ?? null)} className={referencePillClass}>
-                        View reference
-                      </button>
-                    ) : issue.reference !== NO_REFERENCE ? (
-                      <span className={referencePillClass}>{issue.reference}</span>
-                    ) : (
-                      <span className="text-muted-foreground">{NO_REFERENCE}</span>
-                    )}
-                  </div>
+                  <div className="text-sm">{renderReference(issue)}</div>
 
                   <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenMenuIssueId(null);
+                        setViewingIssueId(issue.id);
+                      }}
+                      className={referencePillClass}
+                    >
+                      View issue
+                    </button>
+
                     <label className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
                       <input
                         type="checkbox"
                         checked={issue.resolved}
-                        onChange={() =>
-                          setIssues((current) =>
-                            current.map((item) =>
-                              item.id === issue.id ? { ...item, resolved: !item.resolved } : item,
-                            ),
-                          )
-                        }
+                        onChange={() => toggleResolved(issue.id)}
                         className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
                       />
                       Resolved
@@ -541,6 +559,107 @@ export function UiIssueTracker() {
                 className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover"
               >
                 {editingIssueId ? 'Save changes' : 'Save issue'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {viewingIssue ? (
+        <div
+          onClick={() => setViewingIssueId(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
+          <div
+            role="dialog"
+            aria-label={`Issue details: ${viewingIssue.name}`}
+            onClick={(event) => event.stopPropagation()}
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
+          >
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Issue details</p>
+                <h3 className="mt-2 text-2xl font-semibold text-foreground">{viewingIssue.name}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingIssueId(null)}
+                className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground hover:bg-background"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[viewingIssue.type]}`}>
+                {issueTypes.find((type) => type.value === viewingIssue.type)?.label ?? viewingIssue.type}
+              </span>
+              <span
+                className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${
+                  viewingIssue.resolved ? 'bg-brand-green/10 text-brand-green' : 'bg-yellow-500/10 text-yellow-700'
+                }`}
+              >
+                {viewingIssue.resolved ? 'Resolved' : 'Open'}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Logged {new Date(viewingIssue.createdAt).toLocaleString()}
+              </span>
+            </div>
+
+            <div className="mt-5 space-y-5">
+              <div>
+                <p className="text-sm font-medium text-foreground">Description</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{viewingIssue.description}</p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-foreground">Reference</p>
+                <div className="mt-2 text-sm">{renderReference(viewingIssue)}</div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-foreground">Screenshot</p>
+                {viewingIssue.image ? (
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImage(viewingIssue.image ?? null)}
+                    className="mt-2 block w-full"
+                  >
+                    <img
+                      src={viewingIssue.image}
+                      alt={`Screenshot for ${viewingIssue.name}`}
+                      className="max-h-72 w-full rounded-xl border border-border bg-muted object-contain"
+                    />
+                  </button>
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">No screenshot added</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+              <label className="mr-auto flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={viewingIssue.resolved}
+                  onChange={() => toggleResolved(viewingIssue.id)}
+                  className="h-4 w-4 rounded border-border text-brand-green focus:ring-brand-green"
+                />
+                Resolved
+              </label>
+              <button
+                type="button"
+                onClick={() => handleEditIssue(viewingIssue)}
+                className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-background"
+              >
+                Edit issue
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewingIssueId(null)}
+                className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover"
+              >
+                Done
               </button>
             </div>
           </div>
