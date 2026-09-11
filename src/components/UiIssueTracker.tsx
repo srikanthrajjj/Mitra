@@ -15,6 +15,8 @@ type UiIssue = {
 };
 
 const STORAGE_KEY = 'mitra-ui-audit-v1';
+const NO_REFERENCE = 'No reference added';
+const MAX_IMAGE_DIMENSION = 1280;
 
 const emptyForm = {
   name: '',
@@ -65,7 +67,7 @@ function normalizeIssue(value: Partial<UiIssue> & { title?: string; status?: str
         ? 'Improvement'
         : 'UI',
     description,
-    reference: typeof value.reference === 'string' && value.reference ? value.reference : 'No reference added',
+    reference: typeof value.reference === 'string' && value.reference ? value.reference : NO_REFERENCE,
     image: typeof value.image === 'string' ? value.image : null,
     resolved: typeof value.resolved === 'boolean' ? value.resolved : value.status === 'Resolved',
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
@@ -112,9 +114,17 @@ export function UiIssueTracker() {
   const [editingIssueId, setEditingIssueId] = useState<string | null>(null);
   const [openMenuIssueId, setOpenMenuIssueId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
+      setStorageError(null);
+    } catch {
+      // Usually a QuotaExceededError from large screenshots; keep the app running.
+      setStorageError('Browser storage is full, so the latest changes will be lost on reload. Remove screenshots or delete old issues.');
+    }
   }, [issues]);
 
   const readImageFile = (file: File) => {
@@ -122,8 +132,28 @@ export function UiIssueTracker() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      const image = typeof reader.result === 'string' ? reader.result : null;
-      setForm((current) => ({ ...current, image }));
+      const original = typeof reader.result === 'string' ? reader.result : null;
+      if (!original) return;
+
+      // Downscale so screenshots don't blow through the ~5MB localStorage quota.
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const context = canvas.getContext('2d');
+        if (!context) {
+          setForm((current) => ({ ...current, image: original }));
+          return;
+        }
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        setForm((current) => ({ ...current, image: canvas.toDataURL('image/jpeg', 0.8) }));
+      };
+      img.onerror = () => setForm((current) => ({ ...current, image: original }));
+      img.src = original;
     };
     reader.readAsDataURL(file);
   };
@@ -145,9 +175,10 @@ export function UiIssueTracker() {
   const handleSubmitIssue = () => {
     const name = form.name.trim();
     const description = form.description.trim();
-    const reference = form.reference.trim();
+    const reference = form.reference.trim() || NO_REFERENCE;
 
-    if (!name || !description || !reference) {
+    if (!name || !description) {
+      setFormError('Add an issue name and a description to save.');
       return;
     }
 
@@ -176,16 +207,18 @@ export function UiIssueTracker() {
     });
     setEditingIssueId(null);
     setForm(emptyForm);
+    setFormError(null);
     setIsModalOpen(false);
   };
 
   const handleEditIssue = (issue: UiIssue) => {
     setEditingIssueId(issue.id);
+    setFormError(null);
     setForm({
       name: issue.name,
       type: issue.type,
       description: issue.description,
-      reference: issue.reference,
+      reference: issue.reference === NO_REFERENCE ? '' : issue.reference,
       image: issue.image ?? null,
       resolved: issue.resolved,
     });
@@ -203,6 +236,7 @@ export function UiIssueTracker() {
     setIsModalOpen(false);
     setEditingIssueId(null);
     setForm(emptyForm);
+    setFormError(null);
   };
 
   return (
@@ -221,6 +255,7 @@ export function UiIssueTracker() {
             onClick={() => {
               setEditingIssueId(null);
               setForm(emptyForm);
+              setFormError(null);
               setIsModalOpen(true);
             }}
             className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] transition hover:bg-brand-green-hover"
@@ -228,6 +263,12 @@ export function UiIssueTracker() {
             Log a new issue
           </button>
         </div>
+
+        {storageError ? (
+          <div role="alert" className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+            {storageError}
+          </div>
+        ) : null}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card p-4">
@@ -345,7 +386,7 @@ export function UiIssueTracker() {
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div
-            className="w-full max-w-2xl rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
             onPaste={handleImagePaste}
           >
             <div className="mb-5 flex items-center justify-between gap-4">
@@ -371,7 +412,10 @@ export function UiIssueTracker() {
                 Issue name
                 <input
                   value={form.name}
-                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                  onChange={(event) => {
+                    setFormError(null);
+                    setForm((current) => ({ ...current, name: event.target.value }));
+                  }}
                   placeholder="Buttons misaligned on mobile"
                   className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-brand-green"
                 />
@@ -399,7 +443,7 @@ export function UiIssueTracker() {
               </fieldset>
 
               <label className="block text-sm font-medium text-foreground">
-                View reference
+                View reference <span className="font-normal text-muted-foreground">(optional)</span>
                 <input
                   value={form.reference}
                   onChange={(event) => setForm((current) => ({ ...current, reference: event.target.value }))}
@@ -412,7 +456,10 @@ export function UiIssueTracker() {
                 Description
                 <textarea
                   value={form.description}
-                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                  onChange={(event) => {
+                    setFormError(null);
+                    setForm((current) => ({ ...current, description: event.target.value }));
+                  }}
                   rows={5}
                   placeholder="Describe the bug and expected behavior."
                   className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-brand-green"
@@ -446,7 +493,12 @@ export function UiIssueTracker() {
               </label>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex items-center justify-end gap-3">
+              {formError ? (
+                <p role="alert" className="mr-auto text-sm text-red-600">
+                  {formError}
+                </p>
+              ) : null}
               <button
                 type="button"
                 onClick={handleCloseModal}
