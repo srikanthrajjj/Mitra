@@ -58,7 +58,8 @@ const STORAGE_KEY = 'mitra-ui-audit-v1';
 const NO_REFERENCE = 'No reference added';
 const MAX_IMAGE_DIMENSION = 1280;
 const USER_NAME_KEY = 'mitra-ui-audit-user';
-const VIEW_MODE_KEY = 'mitra-ui-audit-view';
+// v2: earlier versions saved the layout on every visit, so the old key would pin people to List.
+const VIEW_MODE_KEY = 'mitra-ui-audit-view-v2';
 // Set once this browser's pre-sharing issues have been copied into the shared list.
 const LOCAL_ISSUES_UPLOADED_KEY = 'mitra-ui-audit-shared-v1';
 const EXAMPLE_ISSUE_PREFIX = 'issue-example-';
@@ -298,19 +299,21 @@ export function UiIssueTracker() {
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try {
       const saved = localStorage.getItem(VIEW_MODE_KEY);
-      return saved === 'grid' || saved === 'board' ? saved : 'list';
+      return saved === 'list' || saved === 'grid' || saved === 'board' ? saved : 'board';
     } catch {
-      return 'list';
+      return 'board';
     }
   });
 
-  useEffect(() => {
+  // Only remember a layout someone actually picked, so Board stays the default for everyone else.
+  const chooseViewMode = (mode: ViewMode) => {
+    setViewMode(mode);
     try {
-      localStorage.setItem(VIEW_MODE_KEY, viewMode);
+      localStorage.setItem(VIEW_MODE_KEY, mode);
     } catch {
       // Layout preference only; ignore storage failures.
     }
-  }, [viewMode]);
+  };
 
   useEffect(() => {
     const syncScreen = () => setScreen(screenFromHash());
@@ -1109,7 +1112,7 @@ export function UiIssueTracker() {
                   key={mode}
                   type="button"
                   aria-pressed={viewMode === mode}
-                  onClick={() => setViewMode(mode)}
+                  onClick={() => chooseViewMode(mode)}
                   className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                     viewMode === mode ? 'bg-[#030d0a] text-white' : 'text-muted-foreground hover:text-foreground'
                   }`}
