@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { Button } from '@/src/components/ui/button';
@@ -38,7 +38,6 @@ export default function NewProjectModal({ theme, isOpen, onClose, onCreateProjec
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-brand-green" />
             <h2 className={`font-display font-bold text-lg ${isDark ? 'text-white' : 'text-foreground'}`}>
               New Project
             </h2>

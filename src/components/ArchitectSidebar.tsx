@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, type ComponentType, type Ref } from 'react
 import {
   Star,
   MoreVertical,
-  ChevronDown,
   Share2,
   X,
 } from 'lucide-react';
@@ -18,8 +17,6 @@ import {
   SparklesIcon as AnimatedSparklesIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
-import { ConversationStatusDot } from './ConversationStatusDot';
-import { deriveConversationStatus } from '../utils/conversationStatus';
 import { ProjectFolder } from '../data/folders';
 import { getCollaboratorsForSolution } from '../data/projectShares';
 import { ArtifactStatus, ProjectCollaborator, Solution, Theme } from '../types';
@@ -191,7 +188,6 @@ export function ArchitectSidebar({
   const renderSolutionRow = (sol: Solution) => {
     const active = activeTab === 'projects' && selectedSidebarId === sol.id && sol.chatHistory.length > 0;
     const isEditing = editingSolutionId === sol.id;
-    const conversationStatus = deriveConversationStatus(sol, { generatingSolutionId });
     return (
       <div
         key={sol.id}
@@ -238,12 +234,11 @@ export function ArchitectSidebar({
           <>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <div className="flex min-w-0 items-center gap-1.5">
-                <ConversationStatusDot status={conversationStatus} />
                 <span className="truncate text-left">{sol.name}</span>
               </div>
 
               {sol.tags && sol.tags.length > 0 && (
-                <div className="flex min-w-0 flex-wrap items-center gap-1 pl-[13px]">
+                <div className="flex min-w-0 flex-wrap items-center gap-1 pl-[32px]">
                   {sol.tags.slice(0, MAX_INLINE_TAGS).map((tag) => {
                     const isActiveTag = activeTagFilter === tag;
                     return (
@@ -507,12 +502,6 @@ export function ArchitectSidebar({
 
   const navItems: NavItemConfig[] = [
     {
-      id: 'search',
-      label: 'Search',
-      icon: AnimatedSearchIcon,
-      action: onOpenSearch,
-    },
-    {
       id: 'new-chat',
       label: 'New Chat',
       icon: AnimatedPlusIcon,
@@ -656,21 +645,13 @@ export function ArchitectSidebar({
               )}
               aria-expanded={tagsOpen}
             >
-              <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
-                <ChevronDown
-                  className={cn(
-                    'h-3 w-3 transition-transform duration-200',
-                    !tagsOpen && '-rotate-90',
-                  )}
-                />
-              </span>
               <span>Tags</span>
               {activeTagFilter && (
                 <span className="normal-case tracking-normal text-brand-green">· {activeTagFilter}</span>
               )}
             </button>
             {tagsOpen && (
-              <div className="flex flex-wrap gap-1.5 px-1.5 pb-1">
+              <div className="flex flex-wrap gap-1.5 pb-1 pl-[34px] pr-1.5">
                 {allTags.map((tag) => {
                   const isActiveTag = activeTagFilter === tag;
                   return (
@@ -712,14 +693,6 @@ export function ArchitectSidebar({
               )}
               aria-expanded={pinnedOpen}
             >
-              <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
-                <ChevronDown
-                  className={cn(
-                    'h-3 w-3 transition-transform duration-200',
-                    !pinnedOpen && '-rotate-90',
-                  )}
-                />
-              </span>
               <span>Pinned</span>
             </button>
             {pinnedOpen ? (
@@ -746,22 +719,16 @@ export function ArchitectSidebar({
             )}
             aria-expanded={recentsOpen}
           >
-            <span className="inline-flex h-[12px] w-[22px] shrink-0 items-center justify-center">
-              <ChevronDown
-                className={cn(
-                  'h-3 w-3 transition-transform duration-200',
-                  !recentsOpen && '-rotate-90',
-                )}
-              />
-            </span>
             <span>Recents</span>
           </button>
-            {recentsOpen ? (
+          {recentsOpen ? (
             recentSolutions.length === 0 ? (
-              <p className={cn(
-                'px-1.5 py-2 text-[11px]',
-                isDark ? 'text-illuminate-muted' : 'text-muted-foreground',
-              )}>
+              <p
+                className={cn(
+                  'px-1.5 py-2 text-[11px]',
+                  isDark ? 'text-illuminate-muted' : 'text-muted-foreground',
+                )}
+              >
                 {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No recent chats'}
               </p>
             ) : (

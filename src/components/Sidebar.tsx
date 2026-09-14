@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Key, ChevronDown, LogOut, Settings, HelpCircle, Building2,
+  Key, ChevronDown, LogOut, Settings, HelpCircle, Building2, Search,
   PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X, VenetianMask, ArrowRightLeft
 } from 'lucide-react';
 import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme, ProjectCollaborator } from '../types';
@@ -185,6 +185,21 @@ export default function Sidebar({
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  aria-label="Search"
+                  onClick={onOpenSearch}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Search</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
                   aria-label="Expand navigation sidebar"
                   onClick={onToggleCollapse}
                 >
@@ -193,7 +208,6 @@ export default function Sidebar({
               </TooltipTrigger>
               <TooltipContent side="right">Expand sidebar</TooltipContent>
             </Tooltip>
-            <RoleSwitcher theme={theme} role={userRole} onChange={onRoleChange} iconOnly />
           </SidebarHeader>
 
           <SidebarContent className="flex min-h-0 flex-1 flex-col items-center gap-1 px-1 py-2">
@@ -383,7 +397,21 @@ export default function Sidebar({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-0.5">
-            <RoleSwitcher theme={theme} role={userRole} onChange={onRoleChange} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  aria-label="Search"
+                  onClick={onOpenSearch}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Search</TooltipContent>
+            </Tooltip>
             {onToggleCollapse && (
               <Tooltip>
                 <TooltipTrigger asChild>
