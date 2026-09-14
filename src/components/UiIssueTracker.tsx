@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import {
+  deleteIssueRecord,
+  fetchIssueRecords,
+  saveIssueRecords,
+  subscribeToIssueRecords,
+  uploadScreenshot,
+} from './uiIssueStore';
 
 type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
@@ -36,6 +43,9 @@ const NO_REFERENCE = 'No reference added';
 const MAX_IMAGE_DIMENSION = 1280;
 const USER_NAME_KEY = 'mitra-ui-audit-user';
 const VIEW_MODE_KEY = 'mitra-ui-audit-view';
+// Set once this browser's pre-sharing issues have been copied into the shared list.
+const LOCAL_ISSUES_UPLOADED_KEY = 'mitra-ui-audit-shared-v1';
+const EXAMPLE_ISSUE_PREFIX = 'issue-example-';
 
 const emptyForm = {
   name: '',
@@ -44,29 +54,6 @@ const emptyForm = {
   reference: '',
   image: null as string | null,
 };
-
-const defaultIssues: UiIssue[] = [
-  {
-    id: 'issue-example-1',
-    name: 'Checkout spacing issue',
-    type: 'UI',
-    description: 'The CTA section feels too crowded on tablet layout and needs tighter spacing.',
-    reference: 'https://example.com/checkout',
-    image: null,
-    status: 'open',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'issue-example-2',
-    name: 'Dark mode contrast',
-    type: 'UX',
-    description: 'Primary action is hard to read on dark surfaces and needs stronger contrast.',
-    reference: 'dark-mode-review',
-    image: null,
-    status: 'resolved',
-    createdAt: new Date().toISOString(),
-  },
-];
 
 function normalizeIssue(value: StoredIssue): UiIssue | null {
   const name = typeof value.name === 'string' ? value.name : value.title;
@@ -99,6 +86,92 @@ function normalizeIssue(value: StoredIssue): UiIssue | null {
     approvedAt: typeof value.approvedAt === 'string' ? value.approvedAt : null,
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
   };
+}
+
+function sortIssues(list: UiIssue[]) {
+  return [...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+// The shared list is the source of truth; this browser cache only makes the first paint instant.
+function readCachedIssues(): UiIssue[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const parsed = saved ? (JSON.parse(saved) as unknown) : null;
+    if (!Array.isArray(parsed)) return [];
+    return sortIssues(
+      parsed
+        .map((issue) => (issue && typeof issue === 'object' ? normalizeIssue(issue as StoredIssue) : null))
+        .filter((issue): issue is UiIssue => issue !== null),
+    );
+  } catch {
+    return [];
+  }
+}
+
+function hasUploadedLocalIssues() {
+  try {
+    return localStorage.getItem(LOCAL_ISSUES_UPLOADED_KEY) === 'true';
+  } catch {
+    return true;
+  }
+}
+
+function markLocalIssuesUploaded() {
+  try {
+    localStorage.setItem(LOCAL_ISSUES_UPLOADED_KEY, 'true');
+  } catch {
+    // Nothing else to do; the upload is idempotent.
+  }
+}
+
+// Downscale so screenshots upload quickly and stay small; keeps the original if the browser can't decode it.
+function downscaleImage(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const context = canvas.getContext('2d');
+      if (!context) {
+        resolve(dataUrl);
+        return;
+      }
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+let localIssuesUpload: Promise<void> | null = null;
+
+// Shared across overlapping loads (a remount or a focus event mid-upload) so screenshots upload once.
+function uploadLocalIssuesOnce(cachedIssues: UiIssue[]): Promise<void> {
+  if (hasUploadedLocalIssues()) return Promise.resolve();
+
+  if (!localIssuesUpload) {
+    localIssuesUpload = (async () => {
+      const localIssues = cachedIssues.filter((issue) => !issue.id.startsWith(EXAMPLE_ISSUE_PREFIX));
+      const prepared = await Promise.all(localIssues.map(withUploadedScreenshot));
+      await saveIssueRecords(prepared, { onlyMissing: true });
+      markLocalIssuesUploaded();
+    })().finally(() => {
+      localIssuesUpload = null;
+    });
+  }
+  return localIssuesUpload;
+}
+
+async function withUploadedScreenshot(issue: UiIssue): Promise<UiIssue> {
+  if (!issue.image?.startsWith('data:')) return issue;
+  // Issues saved before resizing existed can hold full-size screenshots, so shrink them first.
+  const image = await downscaleImage(issue.image);
+  return { ...issue, image: await uploadScreenshot(issue.id, image) };
 }
 
 function getReferenceUrl(reference: string) {
@@ -167,31 +240,17 @@ const namePromptCopy: Record<NamePromptTarget['action'], { eyebrow: string; titl
 };
 
 export function UiIssueTracker() {
-  const [issues, setIssues] = useState<UiIssue[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as unknown;
-        if (Array.isArray(parsed)) {
-          const normalized = parsed
-            .map((issue) => (issue && typeof issue === 'object' ? normalizeIssue(issue as StoredIssue) : null))
-            .filter((issue): issue is UiIssue => issue !== null);
-          if (normalized.length > 0) {
-            return normalized;
-          }
-        }
-      }
-    } catch {
-      // Ignore malformed data and use defaults.
-    }
-    return defaultIssues;
-  });
+  const [issues, setIssues] = useState<UiIssue[]>(readCachedIssues);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIssueId, setEditingIssueId] = useState<string | null>(null);
   const [openMenuIssueId, setOpenMenuIssueId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
-  const [storageError, setStorageError] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'connecting' | 'live' | 'offline'>('connecting');
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  // Writes for the same issue run one after another so a slow save can't overwrite a newer one.
+  const writeQueues = useRef(new Map<string, Promise<void>>());
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [viewingIssueId, setViewingIssueId] = useState<string | null>(null);
   const viewingIssue = issues.find((issue) => issue.id === viewingIssueId) ?? null;
@@ -241,12 +300,57 @@ export function UiIssueTracker() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
-      setStorageError(null);
     } catch {
-      // Usually a QuotaExceededError from large screenshots; keep the app running.
-      setStorageError('Browser storage is full, so the latest changes will be lost on reload. Remove screenshots or delete old issues.');
+      // Cache only; the shared list still has everything.
     }
   }, [issues]);
+
+  useEffect(() => {
+    let cancelled = false;
+    // Captured before anything async so shared updates can't leak into the one-time upload.
+    const cachedIssues = readCachedIssues();
+
+    const loadSharedIssues = async () => {
+      try {
+        await uploadLocalIssuesOnce(cachedIssues);
+
+        const records = await fetchIssueRecords();
+        if (cancelled) return;
+        setIssues(
+          sortIssues(
+            records
+              .map((record) => normalizeIssue(record as StoredIssue))
+              .filter((issue): issue is UiIssue => issue !== null),
+          ),
+        );
+        setSyncStatus('live');
+      } catch {
+        if (!cancelled) setSyncStatus('offline');
+      }
+    };
+
+    void loadSharedIssues();
+
+    const unsubscribe = subscribeToIssueRecords({
+      onSave: (record) => {
+        const issue = normalizeIssue(record as StoredIssue);
+        if (!issue) return;
+        setIssues((current) => sortIssues([issue, ...current.filter((item) => item.id !== issue.id)]));
+      },
+      onDelete: (id) => setIssues((current) => current.filter((item) => item.id !== id)),
+    });
+
+    const handleFocus = () => {
+      void loadSharedIssues();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   const readImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -255,26 +359,7 @@ export function UiIssueTracker() {
     reader.onload = () => {
       const original = typeof reader.result === 'string' ? reader.result : null;
       if (!original) return;
-
-      // Downscale so screenshots don't blow through the ~5MB localStorage quota.
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(img.width, img.height));
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const context = canvas.getContext('2d');
-        if (!context) {
-          setForm((current) => ({ ...current, image: original }));
-          return;
-        }
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        setForm((current) => ({ ...current, image: canvas.toDataURL('image/jpeg', 0.8) }));
-      };
-      img.onerror = () => setForm((current) => ({ ...current, image: original }));
-      img.src = original;
+      void downscaleImage(original).then((image) => setForm((current) => ({ ...current, image })));
     };
     reader.readAsDataURL(file);
   };
@@ -299,7 +384,27 @@ export function UiIssueTracker() {
     }
   };
 
-  const handleSubmitIssue = () => {
+  const queueWrite = (issueId: string, write: () => Promise<void>, failureMessage: string) => {
+    const previous = writeQueues.current.get(issueId) ?? Promise.resolve();
+    const next = previous
+      .then(write)
+      .then(() => {
+        setSyncStatus('live');
+        setSyncError(null);
+      })
+      .catch(() => setSyncError(failureMessage));
+    writeQueues.current.set(issueId, next);
+  };
+
+  const persistIssue = (issue: UiIssue) => {
+    queueWrite(
+      issue.id,
+      () => saveIssueRecords([issue]),
+      `Couldn't save "${issue.name}" to the shared list, so others won't see that change. Check your connection and try again.`,
+    );
+  };
+
+  const handleSubmitIssue = async () => {
     const name = form.name.trim();
     const description = form.description.trim();
     const reference = form.reference.trim() || NO_REFERENCE;
@@ -309,29 +414,28 @@ export function UiIssueTracker() {
       return;
     }
 
-    setIssues((current) => {
-      if (editingIssueId) {
-        return current.map((issue) =>
-          issue.id === editingIssueId
-            ? { ...issue, name, type: form.type, description, reference, image: form.image }
-            : issue,
-        );
-      }
+    const existing = editingIssueId ? issues.find((issue) => issue.id === editingIssueId) : undefined;
+    const id = existing?.id ?? `audit-${Date.now()}`;
+    let image = form.image;
 
-      return [
-        {
-          id: `audit-${Date.now()}`,
-          name,
-          type: form.type,
-          description,
-          reference,
-          image: form.image,
-          status: 'open',
-          createdAt: new Date().toISOString(),
-        },
-        ...current,
-      ];
-    });
+    if (image?.startsWith('data:')) {
+      setIsSaving(true);
+      try {
+        image = await uploadScreenshot(id, image);
+      } catch {
+        setFormError("Couldn't upload the screenshot. Check your connection and try again.");
+        return;
+      } finally {
+        setIsSaving(false);
+      }
+    }
+
+    const nextIssue: UiIssue = existing
+      ? { ...existing, name, type: form.type, description, reference, image }
+      : { id, name, type: form.type, description, reference, image, status: 'open', createdAt: new Date().toISOString() };
+
+    setIssues((current) => sortIssues([nextIssue, ...current.filter((issue) => issue.id !== nextIssue.id)]));
+    persistIssue(nextIssue);
     setEditingIssueId(null);
     setForm(emptyForm);
     setFormError(null);
@@ -339,7 +443,12 @@ export function UiIssueTracker() {
   };
 
   const updateIssue = (issueId: string, changes: Partial<UiIssue>) => {
-    setIssues((current) => current.map((item) => (item.id === issueId ? { ...item, ...changes } : item)));
+    const existing = issues.find((item) => item.id === issueId);
+    if (!existing) return;
+
+    const nextIssue = { ...existing, ...changes };
+    setIssues((current) => current.map((item) => (item.id === issueId ? nextIssue : item)));
+    persistIssue(nextIssue);
   };
 
   const openScreen = (next: Screen) => {
@@ -430,6 +539,11 @@ export function UiIssueTracker() {
   const handleDeleteIssue = (issue: UiIssue) => {
     if (!window.confirm(`Delete "${issue.name}"?`)) return;
     setIssues((current) => current.filter((item) => item.id !== issue.id));
+    queueWrite(
+      issue.id,
+      () => deleteIssueRecord(issue.id),
+      `Couldn't delete "${issue.name}" from the shared list, so it may come back. Check your connection and try again.`,
+    );
     setOpenMenuIssueId(null);
   };
 
@@ -665,6 +779,13 @@ export function UiIssueTracker() {
               UI audit
             </p>
             <h1 className="mt-2 text-3xl font-semibold">{screen === 'open' ? 'Issue list' : currentSection.title}</h1>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {syncStatus === 'live'
+                ? 'Shared with everyone who opens this page · updates live'
+                : syncStatus === 'connecting'
+                  ? 'Connecting to the shared list…'
+                  : 'Offline copy'}
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -729,9 +850,10 @@ export function UiIssueTracker() {
           </div>
         </div>
 
-        {storageError ? (
+        {syncError || syncStatus === 'offline' ? (
           <div role="alert" className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
-            {storageError}
+            {syncError ??
+              "Can't reach the shared issue list, so this may be an old copy. Check your connection; it refreshes when you come back to this tab."}
           </div>
         ) : null}
 
@@ -887,10 +1009,11 @@ export function UiIssueTracker() {
               </button>
               <button
                 type="button"
-                onClick={handleSubmitIssue}
-                className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover"
+                onClick={() => void handleSubmitIssue()}
+                disabled={isSaving}
+                className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover disabled:cursor-wait disabled:opacity-60"
               >
-                {editingIssueId ? 'Save changes' : 'Save issue'}
+                {isSaving ? 'Saving…' : editingIssueId ? 'Save changes' : 'Save issue'}
               </button>
             </div>
           </div>
