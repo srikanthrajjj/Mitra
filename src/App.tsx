@@ -141,6 +141,7 @@ import { isDemoMode } from './utils/demoMode';
 import { getStreamCharsPerTick, getStreamFlushMs, getStreamTickMs } from './utils/chatTiming';
 import { thinkingDelay } from './utils/demoThinkingDelay';
 import { buildTodosForRequest, isBuildRequest, todosPresentationDelay } from './utils/buildTodos';
+import { getSimulatedQuestionReply } from './utils/simulatedQuestionFlow';
 import { streamServiceNowChat } from './utils/chatStream';
 import { condenseChoices, condenseResponse } from './utils/condenseResponse';
 import {
@@ -1899,7 +1900,7 @@ export default function App() {
 
     const pumpLocalText = (
       finalText: string,
-      extras?: Pick<ChatMessage, 'choices' | 'isTriage' | 'codeSample' | 'snUpdate'>,
+      extras?: Pick<ChatMessage, 'choices' | 'isTriage' | 'codeSample' | 'snUpdate' | 'question'>,
       blueprintPatch?: Partial<Solution['blueprint']>,
       phasePatch?: PhaseProgress,
     ) => {
@@ -2091,6 +2092,17 @@ export default function App() {
 
     const runGeneration = async () => {
       const useLocalOnly = isDemoMode();
+
+      const scriptedReply = useLocalOnly ? getSimulatedQuestionReply(text, targetChatHistory) : null;
+      if (scriptedReply) {
+        await thinkingDelay();
+        if (isCancelled()) return;
+        pumpLocalText(
+          scriptedReply.text,
+          scriptedReply.question ? { question: scriptedReply.question } : undefined,
+        );
+        return;
+      }
 
       if (useLocalOnly) {
         await runLocalFallback();

@@ -289,6 +289,8 @@ export interface ChatMessage {
   /** Build-plan todos shown after thinking (demo / architect chat) */
   todos?: MitraTodoItem[];
   todoSummary?: string;
+  /** Multiple-choice question Mitra pauses on; the answer lands in selectedChoice. */
+  question?: MitraQuestion;
 }
 
 export type MitraTodoStatus = 'pending' | 'active' | 'complete';
@@ -297,6 +299,21 @@ export interface MitraTodoItem {
   id: string;
   label: string;
   status: MitraTodoStatus;
+}
+
+export interface MitraQuestionOption {
+  label: string;
+  /** What happens if this option is picked. */
+  description: string;
+}
+
+export interface MitraQuestion {
+  header: string;
+  options: MitraQuestionOption[];
+  /** Free-text "Other" row. Defaults to true. */
+  allowOther?: boolean;
+  /** Skip button. Defaults to true. */
+  allowSkip?: boolean;
 }
 
 export interface TableField {

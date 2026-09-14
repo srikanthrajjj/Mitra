@@ -39,6 +39,7 @@ import {
 } from '../constants/composerModes';
 import MitraThinkingIndicator from './MitraThinkingIndicator';
 import { MitraTodos } from './MitraTodos';
+import { MitraQuestionCard } from './MitraQuestionCard';
 import { SmoothStreamingText } from './SmoothStreamingText';
 
 interface ChatViewProps {
@@ -757,6 +758,18 @@ export default function ChatView({
                         </>
                       ) : (
                         <span className="whitespace-pre-wrap text-[14px] leading-[1.7]">{msg.text}</span>
+                      )}
+
+                      {isMitra && msg.question && !isStreamingThisMessage && (
+                        <MitraQuestionCard
+                          question={msg.question}
+                          isDark={isDark}
+                          answer={msg.selectedChoice}
+                          disabled={isGeneratingMessage}
+                          onAnswer={(answer) =>
+                            onChoiceSelect ? onChoiceSelect(msg.id, answer) : onSendMessage(answer)
+                          }
+                        />
                       )}
 
                       {msg.choices && msg.choices.length > 0 && !isStreamingThisMessage && (() => {
