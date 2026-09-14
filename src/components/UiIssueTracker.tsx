@@ -842,7 +842,7 @@ export function UiIssueTracker() {
     },
   });
 
-  const renderDraggableCard = (issue: UiIssue, className = '') => (
+  const renderDraggableCard = (issue: UiIssue) => (
     <div
       key={issue.id}
       draggable
@@ -856,71 +856,84 @@ export function UiIssueTracker() {
         setDraggingIssueId(null);
         setDropTarget(null);
       }}
-      className={`cursor-grab active:cursor-grabbing ${draggingIssueId === issue.id ? 'opacity-50' : ''} ${className}`}
+      className={`cursor-grab active:cursor-grabbing ${draggingIssueId === issue.id ? 'opacity-50' : ''}`}
     >
       {renderIssueCard(issue)}
     </div>
   );
 
-  // Dragging only works with a mouse, so the ⋮ → Priority menu stays the way to do it on touch screens.
-  const renderPriorityBoard = (items: UiIssue[]) => {
-    const unprioritized = items.filter((issue) => !getPriorityOption(issue));
-
-    return (
-      <div className="space-y-4">
-        {unprioritized.length > 0 ? (
-          <div
-            {...dropZoneProps('none')}
-            className={`rounded-2xl border border-dashed p-3 transition ${
-              dropTarget === 'none' ? 'border-[#030d0a] bg-muted' : 'border-border bg-card/60'
-            }`}
-          >
-            <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
-              <span className="font-semibold text-foreground">Needs priority · {unprioritized.length}</span>
-              <span className="text-muted-foreground">Drag an issue into a column to set its priority, or use ⋮ → Priority.</span>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {unprioritized.map((issue) => renderDraggableCard(issue, 'w-72 shrink-0'))}
-            </div>
-          </div>
-        ) : null}
-
-        <div className="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-4 overflow-x-auto pb-2">
-          {priorityOptions.map((option) => {
-            const columnIssues = items.filter((issue) => issue.priority === option.value);
-
-            return (
-              <section
-                key={option.value}
-                aria-label={`${option.label} priority`}
-                {...dropZoneProps(option.value)}
-                className={`flex min-h-[16rem] flex-col rounded-2xl border-t-4 bg-card/60 p-3 transition ${option.column} ${
-                  dropTarget === option.value ? 'bg-muted ring-2 ring-[#030d0a]/30' : ''
-                }`}
-              >
-                <div className="mb-3 flex items-center gap-2 px-1">
-                  <span className={`h-2.5 w-2.5 rounded-full ${option.dot}`} aria-hidden="true" />
-                  <h3 className="text-sm font-semibold text-foreground">{option.label}</h3>
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                    {columnIssues.length}
-                  </span>
-                </div>
-
-                <div className="flex flex-1 flex-col gap-3">
-                  {columnIssues.length > 0 ? (
-                    columnIssues.map((issue) => renderDraggableCard(issue))
-                  ) : (
-                    <p className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border px-3 py-8 text-center text-xs text-muted-foreground">
-                      Drop issues here
-                    </p>
-                  )}
-                </div>
-              </section>
-            );
-          })}
+  const renderBoardColumn = (column: {
+    target: IssuePriority | 'none';
+    title: string;
+    ariaLabel: string;
+    hint?: string;
+    dotClass?: string;
+    topBorderClass: string;
+    issues: UiIssue[];
+    emptyText: string;
+  }) => (
+    <section
+      key={column.target}
+      aria-label={column.ariaLabel}
+      {...dropZoneProps(column.target)}
+      className={`flex min-h-[16rem] flex-col rounded-2xl border-t-4 bg-card/60 p-3 transition ${column.topBorderClass} ${
+        dropTarget === column.target ? 'bg-muted ring-2 ring-[#030d0a]/30' : ''
+      }`}
+    >
+      <div className="mb-3 px-1">
+        <div className="flex items-center gap-2">
+          {column.dotClass ? <span className={`h-2.5 w-2.5 rounded-full ${column.dotClass}`} aria-hidden="true" /> : null}
+          <h3 className="text-sm font-semibold text-foreground">{column.title}</h3>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {column.issues.length}
+          </span>
         </div>
+        {column.hint ? <p className="mt-1 text-xs text-muted-foreground">{column.hint}</p> : null}
       </div>
-    );
+
+      <div className="flex flex-1 flex-col gap-3">
+        {column.issues.length > 0 ? (
+          column.issues.map((issue) => renderDraggableCard(issue))
+        ) : (
+          <p className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border px-3 py-8 text-center text-xs text-muted-foreground">
+            {column.emptyText}
+          </p>
+        )}
+      </div>
+    </section>
+  );
+
+  // Issues without a priority wait in the left column; dragging a card right sets its severity.
+  // Dragging only works with a mouse, so ⋮ → Priority stays the way to do it on touch screens.
+  const renderPriorityBoard = (items: UiIssue[], poolTitle: string) => (
+    <div className="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-4 overflow-x-auto pb-2">
+      {renderBoardColumn({
+        target: 'none',
+        title: poolTitle,
+        ariaLabel: `${poolTitle} without a priority`,
+        hint: 'No priority yet. Drag right to set one.',
+        topBorderClass: 'border-t-[#030d0a]',
+        issues: items.filter((issue) => !getPriorityOption(issue)),
+        emptyText: 'Every issue here has a priority',
+      })}
+      {priorityOptions.map((option) =>
+        renderBoardColumn({
+          target: option.value,
+          title: option.label,
+          ariaLabel: `${option.label} priority`,
+          dotClass: option.dot,
+          topBorderClass: option.column,
+          issues: items.filter((issue) => issue.priority === option.value),
+          emptyText: 'Drop issues here',
+        }),
+      )}
+    </div>
+  );
+
+  const boardPoolTitles: Record<Screen, string> = {
+    open: 'Open issues',
+    review: 'Waiting for review',
+    resolved: 'Resolved',
   };
 
   const screenSections: Record<Screen, { title: string; items: UiIssue[]; empty: string }> = {
@@ -1054,7 +1067,7 @@ export function UiIssueTracker() {
         ) : null}
 
         <section className="w-full">
-          {screen === 'open' ? (
+          {screen === 'open' && viewMode !== 'board' ? (
             <div className="mb-3 flex items-center gap-2">
               <h2 className="text-sm font-semibold text-foreground">{currentSection.title}</h2>
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -1065,7 +1078,7 @@ export function UiIssueTracker() {
 
           {currentSection.items.length > 0 ? (
             viewMode === 'board' ? (
-              renderPriorityBoard(currentSection.items)
+              renderPriorityBoard(currentSection.items, boardPoolTitles[screen])
             ) : viewMode === 'grid' ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {currentSection.items.map(renderIssueCard)}
