@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   deleteIssueRecord,
   fetchIssueRecords,
@@ -12,6 +12,8 @@ type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
 type IssueStatus = 'open' | 'review' | 'resolved';
 
+type IssuePriority = 'critical' | 'high' | 'medium' | 'low';
+
 type UiIssue = {
   id: string;
   name: string;
@@ -20,6 +22,7 @@ type UiIssue = {
   reference: string;
   image?: string | null;
   status: IssueStatus;
+  priority?: IssuePriority | null;
   resolvedBy?: string | null;
   resolvedAt?: string | null;
   approvedBy?: string | null;
@@ -80,6 +83,10 @@ function normalizeIssue(value: StoredIssue): UiIssue | null {
         : value.resolved === true || value.status === 'Resolved'
           ? 'resolved'
           : 'open',
+    priority:
+      value.priority === 'critical' || value.priority === 'high' || value.priority === 'medium' || value.priority === 'low'
+        ? value.priority
+        : null,
     resolvedBy: typeof value.resolvedBy === 'string' ? value.resolvedBy : null,
     resolvedAt: typeof value.resolvedAt === 'string' ? value.resolvedAt : null,
     approvedBy: typeof value.approvedBy === 'string' ? value.approvedBy : null,
@@ -211,6 +218,14 @@ const statusLabels: Record<IssueStatus, string> = {
   review: 'Waiting for stakeholder review',
   resolved: 'Resolved',
 };
+
+// Ordered most to least severe. Colour is paired with the label so it never carries meaning alone.
+const priorityOptions: { value: IssuePriority; label: string; dot: string; badge: string; stripe: string }[] = [
+  { value: 'critical', label: 'Critical', dot: 'bg-red-600', badge: 'bg-red-500/10 text-red-700', stripe: 'border-l-red-600' },
+  { value: 'high', label: 'High', dot: 'bg-orange-500', badge: 'bg-orange-500/10 text-orange-700', stripe: 'border-l-orange-500' },
+  { value: 'medium', label: 'Medium', dot: 'bg-amber-400', badge: 'bg-amber-400/15 text-amber-700', stripe: 'border-l-amber-400' },
+  { value: 'low', label: 'Low', dot: 'bg-sky-500', badge: 'bg-sky-500/10 text-sky-700', stripe: 'border-l-sky-500' },
+];
 
 const statusStyles: Record<IssueStatus, string> = {
   open: 'bg-muted text-foreground',
@@ -484,6 +499,37 @@ export function UiIssueTracker() {
     setNotice(`"${issue.name}" moved back to Open issues`);
   };
 
+  const handleSetPriority = (issue: UiIssue, priority: IssuePriority | null) => {
+    setOpenMenuIssueId(null);
+    if ((issue.priority ?? null) === priority) return;
+
+    updateIssue(issue.id, { priority });
+    const label = priorityOptions.find((option) => option.value === priority)?.label;
+    setNotice(label ? `"${issue.name}" set to ${label} priority` : `Cleared the priority on "${issue.name}"`);
+  };
+
+  const getPriorityOption = (issue: UiIssue) => priorityOptions.find((option) => option.value === issue.priority);
+
+  const renderPriorityBadge = (issue: UiIssue) => {
+    const option = getPriorityOption(issue);
+    if (!option) return null;
+
+    return (
+      <span
+        title={`Priority: ${option.label}`}
+        className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${option.badge}`}
+      >
+        <span className={`h-1.5 w-1.5 rounded-full ${option.dot}`} aria-hidden="true" />
+        {option.label}
+      </span>
+    );
+  };
+
+  const priorityStripeClass = (issue: UiIssue) => {
+    const option = getPriorityOption(issue);
+    return option ? `border-l-4 ${option.stripe}` : '';
+  };
+
   const handleConfirmName = () => {
     const name = nameDraft.trim();
     if (!name || !namePrompt) return;
@@ -613,7 +659,7 @@ export function UiIssueTracker() {
         </button>
 
         {openMenuIssueId === issue.id ? (
-          <div className="absolute right-0 top-full z-20 mt-2 w-36 rounded-xl border border-border bg-card p-1 shadow-lg">
+          <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-xl border border-border bg-card p-1 shadow-lg">
             <button
               type="button"
               onClick={() => handleEditIssue(issue)}
@@ -622,6 +668,34 @@ export function UiIssueTracker() {
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </button>
+
+            <div className="my-1 border-t border-border" />
+            <p className="px-3 pb-1 pt-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Priority</p>
+            {priorityOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={issue.priority === option.value}
+                onClick={() => handleSetPriority(issue, option.value)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+              >
+                <span className={`h-2.5 w-2.5 rounded-full ${option.dot}`} aria-hidden="true" />
+                {option.label}
+                {issue.priority === option.value ? <Check className="ml-auto h-3.5 w-3.5" aria-hidden="true" /> : null}
+              </button>
+            ))}
+            {issue.priority ? (
+              <button
+                type="button"
+                onClick={() => handleSetPriority(issue, null)}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
+              >
+                <span className="h-2.5 w-2.5 rounded-full border border-border" aria-hidden="true" />
+                Clear priority
+              </button>
+            ) : null}
+
+            <div className="my-1 border-t border-border" />
             <button
               type="button"
               onClick={() => handleDeleteIssue(issue)}
@@ -672,7 +746,7 @@ export function UiIssueTracker() {
   };
 
   const renderIssueRow = (issue: UiIssue) => (
-    <div key={issue.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <div key={issue.id} className={`rounded-2xl border border-border bg-card p-4 shadow-sm ${priorityStripeClass(issue)}`}>
       <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
         <div>
           <div className="flex items-center gap-3">
@@ -693,9 +767,12 @@ export function UiIssueTracker() {
           </div>
         </div>
 
-        <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
-          {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
-        </span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
+            {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
+          </span>
+          {renderPriorityBadge(issue)}
+        </div>
 
         <p className="text-sm leading-6 text-muted-foreground">{issue.description}</p>
 
@@ -709,7 +786,7 @@ export function UiIssueTracker() {
   );
 
   const renderIssueCard = (issue: UiIssue) => (
-    <div key={issue.id} className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <div key={issue.id} className={`flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm ${priorityStripeClass(issue)}`}>
       {issue.image ? (
         <button
           type="button"
@@ -721,11 +798,14 @@ export function UiIssueTracker() {
         </button>
       ) : null}
 
-      <div className="flex items-center justify-between gap-2">
-        <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
-          {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
-        </span>
-        <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${typeStyles[issue.type]}`}>
+            {issueTypes.find((type) => type.value === issue.type)?.label ?? issue.type}
+          </span>
+          {renderPriorityBadge(issue)}
+        </div>
+        <span className="shrink-0 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
           {new Date(issue.createdAt).toLocaleDateString()}
         </span>
       </div>
@@ -1052,6 +1132,7 @@ export function UiIssueTracker() {
               <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] ${statusStyles[viewingIssue.status]}`}>
                 {statusLabels[viewingIssue.status]}
               </span>
+              {renderPriorityBadge(viewingIssue)}
               <span className="text-xs text-muted-foreground">
                 Logged {new Date(viewingIssue.createdAt).toLocaleString()}
               </span>
