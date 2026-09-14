@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle2, Clock, LayoutGrid, List, MoreVertical, Pencil, SquareKanban, Trash2 } from 'lucide-react';
 import {
   deleteIssueRecord,
   fetchIssueRecords,
@@ -37,7 +37,7 @@ type StatusAction = 'resolve' | 'approve';
 
 type NamePromptTarget = { action: StatusAction; issueId: string } | { action: 'change' };
 
-type ViewMode = 'list' | 'grid';
+type ViewMode = 'list' | 'grid' | 'board';
 
 type Screen = 'open' | 'review' | 'resolved';
 
@@ -220,11 +220,11 @@ const statusLabels: Record<IssueStatus, string> = {
 };
 
 // Ordered most to least severe. Colour is paired with the label so it never carries meaning alone.
-const priorityOptions: { value: IssuePriority; label: string; dot: string; badge: string; stripe: string }[] = [
-  { value: 'critical', label: 'Critical', dot: 'bg-red-600', badge: 'bg-red-500/10 text-red-700', stripe: 'border-l-red-600' },
-  { value: 'high', label: 'High', dot: 'bg-orange-500', badge: 'bg-orange-500/10 text-orange-700', stripe: 'border-l-orange-500' },
-  { value: 'medium', label: 'Medium', dot: 'bg-amber-400', badge: 'bg-amber-400/15 text-amber-700', stripe: 'border-l-amber-400' },
-  { value: 'low', label: 'Low', dot: 'bg-sky-500', badge: 'bg-sky-500/10 text-sky-700', stripe: 'border-l-sky-500' },
+const priorityOptions: { value: IssuePriority; label: string; dot: string; badge: string; stripe: string; column: string }[] = [
+  { value: 'critical', label: 'Critical', dot: 'bg-red-600', badge: 'bg-red-500/10 text-red-700', stripe: 'border-l-red-600', column: 'border-t-red-600' },
+  { value: 'high', label: 'High', dot: 'bg-orange-500', badge: 'bg-orange-500/10 text-orange-700', stripe: 'border-l-orange-500', column: 'border-t-orange-500' },
+  { value: 'medium', label: 'Medium', dot: 'bg-amber-400', badge: 'bg-amber-400/15 text-amber-700', stripe: 'border-l-amber-400', column: 'border-t-amber-400' },
+  { value: 'low', label: 'Low', dot: 'bg-sky-500', badge: 'bg-sky-500/10 text-sky-700', stripe: 'border-l-sky-500', column: 'border-t-sky-500' },
 ];
 
 const statusStyles: Record<IssueStatus, string> = {
@@ -280,9 +280,12 @@ export function UiIssueTracker() {
   const [nameDraft, setNameDraft] = useState('');
   const [screen, setScreen] = useState<Screen>(screenFromHash);
   const [notice, setNotice] = useState<string | null>(null);
+  const [draggingIssueId, setDraggingIssueId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<IssuePriority | 'none' | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try {
-      return localStorage.getItem(VIEW_MODE_KEY) === 'grid' ? 'grid' : 'list';
+      const saved = localStorage.getItem(VIEW_MODE_KEY);
+      return saved === 'grid' || saved === 'board' ? saved : 'list';
     } catch {
       return 'list';
     }
@@ -819,6 +822,107 @@ export function UiIssueTracker() {
     </div>
   );
 
+  const dropZoneProps = (target: IssuePriority | 'none') => ({
+    onDragOver: (event: React.DragEvent<HTMLElement>) => {
+      if (!draggingIssueId) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      if (dropTarget !== target) setDropTarget(target);
+    },
+    onDragLeave: (event: React.DragEvent<HTMLElement>) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDropTarget(null);
+    },
+    onDrop: (event: React.DragEvent<HTMLElement>) => {
+      event.preventDefault();
+      const issueId = event.dataTransfer.getData('text/plain') || draggingIssueId;
+      const issue = issues.find((item) => item.id === issueId);
+      setDraggingIssueId(null);
+      setDropTarget(null);
+      if (issue) handleSetPriority(issue, target === 'none' ? null : target);
+    },
+  });
+
+  const renderDraggableCard = (issue: UiIssue, className = '') => (
+    <div
+      key={issue.id}
+      draggable
+      onDragStart={(event) => {
+        event.dataTransfer.setData('text/plain', issue.id);
+        event.dataTransfer.effectAllowed = 'move';
+        setOpenMenuIssueId(null);
+        setDraggingIssueId(issue.id);
+      }}
+      onDragEnd={() => {
+        setDraggingIssueId(null);
+        setDropTarget(null);
+      }}
+      className={`cursor-grab active:cursor-grabbing ${draggingIssueId === issue.id ? 'opacity-50' : ''} ${className}`}
+    >
+      {renderIssueCard(issue)}
+    </div>
+  );
+
+  // Dragging only works with a mouse, so the ⋮ → Priority menu stays the way to do it on touch screens.
+  const renderPriorityBoard = (items: UiIssue[]) => {
+    const unprioritized = items.filter((issue) => !getPriorityOption(issue));
+
+    return (
+      <div className="space-y-4">
+        {unprioritized.length > 0 ? (
+          <div
+            {...dropZoneProps('none')}
+            className={`rounded-2xl border border-dashed p-3 transition ${
+              dropTarget === 'none' ? 'border-[#030d0a] bg-muted' : 'border-border bg-card/60'
+            }`}
+          >
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
+              <span className="font-semibold text-foreground">Needs priority · {unprioritized.length}</span>
+              <span className="text-muted-foreground">Drag an issue into a column to set its priority, or use ⋮ → Priority.</span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {unprioritized.map((issue) => renderDraggableCard(issue, 'w-72 shrink-0'))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-4 overflow-x-auto pb-2">
+          {priorityOptions.map((option) => {
+            const columnIssues = items.filter((issue) => issue.priority === option.value);
+
+            return (
+              <section
+                key={option.value}
+                aria-label={`${option.label} priority`}
+                {...dropZoneProps(option.value)}
+                className={`flex min-h-[16rem] flex-col rounded-2xl border-t-4 bg-card/60 p-3 transition ${option.column} ${
+                  dropTarget === option.value ? 'bg-muted ring-2 ring-[#030d0a]/30' : ''
+                }`}
+              >
+                <div className="mb-3 flex items-center gap-2 px-1">
+                  <span className={`h-2.5 w-2.5 rounded-full ${option.dot}`} aria-hidden="true" />
+                  <h3 className="text-sm font-semibold text-foreground">{option.label}</h3>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {columnIssues.length}
+                  </span>
+                </div>
+
+                <div className="flex flex-1 flex-col gap-3">
+                  {columnIssues.length > 0 ? (
+                    columnIssues.map((issue) => renderDraggableCard(issue))
+                  ) : (
+                    <p className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border px-3 py-8 text-center text-xs text-muted-foreground">
+                      Drop issues here
+                    </p>
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const screenSections: Record<Screen, { title: string; items: UiIssue[]; empty: string }> = {
     open: { title: 'Open issues', items: openIssues, empty: 'No open issues.' },
     review: { title: 'Waiting for stakeholder review', items: reviewIssues, empty: 'Nothing is waiting for review.' },
@@ -898,6 +1002,7 @@ export function UiIssueTracker() {
                 [
                   { mode: 'list', label: 'List', Icon: List },
                   { mode: 'grid', label: 'Grid', Icon: LayoutGrid },
+                  { mode: 'board', label: 'Board', Icon: SquareKanban },
                 ] as const
               ).map(({ mode, label, Icon }) => (
                 <button
@@ -959,7 +1064,9 @@ export function UiIssueTracker() {
           ) : null}
 
           {currentSection.items.length > 0 ? (
-            viewMode === 'grid' ? (
+            viewMode === 'board' ? (
+              renderPriorityBoard(currentSection.items)
+            ) : viewMode === 'grid' ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {currentSection.items.map(renderIssueCard)}
               </div>
