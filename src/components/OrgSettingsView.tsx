@@ -629,7 +629,8 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
     showFlash('Organization created — finish profile & branding next.');
   };
 
-  const meta = SECTION_META[section];
+  const sectionLabel =
+    NAV_GROUPS.flatMap((g) => g.items).find((i) => i.id === section)?.label ?? SECTION_META[section].title;
 
   const renderSection = () => {
     switch (section) {
@@ -655,8 +656,6 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
             )}
             <SectionCard
               isDark={isDark}
-              title="Your organizations"
-              description="Select an org to manage, or create another."
               action={
                 <Button type="button" variant="cta" size="sm" className="h-8 gap-1.5 text-xs" onClick={createOrg}>
                   <Plus className="h-3.5 w-3.5" />
@@ -707,7 +706,6 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
             <SectionCard
               isDark={isDark}
               title="Add property"
-              description="Define a new configuration key available across this organization."
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Title">
@@ -763,8 +761,6 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
             <SectionCard
               isDark={isDark}
-              title="System properties"
-              description={`${systemProperties.length} configured`}
               action={
                 <div className="flex items-center gap-2">
                   {propertiesDirty && (
@@ -879,7 +875,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
       case 'profile':
         return (
           <div className="space-y-4">
-            <SectionCard isDark={isDark} title="Profile" description="Shown on invites and shared links.">
+            <SectionCard isDark={isDark} title="Profile">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Organization name">
                   <input
@@ -924,7 +920,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                 </Button>
               </div>
             </SectionCard>
-            <SectionCard isDark={isDark} title="Branding" description="Accent used in org chrome and invite emails.">
+            <SectionCard isDark={isDark} title="Branding">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/15 text-sm font-bold text-brand-green">
                   {activeOrg.logoInitials}
@@ -940,11 +936,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       case 'subdomain':
         return (
-          <SectionCard
-            isDark={isDark}
-            title="Custom subdomain"
-            description="Members reach Mitra at your branded hostname."
-          >
+          <SectionCard isDark={isDark}>
             <Field label="Subdomain" hint="Letters, numbers, and hyphens. Must be unique across Mitra.">
               <div className="flex items-center gap-2">
                 <input
@@ -1073,8 +1065,6 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
         return (
           <SectionCard
             isDark={isDark}
-            title="People"
-            description={`${users.filter((u) => u.status !== 'deactivated').length} active or invited`}
             action={
               <div className="relative w-52">
                 <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -1171,7 +1161,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       case 'invite':
         return (
-          <SectionCard isDark={isDark} title="Send invites" description="Invitees receive an email with a join link.">
+          <SectionCard isDark={isDark}>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Email">
                 <input
@@ -1212,11 +1202,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       case 'onboard':
         return (
-          <SectionCard
-            isDark={isDark}
-            title="Create account on behalf"
-            description="Useful when onboarding contractors or new hires before their first login."
-          >
+          <SectionCard isDark={isDark}>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Full name">
                 <input className={inputClass} value={onboardName} onChange={(e) => setOnboardName(e.target.value)} />
@@ -1265,7 +1251,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                 </Button>
               </div>
             </SectionCard>
-            <SectionCard isDark={isDark} title="Teams & departments">
+            <SectionCard isDark={isDark}>
               <div className="space-y-2">
                 {teams.map((team) => (
                   <div
@@ -1344,7 +1330,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
       case 'permissions':
         return (
           <div className="space-y-4">
-            <SectionCard isDark={isDark} title="Assign permissions by role">
+            <SectionCard isDark={isDark}>
               <Field label="Role">
                 <select className={inputClass} value={selectedRoleId} onChange={(e) => setSelectedRoleId(e.target.value)}>
                   {roles.map((r) => (
@@ -1379,7 +1365,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       case 'policies':
         return (
-          <SectionCard isDark={isDark} title="Organization access policies">
+          <SectionCard isDark={isDark}>
             <div className="space-y-3">
               {policies.map((policy) => (
                 <div
@@ -1431,7 +1417,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div className="min-w-0 flex-1 truncate text-center text-sm font-semibold text-foreground">
-          {meta.title}
+          {sectionLabel}
         </div>
         <Button
           type="button"
@@ -1563,13 +1549,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
       <main className="min-h-0 min-w-0 flex-1 overflow-y-auto pt-12 md:pt-0">
         <div className="mx-auto w-full max-w-3xl px-5 pb-10 pt-6 sm:px-8 sm:pt-8">
-          <div className="mb-6">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {NAV_GROUPS.find((g) => g.items.some((i) => i.id === section))?.label ?? 'Organization'}
-            </p>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground">{meta.title}</h1>
-            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{meta.description}</p>
-          </div>
+          <h1 className="mb-6 font-display text-2xl font-extrabold tracking-tight text-foreground">{sectionLabel}</h1>
 
           {flash && (
             <div
