@@ -71,6 +71,8 @@ const USER_NAME_KEY = 'mitra-ui-audit-user';
 const VIEW_MODE_KEY = 'mitra-ui-audit-view-v2';
 // Set once this browser's pre-sharing issues have been copied into the shared list.
 const LOCAL_ISSUES_UPLOADED_KEY = 'mitra-ui-audit-shared-v1';
+// Set once someone dismisses the "drag cards to a column" tip on the board, so it's shown once per browser.
+const BOARD_GUIDE_DISMISSED_KEY = 'mitra-ui-audit-board-guide-v1';
 const EXAMPLE_ISSUE_PREFIX = 'issue-example-';
 
 const emptyForm = {
@@ -335,6 +337,22 @@ export function UiIssueTracker() {
       return 'board';
     }
   });
+  const [showBoardGuide, setShowBoardGuide] = useState(() => {
+    try {
+      return localStorage.getItem(BOARD_GUIDE_DISMISSED_KEY) !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const dismissBoardGuide = () => {
+    setShowBoardGuide(false);
+    try {
+      localStorage.setItem(BOARD_GUIDE_DISMISSED_KEY, 'true');
+    } catch {
+      // Tip only; ignore storage failures.
+    }
+  };
 
   // Only remember a layout someone actually picked, so Board stays the default for everyone else.
   const chooseViewMode = (mode: ViewMode) => {
@@ -1286,6 +1304,23 @@ export function UiIssueTracker() {
         ) : null}
 
         <section className="w-full">
+          {viewMode === 'board' && showBoardGuide ? (
+            <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border border-brand-green/30 bg-brand-green/10 px-4 py-3 text-sm text-[#030d0a]">
+              <p>
+                <span className="font-semibold">Tip:</span> drag an issue card into a column to set its priority — or
+                back into {boardPoolTitles[screen]} to clear it.
+              </p>
+              <button
+                type="button"
+                onClick={dismissBoardGuide}
+                aria-label="Dismiss tip"
+                className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-[#030d0a]/70 hover:bg-brand-green/15 hover:text-[#030d0a]"
+              >
+                Got it
+              </button>
+            </div>
+          ) : null}
+
           {screen === 'open' && viewMode !== 'board' ? (
             <div className="mb-3 flex items-center gap-2">
               <h2 className="text-sm font-semibold text-foreground">{currentSection.title}</h2>
