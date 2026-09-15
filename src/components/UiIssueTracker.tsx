@@ -1112,7 +1112,7 @@ export function UiIssueTracker() {
   // Issues without a priority wait in the left column; dragging a card right sets its severity.
   // Dragging only works with a mouse, so ⋮ → Priority stays the way to do it on touch screens.
   const renderPriorityBoard = (items: UiIssue[], poolTitle: string, resolvedColumnIssues?: UiIssue[]) => (
-    <div className="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-4 overflow-x-auto pb-2">
+    <div className="grid gap-4 sm:auto-cols-[minmax(16rem,1fr)] sm:grid-flow-col sm:overflow-x-auto sm:pb-2">
       {renderBoardColumn({
         target: 'none',
         title: poolTitle,
