@@ -26,7 +26,7 @@ type IssueType = 'Improvement' | 'Bug' | 'Accessibility' | 'UI' | 'UX';
 
 type IssueStatus = 'open' | 'review' | 'resolved';
 
-type IssuePriority = 'critical' | 'high' | 'medium' | 'low';
+type IssuePriority = 'high' | 'medium' | 'low';
 
 type IssueComment = {
   id: string;
@@ -125,7 +125,7 @@ function normalizeIssue(value: StoredIssue): UiIssue | null {
           ? 'resolved'
           : 'open',
     priority:
-      value.priority === 'critical' || value.priority === 'high' || value.priority === 'medium' || value.priority === 'low'
+      value.priority === 'high' || value.priority === 'medium' || value.priority === 'low'
         ? value.priority
         : null,
     resolvedBy: typeof value.resolvedBy === 'string' ? value.resolvedBy : null,
@@ -263,7 +263,6 @@ const statusLabels: Record<IssueStatus, string> = {
 
 // Ordered most to least severe. Colour is paired with the label so it never carries meaning alone.
 const priorityOptions: { value: IssuePriority; label: string; dot: string; badge: string; stripe: string; column: string }[] = [
-  { value: 'critical', label: 'Critical', dot: 'bg-red-600', badge: 'bg-red-500/10 text-red-700', stripe: 'border-l-red-600', column: 'border-t-red-600' },
   { value: 'high', label: 'High', dot: 'bg-orange-500', badge: 'bg-orange-500/10 text-orange-700', stripe: 'border-l-orange-500', column: 'border-t-orange-500' },
   { value: 'medium', label: 'Medium', dot: 'bg-amber-400', badge: 'bg-amber-400/15 text-amber-700', stripe: 'border-l-amber-400', column: 'border-t-amber-400' },
   { value: 'low', label: 'Low', dot: 'bg-sky-500', badge: 'bg-sky-500/10 text-sky-700', stripe: 'border-l-sky-500', column: 'border-t-sky-500' },
