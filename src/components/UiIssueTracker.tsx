@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Link2,
   List,
+  MessageSquare,
   MoreVertical,
   Pencil,
   SquareKanban,
@@ -27,6 +28,13 @@ type IssueStatus = 'open' | 'review' | 'resolved';
 
 type IssuePriority = 'critical' | 'high' | 'medium' | 'low';
 
+type IssueComment = {
+  id: string;
+  author: string;
+  text: string;
+  createdAt: string;
+};
+
 type UiIssue = {
   id: string;
   name: string;
@@ -40,6 +48,7 @@ type UiIssue = {
   resolvedAt?: string | null;
   approvedBy?: string | null;
   approvedAt?: string | null;
+  comments?: IssueComment[];
   createdAt: string;
 };
 
@@ -71,6 +80,24 @@ const emptyForm = {
   reference: '',
   image: null as string | null,
 };
+
+function normalizeComments(value: unknown): IssueComment[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null;
+      const raw = item as Record<string, unknown>;
+      const text = typeof raw.text === 'string' ? raw.text.trim() : '';
+      if (!text) return null;
+      return {
+        id: typeof raw.id === 'string' ? raw.id : `comment-${Date.now()}-${Math.random()}`,
+        author: typeof raw.author === 'string' && raw.author ? raw.author : 'Anonymous',
+        text,
+        createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString(),
+      };
+    })
+    .filter((comment): comment is IssueComment => comment !== null);
+}
 
 function normalizeIssue(value: StoredIssue): UiIssue | null {
   const name = typeof value.name === 'string' ? value.name : value.title;
@@ -105,6 +132,7 @@ function normalizeIssue(value: StoredIssue): UiIssue | null {
     resolvedAt: typeof value.resolvedAt === 'string' ? value.resolvedAt : null,
     approvedBy: typeof value.approvedBy === 'string' ? value.approvedBy : null,
     approvedAt: typeof value.approvedAt === 'string' ? value.approvedAt : null,
+    comments: normalizeComments(value.comments),
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
   };
 }
@@ -292,6 +320,10 @@ export function UiIssueTracker() {
   });
   const [namePrompt, setNamePrompt] = useState<NamePromptTarget | null>(null);
   const [nameDraft, setNameDraft] = useState('');
+  const [commentIssueId, setCommentIssueId] = useState<string | null>(null);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [commentAuthorDraft, setCommentAuthorDraft] = useState('');
+  const commentTargetIssue = issues.find((issue) => issue.id === commentIssueId) ?? null;
   const [screen, setScreen] = useState<Screen>(screenFromHash);
   const [notice, setNotice] = useState<string | null>(null);
   const [draggingIssueId, setDraggingIssueId] = useState<string | null>(null);
@@ -563,6 +595,38 @@ export function UiIssueTracker() {
     setNamePrompt(null);
   };
 
+  const openCommentModal = (issue: UiIssue) => {
+    setOpenMenuIssueId(null);
+    setCommentDraft('');
+    setCommentAuthorDraft(userName);
+    setCommentIssueId(issue.id);
+  };
+
+  const handleSubmitComment = () => {
+    const text = commentDraft.trim();
+    const author = commentAuthorDraft.trim();
+    const issue = commentTargetIssue;
+    if (!text || !author || !issue) return;
+
+    try {
+      localStorage.setItem(USER_NAME_KEY, author);
+    } catch {
+      // Name still applies to this comment even if it can't be remembered.
+    }
+    setUserName(author);
+
+    const comment: IssueComment = {
+      id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      author,
+      text,
+      createdAt: new Date().toISOString(),
+    };
+    updateIssue(issue.id, { comments: [...(issue.comments ?? []), comment] });
+    setNotice(`Comment added to "${issue.name}"`);
+    setCommentIssueId(null);
+    setCommentDraft('');
+  };
+
   const renderReference = (issue: UiIssue) => {
     const referenceUrl = getReferenceUrl(issue.reference);
 
@@ -682,6 +746,20 @@ export function UiIssueTracker() {
           >
             <Pencil className="h-3.5 w-3.5" />
             Edit
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openCommentModal(issue)}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            Comment
+            {issue.comments && issue.comments.length > 0 ? (
+              <span className="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                {issue.comments.length}
+              </span>
+            ) : null}
           </button>
 
           <div className="my-1 border-t border-border" />
@@ -946,6 +1024,15 @@ export function UiIssueTracker() {
               <Link2 className="h-3 w-3" aria-label="Has a reference" />
             </span>
           ) : null}
+          {issue.comments && issue.comments.length > 0 ? (
+            <span
+              title={`${issue.comments.length} comment${issue.comments.length === 1 ? '' : 's'}`}
+              className="inline-flex items-center gap-0.5"
+            >
+              <MessageSquare className="h-3 w-3" aria-hidden="true" />
+              {issue.comments.length}
+            </span>
+          ) : null}
           <div className="ml-auto flex items-center gap-1">{renderStatusControls(issue, true)}</div>
         </div>
       </div>
@@ -993,9 +1080,38 @@ export function UiIssueTracker() {
     </section>
   );
 
+  // A read-only column, not part of the priority drag targets — it just surfaces who resolved what.
+  const renderResolvedColumn = (resolved: UiIssue[]) => (
+    <section
+      aria-label="Resolved issues"
+      className="flex min-h-[12rem] flex-col rounded-xl border-t-4 border-t-brand-green bg-[#f1f2f4] p-2"
+    >
+      <div className="mb-2 px-1 pt-1">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-brand-green" aria-hidden="true" />
+          <h3 className="text-sm font-semibold text-foreground">Resolved</h3>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            {resolved.length}
+          </span>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">Who resolved each issue.</p>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-2">
+        {resolved.length > 0 ? (
+          resolved.map((issue) => renderBoardCard(issue))
+        ) : (
+          <p className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-black/10 px-3 py-8 text-center text-xs text-muted-foreground">
+            Nothing resolved yet
+          </p>
+        )}
+      </div>
+    </section>
+  );
+
   // Issues without a priority wait in the left column; dragging a card right sets its severity.
   // Dragging only works with a mouse, so ⋮ → Priority stays the way to do it on touch screens.
-  const renderPriorityBoard = (items: UiIssue[], poolTitle: string) => (
+  const renderPriorityBoard = (items: UiIssue[], poolTitle: string, resolvedColumnIssues?: UiIssue[]) => (
     <div className="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-4 overflow-x-auto pb-2">
       {renderBoardColumn({
         target: 'none',
@@ -1017,6 +1133,7 @@ export function UiIssueTracker() {
           emptyText: 'Drop issues here',
         }),
       )}
+      {resolvedColumnIssues ? renderResolvedColumn(resolvedColumnIssues) : null}
     </div>
   );
 
@@ -1168,7 +1285,7 @@ export function UiIssueTracker() {
 
           {currentSection.items.length > 0 ? (
             viewMode === 'board' ? (
-              renderPriorityBoard(currentSection.items, boardPoolTitles[screen])
+              renderPriorityBoard(currentSection.items, boardPoolTitles[screen], screen === 'resolved' ? undefined : resolvedIssues)
             ) : viewMode === 'grid' ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {currentSection.items.map(renderIssueCard)}
@@ -1392,6 +1509,30 @@ export function UiIssueTracker() {
                   <p className="mt-2 text-sm text-muted-foreground">No screenshot added</p>
                 )}
               </div>
+
+              <div>
+                <p className="text-sm font-medium text-foreground">Stakeholder feedback</p>
+                {viewingIssue.comments && viewingIssue.comments.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {viewingIssue.comments.map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="rounded-xl border border-amber-300 bg-amber-100 px-3 py-2.5 text-sm text-[#030d0a]"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                          <span className="font-semibold">{comment.author}</span>
+                          <span className="text-xs text-amber-900/70">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="mt-1 whitespace-pre-wrap leading-6">{comment.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">No comments yet</p>
+                )}
+              </div>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
@@ -1490,6 +1631,69 @@ export function UiIssueTracker() {
                 className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {activePrompt.submit}
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
+
+      {commentIssueId && commentTargetIssue ? (
+        <div
+          onClick={() => setCommentIssueId(null)}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+        >
+          <form
+            role="dialog"
+            aria-label={`Add a comment to ${commentTargetIssue.name}`}
+            onClick={(event) => event.stopPropagation()}
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmitComment();
+            }}
+            className="w-full max-w-md rounded-3xl border border-border bg-card p-5 shadow-2xl md:p-6"
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Stakeholder feedback</p>
+            <h3 className="mt-2 text-xl font-semibold text-foreground">Add a comment</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Comments show on the issue as stakeholder feedback for everyone who opens it.
+            </p>
+
+            <label className="mt-4 block text-sm font-medium text-foreground">
+              Your name
+              <input
+                autoFocus
+                value={commentAuthorDraft}
+                onChange={(event) => setCommentAuthorDraft(event.target.value)}
+                placeholder="Your name"
+                className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-brand-green"
+              />
+            </label>
+
+            <label className="mt-4 block text-sm font-medium text-foreground">
+              Comment
+              <textarea
+                value={commentDraft}
+                onChange={(event) => setCommentDraft(event.target.value)}
+                rows={4}
+                placeholder="Share feedback on this issue…"
+                className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-brand-green"
+              />
+            </label>
+
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCommentIssueId(null)}
+                className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-background"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!commentDraft.trim() || !commentAuthorDraft.trim()}
+                className="rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Post comment
               </button>
             </div>
           </form>
