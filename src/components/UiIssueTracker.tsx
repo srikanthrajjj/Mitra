@@ -854,6 +854,24 @@ export function UiIssueTracker() {
     );
   };
 
+  // Shown right on the card face — stakeholders shouldn't have to open an issue to read feedback on it.
+  const renderCommentPreview = (issue: UiIssue) => {
+    if (!issue.comments || issue.comments.length === 0) return null;
+    const latest = issue.comments[issue.comments.length - 1];
+
+    return (
+      <div className="mt-2 rounded-lg border border-amber-300 bg-amber-100 px-2.5 py-2 text-xs text-[#030d0a]">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-semibold">{latest.author}</span>
+          {issue.comments.length > 1 ? (
+            <span className="text-[10px] text-amber-900/70">+{issue.comments.length - 1} more</span>
+          ) : null}
+        </div>
+        <p className="mt-0.5 line-clamp-2 leading-5">{latest.text}</p>
+      </div>
+    );
+  };
+
   const renderIssueRow = (issue: UiIssue) => (
     <div key={issue.id} className={`rounded-2xl border border-border bg-card p-4 shadow-sm ${priorityStripeClass(issue)}`}>
       <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
@@ -890,6 +908,7 @@ export function UiIssueTracker() {
         {renderIssueActions(issue)}
       </div>
 
+      {renderCommentPreview(issue)}
       {renderStatusStrip(issue)}
     </div>
   );
@@ -923,6 +942,7 @@ export function UiIssueTracker() {
       <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">{issue.description}</p>
       <div className="mt-3 text-sm">{renderReference(issue)}</div>
 
+      {renderCommentPreview(issue)}
       <div className="mt-auto pt-4">{renderIssueActions(issue)}</div>
       {renderStatusStrip(issue)}
     </div>
@@ -1013,6 +1033,8 @@ export function UiIssueTracker() {
           </p>
         ) : null}
 
+        {renderCommentPreview(issue)}
+
         <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <CalendarDays className="h-3 w-3" aria-hidden="true" />
@@ -1021,15 +1043,6 @@ export function UiIssueTracker() {
           {issue.reference !== NO_REFERENCE ? (
             <span title="Has a reference">
               <Link2 className="h-3 w-3" aria-label="Has a reference" />
-            </span>
-          ) : null}
-          {issue.comments && issue.comments.length > 0 ? (
-            <span
-              title={`${issue.comments.length} comment${issue.comments.length === 1 ? '' : 's'}`}
-              className="inline-flex items-center gap-0.5"
-            >
-              <MessageSquare className="h-3 w-3" aria-hidden="true" />
-              {issue.comments.length}
             </span>
           ) : null}
           <div className="ml-auto flex items-center gap-1">{renderStatusControls(issue, true)}</div>
