@@ -1304,23 +1304,6 @@ export function UiIssueTracker() {
         ) : null}
 
         <section className="w-full">
-          {viewMode === 'board' && showBoardGuide ? (
-            <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border border-brand-green/30 bg-brand-green/10 px-4 py-3 text-sm text-[#030d0a]">
-              <p>
-                <span className="font-semibold">Tip:</span> drag an issue card into a column to set its priority — or
-                back into {boardPoolTitles[screen]} to clear it.
-              </p>
-              <button
-                type="button"
-                onClick={dismissBoardGuide}
-                aria-label="Dismiss tip"
-                className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-[#030d0a]/70 hover:bg-brand-green/15 hover:text-[#030d0a]"
-              >
-                Got it
-              </button>
-            </div>
-          ) : null}
-
           {screen === 'open' && viewMode !== 'board' ? (
             <div className="mb-3 flex items-center gap-2">
               <h2 className="text-sm font-semibold text-foreground">{currentSection.title}</h2>
@@ -1744,6 +1727,33 @@ export function UiIssueTracker() {
               </button>
             </div>
           </form>
+        </div>
+      ) : null}
+
+      {viewMode === 'board' && showBoardGuide ? (
+        <div
+          onClick={dismissBoardGuide}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+        >
+          <div
+            role="dialog"
+            aria-label="How the board works"
+            onClick={(event) => event.stopPropagation()}
+            className="w-full max-w-md rounded-3xl border border-border bg-card p-5 text-center shadow-2xl md:p-6"
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Board view</p>
+            <h3 className="mt-2 text-xl font-semibold text-foreground">Drag issues to set priority</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Drag an issue card into a column to set its priority — or back into {boardPoolTitles[screen]} to clear it.
+            </p>
+            <button
+              type="button"
+              onClick={dismissBoardGuide}
+              className="mt-5 w-full rounded-xl bg-brand-green px-4 py-2.5 text-sm font-semibold text-[#030d0a] hover:bg-brand-green-hover"
+            >
+              Got it
+            </button>
+          </div>
         </div>
       ) : null}
 
