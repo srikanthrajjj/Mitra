@@ -53,7 +53,7 @@ export function ComposerInstanceSelect({
       <DropdownMenuTrigger asChild disabled={disabled}>
         <button
           type="button"
-          className="inline-flex max-w-[13rem] items-center gap-1 bg-transparent p-0 transition-colors cursor-pointer"
+          className="inline-flex max-w-[13rem] items-center bg-transparent p-0 transition-colors cursor-pointer"
           title={
             selected
               ? `Target instance — ${selected.name} (${selected.tag}) · ${instanceHostname(selected.url)}. Click to switch.`
@@ -67,43 +67,24 @@ export function ComposerInstanceSelect({
         >
           <span
             className={cn(
-              pillSurface('inline-flex h-6 w-6 items-center justify-center'),
+              pillSurface(
+                'inline-flex max-w-[13rem] items-center gap-1.5 px-2 py-0.5 text-[10px] font-medium leading-none',
+              ),
               open && openHighlight,
-              isConnected ? 'text-brand-green' : 'text-muted-foreground',
+              'text-foreground',
             )}
           >
             <Server
               className={cn(
                 'h-3.5 w-3.5 shrink-0 transition-colors duration-250',
-                isConnected && 'text-brand-green drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
+                isConnected ? 'text-brand-green drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]' : 'text-muted-foreground',
               )}
             />
+            <span className={cn('truncate', !selected && 'text-muted-foreground')}>
+              {selected ? selected.name : 'Instance'}
+            </span>
+            <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
           </span>
-          {selected ? (
-            <span
-              className={cn(
-                pillSurface(
-                  'inline-flex max-w-[9rem] items-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none',
-                ),
-                open && openHighlight,
-                'text-foreground',
-              )}
-            >
-              <span className="truncate">{selected.name}</span>
-              <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
-            </span>
-          ) : (
-            <span
-              className={cn(
-                pillSurface('inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none'),
-                open && openHighlight,
-                'text-muted-foreground',
-              )}
-            >
-              Instance
-              <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
-            </span>
-          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
