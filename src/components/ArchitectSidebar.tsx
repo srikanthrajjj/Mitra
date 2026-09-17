@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type ComponentType, type Ref } from 'react';
 import {
+  Folder,
   Star,
   MoreVertical,
   Share2,
@@ -121,6 +122,7 @@ export function ArchitectSidebar({
   const [pinnedOpen, setPinnedOpen] = useState(true);
   const [recentsOpen, setRecentsOpen] = useState(true);
   const [tagsOpen, setTagsOpen] = useState(true);
+  const [collapsedProjectIds, setCollapsedProjectIds] = useState<Set<string>>(() => new Set());
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const [tagDraftBySolution, setTagDraftBySolution] = useState<Record<string, string>>({});
   const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
@@ -572,7 +574,24 @@ export function ArchitectSidebar({
     activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
 
   const pinnedSolutions = filterByTag(solutions.filter((sol) => sol.isPinned));
-  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned));
+  const unpinnedSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned));
+
+  // Like Claude's sidebar: chats in a project are grouped under that project below Pinned,
+  // and Recents keeps the chats that aren't in an active project.
+  const activeFolders = folders.filter((folder) => !folder.archived);
+  const activeFolderIds = new Set(activeFolders.map((folder) => folder.id));
+  const projectGroups = activeFolders
+    .map((folder) => ({ folder, chats: unpinnedSolutions.filter((sol) => sol.folderId === folder.id) }))
+    .filter((group) => group.chats.length > 0);
+  const recentSolutions = unpinnedSolutions.filter((sol) => !sol.folderId || !activeFolderIds.has(sol.folderId));
+
+  const toggleProject = (folderId: string) =>
+    setCollapsedProjectIds((current) => {
+      const next = new Set(current);
+      if (next.has(folderId)) next.delete(folderId);
+      else next.add(folderId);
+      return next;
+    });
 
   return (
     <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
@@ -691,9 +710,30 @@ export function ArchitectSidebar({
           </div>
         )}
 
+        {/* Project sections: one per project that has chats */}
+        {projectGroups.map(({ folder, chats }) => {
+          const projectOpen = !collapsedProjectIds.has(folder.id);
+          return (
+            <div key={folder.id} className="flex flex-col shrink-0 space-y-0.5 pb-1">
+              <button
+                type="button"
+                onClick={() => toggleProject(folder.id)}
+                className="mb-1 mt-1 flex w-full min-w-0 items-center gap-1.5 px-2.5 text-[12px] font-semibold text-foreground transition-colors"
+                aria-expanded={projectOpen}
+                title={folder.name}
+              >
+                <Folder className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span className="truncate">{folder.name}</span>
+                <span className="ml-auto shrink-0 font-normal tabular-nums">{chats.length}</span>
+              </button>
+              {projectOpen ? chats.map((sol) => renderSolutionRow(sol)) : null}
+            </div>
+          );
+        })}
+
         {/* Recents section */}
         <div className="flex flex-1 flex-col space-y-0.5">
-          {pinnedSolutions.length > 0 && (
+          {(pinnedSolutions.length > 0 || projectGroups.length > 0) && (
             <div className="mx-2.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
           )}
           <button
@@ -714,7 +754,11 @@ export function ArchitectSidebar({
                   'px-2.5 py-2 text-[11px] text-foreground',
                 )}
               >
-                {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No recent chats'}
+                {activeTagFilter
+                  ? `No ${projectGroups.length > 0 ? 'other ' : ''}chats tagged "${activeTagFilter}"`
+                  : projectGroups.length > 0
+                    ? 'No chats outside projects'
+                    : 'No recent chats'}
               </p>
             ) : (
               recentSolutions.map((sol) => renderSolutionRow(sol))
