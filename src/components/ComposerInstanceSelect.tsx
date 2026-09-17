@@ -56,13 +56,13 @@ export function ComposerInstanceSelect({
           className="inline-flex max-w-[13rem] items-center gap-1 bg-transparent p-0 transition-colors cursor-pointer"
           title={
             selected
-              ? `${selected.name} (${selected.tag}) · ${instanceHostname(selected.url)}`
-              : 'Select ServiceNow instance'
+              ? `Target instance — ${selected.name} (${selected.tag}) · ${instanceHostname(selected.url)}. Click to switch.`
+              : 'Select the target ServiceNow instance'
           }
           aria-label={
             selected
-              ? `ServiceNow instance: ${selected.name}`
-              : 'Select ServiceNow instance'
+              ? `Target ServiceNow instance: ${selected.name}. Click to switch instance.`
+              : 'Select the target ServiceNow instance'
           }
         >
           <span
@@ -72,10 +72,10 @@ export function ComposerInstanceSelect({
               'text-muted-foreground',
             )}
           >
-            <Plus
+            <Server
               className={cn(
-                'h-3.5 w-3.5 shrink-0 transition-transform duration-250',
-                open && 'rotate-45 text-brand-green',
+                'h-3.5 w-3.5 shrink-0 transition-colors duration-250',
+                open && 'text-brand-green',
               )}
             />
           </span>
@@ -137,6 +137,11 @@ export function ComposerInstanceSelect({
             <DropdownMenuItem
               key={instance.id}
               disabled={!instance.active}
+              title={
+                instance.active
+                  ? `${instance.name} · ${instanceHostname(instance.url)}`
+                  : `${instance.name} is disconnected — reconnect it from Connections`
+              }
               onClick={() => {
                 onChange(instance.id);
                 setOpen(false);
@@ -182,7 +187,9 @@ export function ComposerInstanceSelect({
                   </span>
                 </div>
                 <p className="truncate text-[10px] text-muted-foreground">
-                  {instanceHostname(instance.url)}
+                  {instance.active
+                    ? instanceHostname(instance.url)
+                    : `${instanceHostname(instance.url)} · disconnected`}
                 </p>
               </div>
               <Check

@@ -2876,6 +2876,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
                       setActiveTab(tab);
                     }}
                     onShareProject={() => handleShareProject(activeSolution.id)}
+                    onCreateConnection={handleOpenCreateConnection}
                     isServerConnected={isServerConnected}
                     taskNotificationEnabled={taskNotificationEnabled}
                     onTaskNotificationChange={setTaskNotificationEnabled}

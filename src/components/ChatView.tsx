@@ -1059,7 +1059,8 @@ export default function ChatView({
                       ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title="Voice Input"
+                  title="Voice input"
+                  aria-label="Voice input"
                 >
                   <Mic className="w-4 h-4" />
                 </button>
@@ -1072,7 +1073,8 @@ export default function ChatView({
                       ? 'text-muted-foreground hover:text-foreground hover:bg-muted' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title="Attach Document"
+                  title="Attach files to this message"
+                  aria-label="Attach files to this message"
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
