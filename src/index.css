@@ -535,7 +535,7 @@ html, body, div, textarea, pre, select {
 
 .light .architect-nav-badge {
   background: hsl(var(--muted));
-  color: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground));
 }
 
 /* Futuristic choice-card icons */

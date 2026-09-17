@@ -96,13 +96,6 @@ function AnimatedSidebarNavIcon({
 /** Tags shown inline under a conversation name before collapsing into a +N. */
 const MAX_INLINE_TAGS = 2;
 
-/** Tag-cloud pill size tier — more usages, larger text. */
-function tagSizeClass(count: number): string {
-  if (count >= 4) return 'text-[12px]';
-  if (count >= 2) return 'text-[10.5px]';
-  return 'text-[9.5px]';
-}
-
 export function ArchitectSidebar({
   theme,
   activeTab,
@@ -204,7 +197,7 @@ export function ArchitectSidebar({
               : 'bg-muted text-brand-green'
             : isDark
               ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
-              : 'text-foreground/90 hover:bg-accent/55 hover:text-brand-green',
+              : 'text-foreground hover:bg-accent/55 hover:text-brand-green',
         )}
       >
         {isEditing ? (
@@ -238,7 +231,7 @@ export function ArchitectSidebar({
               </div>
 
               {sol.tags && sol.tags.length > 0 && (
-                <div className="flex min-w-0 flex-wrap items-center gap-1 pl-[32px]">
+                <div className="flex min-w-0 flex-wrap items-center gap-1">
                   {sol.tags.slice(0, MAX_INLINE_TAGS).map((tag) => {
                     const isActiveTag = activeTagFilter === tag;
                     return (
@@ -251,12 +244,12 @@ export function ArchitectSidebar({
                           setActiveTagFilter((current) => (current === tag ? null : tag));
                         }}
                         className={cn(
-                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[9.5px] font-medium leading-tight transition-colors',
+                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
                           isActiveTag
                             ? 'border-brand-green/30 bg-brand-green/15 text-brand-green'
                             : isDark
-                              ? 'border-white/[0.07] bg-mitra-surface text-muted-foreground hover:text-foreground'
-                              : 'border-border/70 bg-muted text-muted-foreground hover:text-foreground',
+                              ? 'border-white/[0.07] bg-mitra-surface text-foreground'
+                              : 'border-border/70 bg-muted text-foreground',
                         )}
                       >
                         <span className="truncate">{tag}</span>
@@ -266,7 +259,7 @@ export function ArchitectSidebar({
                   {sol.tags.length > MAX_INLINE_TAGS && (
                     <span
                       title={sol.tags.join(', ')}
-                      className="text-[9.5px] font-medium leading-tight text-muted-foreground/70"
+                      className="text-[11px] font-medium leading-tight text-foreground"
                     >
                       +{sol.tags.length - MAX_INLINE_TAGS}
                     </span>
@@ -294,8 +287,8 @@ export function ArchitectSidebar({
                 className={cn(
                   'p-0.5 rounded transition-all cursor-pointer',
                   sol.isFavorite
-                    ? 'text-muted-foreground/50 opacity-100'
-                    : 'text-muted-foreground/25 hover:text-muted-foreground/50 opacity-0 group-hover:opacity-100'
+                    ? 'text-foreground opacity-100'
+                    : 'text-foreground opacity-0 group-hover:opacity-100'
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -312,7 +305,7 @@ export function ArchitectSidebar({
                     type="button"
                     title="Options"
                     className={cn(
-                      'p-0.5 rounded transition-all shrink-0 cursor-pointer text-muted-foreground/35 hover:text-foreground',
+                      'p-0.5 rounded transition-all shrink-0 cursor-pointer text-foreground',
                       'opacity-0 group-hover:opacity-100 focus:opacity-100 data-[state=open]:opacity-100 md:opacity-0'
                     )}
                     onClick={(e) => {
@@ -597,14 +590,14 @@ export function ArchitectSidebar({
                 onMouseEnter={() => setHoveredNavItemId(item.id)}
                 onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
-                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
+                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-1.5 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
                       ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-medium'
                       : 'bg-muted text-foreground font-medium'
                     : isDark
-                      ? 'text-foreground/90 hover:bg-sidebar-accent hover:text-foreground'
-                  : 'text-foreground/90 hover:bg-accent/55 hover:text-foreground',
+                      ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
+                  : 'text-foreground hover:bg-accent/55 hover:text-foreground',
                 )}
               >
                 <AnimatedSidebarNavIcon
@@ -638,10 +631,8 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setTagsOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
-                isDark
-                  ? 'text-illuminate-muted hover:text-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                'text-foreground',
               )}
               aria-expanded={tagsOpen}
             >
@@ -651,7 +642,7 @@ export function ArchitectSidebar({
               )}
             </button>
             {tagsOpen && (
-              <div className="flex flex-wrap gap-1.5 pb-1 pl-[34px] pr-1.5">
+              <div className="flex flex-wrap gap-1 px-2.5 pb-1">
                 {allTags.map((tag) => {
                   const isActiveTag = activeTagFilter === tag;
                   return (
@@ -660,17 +651,16 @@ export function ArchitectSidebar({
                       type="button"
                       onClick={() => setActiveTagFilter((current) => (current === tag ? null : tag))}
                       className={cn(
-                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium leading-tight transition-colors',
-                        tagSizeClass(tagCounts[tag]),
+                        'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
                         isActiveTag
-                          ? 'bg-brand-green/15 text-brand-green'
+                          ? 'border-brand-green/30 bg-brand-green/15 text-brand-green'
                           : isDark
-                            ? 'bg-mitra-surface text-muted-foreground hover:text-foreground'
-                            : 'bg-muted text-muted-foreground hover:text-foreground',
+                            ? 'border-white/[0.07] bg-mitra-surface text-foreground'
+                            : 'border-border/70 bg-muted text-foreground',
                       )}
                     >
-                      {tag}
-                      <span className="opacity-60">{tagCounts[tag]}</span>
+                      <span className="truncate">{tag}</span>
+                      <span className="tabular-nums">{tagCounts[tag]}</span>
                     </button>
                   );
                 })}
@@ -686,10 +676,8 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
-                isDark
-                  ? 'text-illuminate-muted hover:text-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                'text-foreground',
               )}
               aria-expanded={pinnedOpen}
             >
@@ -706,16 +694,14 @@ export function ArchitectSidebar({
         {/* Recents section */}
         <div className="flex flex-1 flex-col space-y-0.5">
           {pinnedSolutions.length > 0 && (
-            <div className="mx-1.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
+            <div className="mx-2.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
           )}
           <button
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
             className={cn(
-              'mb-1 mt-1 flex w-full items-center gap-1.5 px-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
-              isDark
-                ? 'text-illuminate-muted hover:text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
+              'mb-1 mt-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+              'text-foreground',
             )}
             aria-expanded={recentsOpen}
           >
@@ -725,8 +711,7 @@ export function ArchitectSidebar({
             recentSolutions.length === 0 ? (
               <p
                 className={cn(
-                  'px-1.5 py-2 text-[11px]',
-                  isDark ? 'text-illuminate-muted' : 'text-muted-foreground',
+                  'px-2.5 py-2 text-[11px] text-foreground',
                 )}
               >
                 {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No recent chats'}

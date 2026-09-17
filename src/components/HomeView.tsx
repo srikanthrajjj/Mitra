@@ -204,10 +204,7 @@ export default function HomeView({
           <div className="relative z-10 mb-8 text-center flex flex-col items-center justify-center">
             <h1 className="mb-3 flex items-center justify-center gap-2 text-3xl font-display font-semibold tracking-tight md:text-4xl">
               <span className="text-foreground">Welcome to</span>
-              <span className="flex items-center gap-1 font-bold text-primary glow-green">
-                Mitra
-                <Sparkles className="h-6 w-6 animate-pulse text-primary" />
-              </span>
+              <span className="font-bold text-primary glow-green">Mitra</span>
             </h1>
             <p className="max-w-xl mx-auto text-center text-sm leading-relaxed text-muted-foreground md:text-[15px]">
               Your AI architect for ServiceNow — from design to deployment.
