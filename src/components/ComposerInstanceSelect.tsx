@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Plus, Server, Zap } from 'lucide-react';
+import { Check, ChevronDown, Plus, Server, Zap } from 'lucide-react';
 import {
   SERVICE_NOW_INSTANCES,
   ServiceNowInstance,
@@ -69,48 +69,39 @@ export function ComposerInstanceSelect({
             className={cn(
               pillSurface('inline-flex h-6 w-6 items-center justify-center'),
               open && openHighlight,
-              'text-muted-foreground',
+              isConnected ? 'text-brand-green' : 'text-muted-foreground',
             )}
           >
             <Server
               className={cn(
                 'h-3.5 w-3.5 shrink-0 transition-colors duration-250',
-                open && 'text-brand-green',
+                isConnected && 'text-brand-green drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
               )}
             />
           </span>
           {selected ? (
-            <>
-              <span
-                className={cn(
-                  pillSurface(
-                    'max-w-[9rem] truncate px-2 py-0.5 text-[10px] font-medium leading-none',
-                  ),
-                  open && openHighlight,
-                  'text-foreground',
-                )}
-              >
-                <span className="inline-flex items-center gap-1">
-                  <Zap
-                    className={cn(
-                      'h-3 w-3 shrink-0 transition-all duration-300',
-                      isConnected && 'text-brand-green drop-shadow-[0_0_4px_rgba(50,215,75,0.6)]',
-                    )}
-                    fill={isConnected ? 'currentColor' : 'none'}
-                  />
-                  {selected.name}
-                </span>
-              </span>
-            </>
+            <span
+              className={cn(
+                pillSurface(
+                  'inline-flex max-w-[9rem] items-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none',
+                ),
+                open && openHighlight,
+                'text-foreground',
+              )}
+            >
+              <span className="truncate">{selected.name}</span>
+              <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
+            </span>
           ) : (
             <span
               className={cn(
-                pillSurface('px-2 py-0.5 text-[10px] font-medium leading-none'),
+                pillSurface('inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium leading-none'),
                 open && openHighlight,
                 'text-muted-foreground',
               )}
             >
               Instance
+              <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
             </span>
           )}
         </button>
