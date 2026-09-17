@@ -597,11 +597,11 @@ export function ArchitectSidebar({
                 onMouseEnter={() => setHoveredNavItemId(item.id)}
                 onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
-                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] font-medium leading-none transition-all duration-200 cursor-pointer border-0',
+                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
-                      ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-semibold'
-                      : 'bg-muted text-foreground font-semibold'
+                      ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-medium'
+                      : 'bg-muted text-foreground font-medium'
                     : isDark
                       ? 'text-foreground/90 hover:bg-sidebar-accent hover:text-foreground'
                   : 'text-foreground/90 hover:bg-accent/55 hover:text-foreground',
