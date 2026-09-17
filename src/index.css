@@ -43,6 +43,8 @@
   /* VR dark portal — primary green palette */
   --color-brand-green: #4FCF36;
   --color-brand-green-hover: #72E95A;
+  /* Brand green for text on light surfaces: #4FCF36 is ~2:1 on white, this is ~5.4:1. */
+  --color-brand-green-deep: #267A18;
   --color-vr-cyan: #00c9a0;
   --color-vr-accent: rgba(79, 207, 54, 0.55);
 

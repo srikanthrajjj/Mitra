@@ -194,10 +194,10 @@ export function ArchitectSidebar({
           active
             ? isDark
               ? 'bg-mitra-highlight text-brand-green'
-              : 'bg-muted text-brand-green'
+              : 'bg-muted text-brand-green-deep'
             : isDark
               ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
-              : 'text-foreground hover:bg-accent/55 hover:text-brand-green',
+              : 'text-foreground hover:bg-accent/55 hover:text-brand-green-deep',
         )}
       >
         {isEditing ? (
@@ -246,7 +246,7 @@ export function ArchitectSidebar({
                         className={cn(
                           'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
                           isActiveTag
-                            ? 'border-brand-green/30 bg-brand-green/15 text-brand-green'
+                            ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
                             : isDark
                               ? 'border-white/[0.07] bg-mitra-surface text-foreground'
                               : 'border-border/70 bg-muted text-foreground',
@@ -274,7 +274,7 @@ export function ArchitectSidebar({
                   title={`Shared with ${getCollaboratorsForSolution(projectCollaborators, sol.id)
                     .map((c) => c.name)
                     .join(', ')}`}
-                  className="flex items-center p-0.5 text-brand-green/70"
+                  className="flex items-center p-0.5 text-brand-green-deep dark:text-brand-green"
                 >
                   <Share2 className="h-3 w-3" />
                 </span>
@@ -344,7 +344,7 @@ export function ArchitectSidebar({
                             key={folder.id}
                             className={cn(
                               "cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground",
-                              sol.folderId === folder.id && "font-semibold text-brand-green"
+                              sol.folderId === folder.id && "font-semibold text-brand-green-deep dark:text-brand-green"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -590,7 +590,7 @@ export function ArchitectSidebar({
                 onMouseEnter={() => setHoveredNavItemId(item.id)}
                 onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
-                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-1.5 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
+                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
                       ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-medium'
@@ -631,14 +631,14 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setTagsOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
                 'text-foreground',
               )}
               aria-expanded={tagsOpen}
             >
               <span>Tags</span>
               {activeTagFilter && (
-                <span className="normal-case tracking-normal text-brand-green">· {activeTagFilter}</span>
+                <span className="normal-case tracking-normal [font-variant-caps:normal] text-brand-green-deep dark:text-brand-green">· {activeTagFilter}</span>
               )}
             </button>
             {tagsOpen && (
@@ -653,7 +653,7 @@ export function ArchitectSidebar({
                       className={cn(
                         'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
                         isActiveTag
-                          ? 'border-brand-green/30 bg-brand-green/15 text-brand-green'
+                          ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
                           : isDark
                             ? 'border-white/[0.07] bg-mitra-surface text-foreground'
                             : 'border-border/70 bg-muted text-foreground',
@@ -676,7 +676,7 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
                 'text-foreground',
               )}
               aria-expanded={pinnedOpen}
@@ -700,7 +700,7 @@ export function ArchitectSidebar({
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
             className={cn(
-              'mb-1 mt-1 flex w-full items-center gap-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-colors',
+              'mb-1 mt-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
               'text-foreground',
             )}
             aria-expanded={recentsOpen}

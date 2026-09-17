@@ -1031,8 +1031,8 @@ export default function ChatView({
               }`}
             />
 
-            {/* Bottom Actions Row */}
-            <div className="mt-2 flex items-center justify-between pt-2 px-1">
+            {/* Options sit on a tinted strip so they read as controls, not part of the input. */}
+            <div className="-mx-3 -mb-3 mt-3 flex items-center justify-between rounded-b-[14px] bg-muted/50 px-4 py-2">
               <div className="flex items-center gap-2">
                 <ComposerInstanceSelect
                   theme={theme}

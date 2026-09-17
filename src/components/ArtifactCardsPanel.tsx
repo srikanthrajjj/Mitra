@@ -370,10 +370,10 @@ function DeliverableRow({
             side="left"
             className={cn(
               theme,
-              'w-48 p-1.5 rounded-xl border shadow-xl backdrop-blur-md transition-all duration-200',
+              'w-48 p-1.5 rounded-xl shadow-xl backdrop-blur-md transition-all duration-200',
               isDark
-                ? 'bg-mitra-surface/90 border-mitra-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                : 'bg-card/90 border-border text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.06)]',
+                ? 'bg-mitra-surface/90 text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+                : 'bg-card/90 text-foreground shadow-[0_16px_40px_-12px_rgba(15,23,42,0.24),0_4px_12px_-4px_rgba(15,23,42,0.08)]',
             )}
           >
             <DropdownMenuItem

@@ -42,7 +42,7 @@ export function ComposerInstanceSelect({
 
   const pillSurface = (extra?: string) =>
     cn(
-      'rounded-full bg-muted',
+      'rounded-full bg-card shadow-[0_1px_2px_rgba(15,23,42,0.08)] dark:bg-accent dark:shadow-none',
       extra,
     );
 

@@ -26,7 +26,6 @@ import {
   getComposerModePlaceholder,
 } from '../constants/composerModes';
 import { Button } from '@/src/components/ui/button';
-import { Separator } from '@/src/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface HomeViewProps {
@@ -283,9 +282,8 @@ export default function HomeView({
                   className="min-h-[38px] w-full max-h-[200px] resize-none border-none bg-transparent px-2 pt-1 text-[13.5px] font-medium leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                 />
 
-                <Separator className="my-2" />
-
-                <div className="flex items-center justify-between px-1">
+                {/* Options sit on a tinted strip so they read as controls, not part of the input. */}
+                <div className="-mx-3 -mb-3 mt-3 flex items-center justify-between rounded-b-[14px] bg-muted/50 px-4 py-2">
                   <div className="flex items-center gap-1.5">
                     <ComposerInstanceSelect
                       theme={theme}
