@@ -103,6 +103,7 @@ export function ArchitectSidebar({
   folders,
   solutions,
   selectedSidebarId,
+  focusedFolderId,
   onNavigate,
   onSelectSolution,
   onNewChat,
@@ -576,14 +577,20 @@ export function ArchitectSidebar({
   const pinnedSolutions = filterByTag(solutions.filter((sol) => sol.isPinned));
   const unpinnedSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned));
 
-  // Like Claude's sidebar: chats in a project are grouped under that project below Pinned,
-  // and Recents keeps the chats that aren't in an active project.
-  const activeFolders = folders.filter((folder) => !folder.archived);
-  const activeFolderIds = new Set(activeFolders.map((folder) => folder.id));
-  const projectGroups = activeFolders
+  // Like Claude's sidebar, only one project gets its own section below Pinned: the focused project,
+  // otherwise the one with the newest chat. Chats from other projects stay in Recents.
+  const projectGroups = folders
+    .filter((folder) => !folder.archived)
     .map((folder) => ({ folder, chats: unpinnedSolutions.filter((sol) => sol.folderId === folder.id) }))
     .filter((group) => group.chats.length > 0);
-  const recentSolutions = unpinnedSolutions.filter((sol) => !sol.folderId || !activeFolderIds.has(sol.folderId));
+  const newestChatTime = (chats: Solution[]) => Math.max(...chats.map((sol) => Date.parse(sol.createdAt) || 0));
+  const spotlightProject =
+    projectGroups.find((group) => group.folder.id === focusedFolderId) ??
+    [...projectGroups].sort((a, b) => newestChatTime(b.chats) - newestChatTime(a.chats))[0];
+  const spotlightOpen = spotlightProject ? !collapsedProjectIds.has(spotlightProject.folder.id) : false;
+  const recentSolutions = spotlightProject
+    ? unpinnedSolutions.filter((sol) => sol.folderId !== spotlightProject.folder.id)
+    : unpinnedSolutions;
 
   const toggleProject = (folderId: string) =>
     setCollapsedProjectIds((current) => {
@@ -638,14 +645,13 @@ export function ArchitectSidebar({
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <div className="mx-3 h-px shrink-0 bg-border/60 dark:bg-white/[0.06]" />
 
       {/* Recents and Pinned list direct render without folders */}
       <div className="relative mt-3 flex min-h-0 flex-1 flex-col">
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-1 pb-2 scrollbar-thin">
+        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-1 pb-2 scrollbar-thin">
         {/* Tags section — collapsible tag cloud, click a tag to filter Pinned/Recents below */}
         {allTags.length > 0 && (
-          <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
+          <div className="flex flex-col shrink-0 space-y-0.5">
             <button
               type="button"
               onClick={() => setTagsOpen((open) => !open)}
@@ -690,7 +696,7 @@ export function ArchitectSidebar({
 
         {/* Pinned section */}
         {pinnedSolutions.length > 0 && (
-          <div className="flex flex-col shrink-0 space-y-0.5 pb-1">
+          <div className="flex flex-col shrink-0 space-y-0.5">
             <button
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
@@ -710,37 +716,31 @@ export function ArchitectSidebar({
           </div>
         )}
 
-        {/* Project sections: one per project that has chats */}
-        {projectGroups.map(({ folder, chats }) => {
-          const projectOpen = !collapsedProjectIds.has(folder.id);
-          return (
-            <div key={folder.id} className="flex flex-col shrink-0 space-y-0.5 pb-1">
-              <button
-                type="button"
-                onClick={() => toggleProject(folder.id)}
-                className="mb-1 mt-1 flex w-full min-w-0 items-center gap-1.5 px-2.5 text-[12px] font-semibold text-foreground transition-colors"
-                aria-expanded={projectOpen}
-                title={folder.name}
-              >
-                <Folder className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span className="truncate">{folder.name}</span>
-                <span className="ml-auto shrink-0 font-normal tabular-nums">{chats.length}</span>
-              </button>
-              {projectOpen ? chats.map((sol) => renderSolutionRow(sol)) : null}
-            </div>
-          );
-        })}
+        {/* Project section: just one project, like Claude's sidebar */}
+        {spotlightProject && (
+          <div className="flex flex-col shrink-0 space-y-0.5">
+            <button
+              type="button"
+              onClick={() => toggleProject(spotlightProject.folder.id)}
+              className="mb-1 flex w-full min-w-0 items-center gap-1.5 px-2.5 text-[12px] font-semibold text-foreground transition-colors"
+              aria-expanded={spotlightOpen}
+              title={spotlightProject.folder.name}
+            >
+              <Folder className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="truncate">{spotlightProject.folder.name}</span>
+              <span className="ml-auto shrink-0 font-normal tabular-nums">{spotlightProject.chats.length}</span>
+            </button>
+            {spotlightOpen ? spotlightProject.chats.map((sol) => renderSolutionRow(sol)) : null}
+          </div>
+        )}
 
         {/* Recents section */}
         <div className="flex flex-1 flex-col space-y-0.5">
-          {(pinnedSolutions.length > 0 || projectGroups.length > 0) && (
-            <div className="mx-2.5 mb-2 mt-1 h-px shrink-0 bg-border/50 dark:bg-white/[0.05]" />
-          )}
           <button
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
             className={cn(
-              'mb-1 mt-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
+              'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
               'text-foreground',
             )}
             aria-expanded={recentsOpen}
@@ -755,9 +755,9 @@ export function ArchitectSidebar({
                 )}
               >
                 {activeTagFilter
-                  ? `No ${projectGroups.length > 0 ? 'other ' : ''}chats tagged "${activeTagFilter}"`
-                  : projectGroups.length > 0
-                    ? 'No chats outside projects'
+                  ? `No ${spotlightProject ? 'other ' : ''}chats tagged "${activeTagFilter}"`
+                  : spotlightProject
+                    ? 'No other recent chats'
                     : 'No recent chats'}
               </p>
             ) : (
