@@ -26,6 +26,7 @@ import { ArtifactStatus, ProjectCollaborator, Solution, Theme } from '../types';
 import { SidebarGroup, SidebarGroupContent } from '@/src/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { isDarkTheme } from '../utils/theme';
+import { assignTagTones } from '../utils/tagColors';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -158,6 +159,7 @@ export function ArchitectSidebar({
   const allTags = Array.from(
     new Set(solutions.flatMap((s) => s.tags ?? [])),
   ).sort((a, b) => a.localeCompare(b));
+  const tagTone = assignTagTones(allTags);
 
   const tagCounts = solutions.reduce<Record<string, number>>((acc, s) => {
     (s.tags ?? []).forEach((t) => {
@@ -245,6 +247,7 @@ export function ArchitectSidebar({
                 <div className="flex min-w-0 flex-wrap items-center gap-1">
                   {sol.tags.slice(0, MAX_INLINE_TAGS).map((tag) => {
                     const isActiveTag = activeTagFilter === tag;
+                    const tone = tagTone(tag);
                     return (
                       <button
                         key={tag}
@@ -255,12 +258,10 @@ export function ArchitectSidebar({
                           setActiveTagFilter((current) => (current === tag ? null : tag));
                         }}
                         className={cn(
-                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[11px] font-normal leading-tight transition-colors',
-                          isActiveTag
-                            ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
-                            : isDark
-                              ? 'border-white/[0.07] bg-mitra-surface text-foreground'
-                              : 'border-border/70 bg-muted text-foreground',
+                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full px-1.5 py-0.5 text-[11px] font-normal leading-tight transition-colors',
+                          tone.chip,
+                          tone.hover,
+                          isActiveTag && tone.selected,
                         )}
                       >
                         <span className="truncate">{tag}</span>
@@ -401,7 +402,7 @@ export function ArchitectSidebar({
                               key={tag}
                               className={cn(
                                 'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium',
-                                isDark ? 'bg-mitra-highlight text-foreground' : 'bg-muted text-foreground',
+                                tagTone(tag).chip,
                               )}
                             >
                               {tag}
@@ -735,25 +736,24 @@ export function ArchitectSidebar({
             >
               <span>Tags</span>
               {activeTagFilter && (
-                <span className="normal-case tracking-normal [font-variant-caps:normal] text-brand-green-deep dark:text-brand-green">· {activeTagFilter}</span>
+                <span className={cn('normal-case tracking-normal [font-variant-caps:normal]', tagTone(activeTagFilter).text)}>· {activeTagFilter}</span>
               )}
             </button>
             {tagsOpen && (
               <div className="flex flex-wrap gap-1 px-2.5 pb-1">
                 {allTags.map((tag) => {
                   const isActiveTag = activeTagFilter === tag;
+                  const tone = tagTone(tag);
                   return (
                     <button
                       key={tag}
                       type="button"
                       onClick={() => setActiveTagFilter((current) => (current === tag ? null : tag))}
                       className={cn(
-                        'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full border px-1.5 py-px text-[11px] font-normal leading-tight transition-colors',
-                        isActiveTag
-                          ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
-                          : isDark
-                            ? 'border-white/[0.07] bg-mitra-surface text-foreground'
-                            : 'border-border/70 bg-muted text-foreground',
+                        'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-normal leading-tight transition-colors',
+                        tone.chip,
+                        tone.hover,
+                        isActiveTag && tone.selected,
                       )}
                     >
                       <span className="truncate">{tag}</span>
