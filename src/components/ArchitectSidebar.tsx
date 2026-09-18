@@ -17,6 +17,8 @@ import {
   ChartLineIcon as AnimatedChartLineIcon,
   MessageCircleIcon as AnimatedMessageCircleIcon,
   SparklesIcon as AnimatedSparklesIcon,
+  ChevronDownIcon as AnimatedChevronDownIcon,
+  ChevronUpIcon as AnimatedChevronUpIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ProjectFolder } from '../data/folders';
@@ -99,6 +101,9 @@ function AnimatedSidebarNavIcon({
 /** Tags shown inline under a conversation name before collapsing into a +N. */
 const MAX_INLINE_TAGS = 2;
 
+/** Less-used destinations that sit under "More" in the nav, like Claude's sidebar. */
+const MORE_NAV_TABS = ['skills', 'capabilities', 'favourites', 'analytics', 'feedback'];
+
 export function ArchitectSidebar({
   theme,
   activeTab,
@@ -127,10 +132,16 @@ export function ArchitectSidebar({
   const [pinnedOpen, setPinnedOpen] = useState(true);
   const [recentsOpen, setRecentsOpen] = useState(true);
   const [tagsOpen, setTagsOpen] = useState(true);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
   const [tagDraftBySolution, setTagDraftBySolution] = useState<Record<string, string>>({});
   const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+
+  // Keep "More" open while one of its pages is showing.
+  useEffect(() => {
+    if (MORE_NAV_TABS.includes(activeTab)) setMoreOpen(true);
+  }, [activeTab]);
 
   useEffect(() => {
     if (editingSolutionId && renameInputRef.current) {
@@ -250,7 +261,7 @@ export function ArchitectSidebar({
                           setActiveTagFilter((current) => (current === tag ? null : tag));
                         }}
                         className={cn(
-                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
+                          'inline-flex min-w-0 max-w-[7.5rem] shrink cursor-pointer items-center rounded-full border px-1.5 py-px text-[11px] font-normal leading-tight transition-colors',
                           isActiveTag
                             ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
                             : isDark
@@ -265,7 +276,7 @@ export function ArchitectSidebar({
                   {sol.tags.length > MAX_INLINE_TAGS && (
                     <span
                       title={sol.tags.join(', ')}
-                      className="text-[11px] font-medium leading-tight text-foreground"
+                      className="text-[11px] font-normal leading-tight text-foreground"
                     >
                       +{sol.tags.length - MAX_INLINE_TAGS}
                     </span>
@@ -574,6 +585,16 @@ export function ArchitectSidebar({
     if (item.tab) onNavigate(item.tab);
   };
 
+  const primaryNavItems = navItems.filter((item) => !MORE_NAV_TABS.includes(item.tab ?? ''));
+  const moreNavItems = navItems.filter((item) => MORE_NAV_TABS.includes(item.tab ?? ''));
+  const moreToggle: NavItemConfig = {
+    id: 'more',
+    label: moreOpen ? 'Less' : 'More',
+    icon: moreOpen ? AnimatedChevronUpIcon : AnimatedChevronDownIcon,
+    action: () => setMoreOpen((open) => !open),
+  };
+  const visibleNavItems = [...primaryNavItems, moreToggle, ...(moreOpen ? moreNavItems : [])];
+
   const filterByTag = (list: Solution[]) =>
     activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
 
@@ -598,7 +619,7 @@ export function ArchitectSidebar({
     <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
       <SidebarGroup className="shrink-0 px-2 pt-3 pb-2">
         <SidebarGroupContent className="space-y-0.5">
-{navItems.map((item) => {
+{visibleNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
             return (
@@ -613,8 +634,8 @@ export function ArchitectSidebar({
                   'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
-                      ? 'architect-nav-item--active bg-mitra-highlight text-foreground font-medium'
-                      : 'bg-muted text-foreground font-medium'
+                      ? 'architect-nav-item--active bg-mitra-highlight text-foreground'
+                      : 'bg-muted text-foreground'
                     : isDark
                       ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
                   : 'text-foreground hover:bg-accent/55 hover:text-foreground',
@@ -629,7 +650,7 @@ export function ArchitectSidebar({
                 />
                 <span className="flex-1 text-left">{item.label}</span>
                 {item.badge !== undefined && (
-                  <span className="architect-nav-badge ml-auto min-w-[1.25rem] rounded-md bg-muted px-1.5 py-0.5 text-center text-[10px] font-semibold tabular-nums leading-none">
+                  <span className="architect-nav-badge ml-auto min-w-[1.25rem] rounded-md bg-muted px-1.5 py-0.5 text-center text-[10px] font-normal tabular-nums leading-none">
                     {item.badge}
                   </span>
                 )}
@@ -647,7 +668,7 @@ export function ArchitectSidebar({
         {spotlightFolder && (
           <div className="flex flex-col shrink-0 space-y-0.5">
             <div className="mb-1 flex items-center justify-between px-2.5">
-              <span className="text-[12px] font-semibold tracking-wider text-foreground [font-variant-caps:all-small-caps]">
+              <span className="text-[12px] font-normal tracking-wider text-foreground [font-variant-caps:all-small-caps]">
                 Projects
               </span>
               <button
@@ -691,7 +712,7 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setTagsOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-normal tracking-wider [font-variant-caps:all-small-caps] transition-colors',
                 'text-foreground',
               )}
               aria-expanded={tagsOpen}
@@ -711,7 +732,7 @@ export function ArchitectSidebar({
                       type="button"
                       onClick={() => setActiveTagFilter((current) => (current === tag ? null : tag))}
                       className={cn(
-                        'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight transition-colors',
+                        'inline-flex max-w-[7.5rem] items-center gap-1 rounded-full border px-1.5 py-px text-[11px] font-normal leading-tight transition-colors',
                         isActiveTag
                           ? 'border-brand-green/30 bg-brand-green/15 text-brand-green-deep dark:text-brand-green'
                           : isDark
@@ -736,7 +757,7 @@ export function ArchitectSidebar({
               type="button"
               onClick={() => setPinnedOpen((open) => !open)}
               className={cn(
-                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
+                'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-normal tracking-wider [font-variant-caps:all-small-caps] transition-colors',
                 'text-foreground',
               )}
               aria-expanded={pinnedOpen}
@@ -757,7 +778,7 @@ export function ArchitectSidebar({
             type="button"
             onClick={() => setRecentsOpen((open) => !open)}
             className={cn(
-              'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-semibold tracking-wider [font-variant-caps:all-small-caps] transition-colors',
+              'mb-1 flex w-full items-center gap-1.5 px-2.5 text-[12px] font-normal tracking-wider [font-variant-caps:all-small-caps] transition-colors',
               'text-foreground',
             )}
             aria-expanded={recentsOpen}

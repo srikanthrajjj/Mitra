@@ -225,7 +225,7 @@ export default function Sidebar({
                     onClick={onToggleCollapse}
                   >
                     <Folder className="h-4 w-4" />
-                    <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[0.875rem] items-center justify-center rounded-full bg-primary px-0.5 text-[8px] font-semibold leading-none text-primary-foreground">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[0.875rem] items-center justify-center rounded-full bg-primary px-0.5 text-[8px] font-normal leading-none text-primary-foreground">
                       {folders.length}
                     </span>
                   </Button>
@@ -267,7 +267,7 @@ export default function Sidebar({
                       data-tour="profile"
                     >
                       <Avatar className={cn('h-7 w-7 rounded-md', impersonatedUser && 'ring-2 ring-amber-500', isOrgSwitched && 'ring-2 ring-brand-green')}>
-                        <AvatarFallback className="rounded-md bg-muted text-[10px] font-medium text-muted-foreground">
+                        <AvatarFallback className="rounded-md bg-muted text-[10px] font-normal text-muted-foreground">
                           {displayInitials}
                         </AvatarFallback>
                       </Avatar>
@@ -387,11 +387,11 @@ export default function Sidebar({
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="truncate text-[15px] font-semibold tracking-tight text-sidebar-foreground/90">
+                <span className="truncate text-[15px] font-normal tracking-tight text-sidebar-foreground/90">
                   Mitra
                 </span>
                 {version === 'v3' && (
-                  <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono leading-none">
+                  <span className="shrink-0 text-[8px] font-normal px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono leading-none">
                     v3 Beta
                   </span>
                 )}
@@ -531,7 +531,7 @@ export default function Sidebar({
                 ? 'bg-brand-green/10 text-foreground'
                 : 'bg-brand-green/5 text-foreground',
             )}>
-              <p>You can turn off notifications from <span className="font-semibold">Settings</span>.</p>
+              <p>You can turn off notifications from <span>Settings</span>.</p>
             </div>
             <button
               type="button"
@@ -555,13 +555,13 @@ export default function Sidebar({
               aria-label="Account menu"
             >
               <Avatar className={cn('h-9 w-9 shrink-0 rounded-full ring-1 ring-border/40', impersonatedUser && 'ring-2 ring-amber-500')}>
-                <AvatarFallback className="rounded-full bg-muted text-[10px] font-medium text-foreground">
+                <AvatarFallback className="rounded-full bg-muted text-[10px] font-normal text-foreground">
                   {displayInitials}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1 min-w-0">
-                  <div className="truncate text-[12px] font-semibold text-foreground">
+                  <div className="truncate text-[12px] font-normal text-foreground">
                     {displayName}
                   </div>
                   {impersonatedUser && (
@@ -572,7 +572,7 @@ export default function Sidebar({
                   )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
-                  <span className={cn('truncate font-semibold', isDark ? 'text-brand-green' : 'text-emerald-900')}>
+                  <span className={cn('truncate', isDark ? 'text-brand-green' : 'text-emerald-900')}>
                     {activeOrg.name}
                   </span>
                   <Building2 className={cn(
