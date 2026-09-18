@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ComponentType, type Ref } from 'react';
+import { useState, useEffect, useRef, type ComponentType, type ReactNode, type Ref } from 'react';
 import {
   Folder,
   Plus,
@@ -18,7 +18,6 @@ import {
   MessageCircleIcon as AnimatedMessageCircleIcon,
   SparklesIcon as AnimatedSparklesIcon,
   ChevronDownIcon as AnimatedChevronDownIcon,
-  ChevronUpIcon as AnimatedChevronUpIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ProjectFolder } from '../data/folders';
@@ -137,11 +136,6 @@ export function ArchitectSidebar({
   const [tagDraftBySolution, setTagDraftBySolution] = useState<Record<string, string>>({});
   const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
-
-  // Keep "More" open while one of its pages is showing.
-  useEffect(() => {
-    if (MORE_NAV_TABS.includes(activeTab)) setMoreOpen(true);
-  }, [activeTab]);
 
   useEffect(() => {
     if (editingSolutionId && renameInputRef.current) {
@@ -566,6 +560,7 @@ export function ArchitectSidebar({
       const isNewChat = activeTab === 'projects' && (!activeSolution || activeSolution.chatHistory.length === 0);
       return isNewChat;
     }
+    if (item.id === 'more') return moreOpen || MORE_NAV_TABS.includes(activeTab);
     if (item.id === 'projects') {
       return activeTab === 'projects' && !selectedSidebarId;
     }
@@ -587,13 +582,33 @@ export function ArchitectSidebar({
 
   const primaryNavItems = navItems.filter((item) => !MORE_NAV_TABS.includes(item.tab ?? ''));
   const moreNavItems = navItems.filter((item) => MORE_NAV_TABS.includes(item.tab ?? ''));
-  const moreToggle: NavItemConfig = {
-    id: 'more',
-    label: moreOpen ? 'Less' : 'More',
-    icon: moreOpen ? AnimatedChevronUpIcon : AnimatedChevronDownIcon,
-    action: () => setMoreOpen((open) => !open),
-  };
-  const visibleNavItems = [...primaryNavItems, moreToggle, ...(moreOpen ? moreNavItems : [])];
+  // "More" opens a flyout menu beside the nav, like Claude's sidebar.
+  const moreToggle: NavItemConfig = { id: 'more', label: 'More', icon: AnimatedChevronDownIcon };
+  const visibleNavItems = [...primaryNavItems, moreToggle];
+
+  const renderMoreMenu = (trigger: ReactNode) => (
+    <DropdownMenu key="more" open={moreOpen} onOpenChange={setMoreOpen}>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="start" sideOffset={8} className={cn(theme, 'w-52')}>
+        {moreNavItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <DropdownMenuItem
+              key={item.id}
+              onSelect={() => handleNavClick(item)}
+              className={cn(
+                'cursor-pointer gap-3 px-2.5 py-2 text-[13px]',
+                isActive(item) && (isDark ? 'bg-mitra-highlight' : 'bg-muted'),
+              )}
+            >
+              <Icon size={16} className="h-4 w-4 shrink-0" />
+              {item.label}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   const filterByTag = (list: Solution[]) =>
     activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
@@ -622,7 +637,7 @@ export function ArchitectSidebar({
 {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item);
-            return (
+            const navButton = (
               <button
                 key={item.id}
                 type="button"
@@ -656,6 +671,7 @@ export function ArchitectSidebar({
                 )}
               </button>
             );
+            return item.id === 'more' ? renderMoreMenu(navButton) : navButton;
           })}
         </SidebarGroupContent>
       </SidebarGroup>
