@@ -2356,6 +2356,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
     return folderId;
   };
 
+  const handleOpenFolder = (folderId: string) => {
+    setFocusedFolderId(folderId);
+    setActiveSolutionId('');
+    setSelectedSidebarId('');
+    setSolutions((prev) => prev.map((sol) => ({ ...sol, active: false })));
+    setActiveTab('projects');
+  };
+
   const handleRenameFolder = (folderId: string, name: string) => {
     const trimmed = name.trim() || UNTITLED_FOLDER_NAME;
     setFolders((prev) =>
@@ -2643,6 +2651,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           renamingFolderId={renamingFolderId}
           onSelectSolution={handleSelectSolution}
           onCreateFolder={handleCreateFolder}
+          onOpenFolder={handleOpenFolder}
           onRenameFolder={handleRenameFolder}
           onDeleteFolder={handleArchiveFolder}
           onRenameSolution={handleRenameSolution}

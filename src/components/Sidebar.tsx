@@ -73,6 +73,7 @@ interface SidebarProps {
   renamingFolderId: string | null;
   onSelectSolution: (solutionId: string) => void;
   onCreateFolder: () => string;
+  onOpenFolder?: (folderId: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onRenameSolution: (solutionId: string, name: string) => void;
@@ -125,6 +126,7 @@ export default function Sidebar({
   renamingFolderId,
   onSelectSolution,
   onCreateFolder,
+  onOpenFolder,
   onRenameFolder,
   onDeleteFolder,
   onRenameSolution,
@@ -456,6 +458,7 @@ export default function Sidebar({
             onNavigate={setActiveTab}
             onSelectSolution={onSelectSolution}
             onCreateFolder={onCreateFolder}
+            onOpenFolder={onOpenFolder}
             onRenameFolder={onRenameFolder}
             onDeleteFolder={onDeleteFolder}
             onRenameSolution={onRenameSolution}
