@@ -2614,7 +2614,9 @@ Pick a step below and I'll continue building — data model, scripts, and update
     <div className={`h-screen w-full flex flex-col relative ${
       `${resolvedTheme} ${resolvedTheme === 'light' ? 'bg-light-canvas' : 'bg-dark-canvas'} text-foreground`
     } ${highContrast ? 'high-contrast' : ''} ${fontSizeLevel > 0 ? `font-size-level-${fontSizeLevel}` : ''} font-sans overflow-hidden`}>
-      {!announcementDismissed && <AnnouncementBar onDismiss={dismissAnnouncement} />}
+      {!announcementDismissed && (activeTab === 'dashboard' || activeTab === 'new-chat') && (
+        <AnnouncementBar onDismiss={dismissAnnouncement} />
+      )}
       <div className="flex min-h-0 w-full flex-1 relative">
       {activeTab !== 'org-settings' && (
       <div
