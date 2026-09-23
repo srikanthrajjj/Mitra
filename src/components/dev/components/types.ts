@@ -8,7 +8,8 @@ export type DevComponentId =
   | 'chat-bubble'
   | 'entry-chips'
   | 'tab-bar'
-  | 'stepper';
+  | 'stepper'
+  | 'announcements';
 
 export interface DevComponentMeta {
   id: DevComponentId;

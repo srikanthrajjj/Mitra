@@ -6,6 +6,8 @@ import { ResolvedTheme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { type HomeActionType } from '../data/homeActions';
 import HomeActionCards from './HomeActionCards';
+import { AnnouncementsPanel } from './dev/components/announcements/AnnouncementsPanel';
+import { sampleAnnouncements } from '../data/announcements';
 import SimulationComposerStack from './SimulationComposerStack';
 import { ComposerModeSelect } from './ComposerModeSelect';
 import { ComposerInstanceSelect } from './ComposerInstanceSelect';
@@ -54,6 +56,14 @@ export default function HomeView({
   const isDark = isDarkTheme(theme);
   const { isOrgSwitched } = useOrgSession();
   const [inputValue, setInputValue] = useState('');
+  const [announcementPreview] = useState(() => {
+    const now = new Date();
+    return {
+      now,
+      // Preview destinations are fictional; keep the home feed read-only.
+      items: sampleAnnouncements(now).map((announcement) => ({ ...announcement, redirectPath: '' })),
+    };
+  });
   const [composerMode, setComposerMode] = useState<ComposerModeId>('plan');
   const [isFocused, setIsFocused] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -223,6 +233,17 @@ export default function HomeView({
             <div className="w-full flex justify-center">
               <HomeActionCards theme={theme} onActionCard={handleActionCard} onExampleClick={handleExampleClick} />
             </div>
+          </div>
+
+          <div className="relative z-10 w-full">
+            <p className="mb-2 text-xs text-muted-foreground">Preview data</p>
+            <AnnouncementsPanel
+              title="Announcements"
+              announcements={announcementPreview.items}
+              theme={theme}
+              now={announcementPreview.now}
+              maxHeight={280}
+            />
           </div>
         </div>
       </div>

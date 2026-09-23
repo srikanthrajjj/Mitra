@@ -455,3 +455,42 @@ export interface AIModel {
   badgeColor: string;
 }
 
+
+/** Announcement severity — drives the feed row's icon and tone. */
+export type AnnouncementType = 'info' | 'success' | 'warning' | 'critical';
+
+/** Who an announcement was raised for. */
+export type AnnouncementLevel = 'system' | 'org' | 'user';
+
+/**
+ * One announcement, in the shape the API returns it. The feed is read-only for the user:
+ * everything here is displayed or filtered on, never edited.
+ */
+export interface Announcement {
+  _id: string;
+  label: string;
+  shortDescription: string;
+  description: string;
+  level: AnnouncementLevel;
+  type: AnnouncementType;
+  organisationId: string;
+  userId?: string;
+  readByUsers?: string[];
+  isRead: boolean;
+  sourceTable?: string;
+  sourceId?: string;
+  /** When true the announcement drops out of the feed at expireAt. */
+  isTTL?: boolean;
+  expireAt?: string;
+  active: boolean;
+  redirectPath?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** Envelope the announcements endpoint responds with. */
+export interface AnnouncementsResponse {
+  data: Announcement[];
+}

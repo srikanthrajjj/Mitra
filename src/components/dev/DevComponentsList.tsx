@@ -1,5 +1,5 @@
 import { useRef, useState, type FC } from 'react';
-import { Check, ChevronRight, Code, Download, ListTodo, MessageSquare, MessagesSquare, Milestone, Sparkles, Type, LayoutGrid } from 'lucide-react';
+import { Check, ChevronRight, Code, Download, ListTodo, Megaphone, MessageSquare, MessagesSquare, Milestone, Sparkles, Type, LayoutGrid } from 'lucide-react';
 import { DEV_COMPONENTS, type DevComponentId, type DevComponentMeta } from './components';
 
 interface DevComponentsListProps {
@@ -14,6 +14,7 @@ const COMPONENT_ICONS: Record<DevComponentId, FC<{ className?: string }>> = {
   'entry-chips': Sparkles,
   'tab-bar': LayoutGrid,
   stepper: Milestone,
+  announcements: Megaphone,
 };
 
 /** Serialize a rendered lucide <svg> to a standalone, downloadable SVG file. */

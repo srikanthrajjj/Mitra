@@ -11,6 +11,7 @@ import { chatBubbleEntry } from './chat-bubble';
 import { entryChipsEntry } from './entry-chips';
 import { tabBarEntry } from '../tab-bar';
 import { stepperEntry } from './stepper';
+import { announcementsEntry } from './announcements';
 
 export type { DevComponentEntry, DevComponentId, DevComponentMeta, DevShowcaseComponent };
 
@@ -22,6 +23,7 @@ export const DEV_COMPONENT_ENTRIES: DevComponentEntry[] = [
   entryChipsEntry,
   tabBarEntry,
   stepperEntry,
+  announcementsEntry,
 ];
 
 export const DEV_COMPONENTS: DevComponentMeta[] = DEV_COMPONENT_ENTRIES.map((entry) => entry.meta);
