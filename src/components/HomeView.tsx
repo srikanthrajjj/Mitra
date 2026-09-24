@@ -27,13 +27,8 @@ import {
 } from '../constants/composerModes';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
-import {
-  AnnouncementBar,
-  persistDismissedAnnouncement,
-  readDismissedAnnouncements,
-} from './AnnouncementBar';
-import { sampleAnnouncements } from '../data/announcements';
-import { visibleAnnouncements } from '../utils/announcements';
+import { AnnouncementBar } from './AnnouncementBar';
+import type { Announcement } from '../types';
 
 interface HomeViewProps {
   appVersion?: 'v2' | 'v3';
@@ -45,6 +40,10 @@ interface HomeViewProps {
   taskNotificationEnabled?: boolean;
   onTaskNotificationChange?: (value: boolean) => void;
   onNotificationsEnabled?: () => void;
+  announcements?: Announcement[];
+  dismissedAnnouncementIds?: string[];
+  onDismissAnnouncement?: (announcementId: string) => void;
+  announcementNow?: Date;
 }
 
 export default function HomeView({
@@ -57,6 +56,10 @@ export default function HomeView({
   taskNotificationEnabled = false,
   onTaskNotificationChange,
   onNotificationsEnabled,
+  announcements = [],
+  dismissedAnnouncementIds = [],
+  onDismissAnnouncement,
+  announcementNow,
 }: HomeViewProps) {
   const isDark = isDarkTheme(theme);
   const { isOrgSwitched } = useOrgSession();
@@ -76,17 +79,11 @@ export default function HomeView({
   const [notificationBannerDismissed, setNotificationBannerDismissed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const announcementTime = useMemo(() => new Date(), []);
-  const announcementFeed = useMemo(
-    () => visibleAnnouncements(sampleAnnouncements(announcementTime), announcementTime),
-    [announcementTime],
-  );
-  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<string[]>(
-    readDismissedAnnouncements,
-  );
+  const fallbackAnnouncementTime = useMemo(() => new Date(), []);
+  const announcementTime = announcementNow ?? fallbackAnnouncementTime;
   const announcement = useMemo(
-    () => announcementFeed.find((item) => !dismissedAnnouncements.includes(item._id)),
-    [announcementFeed, dismissedAnnouncements],
+    () => announcements.find((item) => !dismissedAnnouncementIds.includes(item._id)),
+    [announcements, dismissedAnnouncementIds],
   );
 
   useEffect(() => {
@@ -221,10 +218,7 @@ export default function HomeView({
             <AnnouncementBar
               announcement={announcement}
               now={announcementTime}
-              onDismiss={() => {
-                persistDismissedAnnouncement(announcement._id);
-                setDismissedAnnouncements((ids) => [...ids, announcement._id]);
-              }}
+              onDismiss={() => onDismissAnnouncement?.(announcement._id)}
             />
           </div>
         )}

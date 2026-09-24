@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   Bot, Bell, HelpCircle, ChevronRight, X, ListFilter, Play, Check, 
   Trash2, RefreshCw, AlertCircle, FileCode, CheckCircle, ExternalLink, Settings, Users, Sun, Moon, Star
@@ -44,6 +44,10 @@ import { ShareProjectModal } from './components/ShareProjectModal';
 import { CenterToast, type CenterToastData } from './components/CenterToast';
 import { DesignFeedbackWidget } from './components/DesignFeedbackWidget';
 import { WhatsNewModal, readWhatsNewDismissed } from './components/WhatsNewModal';
+import { AnnouncementsModal } from './components/AnnouncementsModal';
+import { persistDismissedAnnouncement, readDismissedAnnouncements } from './components/AnnouncementBar';
+import { sampleAnnouncements } from './data/announcements';
+import { visibleAnnouncements } from './utils/announcements';
 import { GuestStakeholderView } from './components/GuestStakeholderView';
 import { AdminPanelView } from './components/AdminPanelView';
 import { DeveloperWorkspaceView } from './components/DeveloperWorkspaceView';
@@ -596,6 +600,26 @@ export default function App() {
     setIsTourOpen(true);
   }, [setActiveTab]);
   const [whatsNewOpen, setWhatsNewOpen] = useState<boolean>(false);
+
+  // The feed lives here so the home banner and the sidebar bell's dot cannot disagree.
+  const announcementNow = useMemo(() => new Date(), []);
+  const announcementFeed = useMemo(
+    () => visibleAnnouncements(sampleAnnouncements(announcementNow), announcementNow),
+    [announcementNow],
+  );
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<string[]>(
+    readDismissedAnnouncements,
+  );
+  const [announcementsOpen, setAnnouncementsOpen] = useState<boolean>(false);
+  const dismissAnnouncement = useCallback((announcementId: string) => {
+    persistDismissedAnnouncement(announcementId);
+    setDismissedAnnouncements((ids) =>
+      ids.includes(announcementId) ? ids : [...ids, announcementId],
+    );
+  }, []);
+  const hasUnreadAnnouncements = announcementFeed.some(
+    (item) => !dismissedAnnouncements.includes(item._id),
+  );
   const DEFAULT_MODEL = 'gemini-2.5-flash';
   const [welcomeComplete, setWelcomeComplete] = useState<boolean>(() => {
     if (parseGuestReviewFromHash()) return true;
@@ -2632,6 +2656,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
           onToggleFavorite={handleToggleFavorite}
           onTogglePin={handleTogglePin}
           onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenAnnouncements={() => setAnnouncementsOpen(true)}
+          hasUnreadAnnouncements={hasUnreadAnnouncements}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           devModeEnabled={devModeEnabled}
@@ -2753,6 +2779,10 @@ Pick a step below and I'll continue building — data model, scripts, and update
               taskNotificationEnabled={taskNotificationEnabled}
               onTaskNotificationChange={setTaskNotificationEnabled}
               onNotificationsEnabled={() => setShowNotificationToast(true)}
+              announcements={announcementFeed}
+              dismissedAnnouncementIds={dismissedAnnouncements}
+              onDismissAnnouncement={dismissAnnouncement}
+              announcementNow={announcementNow}
             />
           )}
 
@@ -3087,6 +3117,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
         onPreviewGuest={handlePreviewGuest}
         pendingReviewId={lastShareReviewId}
         defaultAutoApprove={autoApprove}
+      />
+
+      <AnnouncementsModal
+        theme={resolvedTheme}
+        isOpen={announcementsOpen}
+        onClose={() => setAnnouncementsOpen(false)}
+        announcements={announcementFeed}
+        now={announcementNow}
       />
 
       <ShareProjectModal

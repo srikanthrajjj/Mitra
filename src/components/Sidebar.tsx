@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Key, ChevronDown, LogOut, Settings, HelpCircle, Building2, Search,
+  Key, ChevronDown, LogOut, Settings, HelpCircle, Building2, Search, Bell,
   PanelLeftClose, ChevronsRight, Folder, Sun, Moon, Code, X, VenetianMask, ArrowRightLeft
 } from 'lucide-react';
 import { ResolvedTheme, UserRole, StakeholderReview, Solution, BusinessOwnerSubmission, Theme, ProjectCollaborator } from '../types';
@@ -53,6 +53,9 @@ interface SidebarProps {
   onToggleFavorite: (id: string) => void;
   onTogglePin?: (id: string) => void;
   onOpenSearch?: () => void;
+  onOpenAnnouncements?: () => void;
+  /** Unread dot on the bell — there is something the user has not seen. */
+  hasUnreadAnnouncements?: boolean;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenNewSolutionModal: () => void;
@@ -107,6 +110,8 @@ export default function Sidebar({
   onToggleFavorite,
   onTogglePin,
   onOpenSearch,
+  onOpenAnnouncements,
+  hasUnreadAnnouncements = false,
   activeTab,
   setActiveTab,
   onOpenNewSolutionModal,
@@ -197,6 +202,31 @@ export default function Sidebar({
               </TooltipTrigger>
               <TooltipContent side="right">Search</TooltipContent>
             </Tooltip>
+            {onOpenAnnouncements && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-7 w-7 text-muted-foreground hover:text-foreground"
+                    aria-label={
+                      hasUnreadAnnouncements ? 'Announcements, unread' : 'Announcements'
+                    }
+                    onClick={onOpenAnnouncements}
+                  >
+                    <Bell className="h-4 w-4" />
+                    {hasUnreadAnnouncements && (
+                      <span
+                        aria-hidden
+                        className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-brand-green ring-2 ring-sidebar"
+                      />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Announcements</TooltipContent>
+              </Tooltip>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -416,6 +446,31 @@ export default function Sidebar({
               </TooltipTrigger>
               <TooltipContent side="bottom">Search</TooltipContent>
             </Tooltip>
+            {onOpenAnnouncements && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-7 w-7 text-muted-foreground hover:text-foreground"
+                    aria-label={
+                      hasUnreadAnnouncements ? 'Announcements, unread' : 'Announcements'
+                    }
+                    onClick={onOpenAnnouncements}
+                  >
+                    <Bell className="h-4 w-4" />
+                    {hasUnreadAnnouncements && (
+                      <span
+                        aria-hidden
+                        className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-brand-green ring-2 ring-sidebar"
+                      />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Announcements</TooltipContent>
+              </Tooltip>
+            )}
             {onToggleCollapse && (
               <Tooltip>
                 <TooltipTrigger asChild>
