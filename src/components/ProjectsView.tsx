@@ -115,7 +115,7 @@ function ProjectDetailView({
               <h1 className="font-display text-2xl font-bold text-foreground">
                 {solution.name}
               </h1>
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                 <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
                 {status.label}
               </span>
@@ -218,7 +218,7 @@ function ProjectDetailView({
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
+                  <span className="flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-muted-foreground">
                     <Clock className="h-3 w-3 opacity-70" />
                     {getLastUpdated(solution)}
                   </span>
@@ -291,24 +291,23 @@ export default function ProjectsView({
     setFilter('all');
   };
 
+  // Active state carries a ring and bolder weight, not just colour — colour alone fails WCAG 1.4.1.
   const viewToggleBtn = (mode: ViewMode) =>
     cn(
       'inline-flex h-8 w-8 items-center justify-center rounded-lg border-0 transition-colors',
       viewMode === mode
-        ? 'bg-muted text-brand-green'
-        : isDark
-          ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+        ? 'bg-muted text-brand-green ring-1 ring-brand-green/45'
+        : 'text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
   const filterPill = (active: boolean) =>
     cn(
-      'rounded-full border-0 px-4 py-1.5 text-xs font-medium transition-colors',
+      'rounded-full border-0 px-4 py-1.5 text-xs transition-colors',
       active
-        ? 'bg-accent text-brand-green'
+        ? 'bg-accent text-brand-green font-semibold ring-1 ring-brand-green/45'
         : isDark
-          ? 'bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
+          ? 'bg-mitra-surface text-muted-foreground font-medium hover:bg-accent hover:text-foreground'
+          : 'bg-card text-muted-foreground font-medium hover:bg-accent hover:text-foreground',
     );
 
   /* If viewing a specific project, show detail view */
@@ -391,6 +390,7 @@ export default function ProjectsView({
                   type="button"
                   onClick={() => setFilter(f)}
                   className={filterPill(filter === f)}
+                  aria-pressed={filter === f}
                 >
                   {FILTER_LABELS[f]}
                 </button>
@@ -488,12 +488,12 @@ export default function ProjectsView({
                         <p className="truncate text-sm font-semibold text-foreground">
                           {sol.name}
                         </p>
-                        <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className="flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
                           <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
                           {status.label}
                         </span>
                       </div>
-                      <p className="mt-0.5 truncate text-[12px] text-muted-foreground leading-relaxed">
+                      <p className="mt-0.5 truncate text-[12.5px] text-muted-foreground leading-relaxed">
                         {sol.description || 'No description'}
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
@@ -501,7 +501,7 @@ export default function ProjectsView({
                         <MetaItem icon={GitBranch} value={stats.architecture} label="steps" />
                         <MetaItem icon={MessageSquare} value={stats.messages} label="msgs" />
                         {!hasConversation && (
-                          <span className="text-[10px] italic text-muted-foreground/60">
+                          <span className="text-[11px] italic text-muted-foreground">
                             No conversations yet
                           </span>
                         )}
@@ -509,7 +509,7 @@ export default function ProjectsView({
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-2">
                       <ExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className="flex items-center gap-1 whitespace-nowrap text-[10px] font-medium text-muted-foreground">
+                      <span className="flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-muted-foreground">
                         <Clock className="h-3 w-3 opacity-70" />
                         {getLastUpdated(sol)}
                       </span>
@@ -547,31 +547,31 @@ export default function ProjectsView({
                         {sol.description || 'No description'}
                       </p>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <span className={cn('h-1.5 w-1.5 rounded-full', status.dot)} />
                           {status.label}
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <FileText className="h-3 w-3 opacity-70" />
                           <span className="tabular-nums">{stats.requirements}</span>
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <GitBranch className="h-3 w-3 opacity-70" />
                           <span className="tabular-nums">{stats.architecture}</span>
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <MessageSquare className="h-3 w-3 opacity-70" />
                           <span className="tabular-nums">{stats.messages}</span>
                         </span>
                       </div>
                     </div>
                     <div className="mt-4 flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
                         <Clock className="h-3 w-3 opacity-70" />
                         Updated {getLastUpdated(sol)}
                       </span>
                       {!hasConversation && (
-                        <span className="text-[10px] italic text-muted-foreground/60">
+                        <span className="text-[11px] italic text-muted-foreground">
                           No conversations
                         </span>
                       )}
