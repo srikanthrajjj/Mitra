@@ -202,14 +202,14 @@ export function ArchitectSidebar({
           onNavigate('projects');
         }}
         className={cn(
-          'group flex w-full items-center justify-between gap-1.5 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-[11.25px] leading-tight font-normal transition-all duration-200 select-none',
+          'group flex w-full items-center justify-between gap-1.5 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-[13px] leading-tight font-normal transition-all duration-200 select-none',
           isEditing ? 'cursor-default' : 'cursor-pointer',
           active
             ? isDark
               ? 'bg-mitra-highlight text-brand-green'
               : 'bg-muted text-brand-green-deep'
             : isDark
-              ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
+              ? 'text-foreground hover:bg-sidebar-accent'
               : 'text-foreground hover:bg-accent/55 hover:text-brand-green-deep',
         )}
       >
@@ -230,7 +230,7 @@ export function ArchitectSidebar({
             }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "flex-1 min-w-0 px-1 py-0.5 rounded border outline-none text-[11.25px]",
+              "flex-1 min-w-0 px-1 py-0.5 rounded border outline-none text-[13px]",
               isDark
                 ? 'bg-mitra-surface border-white/[0.06] text-foreground focus:border-brand-green/25'
                 : 'bg-card border-border text-foreground focus:border-brand-green'
@@ -336,8 +336,8 @@ export function ArchitectSidebar({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground">
-                      Move to project
+                    <DropdownMenuSubTrigger className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground">
+                      Move to folder
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent
                       className={cn(
@@ -347,15 +347,15 @@ export function ArchitectSidebar({
                       onClick={(e) => e.stopPropagation()}
                     >
                       {folders.length === 0 ? (
-                        <div className="px-2 py-1.5 text-[11px] text-muted-foreground italic">
-                          No projects available
+                        <div className="px-2 py-1.5 text-[12.5px] text-muted-foreground italic">
+                          No folders available
                         </div>
                       ) : (
                         folders.filter((folder) => !folder.archived).map((folder) => (
                           <DropdownMenuItem
                             key={folder.id}
                             className={cn(
-                              "cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground",
+                              "cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground",
                               sol.folderId === folder.id && "font-semibold text-brand-green-deep dark:text-brand-green"
                             )}
                             onClick={(e) => {
@@ -371,13 +371,13 @@ export function ArchitectSidebar({
                         <>
                           <DropdownMenuSeparator className={isDark ? 'bg-mitra-surface' : 'bg-muted'} />
                           <DropdownMenuItem
-                            className="cursor-pointer text-[12.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
+                            className="cursor-pointer text-[13.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
                             onClick={(e) => {
                               e.stopPropagation();
                               onMoveSolution?.(sol.id, undefined);
                             }}
                           >
-                            Remove from project
+                            Remove from folder
                           </DropdownMenuItem>
                         </>
                       )}
@@ -385,7 +385,7 @@ export function ArchitectSidebar({
                   </DropdownMenuSub>
 
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground">
+                    <DropdownMenuSubTrigger className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground">
                       Add Tag
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent
@@ -468,7 +468,7 @@ export function ArchitectSidebar({
                   </DropdownMenuSub>
 
                   <DropdownMenuItem
-                    className="cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                    className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
                     onClick={(e) => {
                       e.stopPropagation();
                       onTogglePin?.(sol.id);
@@ -478,7 +478,7 @@ export function ArchitectSidebar({
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
-                    className="cursor-pointer text-[12.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                    className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditingSolutionId(sol.id);
@@ -488,7 +488,7 @@ export function ArchitectSidebar({
                     Rename
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="cursor-pointer text-[12.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
+                    className="cursor-pointer text-[13.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteSolution?.(sol.id);
@@ -647,14 +647,14 @@ export function ArchitectSidebar({
                 onMouseEnter={() => setHoveredNavItemId(item.id)}
                 onMouseLeave={() => setHoveredNavItemId((current) => (current === item.id ? null : current))}
                 className={cn(
-                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-[13px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
+                  'architect-nav-item flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] font-normal leading-none transition-all duration-200 cursor-pointer border-0',
                   active
                     ? isDark
                       ? 'architect-nav-item--active bg-mitra-highlight text-foreground'
                       : 'bg-muted text-foreground'
                     : isDark
-                      ? 'text-foreground hover:bg-sidebar-accent hover:text-foreground'
-                  : 'text-foreground hover:bg-accent/55 hover:text-foreground',
+                      ? 'text-foreground hover:bg-sidebar-accent'
+                  : 'text-foreground hover:bg-accent/55',
                 )}
               >
                 <AnimatedSidebarNavIcon
@@ -666,7 +666,7 @@ export function ArchitectSidebar({
                 />
                 <span className="flex-1 text-left">{item.label}</span>
                 {item.badge !== undefined && (
-                  <span className="architect-nav-badge ml-auto min-w-[1.25rem] rounded-md bg-muted px-1.5 py-0.5 text-center text-[10px] font-normal tabular-nums leading-none">
+                  <span className="architect-nav-badge ml-auto min-w-[1.25rem] rounded-md bg-muted px-1.5 py-0.5 text-center text-[11px] font-normal tabular-nums leading-none">
                     {item.badge}
                   </span>
                 )}
@@ -706,7 +706,7 @@ export function ArchitectSidebar({
               onClick={() => onOpenFolder?.(spotlightFolder.id)}
               title={spotlightFolder.name}
               className={cn(
-                'flex w-full min-w-0 items-center gap-2 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-left text-[11.25px] leading-tight font-normal transition-all duration-200',
+                'flex w-full min-w-0 items-center gap-2 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-left text-[13px] leading-tight font-normal transition-all duration-200',
                 spotlightFolderActive
                   ? isDark
                     ? 'bg-mitra-highlight text-brand-green'
@@ -805,7 +805,7 @@ export function ArchitectSidebar({
             recentSolutions.length === 0 ? (
               <p
                 className={cn(
-                  'px-2.5 py-2 text-[11px] text-foreground',
+                  'px-2.5 py-2 text-[12.5px] text-foreground',
                 )}
               >
                 {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No recent chats'}
