@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, type ComponentType, type ReactNode, type Ref } from 'react';
 import {
+  Archive,
+  ArchiveRestore,
   ChevronRight,
   Folder,
   Plus,
@@ -53,6 +55,7 @@ interface ArchitectSidebarProps {
   onOpenFolder?: (folderId: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
   onDeleteFolder: (folderId: string) => void;
+  onRestoreFolder: (folderId: string) => void;
   onRenameSolution: (solutionId: string, name: string) => void;
   onDeleteSolution: (solutionId: string) => void;
   onMoveSolution?: (solutionId: string, folderId: string | undefined) => void;
@@ -118,6 +121,7 @@ export function ArchitectSidebar({
   onOpenFolder,
   onRenameFolder,
   onDeleteFolder,
+  onRestoreFolder,
   renamingFolderId,
   onRenamingComplete,
   onNewChat,
@@ -144,6 +148,7 @@ export function ArchitectSidebar({
   const renameInputRef = useRef<HTMLInputElement>(null);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(new Set());
+  const [archivedOpen, setArchivedOpen] = useState(false);
   const [folderEditName, setFolderEditName] = useState('');
   const folderRenameInputRef = useRef<HTMLInputElement>(null);
 
@@ -673,6 +678,7 @@ export function ArchitectSidebar({
       ...solutions.filter((sol) => sol.folderId === folder.id).map((sol) => Date.parse(sol.createdAt) || 0),
     );
   const sortedFolders = [...activeFolders].sort((a, b) => folderActivity(b) - folderActivity(a));
+  const archivedFolders = folders.filter((folder) => folder.archived);
   const solutionsInFolder = (folderId: string) =>
     filterByTag(solutions.filter((sol) => sol.folderId === folderId));
 
@@ -727,7 +733,7 @@ export function ArchitectSidebar({
       <div className="relative mt-3 flex min-h-0 flex-1 flex-col">
         <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-1 pb-2 scrollbar-thin">
         {/* Projects: every project, each expanding to the chats filed under it */}
-        {sortedFolders.length > 0 && (
+        {(sortedFolders.length > 0 || archivedFolders.length > 0) && (
           <div className="flex flex-col shrink-0 space-y-0.5">
             <div className="mb-1 flex items-center justify-between px-2.5">
               <span className="text-[12px] font-normal tracking-wider text-foreground [font-variant-caps:all-small-caps]">
@@ -928,6 +934,56 @@ export function ArchitectSidebar({
                 </div>
               );
             })}
+
+            {archivedFolders.length > 0 && (
+              <div className="flex flex-col space-y-0.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setArchivedOpen((open) => !open)}
+                  aria-expanded={archivedOpen}
+                  className={cn(
+                    'flex w-full items-center gap-1 rounded-[10px] py-1 pl-1 pr-1.5 text-left text-[12px] font-normal text-muted-foreground transition-colors',
+                    isDark ? 'hover:bg-sidebar-accent' : 'hover:bg-accent/55',
+                  )}
+                >
+                  <ChevronRight
+                    className={cn(
+                      'h-3.5 w-3.5 shrink-0 transition-transform duration-200',
+                      archivedOpen && 'rotate-90',
+                    )}
+                  />
+                  <Archive className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span className="flex-1 truncate">Archived</span>
+                  <span className="shrink-0 tabular-nums">{archivedFolders.length}</span>
+                </button>
+
+                {archivedOpen &&
+                  archivedFolders.map((folder) => (
+                    <div
+                      key={folder.id}
+                      title={folder.name}
+                      className={cn(
+                        'group flex w-full min-w-0 items-center gap-2 rounded-[10px] py-1.75 pl-[1.6rem] pr-1.5 text-left text-[13px] leading-tight font-normal text-muted-foreground transition-all duration-200',
+                        isDark ? 'hover:bg-sidebar-accent' : 'hover:bg-accent/55',
+                      )}
+                    >
+                      <span className="flex-1 truncate">{folder.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => onRestoreFolder(folder.id)}
+                        title={`Restore ${folder.name}`}
+                        aria-label={`Restore ${folder.name}`}
+                        className={cn(
+                          'shrink-0 cursor-pointer rounded p-0.5 text-foreground transition-all',
+                          'opacity-0 group-hover:opacity-100 focus:opacity-100',
+                        )}
+                      >
+                        <ArchiveRestore className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -2395,6 +2395,14 @@ Pick a step below and I'll continue building — data model, scripts, and update
     });
   };
 
+  // Archiving promises the project can be restored; this is what makes that true.
+  const handleRestoreFolder = (folderId: string) => {
+    setFolders((prev) =>
+      prev.map((f) => (f.id === folderId ? { ...f, archived: false } : f)),
+    );
+    setFocusedFolderId(folderId);
+  };
+
   const handleRenameSolution = (solutionId: string, name: string) => {
     const trimmed = name.trim() || UNTITLED_THREAD_NAME;
     setSolutions((prev) =>
@@ -2649,6 +2657,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
           onOpenFolder={handleOpenFolder}
           onRenameFolder={handleRenameFolder}
           onDeleteFolder={handleArchiveFolder}
+          onRestoreFolder={handleRestoreFolder}
           onRenameSolution={handleRenameSolution}
           onDeleteSolution={handleDeleteSolution}
           onMoveSolution={handleMoveSolution}
