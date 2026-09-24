@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, ArrowUpRight, Building2, Clock, Megaphone } from 'lucide-react';
+import { ArrowLeft, Building2, Clock, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Announcement, ResolvedTheme } from '../types';
 import {
@@ -139,7 +139,6 @@ function AnnouncementArticle({
 }) {
   const type = toAnnouncementType(announcement.type);
   const paragraphs = announcementParagraphs(announcement);
-  const redirectPath = announcement.redirectPath?.trim();
 
   return (
     <article className={cn('mitra-ann', `mitra-ann--${type}`, 'mx-auto w-full max-w-3xl')}>
@@ -207,13 +206,6 @@ function AnnouncementArticle({
           <p>{announcement.shortDescription}</p>
         )}
       </div>
-
-      {redirectPath && (
-        <a href={redirectPath} className="mitra-ann__cta mt-7">
-          Open in Mitra
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-        </a>
-      )}
     </article>
   );
 }

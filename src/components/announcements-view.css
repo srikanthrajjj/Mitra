@@ -192,30 +192,6 @@
   margin-bottom: 0;
 }
 
-.mitra-ann__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-button);
-  background: var(--ann-tint);
-  color: var(--ann-ink);
-  border: 1px solid var(--ann-tint-strong);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.15s ease;
-}
-
-.mitra-ann__cta:hover {
-  background: var(--ann-tint-strong);
-}
-
-.mitra-ann__cta:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .mitra-ann__card {
     transition: none;
