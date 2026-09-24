@@ -214,8 +214,8 @@ export function SearchDialog({
         className={cn(
           "w-full max-w-2xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[65vh] animate-fade-in",
           isDark
-            ? "bg-mitra-bg text-foreground"
-            : "bg-card text-foreground"
+            ? "bg-mitra-bg text-foreground border-mitra-border"
+            : "bg-card text-foreground border-border"
         )}
       >
         {/* Top Input Bar */}
@@ -297,8 +297,8 @@ export function SearchDialog({
                         "p-1.5 rounded-lg shrink-0 border",
                         active
                           ? isDark
-                            ? "bg-mitra-bg text-brand-green"
-                            : "bg-card text-brand-green"
+                            ? "bg-mitra-bg text-brand-green border-mitra-border"
+                            : "bg-card text-brand-green border-border"
                           : "bg-muted/30 border-transparent text-muted-foreground/60"
                       )}>
                         <ItemIcon className="h-4 w-4" />
