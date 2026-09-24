@@ -151,60 +151,63 @@ function AnnouncementArticle({
         All announcements
       </button>
 
-      <AnnouncementCover announcement={announcement} glyph="15rem" className="mb-7 h-48 sm:h-64" />
+      {/* The body sits on a card so the copy reads against a surface, not the canvas. */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_2px_10px_rgba(0,0,0,0.06)] sm:p-8">
+        <AnnouncementCover announcement={announcement} glyph="15rem" className="mb-7 h-48 sm:h-64" />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mitra-ann__chip">{ANNOUNCEMENT_TYPE_LABEL[type]}</span>
-        {!announcement.isRead && (
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
-            New
-          </span>
-        )}
-      </div>
-
-      <h1 className="mt-3 font-display text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
-        {announcement.label}
-      </h1>
-
-      <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-        {announcement.shortDescription}
-      </p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-        {announcement.authorName && (
-          <span className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold"
-              style={{ background: 'var(--ann-tint)', color: 'var(--ann-ink)' }}
-            >
-              {announcement.authorName.slice(0, 1).toUpperCase()}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mitra-ann__chip">{ANNOUNCEMENT_TYPE_LABEL[type]}</span>
+          {!announcement.isRead && (
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-brand-green">
+              New
             </span>
-            <span className="text-[12px] leading-tight text-foreground">
-              {announcement.authorName}
-              {announcement.authorRole && (
-                <span className="block text-[11px] text-muted-foreground">
-                  {announcement.authorRole}
-                </span>
-              )}
+          )}
+        </div>
+
+        <h1 className="mt-3 font-display text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
+          {announcement.label}
+        </h1>
+
+        <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+          {announcement.shortDescription}
+        </p>
+
+        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+          {announcement.authorName && (
+            <span className="flex items-center gap-2">
+              <span
+                aria-hidden
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold"
+                style={{ background: 'var(--ann-tint)', color: 'var(--ann-ink)' }}
+              >
+                {announcement.authorName.slice(0, 1).toUpperCase()}
+              </span>
+              <span className="text-[12px] leading-tight text-foreground">
+                {announcement.authorName}
+                {announcement.authorRole && (
+                  <span className="block text-[11px] text-muted-foreground">
+                    {announcement.authorRole}
+                  </span>
+                )}
+              </span>
             </span>
+          )}
+          <span className="text-[11px] text-muted-foreground">
+            {formatAnnouncementDate(announcement.createdAt)}
           </span>
-        )}
-        <span className="text-[11px] text-muted-foreground">
-          {formatAnnouncementDate(announcement.createdAt)}
-        </span>
-      </div>
+        </div>
 
-      <MetaLine announcement={announcement} now={now} className="mt-3" />
+        <MetaLine announcement={announcement} now={now} className="mt-3" />
 
-      <div className="mitra-ann__rule my-7" aria-hidden />
+        <div className="mitra-ann__rule my-7" aria-hidden />
 
-      <div className="mitra-ann__body">
-        {paragraphs.length > 0 ? (
-          paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-        ) : (
-          <p>{announcement.shortDescription}</p>
-        )}
+        <div className="mitra-ann__body">
+          {paragraphs.length > 0 ? (
+            paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+          ) : (
+            <p>{announcement.shortDescription}</p>
+          )}
+        </div>
       </div>
     </article>
   );
