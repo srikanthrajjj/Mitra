@@ -1,0 +1,108 @@
+/* ============================================
+   mitra-announcement-bar — the single announcement banner.
+   Surface, border and ink all come from the severity tone, so the
+   banner reads as critical / warning / info / success at a glance.
+   Palette matches the feed in dev/components/announcements.
+   ============================================ */
+
+.mitra-announcement-bar {
+  /* Fallback tone (info) so the bar is never uncoloured; .light overrides below. */
+  --annbar-surface: rgba(56, 189, 248, 0.08);
+  --annbar-border: rgba(56, 189, 248, 0.24);
+  --annbar-fill: rgba(56, 189, 248, 0.16);
+  --annbar-ink: #7dd3fc;
+
+  background: var(--annbar-surface);
+  border: 1px solid var(--annbar-border);
+  border-radius: var(--radius-card);
+  font-family: var(--font-sans);
+}
+
+.mitra-announcement-bar--info {
+  --annbar-surface: rgba(56, 189, 248, 0.08);
+  --annbar-border: rgba(56, 189, 248, 0.24);
+  --annbar-fill: rgba(56, 189, 248, 0.16);
+  --annbar-ink: #7dd3fc;
+}
+
+.mitra-announcement-bar--success {
+  --annbar-surface: rgba(79, 207, 54, 0.08);
+  --annbar-border: rgba(79, 207, 54, 0.24);
+  --annbar-fill: rgba(79, 207, 54, 0.16);
+  --annbar-ink: var(--color-brand-green);
+}
+
+.mitra-announcement-bar--warning {
+  --annbar-surface: rgba(251, 191, 36, 0.08);
+  --annbar-border: rgba(251, 191, 36, 0.24);
+  --annbar-fill: rgba(251, 191, 36, 0.16);
+  --annbar-ink: #fcd34d;
+}
+
+.mitra-announcement-bar--critical {
+  --annbar-surface: rgba(244, 63, 94, 0.09);
+  --annbar-border: rgba(244, 63, 94, 0.26);
+  --annbar-fill: rgba(244, 63, 94, 0.17);
+  --annbar-ink: #fda4af;
+}
+
+/* Light needs a paler wash and darker ink to stay legible. */
+.light .mitra-announcement-bar {
+  --annbar-surface: rgba(2, 132, 199, 0.06);
+  --annbar-border: rgba(2, 132, 199, 0.18);
+  --annbar-fill: rgba(2, 132, 199, 0.12);
+  --annbar-ink: #075985;
+}
+
+.light .mitra-announcement-bar--info {
+  --annbar-surface: rgba(2, 132, 199, 0.06);
+  --annbar-border: rgba(2, 132, 199, 0.18);
+  --annbar-fill: rgba(2, 132, 199, 0.12);
+  --annbar-ink: #075985;
+}
+
+.light .mitra-announcement-bar--success {
+  --annbar-surface: rgba(38, 122, 24, 0.06);
+  --annbar-border: rgba(38, 122, 24, 0.18);
+  --annbar-fill: rgba(38, 122, 24, 0.12);
+  --annbar-ink: var(--color-brand-green-deep);
+}
+
+.light .mitra-announcement-bar--warning {
+  --annbar-surface: rgba(180, 83, 9, 0.06);
+  --annbar-border: rgba(180, 83, 9, 0.18);
+  --annbar-fill: rgba(180, 83, 9, 0.12);
+  --annbar-ink: #92400e;
+}
+
+.light .mitra-announcement-bar--critical {
+  --annbar-surface: rgba(190, 18, 60, 0.05);
+  --annbar-border: rgba(190, 18, 60, 0.18);
+  --annbar-fill: rgba(190, 18, 60, 0.11);
+  --annbar-ink: #9f1239;
+}
+
+.mitra-announcement-bar__icon {
+  background: var(--annbar-fill);
+  color: var(--annbar-ink);
+}
+
+.mitra-announcement-bar__chip {
+  background: var(--annbar-fill);
+  color: var(--annbar-ink);
+}
+
+.mitra-announcement-bar__close {
+  color: hsl(var(--muted-foreground));
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mitra-announcement-bar__close:hover {
+  background: var(--annbar-fill);
+  color: var(--annbar-ink);
+}
+
+.mitra-announcement-bar__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
+}

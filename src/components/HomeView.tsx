@@ -27,10 +27,13 @@ import {
 } from '../constants/composerModes';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
-import { AnnouncementBar } from './AnnouncementBar';
+import {
+  AnnouncementBar,
+  persistDismissedAnnouncement,
+  readDismissedAnnouncements,
+} from './AnnouncementBar';
 import { sampleAnnouncements } from '../data/announcements';
 import { visibleAnnouncements } from '../utils/announcements';
-import { AnnouncementsBell } from './AnnouncementsBell';
 
 interface HomeViewProps {
   appVersion?: 'v2' | 'v3';
@@ -78,7 +81,13 @@ export default function HomeView({
     () => visibleAnnouncements(sampleAnnouncements(announcementTime), announcementTime),
     [announcementTime],
   );
-  const announcement = announcementFeed[0];
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<string[]>(
+    readDismissedAnnouncements,
+  );
+  const announcement = useMemo(
+    () => announcementFeed.find((item) => !dismissedAnnouncements.includes(item._id)),
+    [announcementFeed, dismissedAnnouncements],
+  );
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -207,18 +216,18 @@ export default function HomeView({
   return (
     <div className="flex flex-1 flex-col h-full overflow-hidden bg-transparent">
       <div className="flex-1 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
-        <div className="sticky top-3 z-20 mx-auto mb-8 flex w-full max-w-3xl items-center gap-3">
-          {announcement && (
-            <div className="min-w-0 flex-1">
-              <AnnouncementBar announcement={announcement} now={announcementTime} />
-            </div>
-          )}
-          <AnnouncementsBell
-            announcements={announcementFeed}
-            now={announcementTime}
-            className="ml-auto"
-          />
-        </div>
+        {announcement && (
+          <div className="sticky top-3 z-20 mx-auto mb-8 w-full max-w-3xl">
+            <AnnouncementBar
+              announcement={announcement}
+              now={announcementTime}
+              onDismiss={() => {
+                persistDismissedAnnouncement(announcement._id);
+                setDismissedAnnouncements((ids) => [...ids, announcement._id]);
+              }}
+            />
+          </div>
+        )}
         <div className="relative mx-auto w-full max-w-4xl">
           <div className="pointer-events-none absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted/20 blur-[100px]" />
 
