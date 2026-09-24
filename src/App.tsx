@@ -45,6 +45,7 @@ import { CenterToast, type CenterToastData } from './components/CenterToast';
 import { DesignFeedbackWidget } from './components/DesignFeedbackWidget';
 import { WhatsNewModal, readWhatsNewDismissed } from './components/WhatsNewModal';
 import { AnnouncementsModal } from './components/AnnouncementsModal';
+import AnnouncementsView from './components/AnnouncementsView';
 import { persistDismissedAnnouncement, readDismissedAnnouncements } from './components/AnnouncementBar';
 import { sampleAnnouncements } from './data/announcements';
 import { visibleAnnouncements } from './utils/announcements';
@@ -611,6 +612,13 @@ export default function App() {
     readDismissedAnnouncements,
   );
   const [announcementsOpen, setAnnouncementsOpen] = useState<boolean>(false);
+  // Set when the reader is opened on a specific announcement, cleared once it has been read.
+  const [readerAnnouncementId, setReaderAnnouncementId] = useState<string | null>(null);
+  const openAnnouncementsReader = useCallback((announcementId: string | null = null) => {
+    setReaderAnnouncementId(announcementId);
+    setAnnouncementsOpen(false);
+    setActiveTab('announcements');
+  }, []);
   const dismissAnnouncement = useCallback((announcementId: string) => {
     persistDismissedAnnouncement(announcementId);
     setDismissedAnnouncements((ids) =>
@@ -2973,6 +2981,17 @@ Pick a step below and I'll continue building — data model, scripts, and update
             />
           )}
 
+          {activeTab === 'announcements' && (
+            <AnnouncementsView
+              key={readerAnnouncementId ?? 'index'}
+              theme={resolvedTheme}
+              announcements={announcementFeed}
+              now={announcementNow}
+              initialAnnouncementId={readerAnnouncementId}
+              onArticleClosed={() => setReaderAnnouncementId(null)}
+            />
+          )}
+
           {activeTab === 'templates' && (
             <TemplatesView
               theme={resolvedTheme}
@@ -3125,6 +3144,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
         onClose={() => setAnnouncementsOpen(false)}
         announcements={announcementFeed}
         now={announcementNow}
+        onOpenAnnouncement={(announcement) => openAnnouncementsReader(announcement._id)}
+        onSeeAll={() => openAnnouncementsReader(null)}
       />
 
       <ShareProjectModal

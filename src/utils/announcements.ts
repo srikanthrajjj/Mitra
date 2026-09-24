@@ -185,3 +185,43 @@ export function groupAnnouncements(
     items: buckets.get(id) ?? [],
   }));
 }
+
+/** Body paragraphs for the reader. The API sends one string; blank lines separate paragraphs. */
+export function announcementParagraphs(announcement: Announcement): string[] {
+  return announcement.description
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
+/** "2 min read", at the usual 200 wpm. Always at least a minute so it never reads "0 min". */
+export function announcementReadMinutes(announcement: Announcement): number {
+  const words = `${announcement.shortDescription} ${announcement.description}`
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+/**
+ * A stable small number from the id, so a generated cover keeps the same look between renders
+ * and two announcements of the same severity still differ.
+ */
+export function announcementVariant(announcement: Announcement, buckets = 4): number {
+  let hash = 0;
+  for (let i = 0; i < announcement._id.length; i += 1) {
+    hash = (hash * 31 + announcement._id.charCodeAt(i)) % 100000;
+  }
+  return hash % buckets;
+}
+
+/** Full date for the reader byline, e.g. "24 September 2026". */
+export function formatAnnouncementDate(iso: string): string {
+  const then = parseTime(iso);
+  if (then === null) return '';
+  return new Date(then).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}

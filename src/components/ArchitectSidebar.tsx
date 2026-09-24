@@ -21,6 +21,7 @@ import {
   MessageCircleIcon as AnimatedMessageCircleIcon,
   SparklesIcon as AnimatedSparklesIcon,
   ChevronDownIcon as AnimatedChevronDownIcon,
+  BellIcon as AnimatedBellIcon,
 } from '@animateicons/react/lucide';
 import type { IconHandle } from '@animateicons/react';
 import { ProjectFolder } from '../data/folders';
@@ -106,7 +107,7 @@ function AnimatedSidebarNavIcon({
 const MAX_INLINE_TAGS = 2;
 
 /** Less-used destinations that sit under "More" in the nav, like Claude's sidebar. */
-const MORE_NAV_TABS = ['skills', 'capabilities', 'favourites', 'analytics', 'feedback'];
+const MORE_NAV_TABS = ['skills', 'capabilities', 'favourites', 'analytics', 'announcements', 'feedback'];
 
 export function ArchitectSidebar({
   theme,
@@ -596,6 +597,12 @@ export function ArchitectSidebar({
       label: 'Mitra Insights',
       icon: AnimatedChartLineIcon,
       tab: 'analytics',
+    },
+    {
+      id: 'announcements',
+      label: 'Announcements',
+      icon: AnimatedBellIcon,
+      tab: 'announcements',
     },
     {
       id: 'feedback',

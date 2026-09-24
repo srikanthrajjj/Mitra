@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import type { Announcement, ResolvedTheme } from '../types';
@@ -18,6 +18,8 @@ interface AnnouncementsModalProps {
   announcements: Announcement[];
   now?: Date;
   onOpenAnnouncement?: (announcement: Announcement) => void;
+  /** Opens the full reader. The panel is the glance; the reader is the archive. */
+  onSeeAll?: () => void;
 }
 
 export function AnnouncementsModal({
@@ -27,6 +29,7 @@ export function AnnouncementsModal({
   announcements,
   now,
   onOpenAnnouncement,
+  onSeeAll,
 }: AnnouncementsModalProps) {
   const isDark = isDarkTheme(theme);
 
@@ -88,6 +91,20 @@ export function AnnouncementsModal({
               }}
               className="shadow-2xl"
             />
+
+            {onSeeAll && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSeeAll();
+                }}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-[13px] font-medium text-foreground shadow-2xl transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              >
+                See all announcements
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            )}
           </motion.div>
         </>
       )}

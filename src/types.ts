@@ -488,6 +488,15 @@ export interface Announcement {
   updatedBy?: string;
   createdAt: string;
   updatedAt?: string;
+
+  /**
+   * Presentation only, for the announcements reader. All optional: when the API sends none of
+   * them the reader falls back to a cover generated from the severity, and omits the byline.
+   */
+  coverImage?: string;
+  coverAlt?: string;
+  authorName?: string;
+  authorRole?: string;
 }
 
 /** Envelope the announcements endpoint responds with. */

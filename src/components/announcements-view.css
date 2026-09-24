@@ -1,0 +1,227 @@
+/* ============================================
+   mitra-ann — the announcements reader (index + article).
+   Severity drives the whole visual identity: cover, accent rule,
+   chip and link all come from one tone per announcement.
+   Palette matches the feed in dev/components/announcements.
+   ============================================ */
+
+.mitra-ann {
+  /* Fallback tone (info); each --<type> block below overrides it. */
+  --ann-tint: rgba(56, 189, 248, 0.14);
+  --ann-tint-strong: rgba(56, 189, 248, 0.34);
+  --ann-ink: #7dd3fc;
+
+  font-family: var(--font-sans);
+}
+
+.mitra-ann--info {
+  --ann-tint: rgba(56, 189, 248, 0.14);
+  --ann-tint-strong: rgba(56, 189, 248, 0.34);
+  --ann-ink: #7dd3fc;
+}
+
+.mitra-ann--success {
+  --ann-tint: rgba(79, 207, 54, 0.14);
+  --ann-tint-strong: rgba(79, 207, 54, 0.34);
+  --ann-ink: var(--color-brand-green);
+}
+
+.mitra-ann--warning {
+  --ann-tint: rgba(251, 191, 36, 0.14);
+  --ann-tint-strong: rgba(251, 191, 36, 0.34);
+  --ann-ink: #fcd34d;
+}
+
+.mitra-ann--critical {
+  --ann-tint: rgba(244, 63, 94, 0.15);
+  --ann-tint-strong: rgba(244, 63, 94, 0.36);
+  --ann-ink: #fda4af;
+}
+
+.light .mitra-ann--info {
+  --ann-tint: rgba(2, 132, 199, 0.1);
+  --ann-tint-strong: rgba(2, 132, 199, 0.26);
+  --ann-ink: #075985;
+}
+
+.light .mitra-ann--success {
+  --ann-tint: rgba(38, 122, 24, 0.1);
+  --ann-tint-strong: rgba(38, 122, 24, 0.26);
+  --ann-ink: var(--color-brand-green-deep);
+}
+
+.light .mitra-ann--warning {
+  --ann-tint: rgba(180, 83, 9, 0.1);
+  --ann-tint-strong: rgba(180, 83, 9, 0.26);
+  --ann-ink: #92400e;
+}
+
+.light .mitra-ann--critical {
+  --ann-tint: rgba(190, 18, 60, 0.09);
+  --ann-tint-strong: rgba(190, 18, 60, 0.24);
+  --ann-ink: #9f1239;
+}
+
+/* --- Generated cover: gradient wash, pattern, watermark glyph --- */
+.mitra-ann__cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(var(--ann-cover-angle, 135deg), var(--ann-tint-strong), var(--ann-tint) 55%, transparent),
+    hsl(var(--muted));
+  isolation: isolate;
+}
+
+.mitra-ann__cover-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Four pattern variants so same-severity announcements still look distinct. */
+.mitra-ann__cover-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.mitra-ann__cover-pattern--0 {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: 0.16;
+}
+
+.mitra-ann__cover-pattern--1 {
+  background-image: repeating-linear-gradient(
+    45deg,
+    currentColor 0 1px,
+    transparent 1px 11px
+  );
+  opacity: 0.12;
+}
+
+.mitra-ann__cover-pattern--2 {
+  background-image: repeating-linear-gradient(
+    -30deg,
+    currentColor 0 1px,
+    transparent 1px 16px
+  );
+  opacity: 0.1;
+}
+
+.mitra-ann__cover-pattern--3 {
+  background-image:
+    radial-gradient(circle at 80% 20%, currentColor 0 2px, transparent 2px),
+    radial-gradient(circle at 20% 70%, currentColor 0 2px, transparent 2px);
+  background-size: 34px 34px;
+  opacity: 0.14;
+}
+
+.mitra-ann__cover-glyph {
+  position: absolute;
+  right: -0.35em;
+  bottom: -0.45em;
+  width: 1em;
+  height: 1em;
+  color: var(--ann-ink);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+/* --- Index cards --- */
+.mitra-ann__card {
+  display: flex;
+  flex-direction: column;
+  /* A <button> is inline-level even with display:flex, so it would shrink to its content. */
+  width: 100%;
+  /* No height here: grid cells already stretch, and a standalone featured card must not. */
+  overflow: hidden;
+  text-align: left;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mitra-ann__card:hover {
+  border-color: var(--ann-tint-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.mitra-ann__card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
+}
+
+.mitra-ann__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.3rem;
+  background: var(--ann-tint);
+  color: var(--ann-ink);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* --- Article --- */
+.mitra-ann__rule {
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ann-ink), transparent);
+  opacity: 0.55;
+}
+
+.mitra-ann__body p {
+  margin: 0 0 1em;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: hsl(var(--foreground) / 0.86);
+}
+
+.mitra-ann__body p:last-child {
+  margin-bottom: 0;
+}
+
+.mitra-ann__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-button);
+  background: var(--ann-tint);
+  color: var(--ann-ink);
+  border: 1px solid var(--ann-tint-strong);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.mitra-ann__cta:hover {
+  background: var(--ann-tint-strong);
+}
+
+.mitra-ann__cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mitra-ann__card {
+    transition: none;
+  }
+
+  .mitra-ann__card:hover {
+    transform: none;
+  }
+}

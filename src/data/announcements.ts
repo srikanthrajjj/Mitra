@@ -24,7 +24,9 @@ export function sampleAnnouncements(now: Date = new Date()): Announcement[] {
       label: 'Production deploys paused',
       shortDescription: 'Deploys to POC RAVI are on hold while a failed migration is cleared.',
       description:
-        'A schema migration on the Asset Recovery tables failed partway through. Deploys to the POC RAVI instance are paused until the rollback completes — in progress now, expected within the hour. Work in progress is safe; nothing needs re-running.',
+        'A schema migration on the Asset Recovery tables failed partway through, leaving two columns half-applied. We paused deploys to the POC RAVI instance as soon as the check caught it.\n\nThe rollback is running now and we expect it to finish within the hour. Nothing you have in progress is affected — work already saved is intact, and no chat or generation needs re-running.\n\nWe will lift the pause and post an update here the moment the instance is verified clean.',
+      authorName: 'Priya Raman',
+      authorRole: 'Platform engineering',
       level: 'org',
       type: 'critical',
       organisationId: ORG_ID,
@@ -47,7 +49,9 @@ export function sampleAnnouncements(now: Date = new Date()): Announcement[] {
       label: 'Planned maintenance — Saturday 02:00 UTC',
       shortDescription: 'Mitra will be read-only for roughly 45 minutes during the upgrade.',
       description:
-        'We are upgrading the workspace database on Saturday at 02:00 UTC. Mitra stays available for reading; chat, generation and approvals are disabled for about 45 minutes. No action is needed from you.',
+        'We are upgrading the workspace database on Saturday at 02:00 UTC. The window is roughly 45 minutes.\n\nMitra stays available for reading throughout — you can open projects, read chats and review artifacts as normal. Chat, generation and approvals are disabled for the duration and will return automatically.\n\nNo action is needed from you. If you have an approval that must land before the weekend, send it before Friday 18:00 UTC to be safe.',
+      authorName: 'Mitra Operations',
+      authorRole: 'Workspace',
       level: 'org',
       type: 'warning',
       organisationId: ORG_ID,
