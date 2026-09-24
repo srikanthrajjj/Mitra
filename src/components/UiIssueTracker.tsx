@@ -55,7 +55,8 @@ type UiIssue = {
 // Older saves used `resolved: boolean` (and earlier still, `title` / `status: 'Resolved'`).
 type StoredIssue = Omit<Partial<UiIssue>, 'status'> & { title?: string; status?: string; resolved?: boolean };
 
-type StatusAction = 'resolve' | 'approve';
+// 'resolve' and 'needsApproval' both land on the `review` status; only the wording differs.
+type StatusAction = 'resolve' | 'approve' | 'needsApproval';
 
 type NamePromptTarget = { action: StatusAction; issueId: string } | { action: 'change' };
 
@@ -238,8 +239,12 @@ function screenFromHash(): Screen {
   return hash === 'review' || hash === 'resolved' ? hash : 'open';
 }
 
+// Cards sit on `bg-muted`, so controls use the lighter `bg-card` to stay legible and read as raised.
 const referencePillClass =
-  'inline-flex w-fit items-center rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-[#030d0a] hover:border-[#030d0a]/40';
+  'inline-flex w-fit items-center rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-[#030d0a] hover:border-[#030d0a]/40';
+
+// White mat around a screenshot: the thumbnail becomes the lightest thing on a darker card.
+const thumbFrameClass = 'overflow-hidden rounded-xl border border-border bg-card p-1 shadow-sm';
 
 const issueTypes: { value: IssueType; label: string }[] = [
   { value: 'Improvement', label: 'Improvement' },
@@ -254,7 +259,8 @@ const typeStyles: Record<IssueType, string> = {
   Bug: 'bg-red-500/10 text-red-600 dark:text-red-300',
   Accessibility: 'bg-brand-green/10 text-brand-green',
   UI: 'bg-brand-green/10 text-brand-green',
-  UX: 'bg-muted text-foreground',
+  // Bordered rather than filled: `bg-muted` alone would disappear into the darker card surface.
+  UX: 'border border-border bg-card text-foreground',
 };
 
 const statusLabels: Record<IssueStatus, string> = {
@@ -288,6 +294,12 @@ const namePromptCopy: Record<NamePromptTarget['action'], { eyebrow: string; titl
     title: "What's your name?",
     body: "It's added to issues you mark as resolved or approve. We'll remember it in this browser, so you're only asked once.",
     submit: 'Approve',
+  },
+  needsApproval: {
+    eyebrow: 'Needs approval',
+    title: "What's your name?",
+    body: "It's added to issues you send for approval. We'll remember it in this browser, so you're only asked once.",
+    submit: 'Send for approval',
   },
   change: {
     eyebrow: 'Your name',
@@ -543,9 +555,13 @@ export function UiIssueTracker() {
   const applyStatusAction = (issueId: string, action: StatusAction, actor: string) => {
     const now = new Date().toISOString();
     const issueName = issues.find((item) => item.id === issueId)?.name ?? 'Issue';
-    if (action === 'resolve') {
+    if (action === 'resolve' || action === 'needsApproval') {
       updateIssue(issueId, { status: 'review', resolvedBy: actor, resolvedAt: now, approvedBy: null, approvedAt: null });
-      setNotice(`"${issueName}" moved to Waiting for stakeholder review`);
+      setNotice(
+        action === 'needsApproval'
+          ? `"${issueName}" needs approval — moved to Waiting for stakeholder review`
+          : `"${issueName}" moved to Waiting for stakeholder review`,
+      );
     } else {
       updateIssue(issueId, { status: 'resolved', approvedBy: actor, approvedAt: now });
       setNotice(`"${issueName}" moved to Resolved`);
@@ -706,7 +722,7 @@ export function UiIssueTracker() {
 
   const renderStatusControls = (issue: UiIssue, compact = false) => {
     const pillClass = compact
-      ? 'inline-flex w-fit items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-[#030d0a] hover:border-[#030d0a]/40'
+      ? 'inline-flex w-fit items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-[#030d0a] hover:border-[#030d0a]/40'
       : `${referencePillClass} gap-1.5`;
 
     if (issue.status === 'open') {
@@ -747,8 +763,8 @@ export function UiIssueTracker() {
         onClick={() => setOpenMenuIssueId((current) => (current === issue.id ? null : issue.id))}
         className={
           compact
-            ? 'rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground'
-            : 'rounded-lg border border-border bg-muted p-2 text-muted-foreground hover:bg-background hover:text-foreground'
+            ? 'rounded-md p-1 text-muted-foreground hover:bg-card hover:text-foreground'
+            : 'rounded-lg border border-border bg-card p-2 text-muted-foreground hover:border-[#030d0a]/40 hover:text-foreground'
         }
       >
         <MoreVertical className="h-4 w-4" />
@@ -778,6 +794,20 @@ export function UiIssueTracker() {
               </span>
             ) : null}
           </button>
+
+          {issue.status !== 'review' ? (
+            <button
+              type="button"
+              onClick={() => {
+                setOpenMenuIssueId(null);
+                requestStatusAction(issue, 'needsApproval');
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+            >
+              <Clock className="h-3.5 w-3.5" />
+              Needs approval
+            </button>
+          ) : null}
 
           <div className="my-1 border-t border-border" />
           <p className="px-3 pb-1 pt-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Priority</p>
@@ -891,7 +921,7 @@ export function UiIssueTracker() {
   };
 
   const renderIssueRow = (issue: UiIssue) => (
-    <div key={issue.id} className={`rounded-2xl border border-border bg-card p-4 shadow-sm ${priorityStripeClass(issue)}`}>
+    <div key={issue.id} className={`rounded-2xl border border-border bg-muted p-4 shadow-sm ${priorityStripeClass(issue)}`}>
       <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_1.3fr_0.8fr_auto] md:items-center">
         <div>
           <div className="flex items-center gap-3">
@@ -900,9 +930,9 @@ export function UiIssueTracker() {
                 type="button"
                 aria-label={`View screenshot for ${issue.name}`}
                 onClick={() => setPreviewImage(issue.image ?? null)}
-                className="shrink-0"
+                className={`shrink-0 transition hover:border-[#030d0a]/25 hover:shadow-md ${thumbFrameClass}`}
               >
-                <img src={issue.image} alt="" className="h-10 w-10 rounded-lg border border-border object-cover" />
+                <img src={issue.image} alt="" className="h-12 w-12 rounded-md bg-card object-cover" />
               </button>
             ) : null}
             <div className="text-sm font-semibold text-foreground">{issue.name}</div>
@@ -932,15 +962,15 @@ export function UiIssueTracker() {
   );
 
   const renderIssueCard = (issue: UiIssue) => (
-    <div key={issue.id} className={`flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm ${priorityStripeClass(issue)}`}>
+    <div key={issue.id} className={`flex flex-col rounded-2xl border border-border bg-muted p-4 shadow-sm ${priorityStripeClass(issue)}`}>
       {issue.image ? (
         <button
           type="button"
           aria-label={`View screenshot for ${issue.name}`}
           onClick={() => setPreviewImage(issue.image ?? null)}
-          className="mb-3 block"
+          className={`mb-3 block w-full transition hover:border-[#030d0a]/25 hover:shadow-md ${thumbFrameClass}`}
         >
-          <img src={issue.image} alt="" className="h-36 w-full rounded-xl border border-border bg-muted object-cover" />
+          <img src={issue.image} alt="" className="h-36 w-full rounded-lg bg-card object-cover" />
         </button>
       ) : null}
 
@@ -1011,12 +1041,14 @@ export function UiIssueTracker() {
           if ((event.target as HTMLElement).closest('button, a')) return;
           openDetails();
         }}
-        className={`cursor-pointer rounded-lg bg-white p-2.5 shadow-sm ring-1 ring-black/5 transition hover:shadow-md active:cursor-grabbing ${
+        className={`cursor-pointer rounded-lg bg-muted p-2.5 shadow-sm ring-1 ring-black/5 transition hover:shadow-md active:cursor-grabbing ${
           draggingIssueId === issue.id ? 'opacity-50' : ''
         }`}
       >
         {issue.image ? (
-          <img src={issue.image} alt="" draggable={false} className="mb-2 h-24 w-full rounded-md bg-muted object-cover" />
+          <div className={`mb-2 ${thumbFrameClass}`}>
+            <img src={issue.image} alt="" draggable={false} className="h-24 w-full rounded-md bg-card object-cover" />
+          </div>
         ) : null}
 
         <div className="flex items-start gap-2">
@@ -1084,7 +1116,7 @@ export function UiIssueTracker() {
       aria-label={column.ariaLabel}
       {...dropZoneProps(column.target)}
       className={`flex min-h-[12rem] flex-col rounded-xl border-t-4 p-2 transition ${column.topBorderClass} ${
-        dropTarget === column.target ? 'bg-[#e4e6ea] ring-2 ring-[#030d0a]/30' : 'bg-[#f1f2f4]'
+        dropTarget === column.target ? 'bg-accent ring-2 ring-[#030d0a]/30' : 'bg-background'
       }`}
     >
       <div className="mb-2 px-1 pt-1">
@@ -1114,7 +1146,7 @@ export function UiIssueTracker() {
   const renderResolvedColumn = (resolved: UiIssue[]) => (
     <section
       aria-label="Resolved issues"
-      className="flex min-h-[12rem] flex-col rounded-xl border-t-4 border-t-brand-green bg-[#f1f2f4] p-2"
+      className="flex min-h-[12rem] flex-col rounded-xl border-t-4 border-t-brand-green bg-background p-2"
     >
       <div className="mb-2 px-1 pt-1">
         <div className="flex items-center gap-2">
