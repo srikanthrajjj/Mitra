@@ -44,7 +44,7 @@ function MetaLine({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground',
+        'mitra-ann__ink-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]',
         className,
       )}
     >
@@ -106,7 +106,7 @@ function AnnouncementCard({
 
         <h3
           className={cn(
-            'font-display font-semibold leading-snug text-foreground',
+            'mitra-ann__ink font-display font-semibold leading-snug',
             featured ? 'text-xl sm:text-2xl' : 'text-[15px]',
           )}
         >
@@ -115,7 +115,7 @@ function AnnouncementCard({
 
         <p
           className={cn(
-            'text-[13px] leading-relaxed text-muted-foreground',
+            'mitra-ann__ink-muted text-[13px] leading-relaxed',
             featured ? 'line-clamp-3' : 'line-clamp-2',
           )}
         >
@@ -145,14 +145,14 @@ function AnnouncementArticle({
       <button
         type="button"
         onClick={onBack}
-        className="mb-6 inline-flex items-center gap-1.5 rounded-md text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="mitra-ann__ink-muted mb-6 inline-flex items-center gap-1.5 rounded-md text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
         All announcements
       </button>
 
       {/* The body sits on a card so the copy reads against a surface, not the canvas. */}
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_2px_10px_rgba(0,0,0,0.06)] sm:p-8">
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-8">
         <AnnouncementCover announcement={announcement} glyph="15rem" className="mb-7 h-48 sm:h-64" />
 
         <div className="flex flex-wrap items-center gap-2">
@@ -164,11 +164,11 @@ function AnnouncementArticle({
           )}
         </div>
 
-        <h1 className="mt-3 font-display text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
+        <h1 className="mitra-ann__ink mt-3 font-display text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
           {announcement.label}
         </h1>
 
-        <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+        <p className="mitra-ann__ink-muted mt-3 text-[15px] leading-relaxed">
           {announcement.shortDescription}
         </p>
 
@@ -177,22 +177,21 @@ function AnnouncementArticle({
             <span className="flex items-center gap-2">
               <span
                 aria-hidden
-                className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold"
-                style={{ background: 'var(--ann-tint)', color: 'var(--ann-ink)' }}
+                className="mitra-ann__ink-muted flex h-7 w-7 items-center justify-center rounded-full bg-muted text-[11px] font-semibold"
               >
                 {announcement.authorName.slice(0, 1).toUpperCase()}
               </span>
-              <span className="text-[12px] leading-tight text-foreground">
+              <span className="mitra-ann__ink text-[12px] leading-tight">
                 {announcement.authorName}
                 {announcement.authorRole && (
-                  <span className="block text-[11px] text-muted-foreground">
+                  <span className="mitra-ann__ink-muted block text-[11px]">
                     {announcement.authorRole}
                   </span>
                 )}
               </span>
             </span>
           )}
-          <span className="text-[11px] text-muted-foreground">
+          <span className="mitra-ann__ink-muted text-[11px]">
             {formatAnnouncementDate(announcement.createdAt)}
           </span>
         </div>
@@ -249,12 +248,12 @@ export default function AnnouncementsView({
           }}
         />
       ) : (
-        <div className="mx-auto w-full max-w-5xl">
+        <div className="mitra-ann mx-auto w-full max-w-5xl">
           <header className="mb-8">
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="mitra-ann__ink font-display text-2xl font-semibold tracking-tight sm:text-3xl">
               Announcements
             </h1>
-            <p className="mt-2 text-[14px] text-muted-foreground">
+            <p className="mitra-ann__ink-muted mt-2 text-[14px]">
               Releases, incidents and maintenance for your Mitra workspace.
             </p>
           </header>
@@ -262,8 +261,8 @@ export default function AnnouncementsView({
           {feed.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card py-16 text-center">
               <Megaphone className="mb-3 h-8 w-8 text-muted-foreground/40" aria-hidden />
-              <p className="text-sm font-medium text-foreground">No announcements yet</p>
-              <p className="mt-1 text-[13px] text-muted-foreground">
+              <p className="mitra-ann__ink text-sm font-medium">No announcements yet</p>
+              <p className="mitra-ann__ink-muted mt-1 text-[13px]">
                 New announcements for your workspace will appear here.
               </p>
             </div>

@@ -11,7 +11,29 @@
   --ann-tint-strong: rgba(56, 189, 248, 0.34);
   --ann-ink: #7dd3fc;
 
+  /* Reader copy stays neutral; colour is reserved for severity. */
+  --ann-fg: 0 0% 96%;
+  --ann-fg-muted: 0 0% 64%;
+
   font-family: var(--font-sans);
+}
+
+.light .mitra-ann {
+  --ann-fg: 0 0% 13%;
+  --ann-fg-muted: 0 0% 40%;
+}
+
+.mitra-ann__ink {
+  color: hsl(var(--ann-fg));
+}
+
+.mitra-ann__ink-muted {
+  color: hsl(var(--ann-fg-muted));
+}
+
+a.mitra-ann__ink-muted:hover,
+button.mitra-ann__ink-muted:hover {
+  color: hsl(var(--ann-fg));
 }
 
 .mitra-ann--info {
@@ -146,13 +168,12 @@
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-card);
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
 .mitra-ann__card:hover {
   border-color: var(--ann-tint-strong);
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
 .mitra-ann__card:focus-visible {
@@ -185,7 +206,7 @@
   margin: 0 0 1em;
   font-size: 0.9375rem;
   line-height: 1.75;
-  color: hsl(var(--foreground) / 0.86);
+  color: hsl(var(--ann-fg) / 0.88);
 }
 
 .mitra-ann__body p:last-child {
