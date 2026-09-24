@@ -87,11 +87,6 @@
   color: var(--annbar-ink);
 }
 
-.mitra-announcement-bar__chip {
-  background: var(--annbar-fill);
-  color: var(--annbar-ink);
-}
-
 .mitra-announcement-bar__close {
   color: hsl(var(--muted-foreground));
   transition: background-color 0.15s ease, color 0.15s ease;

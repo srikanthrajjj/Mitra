@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils';
 import type { Announcement, AnnouncementType } from '../types';
 import {
   ANNOUNCEMENT_LEVEL_LABEL,
-  ANNOUNCEMENT_TYPE_LABEL,
   formatAnnouncementTime,
   formatAnnouncementTimestamp,
   toAnnouncementLevel,
@@ -75,14 +74,9 @@ export function AnnouncementBar({ announcement, now = new Date(), onDismiss }: A
         </span>
 
         <div className="min-w-0 flex-1 font-sans">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="mitra-announcement-bar__chip inline-flex rounded-md px-2 py-0.5 text-[10px] font-semibold leading-4">
-              {ANNOUNCEMENT_TYPE_LABEL[type]}
-            </span>
-            <h2 className="text-[13px] font-semibold leading-5 text-foreground sm:text-sm">
-              {announcement.label}
-            </h2>
-          </div>
+          <h2 className="text-[13px] font-semibold leading-5 text-foreground sm:text-sm">
+            {announcement.label}
+          </h2>
           <p className="mt-0.5 text-xs leading-5 text-muted-foreground sm:text-[13px]">
             {announcement.shortDescription}
           </p>
