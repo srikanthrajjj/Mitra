@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type ComponentType, type ReactNode, type Ref } from 'react';
 import {
+  ChevronRight,
   Folder,
   Plus,
   Star,
@@ -142,6 +143,7 @@ export function ArchitectSidebar({
   const [hoveredNavItemId, setHoveredNavItemId] = useState<string | null>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(new Set());
   const [folderEditName, setFolderEditName] = useState('');
   const folderRenameInputRef = useRef<HTMLInputElement>(null);
 
@@ -160,6 +162,18 @@ export function ArchitectSidebar({
       folderRenameInputRef.current.select();
     }
   }, [editingFolderId, renamingFolderId]);
+
+  const toggleFolderExpanded = (folderId: string) => {
+    setExpandedFolderIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(folderId)) {
+        next.delete(folderId);
+      } else {
+        next.add(folderId);
+      }
+      return next;
+    });
+  };
 
   const startFolderRename = (folder: ProjectFolder) => {
     setEditingFolderId(folder.id);
@@ -647,21 +661,20 @@ export function ArchitectSidebar({
     activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
 
   const pinnedSolutions = filterByTag(solutions.filter((sol) => sol.isPinned));
-  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned));
+  // A chat in a project is listed under that project, so Recents stays the loose chats.
+  // Without this, moving a chat into a folder changed nothing on screen.
+  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned && !sol.folderId));
 
-  // Like Claude's sidebar, the Projects section shows a single project: the focused one,
-  // otherwise the project with the most recent activity.
+  // Every project is listed, most recently active first, and each expands to its chats.
   const activeFolders = folders.filter((folder) => !folder.archived);
   const folderActivity = (folder: ProjectFolder) =>
     Math.max(
       Date.parse(folder.updatedAt ?? '') || 0,
       ...solutions.filter((sol) => sol.folderId === folder.id).map((sol) => Date.parse(sol.createdAt) || 0),
     );
-  const spotlightFolder =
-    activeFolders.find((folder) => folder.id === focusedFolderId) ??
-    [...activeFolders].sort((a, b) => folderActivity(b) - folderActivity(a))[0];
-  const spotlightFolderActive =
-    activeTab === 'projects' && !selectedSidebarId && spotlightFolder !== undefined && focusedFolderId === spotlightFolder.id;
+  const sortedFolders = [...activeFolders].sort((a, b) => folderActivity(b) - folderActivity(a));
+  const solutionsInFolder = (folderId: string) =>
+    filterByTag(solutions.filter((sol) => sol.folderId === folderId));
 
   return (
     <div className="mitra-sidebar-minimal flex min-h-0 flex-1 flex-col overflow-hidden" data-tour="sidebar">
@@ -713,8 +726,8 @@ export function ArchitectSidebar({
       {/* Recents and Pinned list direct render without folders */}
       <div className="relative mt-3 flex min-h-0 flex-1 flex-col">
         <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-1 pb-2 scrollbar-thin">
-        {/* Projects: a single project, like Claude's sidebar */}
-        {spotlightFolder && (
+        {/* Projects: every project, each expanding to the chats filed under it */}
+        {sortedFolders.length > 0 && (
           <div className="flex flex-col shrink-0 space-y-0.5">
             <div className="mb-1 flex items-center justify-between px-2.5">
               <span className="text-[12px] font-normal tracking-wider text-foreground [font-variant-caps:all-small-caps]">
@@ -733,122 +746,188 @@ export function ArchitectSidebar({
                 <Plus className="h-3.5 w-3.5" />
               </button>
             </div>
-            {(() => {
+
+            {sortedFolders.map((folder) => {
               const folderEditing =
-                editingFolderId === spotlightFolder.id || renamingFolderId === spotlightFolder.id;
+                editingFolderId === folder.id || renamingFolderId === folder.id;
+              const folderActive =
+                activeTab === 'projects' && !selectedSidebarId && focusedFolderId === folder.id;
+              const expanded = expandedFolderIds.has(folder.id);
+              const children = solutionsInFolder(folder.id);
+
               return (
-                <div
-                  onClick={folderEditing ? undefined : () => onOpenFolder?.(spotlightFolder.id)}
-                  title={folderEditing ? undefined : spotlightFolder.name}
-                  className={cn(
-                    'group flex w-full min-w-0 items-center gap-2 rounded-[10px] py-1.75 pl-2.5 pr-1.5 text-left text-[13px] leading-tight font-normal transition-all duration-200 select-none',
-                    folderEditing ? 'cursor-default' : 'cursor-pointer',
-                    spotlightFolderActive
-                      ? isDark
-                        ? 'bg-mitra-highlight text-brand-green'
-                        : 'bg-muted text-brand-green-deep'
-                      : isDark
-                        ? 'text-foreground hover:bg-sidebar-accent'
-                        : 'text-foreground hover:bg-accent/55 hover:text-brand-green-deep',
-                  )}
-                >
-                  <Folder className="h-4 w-4 shrink-0" aria-hidden />
-
-                  {folderEditing ? (
-                    <input
-                      ref={folderRenameInputRef}
-                      value={folderEditName}
-                      onChange={(e) => setFolderEditName(e.target.value)}
-                      onBlur={() => commitFolderRename(spotlightFolder.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          commitFolderRename(spotlightFolder.id);
-                        } else if (e.key === 'Escape') {
-                          e.preventDefault();
-                          cancelFolderRename();
-                        }
+                <div key={folder.id} className="flex flex-col space-y-0.5">
+                  <div
+                    onClick={
+                      folderEditing
+                        ? undefined
+                        : () => {
+                            // Opening a project also reveals its chats; collapsing is the chevron's job.
+                            setExpandedFolderIds((prev) => new Set(prev).add(folder.id));
+                            onOpenFolder?.(folder.id);
+                          }
+                    }
+                    title={folderEditing ? undefined : folder.name}
+                    className={cn(
+                      'group flex w-full min-w-0 items-center gap-1 rounded-[10px] py-1.75 pl-1 pr-1.5 text-left text-[13px] leading-tight font-normal transition-all duration-200 select-none',
+                      folderEditing ? 'cursor-default' : 'cursor-pointer',
+                      folderActive
+                        ? isDark
+                          ? 'bg-mitra-highlight text-brand-green'
+                          : 'bg-muted text-brand-green-deep'
+                        : isDark
+                          ? 'text-foreground hover:bg-sidebar-accent'
+                          : 'text-foreground hover:bg-accent/55 hover:text-brand-green-deep',
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFolderExpanded(folder.id);
                       }}
-                      onClick={(e) => e.stopPropagation()}
-                      className={cn(
-                        'min-w-0 flex-1 rounded border px-1 py-0.5 text-[13px] outline-none',
-                        isDark
-                          ? 'bg-mitra-surface border-white/[0.06] text-foreground focus:border-brand-green/25'
-                          : 'bg-card border-border text-foreground focus:border-brand-green',
-                      )}
-                    />
-                  ) : (
-                    <>
-                      <span className="flex-1 truncate">{spotlightFolder.name}</span>
+                      aria-expanded={expanded}
+                      aria-label={`${expanded ? 'Collapse' : 'Expand'} ${folder.name}`}
+                      className="shrink-0 cursor-pointer rounded p-0.5 text-foreground"
+                    >
+                      <ChevronRight
+                        className={cn(
+                          'h-3.5 w-3.5 transition-transform duration-200',
+                          expanded && 'rotate-90',
+                        )}
+                      />
+                    </button>
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            title="Project options"
-                            aria-label={`Options for ${spotlightFolder.name}`}
+                    <Folder className="h-4 w-4 shrink-0" aria-hidden />
+
+                    {folderEditing ? (
+                      <input
+                        ref={folderRenameInputRef}
+                        value={folderEditName}
+                        onChange={(e) => setFolderEditName(e.target.value)}
+                        onBlur={() => commitFolderRename(folder.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            commitFolderRename(folder.id);
+                          } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            cancelFolderRename();
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className={cn(
+                          'min-w-0 flex-1 rounded border px-1 py-0.5 text-[13px] outline-none',
+                          isDark
+                            ? 'bg-mitra-surface border-white/[0.06] text-foreground focus:border-brand-green/25'
+                            : 'bg-card border-border text-foreground focus:border-brand-green',
+                        )}
+                      />
+                    ) : (
+                      <>
+                        <span className="flex-1 truncate">{folder.name}</span>
+
+                        {children.length > 0 && (
+                          <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground group-hover:hidden">
+                            {children.length}
+                          </span>
+                        )}
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              title="Project options"
+                              aria-label={`Options for ${folder.name}`}
+                              className={cn(
+                                'shrink-0 cursor-pointer rounded p-0.5 text-foreground transition-all',
+                                'opacity-0 group-hover:opacity-100 focus:opacity-100 data-[state=open]:opacity-100',
+                              )}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-3.5 w-3.5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
                             className={cn(
-                              'shrink-0 cursor-pointer rounded p-0.5 text-foreground transition-all',
-                              'opacity-0 group-hover:opacity-100 focus:opacity-100 data-[state=open]:opacity-100',
+                              isDark ? 'dark bg-mitra-sidebar text-foreground' : 'light bg-card text-foreground',
+                              'w-40',
                             )}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <MoreVertical className="h-3.5 w-3.5" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className={cn(
-                            isDark ? 'dark bg-mitra-sidebar text-foreground' : 'light bg-card text-foreground',
-                            'w-40',
-                          )}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <DropdownMenuItem
-                            className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenFolder?.(spotlightFolder.id);
-                            }}
-                          >
-                            Open
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              startFolderRename(spotlightFolder);
-                            }}
-                          >
-                            Rename
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onCreateFolder();
-                            }}
-                          >
-                            New project
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator className={isDark ? 'bg-mitra-surface' : 'bg-muted'} />
-                          {/* Archive, not delete: App keeps the folder and its threads restorable. */}
-                          <DropdownMenuItem
-                            className="cursor-pointer text-[13.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteFolder(spotlightFolder.id);
-                            }}
-                          >
-                            Archive
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </>
+                            <DropdownMenuItem
+                              className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNewChat(folder.id);
+                              }}
+                            >
+                              New chat
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenFolder?.(folder.id);
+                              }}
+                            >
+                              Open
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startFolderRename(folder);
+                              }}
+                            >
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer text-[13.5px] py-1.5 focus:bg-accent focus:text-accent-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onCreateFolder();
+                              }}
+                            >
+                              New project
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className={isDark ? 'bg-mitra-surface' : 'bg-muted'} />
+                            {/* Archive, not delete: App keeps the folder and its threads restorable. */}
+                            <DropdownMenuItem
+                              className="cursor-pointer text-[13.5px] py-1.5 text-rose-500 focus:bg-rose-500/10 focus:text-rose-500"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteFolder(folder.id);
+                              }}
+                            >
+                              Archive
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </>
+                    )}
+                  </div>
+
+                  {expanded && (
+                    <div
+                      className={cn(
+                        'ml-[1.1rem] flex flex-col space-y-0.5 border-l pl-1',
+                        isDark ? 'border-white/[0.08]' : 'border-border',
+                      )}
+                    >
+                      {children.length === 0 ? (
+                        <p className="px-2.5 py-1.5 text-[12.5px] text-muted-foreground">
+                          {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No chats yet'}
+                        </p>
+                      ) : (
+                        children.map((sol) => renderSolutionRow(sol))
+                      )}
+                    </div>
                   )}
                 </div>
               );
-            })()}
+            })}
           </div>
         )}
 
