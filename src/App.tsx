@@ -2347,6 +2347,8 @@ Pick a step below and I'll continue building — data model, scripts, and update
     setSelectedSidebarId('');
     setSolutions((prev) => prev.map((sol) => ({ ...sol, active: false })));
     setActiveTab('projects');
+    // A new folder is named "untitled N", so hand it straight to the sidebar's rename input.
+    setRenamingFolderId(folderId);
     return folderId;
   };
 
