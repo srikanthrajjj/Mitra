@@ -673,12 +673,16 @@ export function ArchitectSidebar({
     activeTagFilter ? list.filter((sol) => sol.tags?.includes(activeTagFilter)) : list;
 
   const pinnedSolutions = filterByTag(solutions.filter((sol) => sol.isPinned));
-  // A chat in a project is listed under that project, so Recents stays the loose chats.
-  // Without this, moving a chat into a folder changed nothing on screen.
-  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned && !sol.folderId));
 
   // Every project is listed, most recently active first, and each expands to its chats.
   const activeFolders = folders.filter((folder) => !folder.archived);
+  const activeFolderIds = new Set(activeFolders.map((folder) => folder.id));
+  // Filed means "filed somewhere the user can actually see". A chat pointing at an archived or
+  // missing folder falls back to Recents rather than rendering nowhere at all.
+  const isFiled = (sol: Solution) => !!sol.folderId && activeFolderIds.has(sol.folderId);
+  // A chat in a project is listed under that project, so Recents stays the loose chats.
+  // Without this, moving a chat into a folder changed nothing on screen.
+  const recentSolutions = filterByTag(solutions.filter((sol) => !sol.isPinned && !isFiled(sol)));
   const folderActivity = (folder: ProjectFolder) =>
     Math.max(
       Date.parse(folder.updatedAt ?? '') || 0,
@@ -930,9 +934,34 @@ export function ArchitectSidebar({
                       )}
                     >
                       {children.length === 0 ? (
-                        <p className="px-2.5 py-1.5 text-[12.5px] text-muted-foreground">
-                          {activeTagFilter ? `No chats tagged "${activeTagFilter}"` : 'No chats yet'}
-                        </p>
+                        activeTagFilter ? (
+                          <p className="px-2.5 py-1.5 text-[12.5px] text-muted-foreground">
+                            {`No chats tagged "${activeTagFilter}"`}
+                          </p>
+                        ) : (
+                          /* An empty project should offer the way out of being empty. */
+                          <div className="flex flex-col gap-0.5 px-1.5 pb-1 pt-0.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNewChat(folder.id);
+                              }}
+                              className={cn(
+                                'flex w-full items-center gap-1.5 rounded-[10px] px-1.5 py-1.5 text-left text-[12.5px] font-normal transition-colors',
+                                isDark
+                                  ? 'text-foreground hover:bg-sidebar-accent'
+                                  : 'text-foreground hover:bg-accent/55 hover:text-brand-green-deep',
+                              )}
+                            >
+                              <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                              Create a chat
+                            </button>
+                            <p className="px-1.5 text-[11px] leading-snug text-muted-foreground">
+                              or file an existing one here from its menu
+                            </p>
+                          </div>
+                        )
                       ) : (
                         children.map((sol) => renderSolutionRow(sol))
                       )}
