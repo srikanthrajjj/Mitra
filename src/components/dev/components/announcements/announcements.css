@@ -171,8 +171,16 @@
   border-bottom: 1px solid hsl(var(--border) / 0.55);
   font: inherit;
   color: inherit;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.12s ease;
+}
+
+/* A row with no redirectPath goes nowhere, so it should not invite a click. */
+.mitra-announcement--static,
+.mitra-announcement--static:hover {
+  cursor: default;
+  background: transparent;
 }
 
 .mitra-announcement:hover {
@@ -269,10 +277,6 @@
   color: hsl(var(--foreground));
 }
 
-.mitra-announcement--open .mitra-announcement__label {
-  white-space: normal;
-}
-
 .mitra-announcement__dot {
   display: block;
   width: 0.375rem;
@@ -283,47 +287,12 @@
   flex-shrink: 0;
 }
 
-.mitra-announcement__chevron {
+.mitra-announcement__go {
   width: 0.875rem;
   height: 0.875rem;
   margin-top: 0.15rem;
   color: hsl(var(--muted-foreground) / 0.7);
   flex-shrink: 0;
-  transition: transform 0.16s ease;
-}
-
-.mitra-announcement--open .mitra-announcement__chevron {
-  transform: rotate(180deg);
-}
-
-/* --- Expanded detail, outside the trigger so the link stays its own control --- */
-.mitra-announcement--open {
-  border-bottom-color: transparent;
-  padding-bottom: 0.15rem;
-}
-
-.mitra-announcement__panel {
-  position: relative;
-  padding: 0 1rem 0.85rem 3.25rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.55);
-}
-
-.mitra-announcement__panel--unread {
-  background: rgba(79, 207, 54, 0.04);
-}
-
-.mitra-announcement__panel--unread::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--color-brand-green);
-}
-
-.light .mitra-announcement__panel--unread {
-  background: var(--mitra-highlight);
 }
 
 .mitra-announcement__summary {
@@ -332,22 +301,9 @@
   line-height: 1.45;
   color: hsl(var(--muted-foreground));
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.mitra-announcement--open .mitra-announcement__summary {
-  display: block;
-  overflow: visible;
-}
-
-.mitra-announcement__description {
-  margin: 0.4rem 0 0;
-  font-size: 0.75rem;
-  line-height: 1.55;
-  color: hsl(var(--foreground) / 0.78);
-  white-space: pre-line;
 }
 
 /* --- Meta line --- */
@@ -381,37 +337,6 @@
 .mitra-announcement__expiry {
   color: var(--ann-warning-ink);
   font-weight: 500;
-}
-
-.mitra-announcement__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin-top: 0.55rem;
-  border-radius: 0.375rem;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--color-brand-green);
-  text-decoration: none;
-  transition: color 0.12s ease;
-}
-
-.light .mitra-announcement__link {
-  color: var(--color-brand-green-deep);
-}
-
-.mitra-announcement__link:hover {
-  color: var(--color-brand-green-hover);
-}
-
-.mitra-announcement__link:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
-}
-
-.mitra-announcement__link svg {
-  width: 0.75rem;
-  height: 0.75rem;
 }
 
 /* --- Empty / error / loading --- */
@@ -496,7 +421,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mitra-announcement,
-  .mitra-announcement__chevron,
   .mitra-announcements__skeleton-icon,
   .mitra-announcements__skeleton-line {
     transition: none;

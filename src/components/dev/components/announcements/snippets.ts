@@ -17,10 +17,9 @@ export const ANNOUNCEMENTS_HTML = `<!-- Panel: header + read/unread filter + fee
   <div class="mitra-announcements__scroll">
     <h3 class="mitra-announcements__group-label">Today</h3>
     <ul class="mitra-announcements__list">
-      <!-- Unread row, expanded -->
+      <!-- Unread row with a redirectPath: the row itself is the link -->
       <li>
-        <button class="mitra-announcement mitra-announcement--unread mitra-announcement--open"
-                type="button" aria-expanded="true" aria-controls="ann-1-panel" id="ann-1-trigger">
+        <a class="mitra-announcement mitra-announcement--unread" href="/projects/asset-recovery/status">
           <span class="mitra-announcement__icon mitra-announcement__icon--critical">
             <svg aria-hidden="true"><!-- alert-octagon --></svg>
           </span>
@@ -28,7 +27,7 @@ export const ANNOUNCEMENTS_HTML = `<!-- Panel: header + read/unread filter + fee
             <span class="mitra-announcement__head">
               <span class="mitra-announcement__label">Production deploys paused</span>
               <span class="mitra-announcement__dot" aria-hidden="true"></span>
-              <svg class="mitra-announcement__chevron" aria-hidden="true"><!-- chevron-down --></svg>
+              <svg class="mitra-announcement__go" aria-hidden="true"><!-- arrow-up-right --></svg>
             </span>
             <span class="mitra-announcement__summary">Deploys to POC RAVI are on hold while a failed migration is cleared.</span>
             <span class="mitra-announcement__meta">
@@ -37,26 +36,18 @@ export const ANNOUNCEMENTS_HTML = `<!-- Panel: header + read/unread filter + fee
               <span title="23 Sep 2026, 09:12">35m ago</span>
             </span>
           </span>
-        </button>
-        <div class="mitra-announcement__panel mitra-announcement__panel--unread"
-             id="ann-1-panel" role="region" aria-labelledby="ann-1-trigger">
-          <p class="mitra-announcement__description">A schema migration on the Asset Recovery tables failed partway through…</p>
-          <a class="mitra-announcement__link" href="/projects/asset-recovery/status">
-            Open <svg aria-hidden="true"><!-- arrow-up-right --></svg>
-          </a>
-        </div>
+        </a>
       </li>
 
-      <!-- Read row, collapsed -->
+      <!-- Read row, no redirectPath: not a link, so it does not invite a click -->
       <li>
-        <button class="mitra-announcement" type="button" aria-expanded="false" aria-controls="ann-2-panel" id="ann-2-trigger">
+        <div class="mitra-announcement mitra-announcement--static">
           <span class="mitra-announcement__icon mitra-announcement__icon--warning">
             <svg aria-hidden="true"><!-- alert-triangle --></svg>
           </span>
           <span class="mitra-announcement__body">
             <span class="mitra-announcement__head">
               <span class="mitra-announcement__label">Planned maintenance — Saturday 02:00 UTC</span>
-              <svg class="mitra-announcement__chevron" aria-hidden="true"></svg>
             </span>
             <span class="mitra-announcement__summary">Mitra will be read-only for roughly 45 minutes during the upgrade.</span>
             <span class="mitra-announcement__meta">
@@ -67,7 +58,7 @@ export const ANNOUNCEMENTS_HTML = `<!-- Panel: header + read/unread filter + fee
               <span class="mitra-announcement__expiry">Expires in 2 days</span>
             </span>
           </span>
-        </button>
+        </div>
       </li>
     </ul>
   </div>
@@ -124,4 +115,5 @@ export function AnnouncementsDropdown({ theme }: { theme: ResolvedTheme }) {
 //   active === false            -> hidden
 //   isTTL && expireAt <= now    -> hidden
 //   sorted by createdAt, newest first, grouped Today / Yesterday / Earlier
-//   isRead === false            -> green rail, bold label, dot, and the "N new" count`;
+//   isRead === false            -> green rail, bold label, dot, and the "N new" count
+// Rows show label + a two-line summary + meta only; description is not rendered here.`;

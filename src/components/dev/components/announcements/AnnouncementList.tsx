@@ -1,11 +1,10 @@
-import { useId, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   AlertOctagon,
   AlertTriangle,
   ArrowUpRight,
   CheckCircle2,
   Info,
-  ChevronDown,
   Megaphone,
   type LucideIcon,
 } from 'lucide-react';
@@ -33,18 +32,15 @@ const TYPE_ICON: Record<AnnouncementType, LucideIcon> = {
 
 interface AnnouncementRowProps {
   announcement: Announcement;
-  isOpen: boolean;
   now: Date;
-  onToggle: () => void;
   onOpen?: (announcement: Announcement) => void;
 }
 
 /**
- * One row of the feed. Collapsed it shows label + shortDescription; expanding reveals the full
- * description and, when the announcement carries a redirectPath, the link out to it.
+ * One row of the feed: label, a two-line summary and the meta line. The full description is
+ * deliberately not shown here — a row carrying a redirectPath is itself the link to the detail.
  */
-function AnnouncementRow({ announcement, isOpen, now, onToggle, onOpen }: AnnouncementRowProps) {
-  const rowId = useId();
+function AnnouncementRow({ announcement, now, onOpen }: AnnouncementRowProps) {
   const type = toAnnouncementType(announcement.type);
   const level = toAnnouncementLevel(announcement.level);
   const Icon = TYPE_ICON[type];
@@ -53,81 +49,70 @@ function AnnouncementRow({ announcement, isOpen, now, onToggle, onOpen }: Announ
   const expiry = formatAnnouncementExpiry(announcement, now);
   const relative = formatAnnouncementTime(announcement.createdAt, now);
   const exact = formatAnnouncementTimestamp(announcement.createdAt);
-  const hasDetail = announcement.description.trim().length > 0;
   const redirectPath = announcement.redirectPath?.trim();
+
+  const body = (
+    <>
+      <span className={cn('mitra-announcement__icon', `mitra-announcement__icon--${type}`)}>
+        <Icon aria-hidden="true" />
+      </span>
+
+      <span className="mitra-announcement__body">
+        <span className="mitra-announcement__head">
+          <span className="mitra-announcement__label">{announcement.label}</span>
+          {isUnread && <span className="mitra-announcement__dot" aria-hidden="true" />}
+          {redirectPath && <ArrowUpRight className="mitra-announcement__go" aria-hidden="true" />}
+        </span>
+
+        <span className="mitra-announcement__summary">{announcement.shortDescription}</span>
+
+        <span className="mitra-announcement__meta">
+          <span className="mitra-announcement__chip">{ANNOUNCEMENT_LEVEL_LABEL[level]}</span>
+          <span className="mitra-announcement__sep" aria-hidden="true">
+            ·
+          </span>
+          <span title={exact}>{relative}</span>
+          {expiry && (
+            <>
+              <span className="mitra-announcement__sep" aria-hidden="true">
+                ·
+              </span>
+              <span className="mitra-announcement__expiry">{expiry}</span>
+            </>
+          )}
+          <span className="sr-only">
+            {ANNOUNCEMENT_TYPE_LABEL[type]}
+            {isUnread ? ', unread' : ''}
+            {exact ? `, posted ${exact}` : ''}
+          </span>
+        </span>
+      </span>
+    </>
+  );
 
   return (
     <li>
-      <button
-        type="button"
-        id={`${rowId}-trigger`}
-        aria-expanded={isOpen}
-        aria-controls={`${rowId}-panel`}
-        onClick={onToggle}
-        className={cn(
-          'mitra-announcement',
-          isUnread && 'mitra-announcement--unread',
-          isOpen && 'mitra-announcement--open',
-        )}
-      >
-        <span className={cn('mitra-announcement__icon', `mitra-announcement__icon--${type}`)}>
-          <Icon aria-hidden="true" />
-        </span>
-
-        <span className="mitra-announcement__body">
-          <span className="mitra-announcement__head">
-            <span className="mitra-announcement__label">{announcement.label}</span>
-            {isUnread && <span className="mitra-announcement__dot" aria-hidden="true" />}
-            <ChevronDown className="mitra-announcement__chevron" aria-hidden="true" />
-          </span>
-
-          <span className="mitra-announcement__summary">{announcement.shortDescription}</span>
-
-          <span className="mitra-announcement__meta">
-            <span className="mitra-announcement__chip">{ANNOUNCEMENT_LEVEL_LABEL[level]}</span>
-            <span className="mitra-announcement__sep" aria-hidden="true">
-              ·
-            </span>
-            <span title={exact}>{relative}</span>
-            {expiry && (
-              <>
-                <span className="mitra-announcement__sep" aria-hidden="true">
-                  ·
-                </span>
-                <span className="mitra-announcement__expiry">{expiry}</span>
-              </>
-            )}
-            <span className="sr-only">
-              {ANNOUNCEMENT_TYPE_LABEL[type]}
-              {isUnread ? ', unread' : ''}
-              {exact ? `, posted ${exact}` : ''}
-            </span>
-          </span>
-        </span>
-      </button>
-
-      {isOpen && (
-        <div
-          id={`${rowId}-panel`}
-          role="region"
-          aria-labelledby={`${rowId}-trigger`}
-          className={cn('mitra-announcement__panel', isUnread && 'mitra-announcement__panel--unread')}
+      {redirectPath ? (
+        <a
+          href={redirectPath}
+          className={cn('mitra-announcement', isUnread && 'mitra-announcement--unread')}
+          onClick={(event) => {
+            if (!onOpen) return;
+            event.preventDefault();
+            onOpen(announcement);
+          }}
         >
-          {hasDetail && <p className="mitra-announcement__description">{announcement.description}</p>}
-          {redirectPath && (
-            <a
-              href={redirectPath}
-              className="mitra-announcement__link"
-              onClick={(event) => {
-                if (!onOpen) return;
-                event.preventDefault();
-                onOpen(announcement);
-              }}
-            >
-              Open
-              <ArrowUpRight aria-hidden="true" />
-            </a>
+          {body}
+        </a>
+      ) : (
+        <div
+          className={cn(
+            'mitra-announcement',
+            'mitra-announcement--static',
+            isUnread && 'mitra-announcement--unread',
           )}
+        >
+          {body}
         </div>
       )}
     </li>
@@ -177,7 +162,6 @@ export function AnnouncementList({
   now,
   className,
 }: AnnouncementListProps) {
-  const [openId, setOpenId] = useState<string | null>(null);
   const reference = useMemo(() => now ?? new Date(), [now]);
 
   const feed = useMemo(
@@ -230,9 +214,7 @@ export function AnnouncementList({
               <AnnouncementRow
                 key={announcement._id}
                 announcement={announcement}
-                isOpen={openId === announcement._id}
                 now={reference}
-                onToggle={() => setOpenId((current) => (current === announcement._id ? null : announcement._id))}
                 onOpen={onOpen}
               />
             ))}
