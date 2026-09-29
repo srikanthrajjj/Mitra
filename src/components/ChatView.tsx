@@ -329,6 +329,13 @@ export default function ChatView({
     }
   }, [inputValue]);
 
+  // Cold-start chips drop their prompt into the composer so it can be edited before sending,
+  // rather than firing it off as-is.
+  const handlePrefillComposer = (prompt: string) => {
+    setInputValue(prompt);
+    textareaRef.current?.focus();
+  };
+
   const handleSelectInstance = (instanceId: string) => {
     setSelectedInstanceId(instanceId);
     persistSelectedInstanceId(instanceId);
@@ -606,7 +613,7 @@ export default function ChatView({
                 <ColdStartEntryChips
                   theme={theme}
                   disabled={isGeneratingMessage}
-                  onSelect={(prompt) => onSendMessage(prompt)}
+                  onSelect={handlePrefillComposer}
                   onTemplateNavigate={() => onNavigate?.('templates')}
                 />
               ) : showDiscoverySuggestions ? (
@@ -659,7 +666,7 @@ export default function ChatView({
                             : 'bg-transparent border-transparent'
                           : isDark
                             ? 'bg-mitra-surface text-brand-green'
-                            : 'border border-border bg-card text-brand-green'
+                            : 'bg-card text-brand-green'
                     }`}>
                       {isMitra ? (
                         isSnUpdate ? (
@@ -683,9 +690,12 @@ export default function ChatView({
                       'break-words',
                       isMitra
                         ? 'text-foreground'
-                        : isDark
-                          ? 'rounded-2xl bg-mitra-highlight/80 px-4 py-3 font-medium text-foreground'
-                          : 'rounded-[20px] rounded-tr-[4px] border border-border bg-card px-5 py-3 font-medium text-foreground',
+                        : cn(
+                            // A soft filled surface is enough to mark the turn; a border and a
+                            // tail notch only added chrome.
+                            'rounded-2xl px-4 py-2.5 text-foreground',
+                            isDark ? 'bg-mitra-highlight/80' : 'bg-card',
+                          ),
                     )}>
                       {isMitra ? (
                         <>
