@@ -687,15 +687,16 @@ export default function ChatView({
 
                     {/* Body Text */}
                     <div className={cn(
-                      'break-words',
+                      // Both turns sit on a filled surface: no borders, no tails, the fill
+                      // alone says who is speaking.
+                      'break-words rounded-2xl px-4 py-3 text-foreground',
                       isMitra
-                        ? 'text-foreground'
-                        : cn(
-                            // A soft filled surface is enough to mark the turn; a border and a
-                            // tail notch only added chrome.
-                            'rounded-2xl px-4 py-2.5 text-foreground',
-                            isDark ? 'bg-mitra-highlight/80' : 'bg-card',
-                          ),
+                        ? isDark
+                          ? 'bg-mitra-surface'
+                          : 'bg-card'
+                        : isDark
+                          ? 'bg-mitra-highlight/80'
+                          : 'bg-card',
                     )}>
                       {isMitra ? (
                         <>
@@ -708,10 +709,11 @@ export default function ChatView({
                           {hasTodos && (
                             <div
                               className={cn(
+                                // Inset against the message surface it now sits on.
                                 'mb-3 rounded-xl p-3',
                                 isDark
-                                  ? 'bg-mitra-surface/50'
-                                  : 'bg-card',
+                                  ? 'bg-mitra-bg/60'
+                                  : 'bg-muted',
                               )}
                             >
                               <MitraTodos
