@@ -770,6 +770,14 @@ button.rounded-full {
   background: hsl(var(--accent));
 }
 
+.chip-surface--soft {
+  background: hsl(var(--muted) / 0.5);
+}
+
+.chip-surface--soft:hover {
+  background: hsl(var(--accent) / 0.5);
+}
+
 .dark .architect-nav-item[data-active='true'],
 .dark .architect-nav-item--active {
   background: var(--mitra-highlight);

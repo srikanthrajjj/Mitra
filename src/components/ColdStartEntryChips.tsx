@@ -25,8 +25,8 @@ export function ColdStartEntryChips({
   const isDark = isDarkTheme(theme);
 
   const chipClass = isDark
-    ? 'chip-surface text-foreground'
-    : 'chip-surface text-foreground';
+    ? 'chip-surface chip-surface--soft text-foreground'
+    : 'chip-surface chip-surface--soft text-foreground';
 
   return (
     <div className="w-full max-w-xl mx-auto text-center flex flex-col items-center">

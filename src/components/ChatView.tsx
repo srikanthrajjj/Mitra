@@ -568,12 +568,12 @@ export default function ChatView({
                 <div className="mb-5 flex justify-center">
                   <div className="relative">
                     <div className={`absolute inset-0 rounded-full blur-xl animate-pulse ${
-                      isDark ? 'bg-muted' : 'bg-muted'
+                      isDark ? 'bg-muted/50' : 'bg-muted/50'
                     }`} />
                     <div className={`relative flex h-14 w-14 items-center justify-center rounded-2xl ${
                       isDark
-                        ? 'bg-card/80 text-primary'
-                        : 'bg-muted text-brand-green'
+                        ? 'bg-card/40 text-primary'
+                        : 'bg-muted/50 text-brand-green'
                     }`}>
                       <Sparkles className="h-7 w-7 animate-pulse text-primary" />
                     </div>
