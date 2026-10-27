@@ -8,6 +8,8 @@ export interface Organization {
   seats: number;
   seatsUsed: number;
   logoInitials: string;
+  /** Uploaded org logo. Absent for most orgs, so logoInitials is the working fallback. */
+  logoUrl?: string;
   primaryColor: string;
   website: string;
   industry: string;
@@ -81,6 +83,7 @@ export const DEMO_ORGANIZATIONS: Organization[] = [
     seats: 50,
     seatsUsed: 18,
     logoInitials: 'AC',
+    logoUrl: '/org-logos/advance-solutions.svg',
     primaryColor: 'brand-green',
     website: 'https://acme.example',
     industry: 'Financial Services',

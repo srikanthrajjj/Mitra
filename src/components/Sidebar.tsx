@@ -44,6 +44,7 @@ import { Button } from '@/src/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { MitraLogo, useNavLogoPulse } from './MitraLogo';
+import { OrgLogo } from './OrgLogo';
 
 interface SidebarProps {
   version?: 'v2' | 'v3';
@@ -187,6 +188,14 @@ export default function Sidebar({
         <>
           <SidebarHeader className="flex flex-col items-center gap-2 px-1 py-3">
             <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <OrgLogo org={activeOrg} className="h-6 w-6" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="right">{activeOrg.name}</TooltipContent>
+            </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -415,20 +424,28 @@ export default function Sidebar({
         <>
       <SidebarHeader className="flex h-[52px] shrink-0 flex-row items-center border-b border-border/60 px-4 py-0">
         <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          {/* Co-branding lockup: Mitra anchors the product, the org mark says whose
+              workspace this is. The "Mitra" wordmark steps aside for the org name, since
+              the mark beside it already says Mitra and the row is only 52px. */}
+          {/* Two marks, no wordmark: at the default sidebar width the row has room for the
+              Mitra mark, the org mark and the three controls, and nothing else. The org name
+              lives in the account footer, next to the switcher that changes it. */}
           <div className="flex min-w-0 items-center gap-2">
-            <MitraLogo animated={navLogoAnimated} className="h-7 w-7 opacity-90" />
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="truncate text-[15px] font-normal tracking-tight text-sidebar-foreground/90">
-                  Mitra
+            <MitraLogo animated={navLogoAnimated} className="h-7 w-7 shrink-0 opacity-90" />
+            <span aria-hidden className="h-5 w-px shrink-0 bg-border" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <OrgLogo org={activeOrg} className="h-6 w-6" />
                 </span>
-                {version === 'v3' && (
-                  <span className="shrink-0 text-[8px] font-normal px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono leading-none">
-                    v3 Beta
-                  </span>
-                )}
-              </div>
-            </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{activeOrg.name}</TooltipContent>
+            </Tooltip>
+            {version === 'v3' && (
+              <span className="shrink-0 text-[8px] font-normal px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-foreground animate-pulse font-mono leading-none">
+                v3 Beta
+              </span>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-0.5">
             <Tooltip>
@@ -630,13 +647,10 @@ export default function Sidebar({
                   )}
                 </div>
                 <div className="mt-0.5 flex min-w-0 items-center gap-1 text-[10px]">
+                  <OrgLogo org={activeOrg} className="h-3.5 w-3.5" textClassName="text-[7px]" />
                   <span className={cn('truncate', isDark ? 'text-brand-green' : 'text-emerald-900')}>
                     {activeOrg.name}
                   </span>
-                  <Building2 className={cn(
-                    'h-3 w-3 shrink-0',
-                    isDark ? 'text-brand-green' : 'text-emerald-900',
-                  )} />
                   {isOrgSwitched && (
                     <ArrowRightLeft
                       className={cn(

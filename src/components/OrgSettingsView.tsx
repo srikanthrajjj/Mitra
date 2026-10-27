@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
+import { OrgLogo } from './OrgLogo';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
@@ -440,6 +441,26 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
 
   const showFlash = (msg: string) => setFlash(msg);
 
+  const handleLogoUpload = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showFlash('Pick an image file for the logo.');
+      return;
+    }
+    // 1MB keeps a data URL sane; a real uploader would post the file instead.
+    if (file.size > 1_000_000) {
+      showFlash('Logo must be under 1MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      updateOrg({ logoUrl: String(reader.result) });
+      showFlash('Logo updated.');
+    };
+    reader.onerror = () => showFlash('Could not read that file.');
+    reader.readAsDataURL(file);
+  };
+
   const handleInvite = () => {
     if (!inviteEmail.trim() || !inviteEmail.includes('@')) {
       showFlash('Enter a valid email to invite.');
@@ -682,9 +703,7 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
                             : 'hover:bg-accent',
                       )}
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-xs font-bold text-brand-green">
-                        {org.logoInitials}
-                      </div>
+                      <OrgLogo org={org} className="h-10 w-10 rounded-lg" textClassName="text-xs" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-foreground">{org.name}</p>
                         <p className="truncate text-[11px] text-muted-foreground">
@@ -921,14 +940,47 @@ export function OrgSettingsView({ theme, onClose, backLabel = 'Mitra' }: OrgSett
               </div>
             </SectionCard>
             <SectionCard isDark={isDark} title="Branding">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/15 text-sm font-bold text-brand-green">
-                  {activeOrg.logoInitials}
+              <div className="flex flex-wrap items-center gap-3">
+                <OrgLogo org={activeOrg} className="h-12 w-12 rounded-xl" textClassName="text-sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground">Organization logo</p>
+                  <p className="text-xs text-muted-foreground">
+                    Shown beside the Mitra mark in the sidebar. Falls back to the initials above
+                    when no logo is set. PNG or SVG, under 1MB.
+                  </p>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Mitra brand green</p>
-                  <p className="text-xs text-muted-foreground">Matches Mitra product accent across themes.</p>
+                <div className="flex shrink-0 items-center gap-2">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => {
+                        handleLogoUpload(e.target.files?.[0]);
+                        e.target.value = '';
+                      }}
+                    />
+                    <span className="inline-flex h-8 items-center rounded-lg border border-border bg-card px-3 text-xs font-medium text-foreground transition-colors hover:bg-accent">
+                      {activeOrg.logoUrl ? 'Replace' : 'Upload logo'}
+                    </span>
+                  </label>
+                  {activeOrg.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateOrg({ logoUrl: undefined });
+                        showFlash('Logo removed.');
+                      }}
+                      className="inline-flex h-8 items-center rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
+              </div>
+              <div className="mt-4 border-t border-border pt-3">
+                <p className="text-sm font-medium text-foreground">Mitra brand green</p>
+                <p className="text-xs text-muted-foreground">Matches Mitra product accent across themes.</p>
               </div>
             </SectionCard>
           </div>
