@@ -153,7 +153,7 @@ h6,
 .light {
   /* Canvas is a light blue-grey rather than a flat mid grey: lighter overall, and cool
      enough that the white cards on top read as raised. */
-  --background: 214 32% 96%;
+  --background: 214 38% 97.5%;
   --foreground: 120 30% 15%;
   --card: 0 0% 100%;
   --card-foreground: 120 30% 15%;
@@ -161,7 +161,7 @@ h6,
   --popover-foreground: 120 30% 15%;
   --primary: 110 87% 34%;
   --primary-foreground: 92 97% 53%;
-  --secondary: 214 32% 96%;
+  --secondary: 214 38% 97.5%;
   --secondary-foreground: 120 30% 15%;
   /* Sits just under the canvas so chips and insets register on both it and the white cards. */
   --muted: 214 28% 92%;
@@ -183,7 +183,7 @@ h6,
   --sidebar-border: 100 30% 88%;
   --sidebar-ring: 110 87% 34%;
 
-  --mitra-bg: #EEF2F7;
+  --mitra-bg: #F5F8FC;
   --mitra-sidebar: #FFFFFF;
   --mitra-surface: #FFFFFF;
   --mitra-border-color: #DCF8D2;
