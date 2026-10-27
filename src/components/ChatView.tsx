@@ -180,6 +180,13 @@ function StreamingCursor({ isDark }: { isDark: boolean }) {
   );
 }
 
+/**
+ * The conversation column. It steps up with the viewport instead of sitting in a fixed 768px
+ * strip that leaves a wide screen mostly empty, and stops at 1024px, beyond which a line of
+ * prose gets tiring to track. The composer uses the same ladder so the two stay aligned.
+ */
+const CHAT_COLUMN = 'max-w-3xl xl:max-w-4xl 2xl:max-w-5xl';
+
 function formatThoughtDuration(durationMs?: number) {
   const seconds = Math.max(1, Math.round((durationMs ?? 4000) / 1000));
   return `Thought for ${seconds}s`;
@@ -553,9 +560,11 @@ export default function ChatView({
         style={{ scrollBehavior: 'auto' }}
         className="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 relative z-0"
       >
-        <div className={`max-w-3xl mx-auto w-full min-h-full flex flex-col justify-center py-10 pb-16 ${
-          messages.length > 0 ? 'space-y-6' : ''
-        }`}>
+        <div className={cn(
+          CHAT_COLUMN,
+          'mx-auto w-full min-h-full flex flex-col justify-center py-10 pb-16',
+          messages.length > 0 && 'space-y-6',
+        )}>
           {isEmptyChat && (
             <div
               className={`flex flex-col px-2 transition-all duration-500 ease-out ${
@@ -650,7 +659,7 @@ export default function ChatView({
                 <div 
                   key={msg.id || i}
                   ref={isLastMessage ? lastMessageRef : undefined}
-                  className={`group relative flex ${showAssistantAvatar ? 'gap-4' : 'gap-0'} max-w-3xl scroll-mt-8 chat-message-entry ${isMitra ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
+                  className={`group relative flex ${showAssistantAvatar ? 'gap-4' : 'gap-0'} w-full scroll-mt-8 chat-message-entry ${isMitra ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
                 >
                   {showAssistantAvatar && (
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
@@ -973,7 +982,7 @@ export default function ChatView({
 
       {/* Composer — pinned below scroll area so responses stay visible above */}
       <div className="shrink-0 px-4 pt-2 pb-4 z-20 relative border-t border-transparent">
-        <div className="max-w-3xl mx-auto w-full relative z-20">
+        <div className={cn(CHAT_COLUMN, 'mx-auto w-full relative z-20')}>
           {!taskNotificationEnabled && !notificationBannerDismissed && onTaskNotificationChange && (
             <NotificationBanner
               isDark={isDark}
