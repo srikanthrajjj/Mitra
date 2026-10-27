@@ -151,7 +151,9 @@ h6,
 }
 
 .light {
-  --background: 0 0% 92%;
+  /* Canvas is a light blue-grey rather than a flat mid grey: lighter overall, and cool
+     enough that the white cards on top read as raised. */
+  --background: 214 32% 96%;
   --foreground: 120 30% 15%;
   --card: 0 0% 100%;
   --card-foreground: 120 30% 15%;
@@ -159,9 +161,10 @@ h6,
   --popover-foreground: 120 30% 15%;
   --primary: 110 87% 34%;
   --primary-foreground: 92 97% 53%;
-  --secondary: 0 0% 92%;
+  --secondary: 214 32% 96%;
   --secondary-foreground: 120 30% 15%;
-  --muted: 0 0% 94%;
+  /* Sits just under the canvas so chips and insets register on both it and the white cards. */
+  --muted: 214 28% 92%;
   /* 32% lifts secondary text to ~7.2:1 on white cards; 40% sat at ~4.6:1 and read as washed out. */
   --muted-foreground: 110 22% 32%;
   --accent: 95 65% 93%;
@@ -169,7 +172,7 @@ h6,
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --border: 100 12% 82%;
-  --input: 0 0% 94%;
+  --input: 214 28% 94%;
   --ring: 110 87% 34%;
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 120 30% 15%;
@@ -180,12 +183,12 @@ h6,
   --sidebar-border: 100 30% 88%;
   --sidebar-ring: 110 87% 34%;
 
-  --mitra-bg: #EBEBEB;
+  --mitra-bg: #EEF2F7;
   --mitra-sidebar: #FFFFFF;
   --mitra-surface: #FFFFFF;
   --mitra-border-color: #DCF8D2;
   --mitra-highlight: #F2FDEA;
-  --mitra-input: #F4F4F4;
+  --mitra-input: #F2F5F9;
 
   --illuminate-text: #106F00;
   --illuminate-muted: #158F00;
