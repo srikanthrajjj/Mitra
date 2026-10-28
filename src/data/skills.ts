@@ -9,6 +9,7 @@ import {
   Users,
   Rocket,
   ShieldAlert,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import { USER_DISPLAY_NAME } from '../constants/user';
@@ -44,6 +45,57 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
   'Documentation',
   'Testing',
 ];
+
+export interface SkillCategoryMeta {
+  /** Shown on the category rail. */
+  label: string;
+  /** Headline for the category's intro panel — says what the group is for. */
+  title: string;
+  /** One or two sentences under the headline. */
+  description: string;
+  icon: LucideIcon;
+}
+
+/** Copy for the category rail and the intro panel above the list. */
+export const SKILL_CATEGORY_META: Record<SkillCategory, SkillCategoryMeta> = {
+  Design: {
+    label: 'Design',
+    title: 'Shape the solution before it is built',
+    description:
+      'Model tables and relationships, sketch flows and plan the architecture, so the build starts from a decision rather than a guess.',
+    icon: Layers,
+  },
+  Development: {
+    label: 'Development',
+    title: 'Turn the design into working ServiceNow',
+    description:
+      'Generate scripts, business rules and integrations against your instance, with the platform conventions already applied.',
+    icon: Code2,
+  },
+  Documentation: {
+    label: 'Documentation',
+    title: 'Write down what the work actually is',
+    description:
+      'Produce user stories, specifications and handover notes that stakeholders can read and developers can act on.',
+    icon: FileText,
+  },
+  Testing: {
+    label: 'Testing',
+    title: 'Prove it behaves before it ships',
+    description:
+      'Build ATF suites, test data and acceptance checks so a release is verified rather than hoped for.',
+    icon: TestTube,
+  },
+};
+
+/** The "All" pseudo-category, so the rail and the intro panel can treat it like the rest. */
+export const ALL_SKILLS_META: SkillCategoryMeta = {
+  label: 'All skills',
+  title: 'Everything Mitra can do for you',
+  description:
+    'Every skill across design, development, documentation and testing. Pick a category to narrow it down.',
+  icon: Sparkles,
+};
 
 export const SKILLS: Skill[] = [
   {

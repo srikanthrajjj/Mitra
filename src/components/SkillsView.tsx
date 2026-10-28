@@ -2,7 +2,15 @@ import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { Search, Plus, Zap, Trash2, MoreVertical, Pencil, LayoutGrid, List, Play } from 'lucide-react';
 import { Theme } from '../types';
 import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
-import { SKILLS, SKILL_CATEGORIES, type Skill } from '../data/skills';
+import {
+  SKILLS,
+  SKILL_CATEGORIES,
+  SKILL_CATEGORY_META,
+  ALL_SKILLS_META,
+  type Skill,
+  type SkillCategory,
+} from '../data/skills';
+import './skills-view.css';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
 import { Switch } from '@/src/components/ui/switch';
@@ -321,7 +329,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
   const [deletedSkillIds, setDeletedSkillIds] = useState<string[]>(loadDeletedSkillIds);
   const [managedSkills, setManagedSkills] = useState<ManagedSkill[]>(loadManagedSkills);
   const [versions, setVersions] = useState<SkillVersion[]>(loadSkillVersions);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<SkillCategory | null>(null);
   const [statusTab, setStatusTab] = useState<StatusTab>('active');
 
   const [editorOpen, setEditorOpen] = useState(false);
@@ -458,15 +466,20 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
           : 'text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
-  const categoryPill = (active: boolean) =>
-    cn(
-      'rounded-full border-0 px-3 py-1 text-xs font-medium transition-colors',
-      active
-        ? 'bg-muted text-brand-green'
-        : isDark
-          ? 'bg-mitra-surface text-muted-foreground hover:bg-accent hover:text-foreground'
-          : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground',
-    );
+  const activeCategoryMeta = selectedCategory
+    ? SKILL_CATEGORY_META[selectedCategory]
+    : ALL_SKILLS_META;
+
+  /** Counts come from the status tab in view, so the rail matches what the list will show. */
+  const categoryCounts = useMemo(() => {
+    const pool = statusTab === 'active' ? activeSkills : inactiveSkills;
+    const counts = {} as Record<SkillCategory, number>;
+    for (const cat of SKILL_CATEGORIES) counts[cat] = 0;
+    for (const skill of pool) {
+      if (counts[skill.category] !== undefined) counts[skill.category] += 1;
+    }
+    return { total: pool.length, byCategory: counts };
+  }, [statusTab, activeSkills, inactiveSkills]);
 
   if (editorOpen) {
     return (
@@ -573,25 +586,33 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectedCategory(null)}
-                className={categoryPill(selectedCategory === null)}
-              >
-                All
-              </button>
-              {SKILL_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                  className={categoryPill(selectedCategory === cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {/* Intro panel: says what this group of skills is for before showing the list. */}
+            <section className="mitra-skills__intro p-5 sm:p-6">
+              <span aria-hidden className="mitra-skills__grid" />
+              <span aria-hidden className="mitra-skills__sweep" />
+              <span aria-hidden className="mitra-skills__nodes">
+                <span className="mitra-skills__node" />
+                <span className="mitra-skills__node" />
+                <span className="mitra-skills__node" />
+              </span>
+
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green/12 text-brand-green-deep dark:text-brand-green">
+                  <activeCategoryMeta.icon className="h-5 w-5" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {activeCategoryMeta.label}
+                  </p>
+                  <h2 className="mt-0.5 font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
+                    {activeCategoryMeta.title}
+                  </h2>
+                  <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
+                    {activeCategoryMeta.description}
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
         <div
@@ -607,7 +628,52 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
         onScroll={handleScroll}
         className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-4 md:px-8 lg:px-12"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto flex max-w-6xl gap-6">
+          {/* Category rail. Hidden below lg, where the column would squeeze the cards. */}
+          <nav aria-label="Skill categories" className="hidden w-48 shrink-0 lg:block">
+            <div className="sticky top-0 space-y-0.5">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory(null)}
+                aria-current={selectedCategory === null}
+                className={cn(
+                  'mitra-skills__rail-item',
+                  selectedCategory === null && 'mitra-skills__rail-item--active',
+                )}
+              >
+                <ALL_SKILLS_META.icon className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="flex-1 truncate text-[13px]">{ALL_SKILLS_META.label}</span>
+                <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+                  {categoryCounts.total}
+                </span>
+              </button>
+
+              {SKILL_CATEGORIES.map((cat) => {
+                const meta = SKILL_CATEGORY_META[cat];
+                const Icon = meta.icon;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                    aria-current={selectedCategory === cat}
+                    className={cn(
+                      'mitra-skills__rail-item',
+                      selectedCategory === cat && 'mitra-skills__rail-item--active',
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                    <span className="flex-1 truncate text-[13px]">{meta.label}</span>
+                    <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+                      {categoryCounts.byCategory[cat]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          <div className="min-w-0 flex-1">
           {visibleSkills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <p className="text-sm text-muted-foreground">
@@ -641,6 +707,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
               />
             </div>
           )}
+          </div>
         </div>
       </div>
 
