@@ -43,20 +43,6 @@ interface HomeActionCardsProps {
   onExampleClick: (actionId: HomeActionType, prompt: string) => void;
 }
 
-const ACCENT: Record<HomeActionType, string> = {
-  describe: 'border-emerald-500/20 hover:border-emerald-500/40 hover:bg-emerald-500/5',
-  template: 'border-cyan-500/20 hover:border-cyan-500/40 hover:bg-cyan-500/5',
-  import: 'border-amber-500/20 hover:border-amber-500/40 hover:bg-amber-500/5',
-  analyze: 'border-violet-500/20 hover:border-violet-500/40 hover:bg-violet-500/5',
-};
-
-const ICON_COLOR: Record<HomeActionType, { dark: string; light: string }> = {
-  describe: { dark: 'text-emerald-400', light: 'text-emerald-600' },
-  template: { dark: 'text-cyan-400', light: 'text-cyan-600' },
-  import: { dark: 'text-amber-400', light: 'text-amber-600' },
-  analyze: { dark: 'text-violet-400', light: 'text-violet-600' },
-};
-
 const SHORT_LABEL: Record<HomeActionType, string> = {
   describe: 'New application',
   template: 'Industry template',
@@ -84,16 +70,15 @@ export default function HomeActionCards({
               onClick={() => onActionCard(action.id, action.prompt)}
               onKeyDown={(e) => e.key === 'Enter' && onActionCard(action.id, action.prompt)}
               className={cn(
-                'group cursor-pointer border bg-card/65 p-4 rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98]',
-                isDark 
-                  ? 'border-mitra-border hover:border-emerald-500/30 hover:bg-emerald-950/10'
-                  : 'border-border/80 hover:border-emerald-500/20 hover:bg-emerald-50/20',
-                ACCENT[action.id],
+                'group cursor-pointer rounded-xl border p-4 transition-colors duration-200 active:scale-[0.99]',
+                isDark
+                  ? 'border-mitra-border bg-mitra-surface/70 hover:border-brand-green/40 hover:bg-mitra-surface'
+                  : 'border-border/70 bg-card/80 hover:border-brand-green/30 hover:bg-card',
               )}
             >
               <div className="flex items-center gap-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-muted/40 transition-transform group-hover:scale-105">
-                  <Icon className={cn('h-5 w-5', isDark ? ICON_COLOR[action.id].dark : ICON_COLOR[action.id].light)} strokeWidth={1.75} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted/60 transition-colors group-hover:bg-brand-green/10">
+                  <Icon className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-brand-green" strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0 text-left">
                   <p className="text-sm font-semibold leading-snug text-foreground">
@@ -108,18 +93,19 @@ export default function HomeActionCards({
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-3">
-        <span className="text-xs font-semibold text-muted-foreground/80 tracking-wider uppercase">What ServiceNow experts can build:</span>
+        <span className="text-xs font-medium text-muted-foreground">Start with an example</span>
         <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl px-2">
           {SERVICENOW_SUGGESTIONS.map((ex) => (
             <button
               key={ex.label}
               type="button"
               onClick={() => onExampleClick(ex.actionId, ex.prompt)}
-              className={`text-xs px-3.5 py-1.5 rounded-full border transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer ${
+              className={cn(
+                'cursor-pointer rounded-full border px-3.5 py-1.5 text-xs transition-colors duration-200 hover:border-brand-green/30 hover:text-brand-green',
                 isDark
-                  ? 'bg-mitra-surface/50 border-mitra-border text-foreground hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30'
-                  : 'bg-card border-border text-muted-foreground hover:bg-accent hover:text-brand-green hover:border-border'
-              }`}
+                  ? 'border-mitra-border bg-mitra-surface/50 text-muted-foreground hover:bg-accent'
+                  : 'border-border bg-card/75 text-muted-foreground hover:bg-accent',
+              )}
             >
               {ex.label}
             </button>

@@ -1,32 +1,18 @@
 /* ============================================
    mitra-skills — category rail and intro panel.
-   The intro panel carries a quiet technical backdrop: a drifting grid,
-   a slow sweep and a couple of travelling nodes. All of it is CSS, sits
-   behind the copy at low opacity, and stops under prefers-reduced-motion.
    ============================================ */
 
 .mitra-skills__intro {
   position: relative;
   overflow: hidden;
-  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-card);
-  background: hsl(var(--card));
+  background:
+    radial-gradient(ellipse at 18% 16%, hsl(var(--ring) / 0.08), transparent 62%),
+    linear-gradient(130deg, hsl(var(--card)), hsl(var(--accent) / 0.3) 54%, hsl(var(--card)));
   isolation: isolate;
 }
 
-/* Layer 1 — engineering grid, drifting one cell so it never visibly loops. */
-.mitra-skills__grid {
-  position: absolute;
-  inset: -2px;
-  z-index: -2;
-  background-image:
-    linear-gradient(hsl(var(--foreground) / 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--foreground) / 0.055) 1px, transparent 1px);
-  background-size: 28px 28px;
-  animation: mitra-skills-drift 24s linear infinite;
-}
-
-/* Layer 2 — a soft green sweep, so the panel reads as alive rather than static. */
+/* A gentle moving light keeps the intro atmospheric without grid strokes. */
 .mitra-skills__sweep {
   position: absolute;
   inset: -40% -10%;
@@ -40,57 +26,9 @@
   animation: mitra-skills-sweep 18s ease-in-out infinite alternate;
 }
 
-/* Layer 3 — nodes travelling along a line, the "data moving" cue. */
-.mitra-skills__nodes {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.mitra-skills__node {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--color-brand-green);
-  opacity: 0.5;
-  box-shadow: 0 0 8px 1px hsl(var(--ring) / 0.5);
-  animation: mitra-skills-travel 11s linear infinite;
-}
-
-.mitra-skills__node:nth-child(1) { top: 24%; animation-delay: 0s; }
-.mitra-skills__node:nth-child(2) { top: 58%; animation-delay: 3.4s; }
-.mitra-skills__node:nth-child(3) { top: 78%; animation-delay: 7.1s; }
-
-/* The rail trace beneath each node. */
-.mitra-skills__nodes::before,
-.mitra-skills__nodes::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--ring) / 0.18), transparent);
-}
-
-.mitra-skills__nodes::before { top: calc(24% + 2px); }
-.mitra-skills__nodes::after { top: calc(58% + 2px); }
-
-@keyframes mitra-skills-drift {
-  to { background-position: 28px 28px; }
-}
-
 @keyframes mitra-skills-sweep {
   from { transform: translate3d(-6%, -4%, 0); }
   to { transform: translate3d(10%, 6%, 0); }
-}
-
-@keyframes mitra-skills-travel {
-  from { left: -4%; opacity: 0; }
-  12% { opacity: 0.55; }
-  88% { opacity: 0.55; }
-  to { left: 104%; opacity: 0; }
 }
 
 /* --- Category rail --- */
@@ -137,13 +75,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mitra-skills__grid,
-  .mitra-skills__sweep,
-  .mitra-skills__node {
+  .mitra-skills__sweep {
     animation: none;
-  }
-
-  .mitra-skills__node {
-    display: none;
   }
 }

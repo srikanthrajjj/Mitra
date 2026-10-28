@@ -19,6 +19,7 @@ import { Solution, Theme } from '../types';
 import { cardSurfaceHover, isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
 import { Button } from '@/src/components/ui/button';
+import { TabBar } from './dev/tab-bar/TabBar';
 
 type Filter = 'all' | 'mine' | 'shared' | 'organisational';
 type ViewMode = 'list' | 'grid';
@@ -300,16 +301,6 @@ export default function ProjectsView({
         : 'text-muted-foreground hover:bg-accent hover:text-foreground',
     );
 
-  const filterPill = (active: boolean) =>
-    cn(
-      'rounded-full border-0 px-4 py-1.5 text-xs transition-colors',
-      active
-        ? 'bg-accent text-brand-green font-semibold ring-1 ring-brand-green/45'
-        : isDark
-          ? 'bg-mitra-surface text-muted-foreground font-medium hover:bg-accent hover:text-foreground'
-          : 'bg-card text-muted-foreground font-medium hover:bg-accent hover:text-foreground',
-    );
-
   /* If viewing a specific project, show detail view */
   if (viewingProject) {
     return (
@@ -383,19 +374,16 @@ export default function ProjectsView({
             </div>
 
             {/* Filter pills */}
-            <div className="flex gap-2">
-              {(['all', 'mine', 'shared', 'organisational'] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setFilter(f)}
-                  className={filterPill(filter === f)}
-                  aria-pressed={filter === f}
-                >
-                  {FILTER_LABELS[f]}
-                </button>
-              ))}
-            </div>
+            <TabBar
+              tabs={(['all', 'mine', 'shared', 'organisational'] as const).map((id) => ({ id, label: FILTER_LABELS[id] }))}
+              activeTab={filter}
+              variant="pill"
+              fullWidth={false}
+              isDark={isDark}
+              ariaLabel="Project filters"
+              className="flex-wrap"
+              onTabChange={(id) => setFilter(id as Filter)}
+            />
           </div>
         </div>
         <div
@@ -410,6 +398,10 @@ export default function ProjectsView({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
+        id={`panel-${filter}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${filter}`}
+        tabIndex={0}
         className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-8 md:px-8 lg:px-12"
       >
         <div className="mx-auto max-w-6xl">

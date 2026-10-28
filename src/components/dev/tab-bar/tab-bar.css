@@ -106,6 +106,7 @@
 /* --- Pill variant (Mitra Insights style) --- */
 .mitra-tab-bar--pill {
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .mitra-tab-bar--pill .mitra-tab-bar__tab {
@@ -115,6 +116,9 @@
   font-weight: 500;
   background: hsl(var(--card));
   box-shadow: 0 1px 2px hsl(var(--foreground) / 0.06);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
 }
 
 .mitra-tab-bar--pill .mitra-tab-bar__tab--active {

@@ -144,12 +144,12 @@ function CapabilityRow({
       transition={{ duration: 0.22, delay: reducedMotion ? 0 : Math.min(index * 0.025, 0.18) }}
       className={cn(
         'group relative flex w-full !rounded-none items-center border-0 border-l-2 border-transparent px-4 py-4 text-left transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
-        selected ? 'border-l-brand-green bg-brand-green/10' : 'hover:bg-accent',
+        selected ? 'bg-brand-green/10' : 'hover:bg-accent',
       )}
     >
       <span className="min-w-0 flex-1">
-        <span className={cn('block truncate text-base font-semibold', selected ? 'text-brand-green' : 'text-foreground')}>{entry.label}</span>
-        <span className="mt-1 block truncate text-sm leading-relaxed text-muted-foreground">{entry.description}</span>
+        <span className={cn('block truncate text-base', selected ? 'font-bold text-foreground' : 'font-semibold text-foreground')}>{entry.label}</span>
+        <span className={cn('mt-1 block truncate text-sm leading-relaxed', selected ? 'text-foreground/80' : 'text-muted-foreground')}>{entry.description}</span>
       </span>
       <span className={cn('shrink-0 text-sm font-medium text-brand-green transition-all duration-200', selected ? 'translate-x-0 opacity-100' : 'translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100')}>
         View details →
@@ -252,15 +252,31 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
   };
 
   return (
-    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
+    <div className="relative isolate flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden bg-background">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className={cn('absolute inset-0 bg-gradient-to-br', isDark ? 'from-brand-green/10 via-background/0 to-background' : 'from-brand-green/10 via-background/0 to-muted/40')} />
+        <div aria-hidden="true" className="capabilities-orbit-halo absolute -right-40 -top-[31rem] h-[64rem] w-[64rem] rotate-[18deg] opacity-70" />
+        <div className="capabilities-atmosphere-pane absolute left-[57%] top-[12%] h-64 w-40 rotate-[24deg] rounded-3xl backdrop-blur-[2px]" />
+        <div className="capabilities-atmosphere-pane absolute right-[8%] top-[40%] h-52 w-36 -rotate-[17deg] rounded-3xl backdrop-blur-[2px]" />
+        <motion.div
+          className={cn('absolute -left-40 -top-48 h-[40rem] w-[40rem] rounded-full blur-3xl', isDark ? 'bg-brand-green/10' : 'bg-brand-green/20')}
+          animate={reducedMotion ? undefined : { x: [0, 24, 0], y: [0, 18, 0], opacity: [0.4, 0.65, 0.4] }}
+          transition={reducedMotion ? undefined : { duration: 36, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className={cn('absolute -right-48 top-[28%] h-[32rem] w-[32rem] rounded-full blur-3xl', isDark ? 'bg-brand-green/5' : 'bg-brand-green/10')}
+          animate={reducedMotion ? undefined : { x: [0, -20, 0], y: [0, -24, 0], opacity: [0.35, 0.6, 0.35] }}
+          transition={reducedMotion ? undefined : { duration: 44, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
       <div className="shrink-0 px-5 pb-4 pt-7 md:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4">
           <div className="min-w-48 flex-1">
             <h1 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-[42px]">Capabilities</h1>
             <p className="mt-1 text-sm text-muted-foreground">Turn ideas into real ServiceNow solutions with AI.</p>
           </div>
           <div className="relative ml-auto [perspective:900px]">
-            <Button ref={askButtonRef} variant="cta" size="default" onClick={() => setShowAskMitra((open) => !open)} className="ask-mitra-cta h-11 shrink-0 cursor-pointer rounded-xl">
+            <Button ref={askButtonRef} variant="cta" size="default" onClick={() => setShowAskMitra((open) => !open)} className="ask-mitra-cta h-11 shrink-0 cursor-pointer rounded-full">
               Ask Mitra
             </Button>
             <AnimatePresence>
@@ -274,13 +290,13 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
                   exit={reducedMotion ? undefined : { opacity: 0, y: -10, scale: 0.96, rotateX: -5 }}
                   transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 360, damping: 28, mass: 0.7 }}
                   className={cn(
-                    'absolute isolate right-0 top-full z-[100] mt-3 w-[min(38rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] origin-top-right overflow-visible rounded-2xl border p-7 backdrop-blur-2xl will-change-transform md:p-10',
+                    'capabilities-glass-panel absolute isolate right-0 top-full z-[100] mt-3 w-[min(24rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] max-h-[38dvh] xl:max-h-[calc(100dvh-8rem)] origin-top-right overflow-y-auto overscroll-contain rounded-2xl p-6 backdrop-blur-2xl will-change-transform md:p-7',
                     isDark
-                      ? 'border-mitra-border bg-mitra-surface shadow-[0_0_0_1px_hsl(var(--ring)/0.18),0_18px_60px_hsl(var(--foreground)/0.24),0_0_32px_hsl(var(--ring)/0.2)]'
-                      : 'border-border bg-card shadow-[0_0_0_1px_hsl(var(--ring)/0.18),0_18px_60px_hsl(var(--foreground)/0.16),0_0_32px_hsl(var(--ring)/0.14)]',
+                      ? 'bg-mitra-surface/90 shadow-[0_8px_32px_hsl(var(--foreground)/0.14)]'
+                      : 'bg-card/90 shadow-[0_8px_32px_hsl(var(--foreground)/0.08)]',
                   )}
                 >
-                  <span aria-hidden="true" className={cn('absolute -top-1.5 right-7 h-3 w-3 rotate-45 border-l border-t', isDark ? 'border-mitra-border bg-mitra-surface' : 'border-border bg-card')} />
+                  <span aria-hidden="true" className={cn('absolute -top-1.5 right-10 h-3 w-3 rotate-45', isDark ? 'bg-mitra-surface/90' : 'bg-card/90')} />
                   <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-2xl">
                     <div className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-brand-green/10 blur-3xl" />
                     <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-brand-green/70 to-transparent" />
@@ -354,7 +370,7 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-10 md:px-8 lg:px-10">
-        <div className="mx-auto max-w-7xl space-y-6">
+        <div className="mx-auto max-w-6xl space-y-6">
           <AnimatePresence initial={false}>
           {showHero && <motion.section
             key="capabilities-hero"
@@ -363,21 +379,28 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
             exit={reducedMotion ? undefined : { opacity: 0, y: -8, height: 0, marginBottom: 0 }}
             transition={{ duration: reducedMotion ? 0 : 0.3, ease: 'easeOut' }}
             aria-label="Mitra for ServiceNow"
-            className="relative isolate min-h-[260px] overflow-hidden rounded-2xl bg-card px-7 py-7 md:min-h-[290px] md:px-9 md:py-9"
+            className={cn('capabilities-glass-panel relative isolate flex min-h-[320px] items-center overflow-hidden rounded-2xl px-7 py-8 backdrop-blur-xl md:min-h-[350px] md:px-12 md:py-10', isDark ? 'bg-mitra-surface/75' : 'bg-card/80')}
           >
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-green/10 via-transparent to-muted" />
-              <img
-                src={capabilitiesHero}
-                alt=""
-                className={cn('absolute right-[-3%] top-1/2 hidden h-[430px] w-[645px] max-w-[68%] -translate-y-1/2 object-contain object-right md:block', isDark ? 'opacity-70' : 'opacity-90')}
-              />
+              {!isDark && (
+                <img
+                  src={capabilitiesHero}
+                  alt=""
+                  className="absolute right-[-3%] top-1/2 hidden h-[430px] w-[645px] max-w-[68%] -translate-y-1/2 object-contain object-right opacity-90 md:block"
+                />
+              )}
             </div>
-            <div className="relative max-w-[600px]">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mitra for ServiceNow</p>
-              <h2 className="font-display text-4xl font-bold leading-[1.08] tracking-tight text-foreground md:text-[44px]">Build, automate, and<br className="hidden sm:block" /> optimize <span className="text-brand-green">— with AI.</span></h2>
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">Turn your ideas into real ServiceNow solutions. Create applications, streamline workflows, get insights, and accelerate delivery.</p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+            <div className="relative max-w-[700px]">
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-brand-green">Mitra for ServiceNow</p>
+              <h2 className="font-display text-[46px] font-black leading-[0.99] tracking-[-0.045em] text-foreground sm:text-[54px] md:text-[64px] xl:text-[70px]">Build ServiceNow<br className="hidden sm:block" /> solutions <span className="text-brand-green">with AI.</span></h2>
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">Turn an idea into apps, workflows, and insights your team can act on.</p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-3 text-sm font-semibold text-muted-foreground">
+                <span>Apps</span><span aria-hidden="true" className="text-brand-green">·</span>
+                <span>Workflows</span><span aria-hidden="true" className="text-brand-green">·</span>
+                <span>Insights</span>
+              </div>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Button variant="cta" size="lg" onClick={startFromHero} className="rounded-full px-6">Get started</Button>
                 <Button variant="outline" size="lg" onClick={dismissHero} className="rounded-full border-border bg-card px-5">Dismiss</Button>
               </div>
@@ -385,11 +408,11 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
           </motion.section>}
           </AnimatePresence>
 
-          <section aria-labelledby="all-capabilities-heading" className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-            <div className="min-w-0 rounded-xl bg-card p-4 md:p-5">
+          <section aria-labelledby="explore-solutions-heading" className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+            <div className={cn('capabilities-glass-panel relative isolate min-w-0 rounded-xl p-4 backdrop-blur-xl md:p-5', isDark ? 'bg-mitra-surface/75' : 'bg-card/80')}>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <h2 id="all-capabilities-heading" className="font-display text-xl font-bold tracking-tight text-foreground">All capabilities</h2>
+                  <h2 id="explore-solutions-heading" className="font-display text-xl font-bold tracking-tight text-foreground">Explore solutions</h2>
                   <span className="text-xs text-muted-foreground">{filtered.length} results</span>
                 </div>
                 <label className="relative w-full sm:w-64">
@@ -438,7 +461,7 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
               </div>
             </div>
 
-            <aside className="min-w-0 rounded-xl bg-card p-6 md:p-7" aria-live="polite">
+            {!showAskMitra && <aside className={cn('capabilities-glass-panel relative isolate min-w-0 rounded-xl p-6 backdrop-blur-xl md:p-7', isDark ? 'bg-mitra-surface/75' : 'bg-card/80')} aria-live="polite">
               {selected ? (
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div key={selected.label} initial={reducedMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={reducedMotion ? undefined : { opacity: 0, y: -4 }} transition={{ duration: reducedMotion ? 0 : 0.18 }}>
@@ -455,7 +478,7 @@ export default function CapabilitiesView({ theme, onNavigate, onStartChat }: Cap
               ) : (
                 <div className="flex min-h-60 flex-col items-center justify-center text-center"><Search className="mb-3 h-5 w-5 text-muted-foreground" /><p className="text-sm font-medium text-foreground">Choose a capability</p><p className="mt-1 text-xs text-muted-foreground">Select a row to see what Mitra can help you do.</p></div>
               )}
-            </aside>
+            </aside>}
           </section>
         </div>
       </div>

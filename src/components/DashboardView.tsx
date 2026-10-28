@@ -3,6 +3,7 @@ import { Theme } from '../types';
 import { isDarkTheme } from '../utils/theme';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/components/ui/card';
+import { TabBar } from './dev/tab-bar/TabBar';
 import {
   Users,
   Code2,
@@ -20,13 +21,13 @@ interface DashboardViewProps {
 }
 
 const TABS = [
-  'Executive Adoption & ROI',
-  'Developer Productivity',
-  'AI Token Utilization & Model Analytics',
-  'Quality, Reliability & Improvement',
+  { id: 'executive', label: 'Executive Adoption & ROI' },
+  { id: 'productivity', label: 'Developer Productivity' },
+  { id: 'tokens', label: 'AI Token Utilization & Model Analytics' },
+  { id: 'quality', label: 'Quality, Reliability & Improvement' },
 ] as const;
 
-type TabId = typeof TABS[number];
+type TabId = typeof TABS[number]['id'];
 
 interface StatCard {
   label: string;
@@ -267,13 +268,13 @@ function LineChart({ data, isDark }: { data: typeof MONTHLY_DATA; isDark: boolea
 
 export default function DashboardView({ theme }: DashboardViewProps) {
   const isDark = isDarkTheme(theme);
-  const [activeTab, setActiveTab] = useState<TabId>('Executive Adoption & ROI');
+  const [activeTab, setActiveTab] = useState<TabId>('executive');
 
-  const stats = activeTab === 'Executive Adoption & ROI'
+  const stats = activeTab === 'executive'
     ? EXECUTIVE_STATS
-    : activeTab === 'Developer Productivity'
+    : activeTab === 'productivity'
       ? PRODUCTIVITY_STATS
-      : activeTab === 'AI Token Utilization & Model Analytics'
+      : activeTab === 'tokens'
         ? TOKEN_STATS
         : QUALITY_STATS;
 
@@ -289,25 +290,18 @@ export default function DashboardView({ theme }: DashboardViewProps) {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 md:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl space-y-6">
-          {/* Tabs */}
-          <div className="flex min-w-0 gap-0.5 rounded-lg bg-muted/30 p-0.5">
-            {TABS.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'flex min-w-0 flex-1 items-center justify-center rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
-                  activeTab === tab
-                    ? 'bg-brand-green/10 text-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                <span className="truncate">{tab}</span>
-              </button>
-            ))}
-          </div>
+          <TabBar
+            tabs={TABS.map(({ id, label }) => ({ id, label }))}
+            activeTab={activeTab}
+            variant="pill"
+            fullWidth={false}
+            isDark={isDark}
+            ariaLabel="Mitra Insights metrics"
+            className="flex-wrap"
+            onTabChange={(id) => setActiveTab(id as TabId)}
+          />
 
+          <div id={`panel-${activeTab}`} role="tabpanel" aria-labelledby={`tab-${activeTab}`} tabIndex={0} className="space-y-6">
           {/* Stats cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => {
@@ -409,6 +403,7 @@ export default function DashboardView({ theme }: DashboardViewProps) {
                 ))}
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

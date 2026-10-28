@@ -588,13 +588,7 @@ export default function SkillsView({ theme, onRunSkill }: SkillsViewProps) {
 
             {/* Intro panel: says what this group of skills is for before showing the list. */}
             <section className="mitra-skills__intro p-5 sm:p-6">
-              <span aria-hidden className="mitra-skills__grid" />
               <span aria-hidden className="mitra-skills__sweep" />
-              <span aria-hidden className="mitra-skills__nodes">
-                <span className="mitra-skills__node" />
-                <span className="mitra-skills__node" />
-                <span className="mitra-skills__node" />
-              </span>
 
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green/12 text-brand-green-deep dark:text-brand-green">

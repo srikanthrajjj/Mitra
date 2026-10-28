@@ -260,9 +260,9 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
       isDark ? 'bg-mitra-bg' : 'bg-background'
     )}>
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 pt-8 pb-8 md:px-8 lg:px-12">
-        
-        {/* Top Header Row */}
-        <div className="flex items-center justify-between gap-4 pb-4 mb-6">
+        <div className="mx-auto w-full max-w-6xl">
+          {/* Top Header Row */}
+          <div className="flex items-center justify-between gap-4 pb-4 mb-6">
           <h1 className="text-2xl font-bold font-display tracking-tight text-foreground">
             Connections
           </h1>
@@ -276,8 +276,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
           </Button>
         </div>
 
-        {/* Project Section Title */}
-        <div className="flex items-center gap-2 mb-6 min-w-0">
+          {/* Project Section Title */}
+          <div className="flex items-center gap-2 mb-6 min-w-0">
           {isEditingTitle ? (
             <input
               type="text"
@@ -317,8 +317,8 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
           )}
         </div>
 
-        {/* Connections List/Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Connections List/Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {connections.length === 0 ? (
             <div className={cn(
               'rounded-2xl border-0 p-10 text-center flex flex-col items-center justify-center',
@@ -463,6 +463,7 @@ export default function ConnectionsView({ theme, createConnectionNonce = 0 }: Co
               </div>
             ))
           )}
+          </div>
         </div>
 
       </div>

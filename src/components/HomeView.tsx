@@ -222,21 +222,17 @@ export default function HomeView({
             />
           </div>
         )}
-        <div className="relative mx-auto w-full max-w-4xl">
-          <div className="pointer-events-none absolute top-1/2 left-1/2 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted/20 blur-[100px]" />
-
-          <div className="relative z-10 mb-8 text-center flex flex-col items-center justify-center">
-            <h1 className="mb-3 flex items-center justify-center gap-2 text-3xl font-display font-semibold tracking-tight md:text-4xl">
-              <span className="text-foreground">Welcome to</span>
-              <span className="font-bold text-primary glow-green">Mitra</span>
+        <div className="mx-auto w-full max-w-4xl">
+          <div className="mb-10 flex flex-col items-center justify-center text-center">
+            <h1 className="font-display text-5xl font-extrabold tracking-[-0.04em] text-foreground md:text-6xl">
+              Welcome to Mitra
             </h1>
-            <p className="max-w-xl mx-auto text-center text-sm leading-relaxed text-muted-foreground md:text-[15px]">
-              Your AI architect for ServiceNow — from design to deployment.
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              Design and ship ServiceNow solutions from one clear starting point.
             </p>
           </div>
 
-          <div className="relative z-10 mb-8 flex flex-col items-center justify-center w-full">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 text-center">Get started</p>
+          <div className="mb-8 flex w-full flex-col items-center justify-center">
             <input
               type="file"
               ref={fileInputRef}
