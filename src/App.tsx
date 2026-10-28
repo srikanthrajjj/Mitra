@@ -3017,6 +3017,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
             <CapabilitiesView
               theme={resolvedTheme}
               onNavigate={setActiveTab}
+              onStartChat={(prompt) => handleNewChat(undefined, prompt)}
             />
           )}
 
