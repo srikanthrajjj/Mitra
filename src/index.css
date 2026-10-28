@@ -674,6 +674,45 @@ button.rounded-full {
   border-radius: 9999px !important;
 }
 
+.ask-mitra-cta {
+  background-color: transparent !important;
+  color: hsl(var(--ring)) !important;
+  border: 1px solid hsl(var(--ring) / 0.72) !important;
+  box-shadow: none !important;
+  animation: ask-mitra-border-glow 2.8s ease-in-out infinite;
+  transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.ask-mitra-cta:hover {
+  background-color: transparent !important;
+  color: hsl(var(--ring)) !important;
+  border-color: hsl(var(--ring)) !important;
+  box-shadow: none !important;
+  transform: translateY(-1px);
+}
+
+.ask-mitra-cta:active {
+  transform: scale(0.98);
+}
+
+.ask-mitra-cta:focus-visible {
+  outline: 2px solid hsl(var(--ring) / 0.45);
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+
+@keyframes ask-mitra-border-glow {
+  0%, 100% { border-color: hsl(var(--ring) / 0.55); }
+  50% { border-color: hsl(var(--ring)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-mitra-cta {
+    animation: none;
+    transition: none;
+  }
+}
+
 /* Untitled UI inspired container panels */
 .glass-panel-dark {
   background: hsl(var(--card));
