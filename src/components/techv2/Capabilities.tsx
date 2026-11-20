@@ -110,7 +110,7 @@ const CAPABILITIES: Capability[] = [
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GRID = 'color-mix(in srgb, var(--color-foreground) 7%, transparent)';
 
-function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTMLDivElement | null> }) {
+function CapabilityCard({ item, index, total, root }: { item: Capability; index: number; total: number; root: RefObject<HTMLDivElement | null> }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const inView = useInView(ref, { root, amount: 0.6 });
@@ -120,10 +120,10 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
   return (
     <article
       ref={ref}
-      className="group flex h-[390px] w-[300px] shrink-0 snap-start flex-col border-r border-border bg-background transition-colors duration-300 first:border-l hover:bg-mitra-highlight sm:w-[340px]"
+      className="group flex h-[560px] w-[320px] shrink-0 snap-start flex-col border-r border-border bg-background transition-colors duration-300 first:border-l hover:bg-mitra-highlight sm:w-[400px]"
     >
       {/* Visual: top 40% */}
-      <div className="relative h-[40%] border-b border-border">
+      <div className="relative h-[40%] min-h-[224px] border-b border-border">
         <div
           className="absolute inset-0"
           style={{
@@ -134,7 +134,7 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
           }}
           aria-hidden
         />
-        <svg viewBox="0 0 240 120" className="relative h-full w-full p-3" fill="none" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg viewBox="0 0 240 120" className="relative h-full w-full p-8" fill="none" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <defs>
             <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
               <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
@@ -159,9 +159,9 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
       </div>
 
       {/* Copy appears once the drawing has started */}
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col px-8 pb-8 pt-10">
         <motion.p
-          className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-brand-green"
           initial={false}
           animate={{ opacity: show ? 1 : 0, y: show ? 0 : 8 }}
           transition={{ delay: show ? 0.45 : 0, duration: 0.45, ease: EASE }}
@@ -169,7 +169,7 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
           {item.label}
         </motion.p>
         <motion.h3
-          className="mt-3 font-display text-2xl font-semibold leading-tight tracking-[-0.02em]"
+          className="mt-5 font-display text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.025em]"
           initial={false}
           animate={{ opacity: show ? 1 : 0, y: show ? 0 : 10 }}
           transition={{ delay: show ? 0.6 : 0, duration: 0.5, ease: EASE }}
@@ -177,13 +177,22 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
           {item.title}
         </motion.h3>
         <motion.p
-          className="mt-3 text-[15px] leading-snug text-muted-foreground"
+          className="mt-4 max-w-[30ch] text-base leading-relaxed text-muted-foreground"
           initial={false}
           animate={{ opacity: show ? 1 : 0, y: show ? 0 : 10 }}
           transition={{ delay: show ? 0.78 : 0, duration: 0.5, ease: EASE }}
         >
           {item.description}
         </motion.p>
+        <motion.div
+          className="mt-auto flex items-center justify-between border-t border-border pt-5 font-mono text-[11px] tracking-[0.16em] text-muted-foreground"
+          initial={false}
+          animate={{ opacity: show ? 1 : 0 }}
+          transition={{ delay: show ? 0.95 : 0, duration: 0.5 }}
+        >
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <span>{String(total).padStart(2, '0')}</span>
+        </motion.div>
       </div>
     </article>
   );
@@ -264,13 +273,15 @@ export function Capabilities() {
         )}
         style={{ scrollPaddingLeft: 'max(0px, calc((100vw - 1056px) / 2))' }}
       >
-        {CAPABILITIES.map((c) => (
-          <CapabilityCard key={c.id} item={c} root={scroller} />
+        {CAPABILITIES.map((c, i) => (
+          <CapabilityCard key={c.id} item={c} index={i} total={CAPABILITIES.length} root={scroller} />
         ))}
       </div>
 
-      <div className="h-px bg-border" aria-hidden>
-        <div className="h-px bg-brand-green transition-[width] duration-150" style={{ width: `${Math.max(progress, 0.04) * 100}%` }} />
+      <div className="mx-auto w-full max-w-[1056px] border-x border-dashed border-border px-6 py-12 md:px-12 md:py-16">
+        <div className="h-px bg-border" aria-hidden>
+          <div className="h-px bg-brand-green transition-[width] duration-150" style={{ width: `${Math.max(progress, 0.04) * 100}%` }} />
+        </div>
       </div>
     </section>
   );

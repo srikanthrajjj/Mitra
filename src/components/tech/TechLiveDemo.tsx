@@ -33,6 +33,115 @@ const START_OPTIONS = [
   { label: 'Analyse an existing app', hint: 'Improve what you have', icon: Search },
 ] as const;
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Big welcome: each word rises out of a blur, one after another. */
+function KineticWords({ text, className }: { text: string; className?: string }) {
+  return (
+    <span className={className}>
+      {text.split(' ').map((w, i) => (
+        <motion.span
+          key={`${w}-${i}`}
+          className="mr-[0.22em] inline-block"
+          initial={{ opacity: 0, y: 46, filter: 'blur(14px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.9, delay: i * 0.16, ease: EASE }}
+        >
+          {w}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Bold idle state: a welcome in huge type, then the prompt typed straight onto the stage in
+ * display type, one character at a time, with a light that tracks along an underline that draws
+ * itself. No input box: the text is the interface.
+ */
+function BoldIdle({ greeting, typed }: { greeting: boolean; typed: number }) {
+  const progress = Math.min(typed / PROMPT.length, 1);
+  return (
+    <div className="relative z-0 flex flex-1 items-center justify-center overflow-hidden px-6 text-center md:px-14">
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green blur-[120px] transition-opacity duration-700"
+        style={{ opacity: greeting ? 0.18 : 0.08 + progress * 0.22 }}
+        aria-hidden
+      />
+      <AnimatePresence mode="wait">
+        {greeting ? (
+          <motion.div
+            key="welcome"
+            exit={{ opacity: 0, y: -34, filter: 'blur(12px)' }}
+            transition={{ duration: 0.55, ease: EASE }}
+            className="relative"
+          >
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="mb-5 font-mono text-xs uppercase tracking-[0.3em] text-brand-green"
+            >
+              Hello
+            </motion.p>
+            <h3 className="font-display text-[clamp(2.6rem,7.4vw,6rem)] font-semibold leading-[0.98] tracking-[-0.045em]">
+              <KineticWords text="Welcome to" />
+              <br />
+              <motion.span
+                className="inline-block text-brand-green"
+                initial={{ opacity: 0, y: 46, filter: 'blur(14px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.9, delay: 0.32, ease: EASE }}
+                aria-label="IlluminAIte."
+              >
+                Illumin<span className="font-sans font-bold">AI</span>te.
+              </motion.span>
+            </h3>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="input"
+            initial={{ opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -48, filter: 'blur(10px)' }}
+            transition={{ duration: 0.6, ease: EASE }}
+            className="relative w-full max-w-[44rem]"
+          >
+            <p className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+              What will you build?
+            </p>
+            <p className="min-h-[9.5rem] text-left font-display text-[clamp(1.7rem,3.3vw,2.75rem)] font-semibold leading-[1.12] tracking-[-0.03em] md:min-h-[11rem]">
+              {PROMPT.slice(0, typed)
+                .split('')
+                .map((ch, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    transition={{ duration: 0.28 }}
+                  >
+                    {ch}
+                  </motion.span>
+                ))}
+              <span className="ml-1 inline-block h-[0.95em] w-[3px] translate-y-[0.14em] animate-pulse rounded-full bg-brand-green" />
+            </p>
+            <div className="relative mt-5 h-px w-full bg-border" aria-hidden>
+              <motion.div
+                className="absolute inset-y-0 left-0 origin-left bg-brand-green"
+                style={{ width: `${progress * 100}%` }}
+              />
+              <motion.span
+                className="absolute -top-[5px] h-[11px] w-[11px] -translate-x-1/2 rounded-full bg-brand-green blur-[5px]"
+                style={{ left: `${progress * 100}%` }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /** Phase shown as running for a given number of completed to-dos. */
 function phaseFor(done: number, artifacts: number): number {
   if (artifacts >= ARTIFACTS.length) return 4;
@@ -47,9 +156,11 @@ function phaseFor(done: number, artifacts: number): number {
  * plan, advances the five-phase tracker and produces artifacts, then loops.
  * Copy is taken from the real workspace. Static final state for reduced motion.
  */
-export function TechLiveDemo() {
+export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'bold' }) {
+  const bold = variant === 'bold';
   const rootRef = useRef<HTMLDivElement>(null);
   const inView = useInView(rootRef, { amount: 0.35 });
+  const [greeting, setGreeting] = useState(bold);
   const [typed, setTyped] = useState(0);
   const [sent, setSent] = useState(false);
   const [thinking, setThinking] = useState(false);
@@ -61,6 +172,7 @@ export function TechLiveDemo() {
     if (!inView) return;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setGreeting(false);
       setTyped(PROMPT.length);
       setSent(true);
       setShowPlan(true);
@@ -84,12 +196,19 @@ export function TechLiveDemo() {
           setShowPlan(false);
           setDone(0);
           setArtifacts(0);
-          await wait(700);
+          if (bold) {
+            setGreeting(true);
+            await wait(2900);
+            setGreeting(false);
+            await wait(900);
+          } else {
+            await wait(700);
+          }
           for (let i = 1; i <= PROMPT.length; i += 1) {
             setTyped(i);
             await wait(PROMPT[i - 1] === ' ' ? 46 : 24);
           }
-          await wait(550);
+          await wait(bold ? 900 : 550);
           setSent(true);
           setTyped(0);
           setThinking(true);
@@ -115,7 +234,7 @@ export function TechLiveDemo() {
     return () => {
       cancelled = true;
     };
-  }, [inView]);
+  }, [inView, bold]);
 
   const phase = phaseFor(done, artifacts);
   const typing = typed > 0 && !sent;
@@ -154,7 +273,9 @@ export function TechLiveDemo() {
           )}
         </AnimatePresence>
 
-        {!sent && (
+        {!sent && bold && <BoldIdle greeting={greeting} typed={typed} />}
+
+        {!sent && !bold && (
           <div className="relative z-0 flex flex-1 flex-col items-center justify-center px-5 pb-2 text-center md:px-8">
             <h3 className="font-display text-3xl font-extrabold tracking-[-0.035em] md:text-5xl">What will you build?</h3>
             <p className="mt-3 max-w-md text-[15px] text-muted-foreground">
@@ -262,7 +383,7 @@ export function TechLiveDemo() {
         )}
 
         {/* Composer */}
-        <div className="relative z-20 px-4 pb-4 pt-2 md:px-6 md:pb-5">
+        <div className={cn('relative z-20 px-4 pb-4 pt-2 md:px-6 md:pb-5', bold && !sent && 'hidden')}>
           <div
             className={cn(
               'mx-auto flex max-w-2xl items-end gap-3 rounded-2xl border bg-mitra-input/90 px-4 py-3 backdrop-blur transition-all duration-300',
