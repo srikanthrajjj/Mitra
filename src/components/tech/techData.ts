@@ -15,7 +15,7 @@ export const TECH_HERO = {
   eyebrow: 'IlluminAIte Technology',
   title: 'The agentic engine behind every ServiceNow build.',
   subtitle:
-    'Mitra coordinates specialised AI agents that define, build, test, document and deploy on your ServiceNow instance, with a human checkpoint at every promotion.',
+    'IlluminAIte coordinates specialised AI agents that define, build, test, document and deploy on your ServiceNow instance, with a human checkpoint at every promotion.',
 };
 
 export interface TechStage {
@@ -62,7 +62,7 @@ export const TECH_PILLARS: { title: string; desc: string; icon: LucideIcon }[] =
   },
   {
     title: 'Instance-aware AI',
-    desc: 'Mitra grounds builds in your ServiceNow patterns, CMDB and industry playbooks.',
+    desc: 'IlluminAIte grounds builds in your ServiceNow patterns, CMDB and industry playbooks.',
     icon: Sparkles,
   },
   {
@@ -85,27 +85,27 @@ export interface TechFeature {
   url: string;
 }
 
-/** Feature rows. Each image is a real capture of the Mitra workspace. */
+/** Feature rows. Each image is a real capture of the IlluminAIte workspace. */
 export const TECH_FEATURES: TechFeature[] = [
   {
     id: 'start',
     kicker: '01 / Start',
     title: 'Start from a single sentence.',
-    desc: 'Describe a solution, pick an industry template, import requirements, or analyse an app you already have. Mitra takes it from there.',
+    desc: 'Describe a solution, pick an industry template, import requirements, or analyse an app you already have. IlluminAIte takes it from there.',
     bullets: ['New application', 'Industry templates', 'Requirements to solution', 'Analyse an existing app'],
     image: asset('start.jpg'),
-    alt: 'Mitra start screen with four ways to begin a ServiceNow solution',
-    url: 'Mitra · New solution',
+    alt: 'IlluminAIte start screen with four ways to begin a ServiceNow solution',
+    url: 'IlluminAIte · New solution',
   },
   {
     id: 'discovery',
     kicker: '02 / Build',
     title: 'Discovery that drives the build.',
-    desc: 'Mitra plans its own to-dos, asks the next discovery question, and tracks the work through five phases from Define to Deploy.',
+    desc: 'IlluminAIte plans its own to-dos, asks the next discovery question, and tracks the work through five phases from Define to Deploy.',
     bullets: ['Live build plan', 'Phase-gated approvals', 'Five-stage tracker'],
     image: asset('chat-status.jpg'),
-    alt: 'Mitra chat with a generated to-do list and a five-phase status tracker',
-    url: 'Mitra · Discovery chat',
+    alt: 'IlluminAIte chat with a generated to-do list and a five-phase status tracker',
+    url: 'IlluminAIte · Discovery chat',
   },
   {
     id: 'artifacts',
@@ -114,8 +114,8 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'Requirements, data model, workflow, role matrix, scripts, tests and a deployment checklist are produced together and stay in sync.',
     bullets: ['Requirements document', 'Data model and workflow', 'Role matrix and scripts', 'Test script and checklist'],
     image: asset('chat-artifacts.jpg'),
-    alt: 'Mitra artifacts panel listing requirements, data model, workflow, role matrix and scripts',
-    url: 'Mitra · Artifacts',
+    alt: 'IlluminAIte artifacts panel listing requirements, data model, workflow, role matrix and scripts',
+    url: 'IlluminAIte · Artifacts',
   },
   {
     id: 'projects',
@@ -124,8 +124,8 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'Search, filter and track every solution by status, with shared and organisation views so reviewers always see the latest.',
     bullets: ['Status at a glance', 'Shared and organisational views', 'Searchable history'],
     image: asset('projects.jpg'),
-    alt: 'Mitra projects view with solution cards showing status and artifact counts',
-    url: 'Mitra · Projects',
+    alt: 'IlluminAIte projects view with solution cards showing status and artifact counts',
+    url: 'IlluminAIte · Projects',
   },
 ];
 

@@ -37,7 +37,7 @@ function phaseFor(done: number, artifacts: number): number {
 }
 
 /**
- * Scripted product demo: a prompt types itself, Mitra plans, checks off its build
+ * Scripted product demo: a prompt types itself, IlluminAIte plans, checks off its build
  * plan, advances the five-phase tracker and produces artifacts, then loops.
  * Copy is taken from the real workspace. Static final state for reduced motion.
  */
@@ -119,7 +119,7 @@ export function TechLiveDemo() {
     <div
       ref={rootRef}
       className="relative grid h-[36rem] grid-cols-1 overflow-hidden bg-background text-foreground md:h-[34rem] md:grid-cols-[1fr_16rem]"
-      aria-label="Animated demo of Mitra building a ServiceNow onboarding app"
+      aria-label="Animated demo of IlluminAIte building a ServiceNow onboarding app"
       role="img"
     >
       <div
@@ -127,20 +127,22 @@ export function TechLiveDemo() {
         aria-hidden
       />
 
-      {/* Orb: centred while idle, docks to the corner once the build starts */}
-      <motion.div
-        className="pointer-events-none absolute z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 md:h-72 md:w-72"
-        initial={false}
-        animate={sent ? { left: '2.4rem', top: '2.5rem', scale: 0.16, opacity: 0.95 } : { left: '50%', top: '32%', scale: 1, opacity: 1 }}
-        style={{ marginLeft: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div
-          className="absolute inset-0 rounded-full bg-brand-green/10 blur-3xl"
-          aria-hidden
-        />
-        <TechOrb energy={energy} className="absolute inset-0" />
-      </motion.div>
+      {/* Hero orb: fades out when the build starts; a small one takes over in the header */}
+      <AnimatePresence>
+        {!sent && (
+          <motion.div
+            key="orb"
+            className="pointer-events-none absolute left-1/2 top-[30%] z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 md:h-72 md:w-72"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, y: -40 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="absolute inset-0 rounded-full bg-brand-green/10 blur-3xl" aria-hidden />
+            <TechOrb energy={energy} className="absolute inset-0" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat column */}
       <div className="relative flex min-w-0 flex-col border-border md:border-r">
@@ -150,9 +152,10 @@ export function TechLiveDemo() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center gap-3 border-b border-border px-5 py-3 pl-[4.2rem]"
+              className="flex items-center gap-3 border-b border-border px-5 py-2.5"
             >
-              <span className="font-display text-sm font-extrabold tracking-tight">Mitra</span>
+              <TechOrb energy={energy} pointSize={1.3} className="h-9 w-9 shrink-0" />
+              <span className="font-display text-sm font-extrabold tracking-tight">IlluminAIte</span>
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-green">
                 {artifacts >= ARTIFACTS.length ? 'Ready for review' : 'Building'}
               </span>
@@ -189,7 +192,7 @@ export function TechLiveDemo() {
                   className="flex items-center gap-2 text-[13px] text-muted-foreground"
                 >
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-green" />
-                  Mitra is thinking…
+                  IlluminAIte is thinking…
                 </motion.div>
               )}
             </AnimatePresence>
@@ -262,7 +265,7 @@ export function TechLiveDemo() {
                 </>
               ) : (
                 <span className="text-muted-foreground">
-                  {sent ? (artifacts >= ARTIFACTS.length ? 'Awaiting stakeholder approval…' : 'Mitra is working…') : 'Describe the solution you want to build…'}
+                  {sent ? (artifacts >= ARTIFACTS.length ? 'Awaiting stakeholder approval…' : 'IlluminAIte is working…') : 'Describe the solution you want to build…'}
                 </span>
               )}
             </p>

@@ -184,7 +184,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
           </div>
         </div>
         <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-8 md:pt-10">
-          <TechProductWindow tilt priority src="" alt="" url="Mitra · New solution">
+          <TechProductWindow tilt priority src="" alt="" url="IlluminAIte · New solution">
             <TechLiveDemo />
           </TechProductWindow>
         </div>
@@ -255,7 +255,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green/10 blur-3xl" />
         <Reveal className="relative mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] md:text-8xl">
-            See Mitra build on your instance.
+            See IlluminAIte build on your instance.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
             Start from a workshop conversation and finish with a go-live ready ServiceNow implementation.

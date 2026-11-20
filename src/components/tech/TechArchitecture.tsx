@@ -36,7 +36,7 @@ export function TechArchitecture() {
           One orchestrator. Specialised agents. Your ServiceNow instance.
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Mitra routes work to the right agent, keeps context shared across stages, and pauses for human approval
+          IlluminAIte routes work to the right agent, keeps context shared across stages, and pauses for human approval
           before anything is promoted.
         </p>
 
@@ -46,7 +46,7 @@ export function TechArchitecture() {
             viewBox={`0 0 ${W} ${H}`}
             className="mx-auto min-w-[640px] w-full"
             role="img"
-            aria-label="Mitra orchestrator coordinating requirements, build, test, documentation and deployment agents"
+            aria-label="IlluminAIte orchestrator coordinating requirements, build, test, documentation and deployment agents"
           >
             {ARCH_NODES.map((n, i) => {
               const p = POSITIONS[i];
@@ -115,7 +115,7 @@ export function TechArchitecture() {
               <foreignObject x={HUB.x - 64} y={HUB.y - 40} width={128} height={80}>
                 <div className="flex h-full flex-col items-center justify-center text-center text-foreground">
                   <Bot className="h-6 w-6 text-brand-green" />
-                  <span className="mt-1 font-display text-sm font-bold">Mitra</span>
+                  <span className="mt-1 font-display text-sm font-bold">IlluminAIte</span>
                   <span className="font-mono text-[10px] text-muted-foreground">orchestrator</span>
                 </div>
               </foreignObject>

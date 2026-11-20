@@ -64,10 +64,12 @@ interface TechOrbProps {
   /** 0 idle, 1 typing, 2 working. Eased internally. */
   energy: number;
   className?: string;
+  /** Point size in CSS px. */
+  pointSize?: number;
 }
 
 /** Particle ring rendered with WebGL; reacts to the demo state through `energy`. */
-export function TechOrb({ energy, className }: TechOrbProps) {
+export function TechOrb({ energy, className, pointSize = 5 }: TechOrbProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const energyRef = useRef(energy);
   energyRef.current = energy;
@@ -110,7 +112,7 @@ export function TechOrb({ energy, className }: TechOrbProps) {
       uniforms: {
         uTime: { value: 0 },
         uEnergy: { value: 0 },
-        uSize: { value: 5 * renderer.dpr },
+        uSize: { value: pointSize * renderer.dpr },
         uColor: { value: brandColor(host) },
       },
     });
@@ -156,6 +158,7 @@ export function TechOrb({ energy, className }: TechOrbProps) {
       host.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <div ref={hostRef} className={className} aria-hidden />;
