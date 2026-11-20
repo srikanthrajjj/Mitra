@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { TechLiveDemo } from '../tech/TechLiveDemo';
 import { GridBackdrop } from './GridBackdrop';
 import { UseCases } from './UseCases';
+import { Capabilities } from './Capabilities';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
 
 interface TechPageV2Props {
@@ -368,6 +369,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           <div className="hidden items-center gap-8 text-[15px] text-muted-foreground md:flex">
             <a href="#demo" className="transition-colors hover:text-foreground">Live demo</a>
             <a href="#product" className="transition-colors hover:text-foreground">Product</a>
+            <a href="#capabilities" className="transition-colors hover:text-foreground">Capabilities</a>
             <a href="#usecases" className="transition-colors hover:text-foreground">Use cases</a>
             <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
             <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
@@ -475,6 +477,8 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       <Statement />
 
       <StageTabs />
+
+      <Capabilities />
 
       <UseCases />
 
