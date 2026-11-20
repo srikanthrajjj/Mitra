@@ -11,9 +11,9 @@ const WIDEST = 'document';
 const SWAP_MS = 2600;
 
 /**
- * Simple word swap: the old word slides up and fades while the new one slides in. The
- * slot is as wide as the longest word and the word is right-aligned, so the swap never
- * changes the layout. On small screens "ServiceNow." wraps beneath it.
+ * Word swap inside a fixed-width highlight box. The box is as wide as the longest word and
+ * the word is centred in it, so short words look intentional and the swap never changes the
+ * layout. On small screens "ServiceNow." wraps beneath it.
  */
 function SwapWord() {
   const reduced = useReducedMotion();
@@ -26,10 +26,10 @@ function SwapWord() {
   }, [reduced]);
 
   return (
-    <span className="flex flex-wrap items-center justify-center gap-x-[0.24em]">
+    <span className="mt-[0.1em] flex flex-wrap items-center justify-center gap-x-[0.2em]">
       <span
-        className="relative inline-block overflow-hidden"
-        style={{ paddingBottom: '0.16em', marginBottom: '-0.16em' }}
+        className="relative inline-block overflow-hidden rounded-[0.2em] bg-brand-green text-background"
+        style={{ height: '1.16em', lineHeight: '1.16em', paddingInline: '0.26em' }}
         aria-label="define, design, build, test, document or deploy"
       >
         <span className="invisible block" aria-hidden>
@@ -39,10 +39,10 @@ function SwapWord() {
           <motion.span
             key={WORDS[i]}
             aria-hidden
-            className="absolute inset-x-0 top-0 block text-center text-brand-green sm:text-right"
-            initial={{ y: '70%', opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center pb-[0.04em]"
+            initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '-70%', opacity: 0 }}
+            exit={{ y: '-100%', opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
           >
             {WORDS[i]}
