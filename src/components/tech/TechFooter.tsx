@@ -16,7 +16,7 @@ import { ArrowRight, ArrowUp } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
-import { BLOB, GLASS_CHROME, tint } from './techStyles';
+import { BLOB, tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const HEADLINE = ['See', 'IlluminAIte', 'build', 'on', 'your', 'instance.'] as const;

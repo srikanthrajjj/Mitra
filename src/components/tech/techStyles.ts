@@ -7,16 +7,17 @@ export const tint = (percent: number) =>
   `color-mix(in srgb, var(--color-brand-green) ${percent}%, hsl(var(--background)))`;
 
 /**
- * Subtle iOS-style glass: a translucent, blurred surface with a hairline border, a faint
- * top highlight and a soft shadow. Only theme tokens; the blur needs something behind it,
- * which the section ambience blobs provide.
+ * Apple-style glass, with no drop shadows. Depth comes from the material itself: a lighter
+ * translucent fill, heavy backdrop blur with boosted saturation and brightness (vibrancy),
+ * and a thin luminous edge (a 1px inset highlight along the top, a faint hairline border).
+ * Dark sections use the foreground token as the tint, light sections use the card (white)
+ * token. The blur needs colour behind it, which the section ambience blobs provide.
  */
-export const GLASS =
-  'border border-foreground/10 bg-card/55 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_12px_40px_-20px_rgba(0,0,0,0.45)]';
+export const GLASS_DARK =
+  'border border-foreground/[0.13] bg-foreground/[0.06] backdrop-blur-[30px] backdrop-saturate-[1.8] backdrop-brightness-[1.12] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]';
 
-/** Lighter glass for small chrome such as pills, chips and the nav. */
-export const GLASS_CHROME =
-  'border border-foreground/10 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_8px_28px_-12px_rgba(0,0,0,0.5)]';
+export const GLASS_LIGHT =
+  'border border-card/80 bg-card/50 backdrop-blur-[30px] backdrop-saturate-[1.8] backdrop-brightness-[1.04] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]';
 
 /** Soft ambient light behind glass, so the blur has something to refract. */
 export const BLOB = 'pointer-events-none absolute rounded-full bg-brand-green/25 blur-3xl';

@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { TECH_HERO } from './techData';
-import { BLOB, GLASS_CHROME, tint } from './techStyles';
+import { BLOB, GLASS_DARK, tint } from './techStyles';
 import { cn } from '@/lib/utils';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -29,7 +29,7 @@ function SwapWord() {
   return (
     <span className="mt-[0.1em] flex flex-wrap items-center justify-center gap-x-[0.2em]">
       <span
-        className="relative inline-block overflow-hidden rounded-[0.22em] border border-brand-green/35 bg-brand-green/15 text-brand-green backdrop-blur-xl backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_30px_-14px_rgba(0,0,0,0.6)]"
+        className="relative inline-block overflow-hidden rounded-[0.22em] border border-brand-green/40 bg-brand-green/[0.14] text-brand-green backdrop-blur-[30px] backdrop-saturate-[1.8] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22)]"
         style={{ height: '1.16em', lineHeight: '1.16em', paddingInline: '0.26em' }}
         aria-label="define, design, build, test, document or deploy"
       >
@@ -78,7 +78,7 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className={cn('mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green', GLASS_CHROME)}
+          className={cn('mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green', GLASS_DARK)}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />
           {TECH_HERO.eyebrow}
@@ -115,7 +115,7 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           </Button>
           <a
             href="#demo"
-            className={cn('inline-flex h-14 items-center rounded-full px-9 text-base font-semibold transition-colors hover:bg-foreground/10', GLASS_CHROME)}
+            className={cn('inline-flex h-14 items-center rounded-full px-9 text-base font-semibold transition-colors hover:bg-foreground/10', GLASS_DARK)}
           >
             Watch it build
           </a>
