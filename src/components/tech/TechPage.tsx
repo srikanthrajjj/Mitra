@@ -5,7 +5,6 @@ import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
 import { TechLifecycle } from './TechLifecycle';
-import { TechArchitecture } from './TechArchitecture';
 import { TechShowcase } from './TechShowcase';
 import { TechLiveDemo } from './TechLiveDemo';
 import { TechHero } from './TechHero';
@@ -77,7 +76,7 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
 /**
  * Mixed light/dark page. Sections are flat and meet at clean, rounded, stacked edges
  * (no gradient blends): light hero, big dark live-chat panel, light features, a dark
- * block for lifecycle and architecture, light outcomes, dark finale.
+ * block for lifecycle and finale, light outcomes, dark finale.
  */
 export function TechPage({ onGetStarted, onBack }: TechPageProps) {
   useSmoothScroll();
@@ -198,11 +197,10 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </section>
       </div>
 
-      {/* Dark block: lifecycle, architecture, finale */}
+      {/* Dark block: lifecycle, finale */}
       <div className="dark relative -mt-12 rounded-t-[2.5rem] bg-background text-foreground md:-mt-16 md:rounded-t-[3.5rem]">
         <div className="h-12 md:h-16" aria-hidden />
         <TechLifecycle />
-        <TechArchitecture />
         <section className="py-28 md:py-44">
           <Reveal className="mx-auto max-w-3xl px-6 text-center">
             <h2 className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] md:text-8xl">
