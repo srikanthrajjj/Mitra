@@ -66,6 +66,15 @@ export const TECH_PILLARS: { title: string; desc: string; icon: LucideIcon }[] =
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}tech/${name}`;
 
+export interface TechCallout {
+  /** Position over the screenshot, as a percentage of its width and height. */
+  x: number;
+  y: number;
+  label: string;
+  /** Where the label sits relative to the pin. */
+  side?: 'left' | 'right' | 'top' | 'bottom' | 'top-left' | 'top-right';
+}
+
 export interface TechFeature {
   id: string;
   kicker: string;
@@ -76,53 +85,74 @@ export interface TechFeature {
   imageLight: string;
   alt: string;
   windowTitle: string;
+  callouts: TechCallout[];
 }
 
-/** Feature rows. Each image is a real capture of the IlluminAIte workspace. */
+/** Feature story. Each image is a real capture of the IlluminAIte workspace. */
 export const TECH_FEATURES: TechFeature[] = [
   {
     id: 'start',
     kicker: '01 / Start',
     title: 'Start from a single sentence.',
-    desc: 'Describe a solution, pick an industry template, import requirements, or analyse an app you already have. IlluminAIte takes it from there.',
-    bullets: ['New application', 'Industry templates', 'Requirements to solution', 'Analyse an existing app'],
+    desc: 'Describe it, pick a template, import requirements or point at an app you already run.',
+    bullets: ['Plain-language prompt', 'Industry templates', 'Existing apps'],
     image: asset('start.jpg'),
     imageLight: asset('start-light.jpg'),
-    alt: 'IlluminAIte start screen with four ways to begin a ServiceNow solution',
+    alt: 'Start screen with four ways to begin a ServiceNow solution',
     windowTitle: 'IlluminAIte · New solution',
+    callouts: [
+      { x: 83, y: 34, label: 'Four ways to begin', side: 'top-left' },
+      { x: 70, y: 59, label: 'Or start from an example', side: 'bottom' },
+      { x: 80, y: 85, label: 'Describe it in plain words', side: 'top-left' },
+    ],
   },
   {
     id: 'discovery',
     kicker: '02 / Build',
     title: 'Discovery that drives the build.',
-    desc: 'IlluminAIte plans its own to-dos, asks the next discovery question, and tracks the work through five phases from Define to Deploy.',
-    bullets: ['Live build plan', 'Phase-gated approvals', 'Five-stage tracker'],
+    desc: 'It plans its own to-dos, asks the next question and tracks five phases from Define to Deploy.',
+    bullets: ['Live build plan', 'Phase-gated approvals', 'Guided next steps'],
     image: asset('chat-status.jpg'),
     imageLight: asset('chat-status-light.jpg'),
-    alt: 'IlluminAIte chat with a generated to-do list and a five-phase status tracker',
+    alt: 'Chat with a generated to-do list and a five-phase status tracker',
     windowTitle: 'IlluminAIte · Discovery chat',
+    callouts: [
+      { x: 34, y: 36, label: 'A build plan that checks itself off', side: 'right' },
+      { x: 88, y: 13, label: 'Five-phase tracker', side: 'top-left' },
+      { x: 15, y: 73, label: 'Guided next steps', side: 'bottom' },
+    ],
   },
   {
     id: 'artifacts',
     kicker: '03 / Deliver',
     title: 'Every artifact, generated.',
-    desc: 'Requirements, data model, workflow, role matrix, scripts, tests and a deployment checklist are produced together and stay in sync.',
-    bullets: ['Requirements document', 'Data model and workflow', 'Role matrix and scripts', 'Test script and checklist'],
+    desc: 'Requirements, data model, workflow, roles, scripts and tests, produced together and kept in sync.',
+    bullets: ['Requirements and data model', 'Workflow and role matrix', 'Tests and checklist'],
     image: asset('chat-artifacts.jpg'),
     imageLight: asset('chat-artifacts-light.jpg'),
-    alt: 'IlluminAIte artifacts panel listing requirements, data model, workflow, role matrix and scripts',
+    alt: 'Artifacts panel listing requirements, data model, workflow, role matrix and scripts',
     windowTitle: 'IlluminAIte · Artifacts',
+    callouts: [
+      { x: 80, y: 9, label: 'Requirements document', side: 'left' },
+      { x: 80, y: 31, label: 'Workflow diagram', side: 'left' },
+      { x: 80, y: 53, label: 'Script library', side: 'left' },
+    ],
   },
   {
     id: 'projects',
     kicker: '04 / Govern',
     title: 'One workspace for every project.',
-    desc: 'Search, filter and track every solution by status, with shared and organisation views so reviewers always see the latest.',
+    desc: 'Search, filter and track every solution by status. Reviewers always see the latest.',
     bullets: ['Status at a glance', 'Shared and organisational views', 'Searchable history'],
     image: asset('projects.jpg'),
     imageLight: asset('projects-light.jpg'),
-    alt: 'IlluminAIte projects view with solution cards showing status and artifact counts',
+    alt: 'Projects view with solution cards showing status and artifact counts',
     windowTitle: 'IlluminAIte · Projects',
+    callouts: [
+      { x: 84, y: 12.5, label: 'Search every project', side: 'bottom' },
+      { x: 34, y: 18, label: 'Mine, shared, organisational', side: 'right' },
+      { x: 20, y: 34, label: 'Status at a glance', side: 'bottom' },
+    ],
   },
 ];
 

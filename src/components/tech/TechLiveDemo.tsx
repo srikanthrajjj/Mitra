@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView } from 'motion/react';
-import { ArrowUp, Check, Loader2 } from 'lucide-react';
+import { ArrowUp, Check, LayoutTemplate, Lightbulb, Loader2, Search, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TECH_STAGES } from './techData';
-import { TechOrb } from './TechOrb';
 
 const PROMPT =
   'I want to build a scoped app for employee onboarding with table extensions and catalog items.';
@@ -25,6 +24,13 @@ const ARTIFACTS = [
   { name: 'Script Library', type: 'JSON' },
   { name: 'Test Script', type: 'DOC' },
   { name: 'Deployment Checklist', type: 'DOC' },
+] as const;
+
+const START_OPTIONS = [
+  { label: 'New application', hint: 'Describe a solution', icon: Lightbulb },
+  { label: 'Industry template', hint: 'Start from a template', icon: LayoutTemplate },
+  { label: 'Requirements to solution', hint: 'Import requirements', icon: Upload },
+  { label: 'Analyse an existing app', hint: 'Improve what you have', icon: Search },
 ] as const;
 
 /** Phase shown as running for a given number of completed to-dos. */
@@ -113,12 +119,11 @@ export function TechLiveDemo() {
 
   const phase = phaseFor(done, artifacts);
   const typing = typed > 0 && !sent;
-  const energy = !sent ? (typing ? 1 : 0) : artifacts >= ARTIFACTS.length ? 0 : 2;
 
   return (
     <div
       ref={rootRef}
-      className="relative grid h-[40rem] grid-cols-1 overflow-hidden bg-background text-foreground md:h-[44rem] md:grid-cols-[1fr_20rem]"
+      className="relative grid h-[clamp(32rem,82dvh,46rem)] grid-cols-1 overflow-hidden bg-background text-foreground lg:grid-cols-[1fr_20rem]"
       aria-label="Animated demo of IlluminAIte building a ServiceNow onboarding app"
       role="img"
     >
@@ -127,25 +132,8 @@ export function TechLiveDemo() {
         aria-hidden
       />
 
-      {/* Hero orb: fades out when the build starts; a small one takes over in the header */}
-      <AnimatePresence>
-        {!sent && (
-          <motion.div
-            key="orb"
-            className="pointer-events-none absolute left-1/2 top-[32%] z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 md:h-[26rem] md:w-[26rem]"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, y: -40 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="absolute inset-0 rounded-full bg-brand-green/10 blur-3xl" aria-hidden />
-            <TechOrb energy={energy} className="absolute inset-0" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Chat column */}
-      <div className="relative flex min-w-0 flex-col border-border md:border-r">
+      <div className="relative flex min-w-0 flex-col border-border lg:border-r">
         <AnimatePresence>
           {sent && (
             <motion.div
@@ -154,7 +142,10 @@ export function TechLiveDemo() {
               transition={{ delay: 0.4 }}
               className="flex items-center gap-3 border-b border-border px-5 py-2.5"
             >
-              <TechOrb energy={energy} pointSize={1.3} className="h-11 w-11 shrink-0" />
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green opacity-60" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-green" />
+              </span>
               <span className="font-display text-base font-extrabold tracking-tight">IlluminAIte</span>
               <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-brand-green">
                 {artifacts >= ARTIFACTS.length ? 'Ready for review' : 'Building'}
@@ -164,10 +155,33 @@ export function TechLiveDemo() {
         </AnimatePresence>
 
         {!sent && (
-          <div className="relative z-0 flex flex-1 flex-col items-center justify-end px-5 pb-1 text-center md:px-8">
-            <h3 className="mb-4 font-display text-3xl font-extrabold tracking-[-0.035em] md:text-5xl">
-              What will you build?
-            </h3>
+          <div className="relative z-0 flex flex-1 flex-col items-center justify-center px-5 pb-2 text-center md:px-8">
+            <h3 className="font-display text-3xl font-extrabold tracking-[-0.035em] md:text-5xl">What will you build?</h3>
+            <p className="mt-3 max-w-md text-[15px] text-muted-foreground">
+              Describe it in plain language, or start from one of these.
+            </p>
+            <ul className="mt-7 grid w-full max-w-2xl grid-cols-2 gap-3">
+              {START_OPTIONS.map((o, i) => {
+                const Icon = o.icon;
+                return (
+                  <motion.li
+                    key={o.label}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + i * 0.08, duration: 0.45 }}
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-4 py-3.5 text-left backdrop-blur"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-brand-green">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-[14px] font-semibold">{o.label}</span>
+                      <span className="block truncate text-[12px] text-muted-foreground">{o.hint}</span>
+                    </span>
+                  </motion.li>
+                );
+              })}
+            </ul>
           </div>
         )}
 
@@ -282,7 +296,7 @@ export function TechLiveDemo() {
       </div>
 
       {/* Status + artifacts column */}
-      <aside className="relative z-0 hidden flex-col gap-5 overflow-hidden p-5 md:flex">
+      <aside className="relative z-0 hidden flex-col gap-5 overflow-hidden p-5 lg:flex">
         <ol className="space-y-3.5">
           {TECH_STAGES.map((s, i) => {
             const state = !sent ? 'idle' : i < phase ? 'done' : i === phase ? 'running' : 'idle';
