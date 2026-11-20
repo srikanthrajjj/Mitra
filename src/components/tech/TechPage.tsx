@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
 import { TechHeroField } from './TechHeroField';
 import { TechLifecycle } from './TechLifecycle';
 import { TechArchitecture } from './TechArchitecture';
 import { TechShowcase } from './TechShowcase';
-import { TechMarquee } from './TechMarquee';
+import { TechThemeBridge } from './TechThemeBridge';
+import { GLOW_BOTTOM, GRADIENT_TEXT_ON_DARK, GRADIENT_TEXT_ON_LIGHT } from './techStyles';
 import { Button } from '@/src/components/ui/button';
 import { useSmoothScroll } from './useSmoothScroll';
 import { TECH_HERO, TECH_PILLARS, TECH_STATS } from './techData';
@@ -95,6 +96,8 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
 
 export function TechPage({ onGetStarted, onBack }: TechPageProps) {
   useSmoothScroll();
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -105,12 +108,17 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
   }, []);
 
   return (
-    <div className="dark min-h-screen overflow-x-clip bg-background text-foreground antialiased selection:bg-brand-green/25">
-      <header className="fixed inset-x-0 top-4 z-50 px-4">
+    <div className="min-h-screen overflow-x-clip antialiased selection:bg-brand-green/25">
+      <motion.div
+        style={{ scaleX: progress }}
+        className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-brand-green-deep via-brand-green to-brand-green-hover"
+        aria-hidden
+      />
+      <header className="dark fixed inset-x-0 top-4 z-50 px-4">
         <nav
           className={cn(
             'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-xl transition-colors duration-300',
-            scrolled ? 'border-border bg-background/80' : 'border-border/60 bg-background/40',
+            scrolled ? 'border-border bg-background/90' : 'border-border/60 bg-background/55',
           )}
         >
           <button type="button" onClick={onBack} aria-label="IlluminAIte home">
@@ -129,7 +137,8 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </nav>
       </header>
 
-      <section className="relative flex min-h-screen items-center overflow-hidden pt-16">
+      <section className="dark relative flex min-h-screen items-center overflow-hidden bg-background pt-16 text-foreground">
+        <div className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-60', GLOW_BOTTOM)} aria-hidden />
         <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden />
         <TechHeroField className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
@@ -148,7 +157,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             <RevealWords
               text="agentic engine"
               delay={0.25}
-              className="bg-gradient-to-r from-brand-green to-brand-green-hover bg-clip-text text-transparent"
+              className={GRADIENT_TEXT_ON_DARK}
             />
             <RevealWords text="behind every ServiceNow build." delay={0.4} />
           </h1>
@@ -182,16 +191,18 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </div>
       </section>
 
-      <TechMarquee />
+      <TechThemeBridge from="dark" to="light" />
       <TechShowcase />
+      <TechThemeBridge from="light" to="dark" />
 
       <TechLifecycle />
       <TechArchitecture />
+      <TechThemeBridge from="dark" to="light" />
 
-      <section id="outcomes" className="border-t border-border py-24 md:py-32">
+      <section id="outcomes" className="light relative overflow-hidden bg-background py-24 text-foreground md:py-32">
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Outcomes</p>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Outcomes</p>
             <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
               Measured where it matters: speed, cost and accuracy.
             </h2>
@@ -199,7 +210,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
           <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
             {TECH_STATS.map((s) => (
               <div key={s.label} className="bg-background p-8 md:p-10">
-                <div className="font-display text-7xl font-extrabold tracking-[-0.05em] text-brand-green md:text-8xl">
+                <div className={cn('font-display text-7xl font-extrabold tracking-[-0.05em] md:text-8xl', GRADIENT_TEXT_ON_LIGHT)}>
                   <CountUp target={s.target} suffix={s.suffix} />
                 </div>
                 <div className="mt-4 font-display text-lg font-semibold">{s.label}</div>
@@ -210,10 +221,10 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </div>
       </section>
 
-      <section id="trust" className="border-t border-border py-24 md:py-32">
+      <section id="trust" className="light relative overflow-hidden bg-background pb-28 text-foreground md:pb-40">
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Built for enterprise delivery</p>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Built for enterprise delivery</p>
             <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
               Autonomous where it helps. Accountable where it counts.
             </h2>
@@ -230,7 +241,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
                   transition={{ duration: 0.6, ease: EASE, delay: i * 0.1 }}
                 >
                   <SpotlightCard className="h-full p-8">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-muted text-brand-green">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-muted text-brand-green-deep">
                       <Icon className="h-5 w-5" />
                     </span>
                     <h3 className="mt-6 font-display text-xl font-bold">{p.title}</h3>
@@ -243,11 +254,13 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-t border-border py-28 md:py-40">
+      <TechThemeBridge from="light" to="dark" />
+      <section className="dark relative overflow-hidden bg-background py-28 text-foreground md:py-44">
+        <div className={cn('pointer-events-none absolute inset-0', GLOW_BOTTOM)} aria-hidden />
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green/10 blur-3xl" />
         <Reveal className="relative mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] md:text-8xl">
-            See IlluminAIte build on your instance.
+            See IlluminAIte <span className={GRADIENT_TEXT_ON_DARK}>build</span> on your instance.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
             Start from a workshop conversation and finish with a go-live ready ServiceNow implementation.
@@ -258,7 +271,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </Reveal>
       </section>
 
-      <footer className="border-t border-border py-8">
+      <footer className="dark border-t border-border bg-background py-8 text-foreground">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 text-xs text-muted-foreground">
           <IlluminaiteLogo className="h-5 w-auto opacity-80" />
           <span>© IlluminAIte</span>

@@ -81,8 +81,9 @@ export interface TechFeature {
   desc: string;
   bullets: string[];
   image: string;
+  imageLight: string;
   alt: string;
-  url: string;
+  windowTitle: string;
 }
 
 /** Feature rows. Each image is a real capture of the IlluminAIte workspace. */
@@ -94,8 +95,9 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'Describe a solution, pick an industry template, import requirements, or analyse an app you already have. IlluminAIte takes it from there.',
     bullets: ['New application', 'Industry templates', 'Requirements to solution', 'Analyse an existing app'],
     image: asset('start.jpg'),
+    imageLight: asset('start-light.jpg'),
     alt: 'IlluminAIte start screen with four ways to begin a ServiceNow solution',
-    url: 'IlluminAIte · New solution',
+    windowTitle: 'IlluminAIte · New solution',
   },
   {
     id: 'discovery',
@@ -104,8 +106,9 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'IlluminAIte plans its own to-dos, asks the next discovery question, and tracks the work through five phases from Define to Deploy.',
     bullets: ['Live build plan', 'Phase-gated approvals', 'Five-stage tracker'],
     image: asset('chat-status.jpg'),
+    imageLight: asset('chat-status-light.jpg'),
     alt: 'IlluminAIte chat with a generated to-do list and a five-phase status tracker',
-    url: 'IlluminAIte · Discovery chat',
+    windowTitle: 'IlluminAIte · Discovery chat',
   },
   {
     id: 'artifacts',
@@ -114,8 +117,9 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'Requirements, data model, workflow, role matrix, scripts, tests and a deployment checklist are produced together and stay in sync.',
     bullets: ['Requirements document', 'Data model and workflow', 'Role matrix and scripts', 'Test script and checklist'],
     image: asset('chat-artifacts.jpg'),
+    imageLight: asset('chat-artifacts-light.jpg'),
     alt: 'IlluminAIte artifacts panel listing requirements, data model, workflow, role matrix and scripts',
-    url: 'IlluminAIte · Artifacts',
+    windowTitle: 'IlluminAIte · Artifacts',
   },
   {
     id: 'projects',
@@ -124,8 +128,9 @@ export const TECH_FEATURES: TechFeature[] = [
     desc: 'Search, filter and track every solution by status, with shared and organisation views so reviewers always see the latest.',
     bullets: ['Status at a glance', 'Shared and organisational views', 'Searchable history'],
     image: asset('projects.jpg'),
+    imageLight: asset('projects-light.jpg'),
     alt: 'IlluminAIte projects view with solution cards showing status and artifact counts',
-    url: 'IlluminAIte · Projects',
+    windowTitle: 'IlluminAIte · Projects',
   },
 ];
 

@@ -1,29 +1,52 @@
-import { motion } from 'motion/react';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TechProductWindow } from './TechProductWindow';
+import { TechMarquee } from './TechMarquee';
+import { DOT_GRID, GLOW_TOP, GRADIENT_TEXT_ON_LIGHT, ORB } from './techStyles';
 import { TECH_FEATURES } from './techData';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Alternating feature rows, each backed by a real product screenshot. */
+/**
+ * Light-theme feature section. Green orbs drift at different speeds as you scroll and
+ * every screenshot opens in light theme, with a switch to flip it to dark.
+ */
 export function TechShowcase() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const orbA = useTransform(scrollYProgress, [0, 1], [-160, 420]);
+  const orbB = useTransform(scrollYProgress, [0, 1], [260, -380]);
+  const orbC = useTransform(scrollYProgress, [0, 1], [0, 220]);
+
   return (
-    <section id="product" className="relative border-t border-border bg-background py-28 md:py-40">
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green">Inside the product</p>
+    <section
+      ref={ref}
+      id="product"
+      className="light relative overflow-hidden bg-background text-foreground"
+    >
+      <div className={cn('pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]', DOT_GRID)} aria-hidden />
+      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-[40rem]', GLOW_TOP)} aria-hidden />
+      <motion.div style={{ y: orbA }} className={cn('pointer-events-none absolute -left-60 top-[8%] h-[46rem] w-[46rem] rounded-full blur-3xl', ORB)} aria-hidden />
+      <motion.div style={{ y: orbB }} className={cn('pointer-events-none absolute -right-72 top-[40%] h-[52rem] w-[52rem] rounded-full blur-3xl', ORB)} aria-hidden />
+      <motion.div style={{ y: orbC }} className={cn('pointer-events-none absolute -left-40 bottom-[4%] h-[40rem] w-[40rem] rounded-full blur-3xl', ORB)} aria-hidden />
+
+      <TechMarquee />
+
+      <div className="relative mx-auto max-w-6xl px-6 pt-28 md:pt-40">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green-deep">Inside the product</p>
         <h2 className="mt-5 max-w-4xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
-          See the work <span className="bg-gradient-to-r from-brand-green to-brand-green-hover bg-clip-text text-transparent">before</span> it ships.
+          See the work <span className={GRADIENT_TEXT_ON_LIGHT}>before</span> it ships.
         </h2>
       </div>
 
-      <div className="mt-20 space-y-28 md:mt-28 md:space-y-44">
+      <div className="relative mt-20 space-y-28 pb-28 md:mt-28 md:space-y-44 md:pb-44">
         {TECH_FEATURES.map((f, i) => {
           const flip = i % 2 === 1;
           return (
-            <div key={f.id} className="relative mx-auto max-w-6xl px-6">
-              <div className="pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green/[0.07] blur-3xl" />
-              <div className={cn('relative grid items-center gap-10 lg:grid-cols-12 lg:gap-14')}>
+            <div key={f.id} className="mx-auto max-w-6xl px-6">
+              <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
                 <motion.div
                   initial={{ opacity: 0, y: 32 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -31,7 +54,7 @@ export function TechShowcase() {
                   transition={{ duration: 0.8, ease: EASE }}
                   className={cn('lg:col-span-4', flip && 'lg:order-2')}
                 >
-                  <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green">{f.kicker}</p>
+                  <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green-deep">{f.kicker}</p>
                   <h3 className="mt-4 font-display text-3xl font-extrabold leading-[1.05] tracking-[-0.035em] md:text-5xl">
                     {f.title}
                   </h3>
@@ -39,7 +62,7 @@ export function TechShowcase() {
                   <ul className="mt-7 space-y-2.5">
                     {f.bullets.map((b) => (
                       <li key={b} className="flex items-center gap-3 text-sm font-medium">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-green text-background">
                           <Check className="h-3 w-3" strokeWidth={3} />
                         </span>
                         {b}
@@ -49,8 +72,10 @@ export function TechShowcase() {
                 </motion.div>
                 <TechProductWindow
                   src={f.image}
+                  srcLight={f.imageLight}
                   alt={f.alt}
-                  url={f.url}
+                  title={f.windowTitle}
+                  defaultMode="light"
                   className={cn('lg:col-span-8', flip && 'lg:order-1')}
                 />
               </div>

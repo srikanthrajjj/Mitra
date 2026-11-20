@@ -5,14 +5,14 @@ export function TechMarquee() {
   const row = [...TECH_MARQUEE, ...TECH_MARQUEE];
   return (
     <div
-      className="relative overflow-hidden border-y border-border bg-background py-6 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
+      className="relative overflow-hidden border-y border-border py-6 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]"
       aria-hidden
     >
       <div className="tech-marquee flex w-max gap-12">
         {row.map((t, i) => (
           <span
             key={`${t}-${i}`}
-            className="flex items-center gap-12 font-display text-2xl font-extrabold uppercase tracking-[-0.02em] text-muted-foreground/60 md:text-4xl"
+            className="flex items-center gap-12 font-display text-2xl font-extrabold uppercase tracking-[-0.02em] text-brand-green-deep/30 md:text-4xl"
           >
             {t}
             <span className="h-2 w-2 rounded-full bg-brand-green" />
