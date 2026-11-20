@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   AnimatePresence,
   motion,
@@ -27,7 +27,6 @@ interface TechPageV2Props {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const SWAP_WORDS = ['workflows', 'scoped apps', 'catalog items', 'integrations', 'portals'];
-const CAPABILITIES = ['Scoped apps', 'Flow Designer', 'Catalog items', 'ATF testing', 'Update sets', 'CMDB'];
 const STATEMENT = 'Every ServiceNow build starts with an impossible amount of manual work.';
 
 /** Centered 1056px column with the dashed side guides used across the page. */
@@ -88,9 +87,9 @@ function BlurWord({
   total: number;
   progress: MotionValue<number>;
 }) {
-  const start = 0.15 + (index / total) * 0.55;
-  const end = start + 0.12;
-  const opacity = useTransform(progress, [start, end], [0.12, 1]);
+  const start = 0.03 + (index / total) * 0.55;
+  const end = start + 0.09;
+  const opacity = useTransform(progress, [start, end], [0.18, 1]);
   const blur = useTransform(progress, [start, end], [10, 0]);
   const filter = useTransform(blur, (v) => `blur(${v}px)`);
   return (
@@ -183,15 +182,62 @@ function NetworkField() {
   return <canvas ref={ref} className="absolute inset-0 h-full w-full" aria-hidden />;
 }
 
+
+/** Atmosphere behind the workflow window: drifting green light, a faint grid and a beam that circles the border. */
+function DemoStage({ children }: { children: ReactNode }) {
+  const reduce = useReducedMotion();
+  const drift = (x: number, y: number, d: number) =>
+    reduce ? {} : { animate: { x: [0, x, 0], y: [0, y, 0] }, transition: { duration: d, repeat: Infinity, ease: 'easeInOut' as const } };
+  const GRID = 'color-mix(in srgb, var(--color-foreground) 7%, transparent)';
+  return (
+    <div className="relative mx-auto max-w-[1310px]">
+      <div className="pointer-events-none absolute -inset-x-6 -inset-y-16 overflow-hidden md:-inset-x-16" aria-hidden>
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${GRID} 1px, transparent 1px), linear-gradient(to bottom, ${GRID} 1px, transparent 1px)`,
+            backgroundSize: '48px 48px',
+            maskImage: 'radial-gradient(ellipse 65% 60% at 50% 50%, black, transparent 75%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 65% 60% at 50% 50%, black, transparent 75%)',
+          }}
+        />
+        <motion.div
+          className="absolute left-[6%] top-[8%] h-[420px] w-[420px] rounded-full bg-brand-green/25 blur-[110px]"
+          {...drift(90, 50, 14)}
+        />
+        <motion.div
+          className="absolute bottom-[6%] right-[4%] h-[480px] w-[480px] rounded-full bg-brand-green/20 blur-[130px]"
+          {...drift(-80, -60, 18)}
+        />
+      </div>
+      <div className="relative overflow-hidden rounded-xl p-px">
+        {!reduce && (
+          <motion.div
+            className="absolute left-1/2 top-1/2 aspect-square w-[220%] -translate-x-1/2 -translate-y-1/2"
+            style={{
+              background:
+                'conic-gradient(from 0deg, transparent 0deg, transparent 300deg, var(--color-brand-green) 340deg, transparent 360deg)',
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+            aria-hidden
+          />
+        )}
+        <div className="relative overflow-hidden rounded-[11px] border border-border bg-card">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 function Statement() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const words = useMemo(() => STATEMENT.split(' '), []);
   return (
-    <section ref={ref} className="relative h-[130vh] border-y border-border">
+    <section ref={ref} className="relative h-[165vh] border-y border-border">
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-6">
         <NetworkField />
-        <h2 className="relative max-w-[640px] text-center text-[clamp(1.9rem,4.4vw,3.4rem)] font-medium leading-[1.12] tracking-[-0.0225em]">
+        <h2 className="relative max-w-[920px] text-center font-display text-[clamp(2.4rem,6.4vw,5.2rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
           {words.map((w, i) => (
             <BlurWord key={`${w}-${i}`} word={w} index={i} total={words.length} progress={scrollYProgress} />
           ))}
@@ -413,37 +459,17 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </section>
 
       {/* App window */}
-      <section id="demo" className="px-4 pb-24 md:px-6 md:pb-32">
+      <section id="demo" className="relative px-4 pb-32 pt-8 md:px-6 md:pb-44">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: EASE }}
-          className="mx-auto max-w-[1310px] overflow-hidden rounded-xl border border-border bg-card"
         >
-          <TechLiveDemo />
+          <DemoStage>
+            <TechLiveDemo />
+          </DemoStage>
         </motion.div>
-      </section>
-
-      {/* Capability strip, in the spot a customer-logo row would sit */}
-      <section className={cn(COLUMN, 'border-b-0')}>
-        <div className="flex items-center justify-between px-6 py-8 md:px-12">
-          <p className="text-[15px]">Built for every layer of ServiceNow delivery</p>
-          <a href="#product" className="hidden items-center gap-1 text-[15px] text-muted-foreground transition-colors hover:text-foreground sm:flex">
-            See the platform <ArrowRight className="h-4 w-4" aria-hidden />
-          </a>
-        </div>
-        <div className="grid grid-cols-2 border-y border-border sm:grid-cols-3 lg:grid-cols-6">
-          {CAPABILITIES.map((c) => (
-            <div
-              key={c}
-              className="flex h-24 items-center justify-center border-b border-r border-border px-3 text-center text-[15px] font-medium text-muted-foreground transition-colors last:border-r-0 hover:text-foreground sm:[&:nth-child(3n)]:border-r-0 lg:border-b-0 lg:[&:nth-child(3n)]:border-r lg:[&:nth-child(6n)]:border-r-0"
-            >
-              {c}
-            </div>
-          ))}
-        </div>
-        <div className="h-24" />
       </section>
 
       <Statement />
