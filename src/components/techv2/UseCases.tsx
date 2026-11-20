@@ -156,7 +156,27 @@ function Workplace({ on }: V) {
   );
 }
 
+function Supply({ on }: V) {
+  return (
+    <>
+      <path d="M52 52C82 18 102 18 120 48S170 78 198 46" className={LINE} strokeDasharray="3 4" />
+      <rect x="24" y="38" width="28" height="28" rx="6" className={LINE} />
+      <circle cx="120" cy="48" r="8" className={LINE} />
+      <circle cx="206" cy="44" r="10" className={GREEN_FILL} />
+      <circle cx="206" cy="44" r="3" className={ACCENT} />
+      <motion.circle
+        r="3"
+        className={ACCENT}
+        initial={false}
+        animate={on ? { cx: [52, 86, 120, 160, 198], cy: [52, 28, 48, 68, 46], opacity: [0, 1, 1, 1, 0] } : { cx: 52, cy: 52, opacity: 0 }}
+        transition={on ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
+      />
+    </>
+  );
+}
+
 const VISUALS: Record<string, (p: V) => ReactNode> = {
+  supply: Supply,
   onboarding: Onboarding,
   triage: Triage,
   vendor: Vendor,
@@ -170,6 +190,7 @@ interface UseCase {
   title: string;
   after: string;
   visual: string;
+  wide?: boolean;
 }
 
 /** Illustrative scenarios drawn from common ServiceNow delivery work, not customer claims. */
@@ -180,6 +201,14 @@ const USE_CASES: UseCase[] = [
   { team: 'Customer service', title: 'Case routing', after: 'Cases reach the right team before the SLA clock matters.', visual: 'routing' },
   { team: 'Security', title: 'Access reviews', after: 'Reviews run in-platform with a full evidence trail.', visual: 'access' },
   { team: 'Facilities', title: 'Workplace requests', after: 'One portal, tracked end to end.', visual: 'workplace' },
+  {
+    team: 'Humanitarian programs',
+    title: 'Field supply requests',
+    after:
+      'Country offices request vaccines, shelter and supplies in one place. Each request routes to procurement, logistics and approvers, and is tracked until it arrives.',
+    visual: 'supply',
+    wide: true,
+  },
 ];
 
 function Corner({ className }: { className: string }) {
@@ -203,7 +232,7 @@ export function UseCases() {
         </p>
       </div>
 
-      <div className="relative grid border-y border-border sm:grid-cols-2 lg:grid-cols-3">
+      <div className="relative grid gap-px border-y border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         {USE_CASES.map((u, i) => (
           <UseCaseCard key={u.title} u={u} i={i} />
         ))}
@@ -226,21 +255,29 @@ function UseCaseCard({ u, i }: { u: UseCase; i: number }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative border-b border-border p-7 transition-colors duration-300 last:border-b-0 hover:bg-mitra-highlight sm:border-r sm:[&:nth-child(2n)]:border-r-0 sm:[&:nth-last-child(-n+2)]:border-b-0 md:p-8 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(3n)]:border-r-0 lg:[&:nth-last-child(-n+3)]:border-b-0"
+            className={cn(
+              'group relative bg-background p-7 transition-colors duration-300 hover:bg-mitra-highlight md:p-8',
+              u.wide && 'sm:col-span-2 lg:col-span-3 md:flex md:items-center md:gap-12',
+            )}
           >
             <Corner className="-left-[5px] -top-[5px]" />
             <svg
               viewBox="0 0 240 96"
-              className="h-24 w-full opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+              className={cn(
+                'h-24 w-full opacity-70 transition-opacity duration-300 group-hover:opacity-100',
+                u.wide && 'md:h-32 md:w-[38%] md:shrink-0',
+              )}
               fill="none"
               strokeWidth="1"
               aria-hidden
             >
               <Visual on={on} />
             </svg>
-            <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{u.team}</p>
-            <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.02em]">{u.title}</h3>
-            <p className="mt-2 text-[15px] leading-snug text-muted-foreground">{u.after}</p>
+            <div className={cn(!u.wide && 'mt-6')}>
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{u.team}</p>
+              <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.02em]">{u.title}</h3>
+              <p className={cn('mt-2 text-[15px] leading-snug text-muted-foreground', u.wide && 'max-w-[520px]')}>{u.after}</p>
+            </div>
           </motion.article>
   );
 }
