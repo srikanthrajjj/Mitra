@@ -25,7 +25,6 @@ import { SearchDialog } from './components/SearchDialog';
 import NewSolutionModal from './components/NewSolutionModal';
 import ApiKeyModal from './components/ApiKeyModal';
 import OnboardingTour from './components/OnboardingTour';
-import LandingPage from './components/LandingPage';
 import { TechPage } from './components/tech/TechPage';
 import { isTechPath } from './utils/techRoute';
 import AlertDialog from './components/AlertDialog';
@@ -2566,10 +2565,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
     return (
       <TechPage
         onGetStarted={openSignup}
-        onBack={() => {
-          navigateToLandingUrl();
-          setShowLanding(true);
-        }}
+        onSignIn={() => enterWorkspace('signed-in')}
       />
     );
   }
@@ -2593,9 +2589,7 @@ Pick a step below and I'll continue building — data model, scripts, and update
     !guestReviewId
   ) {
     return (
-      <LandingPage
-        version={appVersion}
-        setVersion={setAppVersion}
+      <TechPage
         onGetStarted={openSignup}
         onSignIn={() => enterWorkspace('signed-in')}
       />

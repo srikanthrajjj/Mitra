@@ -13,6 +13,7 @@ import { TECH_PILLARS, TECH_STATS } from './techData';
 
 interface TechPageProps {
   onGetStarted: () => void;
+  onSignIn?: () => void;
   onBack?: () => void;
 }
 
@@ -78,7 +79,7 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
  * (no gradient blends): light hero, big dark live-chat panel, light features, a dark
  * block for lifecycle and finale, light outcomes, dark finale.
  */
-export function TechPage({ onGetStarted, onBack }: TechPageProps) {
+export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
   useSmoothScroll();
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
@@ -116,9 +117,20 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
             <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
           </div>
-          <Button variant="cta" size="sm" onClick={onGetStarted} className="rounded-full">
-            Try IlluminAIte
-          </Button>
+          <div className="flex items-center gap-1">
+            {onSignIn && (
+              <button
+                type="button"
+                onClick={onSignIn}
+                className="hidden rounded-full px-4 py-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground sm:block"
+              >
+                Sign in
+              </button>
+            )}
+            <Button variant="cta" size="sm" onClick={onGetStarted} className="rounded-full">
+              Try IlluminAIte
+            </Button>
+          </div>
         </nav>
       </header>
 
