@@ -10,7 +10,7 @@ import {
   useTransform,
   type MotionValue,
 } from 'motion/react';
-import { ArrowRight, Check, ChevronRight, FileText } from 'lucide-react';
+import { ArrowRight, Check, FileText } from 'lucide-react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -383,7 +383,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
               </button>
             )}
             <Button variant="cta" size="sm" onClick={onGetStarted} className="rounded-md">
-              Get a demo
+              Start building
             </Button>
           </div>
         </nav>
@@ -447,7 +447,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           className="relative mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
-            Get a demo
+            Start building
           </Button>
           <a
             href="#usecases"
@@ -513,9 +513,6 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
                 <PillarIcon className="h-5 w-5 text-brand-green" aria-hidden />
                 <div className="mt-6 text-lg font-medium">{p.title}</div>
                 <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{p.desc}</p>
-                <span className="mt-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors group-hover:text-brand-green">
-                  Learn more <ChevronRight className="h-4 w-4" aria-hidden />
-                </span>
               </div>
             );
           })}
@@ -529,7 +526,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
         </h2>
         <div className="mt-9">
           <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
-            Get a demo
+            Start building
           </Button>
         </div>
       </section>
