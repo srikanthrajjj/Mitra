@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BLOB, tint } from './techStyles';
+import { BLOB, GLASS_DARK, GLASS_LIGHT, tint } from './techStyles';
 import { TECH_FEATURES, type TechFeature } from './techData';
 
 type Mode = 'light' | 'dark';
@@ -35,7 +35,7 @@ function Callout({ x, y, label, side = 'right', show, index }: TechFeature['call
       </span>
       <span
         className={cn(
-          'absolute whitespace-nowrap rounded-full bg-brand-green px-3 py-1.5 text-[11px] font-bold text-background shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)] md:text-xs',
+          'absolute whitespace-nowrap rounded-full bg-brand-green px-3 py-1.5 text-[11px] font-bold text-background md:text-xs',
           PLACEMENT[side],
         )}
       >
@@ -59,11 +59,11 @@ function ShowcaseFrame({ features, activeIndex }: FrameProps) {
     <div
       className={cn(
         mode,
-        'overflow-hidden rounded-3xl border border-foreground/10 bg-card/60 backdrop-blur-2xl backdrop-saturate-150 transition-shadow duration-500',
-        mode === 'dark' ? 'shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]' : 'shadow-[0_40px_100px_-40px_rgba(0,0,0,0.35)]',
+        'overflow-hidden rounded-[28px]',
+        mode === 'dark' ? GLASS_DARK : GLASS_LIGHT,
       )}
     >
-      <div className="flex items-center gap-3 border-b border-foreground/10 bg-card/40 px-4 py-3 transition-colors duration-500">
+      <div className="flex items-center gap-3 border-b border-foreground/[0.1] bg-foreground/[0.03] px-4 py-3 transition-colors duration-500">
         <div className="flex gap-1.5" aria-hidden>
           <span className="h-2.5 w-2.5 rounded-full bg-muted" />
           <span className="h-2.5 w-2.5 rounded-full bg-muted" />
@@ -143,7 +143,7 @@ function FeatureCopy({ f, dim }: { f: TechFeature; dim?: boolean }) {
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">{f.desc}</p>
       <ul className="mt-6 flex flex-wrap gap-2">
         {f.bullets.map((b) => (
-          <li key={b} className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-card/55 px-3 py-1.5 text-[13px] font-medium backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08)]">
+          <li key={b} className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium', GLASS_LIGHT)}>
             <Check className="h-3.5 w-3.5 text-brand-green-deep" strokeWidth={3} />
             {b}
           </li>

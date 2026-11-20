@@ -9,7 +9,7 @@ import { TechHero } from './TechHero';
 import { TechFooter } from './TechFooter';
 import { useSmoothScroll } from './useSmoothScroll';
 import { TECH_PILLARS, TECH_STATS } from './techData';
-import { BLOB, GLASS, GLASS_CHROME, tint } from './techStyles';
+import { BLOB, GLASS_LIGHT, tint } from './techStyles';
 
 interface TechPageProps {
   onGetStarted: () => void;
@@ -46,7 +46,7 @@ function SpotlightCard({ children, className }: { children: React.ReactNode; cla
     <div
       ref={ref}
       onPointerMove={onMove}
-      className={cn('group relative overflow-hidden rounded-3xl', GLASS, className)}
+      className={cn('group relative overflow-hidden rounded-[28px]', GLASS_LIGHT, className)}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -103,8 +103,8 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       <header className="dark fixed inset-x-0 top-4 z-50 px-4">
         <nav
           className={cn(
-            'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_8px_30px_-10px_rgba(0,0,0,0.55)] transition-colors duration-300',
-            scrolled ? 'border-foreground/15 bg-background/80' : 'border-foreground/10 bg-background/35',
+            'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-[30px] backdrop-saturate-[1.8] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] transition-colors duration-300',
+            scrolled ? 'border-foreground/[0.15] bg-background/75' : 'border-foreground/[0.13] bg-foreground/[0.06]',
           )}
         >
           <button type="button" onClick={onBack} aria-label="IlluminAIte home">
@@ -148,7 +148,7 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.12 }}
           transition={{ duration: 0.9, ease: EASE }}
-          className="relative mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-background/45 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_40px_100px_-40px_rgba(0,0,0,0.8)] md:rounded-[2.25rem]"
+          className="relative mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-foreground/[0.13] bg-foreground/[0.05] backdrop-blur-[30px] backdrop-saturate-[1.8] backdrop-brightness-[1.1] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] md:rounded-[2.25rem]"
         >
           <TechLiveDemo />
         </motion.div>
@@ -177,7 +177,7 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
             </Reveal>
             <div className="relative mt-14 grid gap-4 md:grid-cols-3">
               {TECH_STATS.map((s) => (
-                <div key={s.label} className={cn('rounded-3xl p-8 md:p-10', GLASS)}>
+                <div key={s.label} className={cn('rounded-[28px] p-8 md:p-10', GLASS_LIGHT)}>
                   <div className="font-display text-7xl font-extrabold tracking-[-0.05em] text-brand-green-deep md:text-8xl">
                     <CountUp target={s.target} suffix={s.suffix} />
                   </div>
@@ -215,7 +215,7 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
                     transition={{ duration: 0.6, ease: EASE, delay: i * 0.1 }}
                   >
                     <SpotlightCard className="h-full p-8">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-green text-background shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-green text-background">
                         <Icon className="h-5 w-5" />
                       </span>
                       <h3 className="mt-6 font-display text-xl font-bold">{p.title}</h3>

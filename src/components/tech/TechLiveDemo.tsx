@@ -169,7 +169,7 @@ export function TechLiveDemo() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 + i * 0.08, duration: 0.45 }}
-                    className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-card/50 px-4 py-3.5 text-left backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.07)]"
+                    className="flex items-center gap-3 rounded-2xl border border-foreground/[0.12] bg-foreground/[0.05] px-4 py-3.5 text-left backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14)]"
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-brand-green">
                       <Icon className="h-4 w-4" />
@@ -216,7 +216,7 @@ export function TechLiveDemo() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-2xl border border-foreground/10 bg-card/55 p-5 backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.07)]"
+                className="rounded-2xl border border-foreground/[0.12] bg-foreground/[0.05] p-5 backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14)]"
               >
                 <p className="text-[15px] leading-snug text-muted-foreground">
                   I&apos;ll build your HR onboarding tracker: HRSD scope, catalog workflows, SLA timers, and
@@ -267,7 +267,7 @@ export function TechLiveDemo() {
             className={cn(
               'mx-auto flex max-w-2xl items-end gap-3 rounded-2xl border bg-mitra-input/90 px-4 py-3 backdrop-blur transition-all duration-300',
               typing
-                ? 'border-brand-green/70 shadow-[0_0_0_4px_hsl(var(--ring)/0.14),0_0_40px_-8px_hsl(var(--ring)/0.5)]'
+                ? 'border-brand-green/70 ring-4 ring-brand-green/15'
                 : 'border-border',
             )}
           >
