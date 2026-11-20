@@ -3,14 +3,13 @@ import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform }
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
-import { TechLifecycle } from './TechLifecycle';
 import { TechShowcase } from './TechShowcase';
 import { TechLiveDemo } from './TechLiveDemo';
 import { TechHero } from './TechHero';
 import { TechFooter } from './TechFooter';
 import { useSmoothScroll } from './useSmoothScroll';
 import { TECH_PILLARS, TECH_STATS } from './techData';
-import { tint } from './techStyles';
+import { BLOB, GLASS, GLASS_CHROME, tint } from './techStyles';
 
 interface TechPageProps {
   onGetStarted: () => void;
@@ -47,7 +46,7 @@ function SpotlightCard({ children, className }: { children: React.ReactNode; cla
     <div
       ref={ref}
       onPointerMove={onMove}
-      className={cn('group relative overflow-hidden rounded-2xl border border-border bg-card', className)}
+      className={cn('group relative overflow-hidden rounded-3xl', GLASS, className)}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -104,8 +103,8 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       <header className="dark fixed inset-x-0 top-4 z-50 px-4">
         <nav
           className={cn(
-            'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-xl transition-colors duration-300',
-            scrolled ? 'border-border bg-background/90' : 'border-border/60 bg-background/80',
+            'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_8px_30px_-10px_rgba(0,0,0,0.55)] transition-colors duration-300',
+            scrolled ? 'border-foreground/15 bg-background/80' : 'border-foreground/10 bg-background/35',
           )}
         >
           <button type="button" onClick={onBack} aria-label="IlluminAIte home">
@@ -114,7 +113,6 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
           <div className="hidden items-center gap-7 text-[13px] font-medium text-muted-foreground md:flex">
             <a href="#demo" className="transition-colors hover:text-foreground">Live demo</a>
             <a href="#product" className="transition-colors hover:text-foreground">Product</a>
-            <a href="#lifecycle" className="transition-colors hover:text-foreground">Lifecycle</a>
             <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
             <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
           </div>
@@ -141,14 +139,16 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       <section
         id="demo"
         style={{ backgroundColor: tint(9) }}
-        className="dark relative z-10 -mt-10 rounded-t-[2.5rem] px-4 pb-28 pt-16 text-foreground md:-mt-14 md:rounded-t-[3.5rem] md:px-6 md:pb-44 md:pt-20"
+        className="dark relative z-10 -mt-10 rounded-t-[2.5rem] px-4 pb-28 pt-16 text-foreground [overflow:clip] md:-mt-14 md:rounded-t-[3.5rem] md:px-6 md:pb-44 md:pt-20"
       >
+        <div className={cn(BLOB, 'left-[8%] top-[12%] h-[26rem] w-[26rem] opacity-70')} aria-hidden />
+        <div className={cn(BLOB, 'right-[6%] bottom-[10%] h-[30rem] w-[30rem] opacity-50')} aria-hidden />
         <motion.div
           initial={{ opacity: 0, y: 48 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.12 }}
           transition={{ duration: 0.9, ease: EASE }}
-          className="mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-border bg-background shadow-[0_0_0_1px_hsl(var(--foreground)/0.04),0_50px_120px_-40px_rgba(0,0,0,0.9)] md:rounded-[2.25rem]"
+          className="relative mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-background/45 backdrop-blur-2xl backdrop-saturate-150 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08),0_40px_100px_-40px_rgba(0,0,0,0.8)] md:rounded-[2.25rem]"
         >
           <TechLiveDemo />
         </motion.div>
@@ -164,8 +164,10 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
         <section
           id="outcomes"
           style={{ backgroundColor: tint(13) }}
-          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-28 pt-24 md:-mt-14 md:rounded-t-[3.5rem] md:pb-36 md:pt-32"
+          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-28 pt-24 [overflow:clip] md:-mt-14 md:rounded-t-[3.5rem] md:pb-36 md:pt-32"
         >
+          <div className={cn(BLOB, 'left-[-6%] top-[30%] h-[28rem] w-[28rem] opacity-60')} aria-hidden />
+          <div className={cn(BLOB, 'right-[-4%] bottom-[6%] h-[24rem] w-[24rem] opacity-50')} aria-hidden />
           <div className="mx-auto max-w-6xl px-6">
             <Reveal>
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Outcomes</p>
@@ -173,9 +175,9 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
                 Measured where it matters: speed, cost and accuracy.
               </h2>
             </Reveal>
-            <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
+            <div className="relative mt-14 grid gap-4 md:grid-cols-3">
               {TECH_STATS.map((s) => (
-                <div key={s.label} className="bg-card p-8 md:p-10">
+                <div key={s.label} className={cn('rounded-3xl p-8 md:p-10', GLASS)}>
                   <div className="font-display text-7xl font-extrabold tracking-[-0.05em] text-brand-green-deep md:text-8xl">
                     <CountUp target={s.target} suffix={s.suffix} />
                   </div>
@@ -190,8 +192,10 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
         <section
           id="trust"
           style={{ backgroundColor: tint(8) }}
-          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-32 pt-24 md:-mt-14 md:rounded-t-[3.5rem] md:pb-48 md:pt-32"
+          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-32 pt-24 [overflow:clip] md:-mt-14 md:rounded-t-[3.5rem] md:pb-48 md:pt-32"
         >
+          <div className={cn(BLOB, 'right-[8%] top-[34%] h-[26rem] w-[26rem] opacity-60')} aria-hidden />
+          <div className={cn(BLOB, 'left-[4%] bottom-[8%] h-[22rem] w-[22rem] opacity-40')} aria-hidden />
           <div className="mx-auto max-w-6xl px-6">
             <Reveal>
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Built for enterprise delivery</p>
@@ -211,7 +215,7 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
                     transition={{ duration: 0.6, ease: EASE, delay: i * 0.1 }}
                   >
                     <SpotlightCard className="h-full p-8">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-green text-background">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-green text-background shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
                         <Icon className="h-5 w-5" />
                       </span>
                       <h3 className="mt-6 font-display text-xl font-bold">{p.title}</h3>
@@ -225,14 +229,7 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
         </section>
       </div>
 
-      {/* Dark block: lifecycle and footer */}
-      <div
-        style={{ backgroundColor: tint(5) }}
-        className="dark relative z-10 -mt-12 rounded-t-[2.5rem] text-foreground [overflow:clip] md:-mt-16 md:rounded-t-[3.5rem]"
-      >
-        <TechLifecycle />
-        <TechFooter onGetStarted={onGetStarted} />
-      </div>
+      <TechFooter onGetStarted={onGetStarted} />
     </div>
   );
 }

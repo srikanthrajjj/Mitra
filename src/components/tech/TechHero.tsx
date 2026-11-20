@@ -3,7 +3,8 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { TECH_HERO } from './techData';
-import { tint } from './techStyles';
+import { BLOB, GLASS_CHROME, tint } from './techStyles';
+import { cn } from '@/lib/utils';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const WORDS = ['define', 'design', 'build', 'test', 'document', 'deploy'] as const;
@@ -28,7 +29,7 @@ function SwapWord() {
   return (
     <span className="mt-[0.1em] flex flex-wrap items-center justify-center gap-x-[0.2em]">
       <span
-        className="relative inline-block overflow-hidden rounded-[0.2em] bg-brand-green text-background"
+        className="relative inline-block overflow-hidden rounded-[0.22em] border border-brand-green/35 bg-brand-green/15 text-brand-green backdrop-blur-xl backdrop-saturate-150 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_30px_-14px_rgba(0,0,0,0.6)]"
         style={{ height: '1.16em', lineHeight: '1.16em', paddingInline: '0.26em' }}
         aria-label="define, design, build, test, document or deploy"
       >
@@ -68,18 +69,16 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
       style={{ backgroundColor: tint(4) }}
       className="dark relative flex min-h-[100dvh] items-center justify-center overflow-hidden pb-24 pt-32 text-foreground"
     >
-      {/* Faint static grid, fading out toward the edges */}
-      <div
-        className="pointer-events-none absolute inset-0 [background-image:linear-gradient(hsl(var(--foreground)/0.05)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground)/0.05)_1px,transparent_1px)] [background-size:80px_80px] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_45%,black_30%,transparent_100%)]"
-        aria-hidden
-      />
+      {/* Soft ambient light for the glass surfaces */}
+      <div className={cn(BLOB, 'left-[12%] top-[18%] h-[24rem] w-[24rem] opacity-60')} aria-hidden />
+      <div className={cn(BLOB, 'right-[10%] bottom-[12%] h-[28rem] w-[28rem] opacity-45')} aria-hidden />
 
       <div className="relative mx-auto w-full max-w-[100rem] px-5 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="mx-auto inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green"
+          className={cn('mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green', GLASS_CHROME)}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />
           {TECH_HERO.eyebrow}
@@ -116,7 +115,7 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           </Button>
           <a
             href="#demo"
-            className="inline-flex h-14 items-center rounded-full border border-border px-9 text-base font-semibold transition-colors hover:bg-accent"
+            className={cn('inline-flex h-14 items-center rounded-full px-9 text-base font-semibold transition-colors hover:bg-foreground/10', GLASS_CHROME)}
           >
             Watch it build
           </a>

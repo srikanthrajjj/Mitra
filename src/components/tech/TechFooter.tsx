@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   motion,
+  stagger,
+  useAnimate,
   useInView,
   useMotionTemplate,
   useMotionValue,
@@ -14,8 +16,7 @@ import { ArrowRight, ArrowUp } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
-import { TechAgentMesh } from './TechAgentMesh';
-import { tint } from './techStyles';
+import { BLOB, GLASS_CHROME, tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const HEADLINE = ['See', 'IlluminAIte', 'build', 'on', 'your', 'instance.'] as const;
@@ -23,7 +24,6 @@ const WORDMARK = 'IlluminAIte'.split('');
 const LINKS = [
   { label: 'Live demo', href: '#demo' },
   { label: 'Product', href: '#product' },
-  { label: 'Lifecycle', href: '#lifecycle' },
   { label: 'Outcomes', href: '#outcomes' },
   { label: 'Governance', href: '#trust' },
 ] as const;
@@ -69,14 +69,27 @@ const OUTLINE = 'text-transparent [-webkit-text-stroke:1.5px_hsl(var(--foregroun
 /** The "AI" in IlluminAIte: letters at these positions get the assistant animation. */
 const AI_START = WORDMARK.indexOf('A');
 
-/** One wordmark letter: outline plus the scroll-driven green fill. */
-function Letter({ ch, clip }: { ch: string; clip: MotionValue<string> }) {
+const SHINE_MASK =
+  'linear-gradient(105deg, transparent calc(var(--s) * 1% - 24%), black calc(var(--s) * 1%), transparent calc(var(--s) * 1% + 24%))';
+
+/** One wordmark letter: outline plus the scroll-driven green fill, and an optional shine layer. */
+function Letter({ ch, clip, shine }: { ch: string; clip: MotionValue<string>; shine?: boolean }) {
   return (
     <span className="relative inline-block">
       <span className={OUTLINE}>{ch}</span>
       <motion.span aria-hidden className="absolute inset-0 text-brand-green" style={{ clipPath: clip }}>
         {ch}
       </motion.span>
+      {shine && (
+        <span
+          aria-hidden
+          data-shine
+          className="absolute inset-0 text-foreground"
+          style={{ ['--s' as string]: -50, maskImage: SHINE_MASK, WebkitMaskImage: SHINE_MASK }}
+        >
+          {ch}
+        </span>
+      )}
     </span>
   );
 }
@@ -90,78 +103,86 @@ function Sparkle({ className }: { className?: string }) {
   );
 }
 
+const SPARKS = [
+  { left: '96%', top: '14%', size: '0.3em', fill: 'fill-foreground' },
+  { left: '2%', top: '24%', size: '0.2em', fill: 'fill-brand-green-hover' },
+  { left: '58%', top: '-4%', size: '0.15em', fill: 'fill-foreground' },
+] as const;
+
+const LIFT = [0.22, 1, 0.36, 1] as const;
+
 /**
- * The "AI" pair. Every few seconds, and whenever you hover it, the two letters morph into an
- * assistant sparkle (they shrink and blur away as the sparkle grows in), hold briefly, then
- * morph back. The rest of the wordmark stays still.
+ * The "AI" pair. The letters never disappear. A sequence plays every few seconds and when you
+ * hover or tap them: the A and I lift with a small spring (the I a beat later), a soft light
+ * sweeps across each letter, and three sparkles bloom around them and fade. The rest of the
+ * wordmark stays still.
  */
 function AssistantPair({ letters, clip }: { letters: string[]; clip: MotionValue<string> }) {
   const reduced = useReducedMotion();
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { amount: 0.5 });
-  const [auto, setAuto] = useState(false);
-  const [hover, setHover] = useState(false);
-  const on = auto || hover;
+  const [scope, animate] = useAnimate();
+  const inView = useInView(scope, { amount: 0.5 });
+  const running = useRef(false);
+
+  const run = useCallback(async () => {
+    if (running.current || reduced || !scope.current) return;
+    running.current = true;
+    const up = { duration: 0.4, ease: LIFT };
+    const settle = { type: 'spring', stiffness: 230, damping: 12 } as const;
+    try {
+      await Promise.all([
+        animate('[data-ai="a"]', { y: '-7%', rotate: -2.5 }, up).then(() =>
+          animate('[data-ai="a"]', { y: '0%', rotate: 0 }, settle),
+        ),
+        animate('[data-ai="i"]', { y: '-11%', rotate: 2.5 }, { ...up, delay: 0.1 }).then(() =>
+          animate('[data-ai="i"]', { y: '0%', rotate: 0 }, settle),
+        ),
+        animate('[data-shine]', { '--s': [-50, 150] }, { duration: 1.15, delay: stagger(0.14, { startDelay: 0.12 }), ease: [0.4, 0, 0.2, 1] }),
+        animate(
+          '[data-spark]',
+          { opacity: [0, 1, 1, 0], scale: [0, 1.15, 0.9, 0], rotate: [-80, 0, 40, 100] },
+          { duration: 1.5, delay: stagger(0.16, { startDelay: 0.35 }), ease: 'easeOut' },
+        ),
+      ]);
+    } finally {
+      running.current = false;
+    }
+  }, [animate, reduced, scope]);
 
   useEffect(() => {
     if (!inView || reduced) return;
-    let hide: ReturnType<typeof setTimeout> | undefined;
-    const cycle = () => {
-      setAuto(true);
-      hide = setTimeout(() => setAuto(false), 2200);
-    };
-    const first = setTimeout(cycle, 1600);
-    const every = setInterval(cycle, 7000);
+    const first = setTimeout(run, 1400);
+    const every = setInterval(run, 6500);
     return () => {
       clearTimeout(first);
       clearInterval(every);
-      if (hide) clearTimeout(hide);
     };
-  }, [inView, reduced]);
-
-  const t = { duration: reduced ? 0 : 0.65, ease: EASE };
+  }, [inView, reduced, run]);
 
   return (
     <span
-      ref={ref}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
+      ref={scope}
+      onPointerEnter={run}
+      onClick={run}
       className="relative inline-flex cursor-pointer"
       aria-hidden
     >
-      <motion.span
-        className="inline-flex"
-        style={{ transformOrigin: '50% 62%' }}
-        animate={on ? { opacity: 0, scale: 0.5, filter: 'blur(12px)' } : { opacity: 1, scale: 1, filter: 'blur(0px)' }}
-        transition={t}
-      >
-        {letters.map((ch, i) => (
-          <Letter key={`${ch}-${i}`} ch={ch} clip={clip} />
-        ))}
-      </motion.span>
-
-      <motion.span
-        className="pointer-events-none absolute inset-0 flex items-center justify-center"
-        style={{ transformOrigin: '50% 62%' }}
-        initial={false}
-        animate={on ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.35, rotate: -70 }}
-        transition={t}
-      >
-        <span className="relative block h-[0.82em] w-[0.82em] tech-spark">
-          <Sparkle className="absolute inset-0 h-full w-full fill-brand-green" />
-          <Sparkle className="tech-twinkle absolute -right-[0.1em] -top-[0.06em] h-[0.26em] w-[0.26em] fill-brand-green" />
-          <Sparkle className="tech-twinkle-2 absolute -bottom-[0.02em] -left-[0.12em] h-[0.2em] w-[0.2em] fill-brand-green" />
+      {letters.map((ch, i) => (
+        <span key={`${ch}-${i}`} data-ai={i === 0 ? 'a' : 'i'} className="inline-block" style={{ transformOrigin: '50% 92%' }}>
+          <Letter ch={ch} clip={clip} shine />
         </span>
-      </motion.span>
-
-      <style>{`
-        .tech-spark { animation: tech-spark 1.6s ease-in-out infinite; }
-        @keyframes tech-spark { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
-        .tech-twinkle { animation: tech-twinkle 1.1s ease-in-out infinite; }
-        .tech-twinkle-2 { animation: tech-twinkle 1.1s ease-in-out 0.45s infinite; }
-        @keyframes tech-twinkle { 0%,100% { opacity: 0.2; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
-        @media (prefers-reduced-motion: reduce) { .tech-spark, .tech-twinkle, .tech-twinkle-2 { animation: none; } }
-      `}</style>
+      ))}
+      {SPARKS.map((s, i) => (
+        <span
+          key={i}
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ left: s.left, top: s.top, width: s.size, height: s.size }}
+        >
+          <Sparkle className={`h-full w-full opacity-0 ${s.fill}`} />
+          <span data-spark className="absolute inset-0" style={{ opacity: 0 }}>
+            <Sparkle className={`h-full w-full ${s.fill}`} />
+          </span>
+        </span>
+      ))}
     </span>
   );
 }
@@ -216,11 +237,11 @@ export function TechFooter({ onGetStarted }: TechFooterProps) {
     <div
       ref={rootRef}
       style={{ backgroundColor: tint(3) }}
-      className="relative z-10 -mt-10 overflow-hidden rounded-t-[2.5rem] md:-mt-14 md:rounded-t-[3.5rem]"
+      className="dark relative z-10 -mt-10 overflow-hidden rounded-t-[2.5rem] text-foreground md:-mt-14 md:rounded-t-[3.5rem]"
     >
       {/* Finale */}
       <section className="relative">
-        <TechAgentMesh className="absolute inset-0 [mask-image:radial-gradient(ellipse_80%_75%_at_50%_45%,black_35%,transparent_100%)]" />
+        <div className={cn(BLOB, 'left-1/2 top-[30%] h-[26rem] w-[40rem] -translate-x-1/2 opacity-40')} aria-hidden />
         <div className="relative mx-auto max-w-5xl px-6 py-28 text-center md:py-44">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
