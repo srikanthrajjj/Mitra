@@ -18,6 +18,7 @@ import { TechLiveDemo } from '../tech/TechLiveDemo';
 import { GridBackdrop } from './GridBackdrop';
 import { UseCases } from './UseCases';
 import { Capabilities } from './Capabilities';
+import { AmbientGlow } from './AmbientGlow';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
 
 interface TechPageV2Props {
@@ -190,9 +191,29 @@ function DemoStage({ children }: { children: ReactNode }) {
   const drift = (x: number, y: number, d: number) =>
     reduce ? {} : { animate: { x: [0, x, 0], y: [0, y, 0] }, transition: { duration: d, repeat: Infinity, ease: 'easeInOut' as const } };
   const GRID = 'color-mix(in srgb, var(--color-foreground) 7%, transparent)';
+  const ref = useRef<HTMLDivElement>(null);
+  // The light comes up as the section scrolls into view, full by the time the window is centred.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
+  const light = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const bloomScale = useTransform(scrollYProgress, [0, 1], [0.55, 1.05]);
+  const ambient = useTransform(scrollYProgress, [0, 1], [0.15, 1]);
   return (
-    <div className="relative mx-auto max-w-[1310px]">
-      <div className="pointer-events-none absolute -inset-x-6 -inset-y-16 overflow-hidden md:-inset-x-16" aria-hidden>
+    <div ref={ref} className="relative mx-auto max-w-[1310px]">
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-[-22rem] h-[60rem] w-[min(170vw,2800px)] -translate-x-1/2"
+        style={{
+          opacity: light,
+          scale: bloomScale,
+          background:
+            'radial-gradient(ellipse 48% 50% at 50% 40%, color-mix(in srgb, var(--color-brand-green) 38%, transparent), color-mix(in srgb, var(--color-brand-green) 12%, transparent) 42%, transparent 72%)',
+        }}
+        aria-hidden
+      />
+      <motion.div
+        className="pointer-events-none absolute -inset-x-6 -inset-y-16 overflow-hidden md:-inset-x-16"
+        style={{ opacity: ambient }}
+        aria-hidden
+      >
         <div
           className="absolute inset-0"
           style={{
@@ -210,7 +231,7 @@ function DemoStage({ children }: { children: ReactNode }) {
           className="absolute bottom-[6%] right-[4%] h-[480px] w-[480px] rounded-full bg-brand-green/20 blur-[130px]"
           {...drift(-80, -60, 18)}
         />
-      </div>
+      </motion.div>
       <div className="relative overflow-hidden rounded-xl p-px">
         {!reduce && (
           <motion.div
@@ -414,15 +435,6 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           }}
           aria-hidden
         />
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="relative mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground backdrop-blur"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-green" aria-hidden />
-          Agentic delivery for ServiceNow
-        </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -469,7 +481,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           transition={{ duration: 0.9, ease: EASE }}
         >
           <DemoStage>
-            <TechLiveDemo />
+            <TechLiveDemo variant="bold" />
           </DemoStage>
         </motion.div>
       </section>
@@ -483,7 +495,8 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       <UseCases />
 
       {/* Outcomes */}
-      <section id="outcomes" className={cn(COLUMN, 'border-b border-border')}>
+      <section id="outcomes" className={cn(COLUMN, 'relative border-b border-border')}>
+        <AmbientGlow intensity={0.55} />
         <div className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Measured where it matters: speed, cost and accuracy
@@ -503,7 +516,8 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </section>
 
       {/* Governance */}
-      <section id="trust" className={cn(COLUMN, 'border-b border-border')}>
+      <section id="trust" className={cn(COLUMN, 'relative border-b border-border')}>
+        <AmbientGlow intensity={0.55} />
         <div className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Engineered for teams with higher standards
@@ -524,11 +538,12 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </section>
 
       {/* Final CTA + footer */}
-      <section className={cn(COLUMN, 'px-6 py-24 text-center md:py-32')}>
-        <h2 className="mx-auto max-w-[720px] font-display text-[clamp(2.2rem,5vw,3.8rem)] font-medium leading-[1.06] tracking-[-0.0225em]">
-          See IlluminAIte build on your instance
+      <section className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
+        <AmbientGlow intensity={0.9} />
+        <h2 className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
+          See Illumin<span className="font-sans font-bold">AI</span>te build on your instance
         </h2>
-        <div className="mt-9">
+        <div className="relative mt-10">
           <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
             Start building
           </Button>
@@ -536,7 +551,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </section>
       <div className="overflow-hidden border-t border-border" aria-hidden>
         <div className="select-none text-center font-display text-[clamp(3.5rem,17vw,16rem)] font-semibold leading-[0.85] tracking-[-0.05em] text-foreground/[0.05]">
-          IlluminAIte
+          Illumin<span className="font-sans font-bold">AI</span>te
         </div>
       </div>
       <footer className="border-t border-border">
