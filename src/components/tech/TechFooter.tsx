@@ -16,6 +16,7 @@ import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
 import { TechAgentMesh } from './TechAgentMesh';
+import { TechBotScan } from './TechBotScan';
 import { tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -198,19 +199,22 @@ function Wordmark({ clip }: { clip: MotionValue<string> }) {
       className="relative mx-auto max-w-[110rem] cursor-pointer select-none overflow-hidden px-2 pt-16 md:px-6 md:pt-24"
       aria-hidden
     >
-      <p className={cn('flex justify-center', WORD_CLASS)}>
-        {WORDMARK.map((ch, i) => (
-          <span
-            key={`${ch}-${i}`}
-            ref={(el) => {
-              letterRefs.current[i] = el;
-            }}
-            className="inline-block"
-          >
-            <WordLetter ch={ch} index={i} weight={weightMVs[i]} bump={bumpMVs[i]} clip={clip} />
-          </span>
-        ))}
-      </p>
+      <div className="relative">
+        <p className={cn('flex justify-center', WORD_CLASS)}>
+          {WORDMARK.map((ch, i) => (
+            <span
+              key={`${ch}-${i}`}
+              ref={(el) => {
+                letterRefs.current[i] = el;
+              }}
+              className="inline-block"
+            >
+              <WordLetter ch={ch} index={i} weight={weightMVs[i]} bump={bumpMVs[i]} clip={clip} />
+            </span>
+          ))}
+        </p>
+        <TechBotScan wordClass={WORD_CLASS} run={inView} hovering={hovering} />
+      </div>
     </div>
   );
 }

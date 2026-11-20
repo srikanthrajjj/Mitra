@@ -1,71 +1,56 @@
-import { useEffect, useRef } from 'react';
-import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
+import { TechHeroEnergy } from './TechHeroEnergy';
 import { TECH_HERO } from './techData';
 import { tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const WORDS = ['define', 'design', 'build', 'test', 'document', 'deploy'] as const;
-/** The first word repeats at the end so the reel can roll forward forever, then snap back. */
-const REEL = [...WORDS, WORDS[0]] as const;
-const STEP_MS = 2400;
-const ROLL_S = 0.8;
-const LINE = 1.1; // line height in em
-
-function ReelWord({ word, index, pos }: { word: string; index: number; pos: MotionValue<number> }) {
-  const opacity = useTransform(pos, (p) => Math.max(0, 1 - Math.abs(p - index) * 1.5));
-  const filter = useTransform(pos, (p) => `blur(${Math.min(6, Math.abs(p - index) * 6)}px)`);
-  const scale = useTransform(pos, (p) => 1 - Math.min(0.1, Math.abs(p - index) * 0.1));
-  return (
-    <motion.span
-      className="block text-center text-brand-green will-change-transform"
-      style={{ height: `${LINE}em`, lineHeight: `${LINE}em`, opacity, filter, scale }}
-    >
-      {word}
-    </motion.span>
-  );
-}
+const WIDEST = 'document';
+const SWAP_MS = 2600;
 
 /**
- * Slot-reel verb on its own line, so nothing sits beside it that could shift when the
- * word changes length. The box has a fixed height; one position value drives the roll and
- * a blur cross-fade, so the swap is purely vertical and never moves the layout.
+ * Simple word swap: the old word slides up and fades while the new one slides in. The
+ * slot is as wide as the longest word and the word is right-aligned, so the swap never
+ * changes the layout. On small screens "ServiceNow." wraps beneath it.
  */
-function CyclingWord() {
+function SwapWord() {
   const reduced = useReducedMotion();
-  const pos = useMotionValue(2);
-  const idx = useRef(2);
+  const [i, setI] = useState(2);
 
   useEffect(() => {
     if (reduced) return;
-    const id = setInterval(() => {
-      idx.current += 1;
-      const target = idx.current;
-      animate(pos, target, { duration: ROLL_S, ease: [0.65, 0, 0.35, 1] }).then(() => {
-        if (target >= WORDS.length) {
-          idx.current = 0;
-          pos.jump(0);
-        }
-      });
-    }, STEP_MS);
+    const id = setInterval(() => setI((v) => (v + 1) % WORDS.length), SWAP_MS);
     return () => clearInterval(id);
-  }, [reduced, pos]);
-
-  const y = useTransform(pos, (p) => `${-p * LINE}em`);
+  }, [reduced]);
 
   return (
-    <span
-      className="relative block overflow-hidden"
-      style={{ height: `${LINE}em`, paddingBottom: '0.14em', marginBottom: '-0.14em', contain: 'layout paint' }}
-      role="text"
-      aria-label="define, design, build, test, document or deploy"
-    >
-      <motion.span className="block" style={{ y }} aria-hidden>
-        {REEL.map((w, i) => (
-          <ReelWord key={`${w}-${i}`} word={w} index={i} pos={pos} />
-        ))}
-      </motion.span>
+    <span className="flex flex-wrap items-center justify-center gap-x-[0.24em]">
+      <span
+        className="relative inline-block overflow-hidden"
+        style={{ paddingBottom: '0.16em', marginBottom: '-0.16em' }}
+        aria-label="define, design, build, test, document or deploy"
+      >
+        <span className="invisible block" aria-hidden>
+          {WIDEST}
+        </span>
+        <AnimatePresence initial={false}>
+          <motion.span
+            key={WORDS[i]}
+            aria-hidden
+            className="absolute inset-x-0 top-0 block text-center text-brand-green sm:text-right"
+            initial={{ y: '70%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '-70%', opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {WORDS[i]}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+      <span>ServiceNow.</span>
     </span>
   );
 }
@@ -79,34 +64,14 @@ interface TechHeroProps {
  * demo panel follows below the fold.
  */
 export function TechHero({ onGetStarted }: TechHeroProps) {
-  const ref = useRef<HTMLElement>(null);
-
-  const onMove = (e: React.PointerEvent<HTMLElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    el.style.setProperty('--my', `${e.clientY - r.top}px`);
-  };
-
   return (
     <section
-      ref={ref}
-      onPointerMove={onMove}
       style={{ backgroundColor: tint(4) }}
       className="dark relative flex min-h-[100dvh] items-center justify-center overflow-hidden pb-24 pt-32 text-foreground"
     >
-      {/* Dots brighten around the cursor */}
-      <div
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.55)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(260px_circle_at_var(--mx,50%)_var(--my,40%),black,transparent)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.1)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
-        aria-hidden
-      />
+      <TechHeroEnergy className="absolute inset-0 [mask-image:radial-gradient(ellipse_90%_85%_at_50%_45%,black_45%,transparent_100%)]" />
 
-      <div className="relative mx-auto w-full max-w-6xl px-6 text-center">
+      <div className="relative mx-auto w-full max-w-[100rem] px-5 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -121,11 +86,10 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
-          className="mt-9 font-display text-[clamp(2.4rem,7.2vw,6.9rem)] font-extrabold leading-[1.04] tracking-[-0.05em]"
+          className="mt-9 font-display text-[clamp(2.7rem,8.2vw,8.5rem)] font-extrabold leading-[1.02] tracking-[-0.05em] [-webkit-text-stroke:0.028em_currentColor]"
         >
           <span className="block">AI agents that</span>
-          <CyclingWord />
-          <span className="block">ServiceNow.</span>
+          <SwapWord />
         </motion.h1>
 
         <motion.p
