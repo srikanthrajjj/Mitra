@@ -194,7 +194,7 @@ function Corner({ className }: { className: string }) {
 export function UseCases() {
   return (
     <section id="usecases" className="mx-auto w-full max-w-[1056px] border-x border-dashed border-border">
-      <div className="px-6 py-20 md:px-12 md:py-28">
+      <div data-reveal className="px-6 py-20 md:px-12 md:py-28">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-brand-green">Use cases</p>
         <h2 className="mt-4 max-w-[760px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
           The backlog every ServiceNow team already has, shipped

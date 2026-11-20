@@ -20,6 +20,7 @@ import { UseCases } from './UseCases';
 import { Capabilities } from './Capabilities';
 import { AmbientGlow } from './AmbientGlow';
 import { ScrollTheme } from './ScrollTheme';
+import { useScrollReveal, useSmoothScrollV2 } from './useSmoothScrollV2';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
 
 interface TechPageV2Props {
@@ -277,7 +278,7 @@ function StageTabs() {
 
   return (
     <section id="product" className={cn(COLUMN, 'border-b border-border')}>
-      <div className="px-6 py-20 md:px-12 md:py-28">
+      <div data-reveal className="px-6 py-20 md:px-12 md:py-28">
         <h2 className="max-w-[560px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
           Your build team, <span className="text-brand-green">on demand</span>
         </h2>
@@ -380,8 +381,14 @@ function StageTabs() {
 }
 
 export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  useSmoothScrollV2();
+  useScrollReveal(rootRef);
   return (
-    <div className="dark min-h-screen overflow-x-clip bg-background font-sans text-foreground antialiased selection:bg-brand-green/25">
+    <div
+      ref={rootRef}
+      className="dark min-h-screen overflow-x-clip bg-background font-sans text-foreground antialiased selection:bg-brand-green/25 [&_[data-reveal]]:translate-y-8 [&_[data-reveal]]:opacity-0 [&_[data-reveal]]:transition-[opacity,transform,background-color] [&_[data-reveal]]:duration-[1000ms] [&_[data-reveal]]:ease-[cubic-bezier(0.22,1,0.36,1)] [&_[data-reveal][data-in]]:translate-y-0 [&_[data-reveal][data-in]]:opacity-100"
+    >
       <ScrollTheme />
       {/* Announcement + nav */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -500,14 +507,14 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       {/* Outcomes */}
       <section id="outcomes" className={cn(COLUMN, 'relative border-b border-border')}>
         <AmbientGlow intensity={0.3} />
-        <div className="px-6 py-20 md:px-12 md:py-28">
+        <div data-reveal className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Measured where it matters: speed, cost and accuracy
           </h2>
         </div>
         <div className="grid border-t border-border md:grid-cols-3">
-          {TECH_STATS.map((s) => (
-            <div key={s.label} className="border-b border-border p-8 last:border-b-0 md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
+          {TECH_STATS.map((s, i) => (
+            <div key={s.label} data-reveal style={{ transitionDelay: `${i * 120}ms` }} className="border-b border-border p-8 last:border-b-0 md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
               <div className="font-display text-[clamp(4.5rem,9vw,8rem)] font-semibold leading-none tracking-[-0.05em] text-brand-green">
                 <CountUp target={s.target} suffix={s.suffix} />
               </div>
@@ -521,16 +528,16 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       {/* Governance */}
       <section id="trust" className={cn(COLUMN, 'relative border-b border-border')}>
         <AmbientGlow intensity={0.3} />
-        <div className="px-6 py-20 md:px-12 md:py-28">
+        <div data-reveal className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Engineered for teams with higher standards
           </h2>
         </div>
         <div className="grid border-t border-border md:grid-cols-3">
-          {TECH_PILLARS.map((p) => {
+          {TECH_PILLARS.map((p, i) => {
             const PillarIcon = p.icon;
             return (
-              <div key={p.title} className="group border-b border-border p-8 transition-colors last:border-b-0 hover:bg-mitra-highlight md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
+              <div key={p.title} data-reveal style={{ transitionDelay: `${i * 120}ms` }} className="group border-b border-border p-8 transition-colors last:border-b-0 hover:bg-mitra-highlight md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
                 <PillarIcon className="h-5 w-5 text-brand-green" aria-hidden />
                 <div className="mt-6 text-lg font-medium">{p.title}</div>
                 <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{p.desc}</p>
@@ -543,10 +550,10 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       {/* Final CTA + footer */}
       <section id="start" className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
         <AmbientGlow intensity={0.5} />
-        <h2 className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
+        <h2 data-reveal className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
           See Illumin<span className="font-sans font-bold">AI</span>te build on your instance
         </h2>
-        <div className="relative mt-10">
+        <div data-reveal style={{ transitionDelay: '160ms' }} className="relative mt-10">
           <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
             Start building
           </Button>
