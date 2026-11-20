@@ -1,67 +1,110 @@
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
-import { cn } from '@/lib/utils';
-import { TechHeroField } from './TechHeroField';
-import { TECH_HERO, TECH_STAGES } from './techData';
+import { TECH_HERO } from './techData';
+import { tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const WORDS = ['define', 'design', 'build', 'test', 'document', 'deploy'] as const;
+/** The first word repeats at the end so the reel can roll forward forever, then snap back. */
+const REEL = [...WORDS, WORDS[0]] as const;
+const STEP_MS = 2600;
+const ROLL_S = 1.05;
+const LINE = 1.1; // line height in em
 
-/** Kinetic verb: slides through the lifecycle stages. Static for reduced motion. */
-function CyclingLine() {
-  const reduced = useReducedMotion();
-  const [i, setI] = useState(2);
-
-  useEffect(() => {
-    if (reduced) return;
-    const id = setInterval(() => setI((v) => (v + 1) % WORDS.length), 2300);
-    return () => clearInterval(id);
-  }, [reduced]);
-
+function ReelWord({ word, index, pos }: { word: string; index: number; pos: MotionValue<number> }) {
+  const opacity = useTransform(pos, (p) => Math.max(0, 1 - Math.abs(p - index) * 1.35));
+  const filter = useTransform(pos, (p) => `blur(${Math.min(8, Math.abs(p - index) * 7)}px)`);
+  const scale = useTransform(pos, (p) => 1 - Math.min(0.12, Math.abs(p - index) * 0.1));
   return (
-    <motion.span layout transition={{ duration: 0.5, ease: EASE }} className="inline-flex items-baseline gap-[0.26em]">
-      <motion.span
-        layout
-        transition={{ duration: 0.5, ease: EASE }}
-        className="relative inline-flex overflow-hidden pb-[0.2em] -mb-[0.2em]"
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={WORDS[i]}
-            initial={{ y: '100%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '-100%', opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE }}
-            className="inline-block text-brand-green"
-          >
-            {WORDS[i]}
-          </motion.span>
-        </AnimatePresence>
-      </motion.span>
-      <motion.span layout transition={{ duration: 0.5, ease: EASE }}>
-        ServiceNow.
-      </motion.span>
+    <motion.span
+      className="block text-brand-green"
+      style={{ height: `${LINE}em`, lineHeight: `${LINE}em`, opacity, filter, scale, transformOrigin: '0% 60%' }}
+    >
+      {word}
     </motion.span>
   );
 }
 
-const CHIPS = [
-  { stage: 0, className: 'left-[5%] top-[30%]', dur: 6.5 },
-  { stage: 1, className: 'left-[9%] top-[56%]', dur: 7.5 },
-  { stage: 2, className: 'right-[6%] top-[27%]', dur: 7 },
-  { stage: 3, className: 'right-[10%] top-[50%]', dur: 6 },
-  { stage: 4, className: 'right-[4%] top-[70%]', dur: 8 },
-] as const;
+/**
+ * Slot-reel verb. One continuous position value drives everything: the column rolls,
+ * each word cross-fades with a touch of blur, and the box width eases between word
+ * widths so "ServiceNow." glides instead of jumping.
+ */
+function CyclingLine() {
+  const reduced = useReducedMotion();
+  const pos = useMotionValue(2);
+  const [widths, setWidths] = useState<number[]>(() => REEL.map((w) => w.length * 0.62 * 16));
+  const probeRef = useRef<HTMLSpanElement>(null);
+  const idx = useRef(2);
+
+  // Measure each word's rendered width (re-measure when webfonts finish loading).
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = probeRef.current;
+      if (!el) return;
+      const w = Array.from(el.children).map((c) => (c as HTMLElement).getBoundingClientRect().width);
+      if (w.every((n) => n > 0)) setWidths(w);
+    };
+    measure();
+    void document.fonts?.ready.then(measure);
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  useEffect(() => {
+    if (reduced) return;
+    const id = setInterval(() => {
+      idx.current += 1;
+      const target = idx.current;
+      animate(pos, target, { duration: ROLL_S, ease: [0.65, 0, 0.35, 1] }).then(() => {
+        if (target >= WORDS.length) {
+          idx.current = 0;
+          pos.jump(0);
+        }
+      });
+    }, STEP_MS);
+    return () => clearInterval(id);
+  }, [reduced, pos]);
+
+  const stops = useMemo(() => REEL.map((_, i) => i), []);
+  const width = useTransform(pos, stops, widths);
+  const y = useTransform(pos, (p) => `${-p * LINE}em`);
+
+  return (
+    <span className="flex flex-wrap items-center justify-center gap-x-[0.26em]">
+      <motion.span
+        className="relative inline-block overflow-hidden text-left"
+        style={{ width, height: `${LINE}em`, paddingBottom: '0.12em', marginBottom: '-0.12em' }}
+        aria-label="define, design, build, test, document or deploy"
+      >
+        <motion.span className="block" style={{ y }} aria-hidden>
+          {REEL.map((w, i) => (
+            <ReelWord key={`${w}-${i}`} word={w} index={i} pos={pos} />
+          ))}
+        </motion.span>
+      </motion.span>
+      <span>ServiceNow.</span>
+      {/* hidden probe for measuring word widths */}
+      <span ref={probeRef} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-10 whitespace-nowrap">
+        {REEL.map((w, i) => (
+          <span key={`${w}-${i}`} className="absolute left-0 top-0 whitespace-nowrap">
+            {w}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
 
 interface TechHeroProps {
   onGetStarted: () => void;
 }
 
 /**
- * Dark hero: kinetic headline, cursor-reactive dot grid, floating lifecycle chips and a
- * scroll-driven shader background. The live demo panel follows directly below.
+ * Full-height dark hero: a big kinetic headline over a cursor-reactive dot grid. The live
+ * demo panel follows below the fold.
  */
 export function TechHero({ onGetStarted }: TechHeroProps) {
   const ref = useRef<HTMLElement>(null);
@@ -78,47 +121,20 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
     <section
       ref={ref}
       onPointerMove={onMove}
-      className="dark relative overflow-hidden bg-background pb-16 pt-36 text-foreground md:pb-24 md:pt-44"
+      style={{ backgroundColor: tint(4) }}
+      className="dark relative flex min-h-[100dvh] items-center justify-center overflow-hidden pb-24 pt-32 text-foreground"
     >
-      <TechHeroField className="absolute inset-0 opacity-80" />
       {/* Dots brighten around the cursor */}
       <div
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.5)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(240px_circle_at_var(--mx,50%)_var(--my,35%),black,transparent)]"
+        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.55)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(260px_circle_at_var(--mx,50%)_var(--my,40%),black,transparent)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.1)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]"
+        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.1)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
         aria-hidden
       />
 
-      {CHIPS.map((c) => {
-        const s = TECH_STAGES[c.stage];
-        const Icon = s.icon;
-        return (
-          <motion.div
-            key={s.num}
-            aria-hidden
-            className={cn(
-              'pointer-events-none absolute hidden items-center gap-2 rounded-full border border-border bg-card/70 py-2 pl-2.5 pr-4 text-xs font-semibold backdrop-blur-md xl:flex',
-              c.className,
-            )}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
-            transition={{
-              opacity: { duration: 0.8, delay: 1 + c.stage * 0.12 },
-              scale: { duration: 0.8, delay: 1 + c.stage * 0.12 },
-              y: { duration: c.dur, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-green text-background">
-              <Icon className="h-3.5 w-3.5" />
-            </span>
-            {s.title}
-          </motion.div>
-        );
-      })}
-
-      <div className="relative mx-auto max-w-5xl px-6 text-center">
+      <div className="relative mx-auto w-full max-w-6xl px-6 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -130,10 +146,10 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
         </motion.p>
 
         <motion.h1
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
-          className="mt-8 font-display text-[2.8rem] font-extrabold leading-[1.02] tracking-[-0.045em] sm:text-7xl md:text-[5.25rem]"
+          className="mt-9 font-display text-[clamp(2.5rem,8.2vw,7.75rem)] font-extrabold leading-[1.02] tracking-[-0.05em]"
         >
           AI agents that
           <br />
@@ -144,7 +160,7 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE, delay: 0.35 }}
-          className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
+          className="mx-auto mt-9 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl lg:text-2xl"
         >
           {TECH_HERO.subtitle}
         </motion.p>
@@ -153,20 +169,34 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE, delay: 0.5 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          className="mt-12 flex flex-wrap items-center justify-center gap-4"
         >
-          <Button variant="cta" size="lg" onClick={onGetStarted} className="group rounded-full px-7">
+          <Button variant="cta" size="lg" onClick={onGetStarted} className="group h-14 rounded-full px-9 text-base">
             Try IlluminAIte
-            <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
           <a
             href="#demo"
-            className="rounded-full border border-border bg-card/70 px-7 py-2.5 text-sm font-semibold backdrop-blur transition-colors hover:bg-accent"
+            className="inline-flex h-14 items-center rounded-full border border-border bg-card/70 px-9 text-base font-semibold backdrop-blur transition-colors hover:bg-accent"
           >
             Watch it build
           </a>
         </motion.div>
       </div>
+
+      <motion.a
+        href="#demo"
+        aria-label="Scroll to the live demo"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4, duration: 0.8 }}
+        className="absolute bottom-16 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground transition-colors hover:text-foreground sm:flex"
+      >
+        Scroll
+        <motion.span animate={{ y: [0, 6, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
+          <ChevronDown className="h-4 w-4" />
+        </motion.span>
+      </motion.a>
     </section>
   );
 }
