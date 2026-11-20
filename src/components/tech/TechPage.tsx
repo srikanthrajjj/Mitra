@@ -8,11 +8,9 @@ import { TechLifecycle } from './TechLifecycle';
 import { TechArchitecture } from './TechArchitecture';
 import { TechShowcase } from './TechShowcase';
 import { TechMarquee } from './TechMarquee';
-import { TechLiveDemo } from './TechLiveDemo';
-import { TechProductWindow } from './TechProductWindow';
 import { Button } from '@/src/components/ui/button';
 import { useSmoothScroll } from './useSmoothScroll';
-import { TECH_FEATURES, TECH_HERO, TECH_PILLARS, TECH_STATS } from './techData';
+import { TECH_HERO, TECH_PILLARS, TECH_STATS } from './techData';
 
 interface TechPageProps {
   onGetStarted: () => void;
@@ -131,11 +129,11 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         </nav>
       </header>
 
-      <section className="relative overflow-hidden pt-16">
+      <section className="relative flex min-h-screen items-center overflow-hidden pt-16">
         <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden />
         <TechHeroField className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-4 pt-24 md:pt-28">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-24">
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -145,14 +143,13 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
             {TECH_HERO.eyebrow}
           </motion.p>
-          <h1 className="mt-6 max-w-6xl font-display text-[3rem] font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[4.5rem] lg:text-[4.75rem]">
+          <h1 className="mt-8 max-w-5xl font-display text-[3rem] font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[5.5rem] lg:text-[6.25rem]">
             <RevealWords text="The" delay={0.15} />
             <RevealWords
               text="agentic engine"
               delay={0.25}
               className="bg-gradient-to-r from-brand-green to-brand-green-hover bg-clip-text text-transparent"
             />
-            <br className="hidden md:block" />
             <RevealWords text="behind every ServiceNow build." delay={0.4} />
           </h1>
           <div className="mt-7 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -182,11 +179,6 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             </a>
           </motion.div>
           </div>
-        </div>
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-8 md:pt-10">
-          <TechProductWindow tilt priority src="" alt="" url="IlluminAIte · New solution">
-            <TechLiveDemo />
-          </TechProductWindow>
         </div>
       </section>
 
