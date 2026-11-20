@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
@@ -8,6 +7,7 @@ import { TechLifecycle } from './TechLifecycle';
 import { TechShowcase } from './TechShowcase';
 import { TechLiveDemo } from './TechLiveDemo';
 import { TechHero } from './TechHero';
+import { TechFooter } from './TechFooter';
 import { useSmoothScroll } from './useSmoothScroll';
 import { TECH_PILLARS, TECH_STATS } from './techData';
 
@@ -209,29 +209,11 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
         </section>
       </div>
 
-      {/* Dark block: lifecycle, finale */}
+      {/* Dark block: lifecycle and footer */}
       <div className="dark relative -mt-12 rounded-t-[2.5rem] bg-background text-foreground md:-mt-16 md:rounded-t-[3.5rem]">
         <div className="h-12 md:h-16" aria-hidden />
         <TechLifecycle />
-        <section className="py-28 md:py-44">
-          <Reveal className="mx-auto max-w-3xl px-6 text-center">
-            <h2 className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] md:text-8xl">
-              See IlluminAIte <span className="text-brand-green">build</span> on your instance.
-            </h2>
-            <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
-              Start from a workshop conversation and finish with a go-live ready ServiceNow implementation.
-            </p>
-            <Button variant="cta" size="lg" onClick={onGetStarted} className="mt-10 rounded-full px-8">
-              Try IlluminAIte <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </Reveal>
-        </section>
-        <footer className="border-t border-border py-8">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 text-xs text-muted-foreground">
-            <IlluminaiteLogo className="h-5 w-auto opacity-80" />
-            <span>© IlluminAIte</span>
-          </div>
-        </footer>
+        <TechFooter onGetStarted={onGetStarted} />
       </div>
     </div>
   );
