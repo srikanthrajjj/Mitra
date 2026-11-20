@@ -39,20 +39,12 @@ export const TECH_STAGES: TechStage[] = LIFECYCLE_STEPS.map((step) => ({
   num: step.num,
   title: step.title,
   summary: step.desc,
-  detail: step.detail,
+  detail: step.detail.replaceAll('Mitra', 'IlluminAIte'),
   icon: step.icon,
   outputs: STAGE_OUTPUTS[step.title] ?? [],
 }));
 
 export const TECH_STATS = HERO_STATS;
-
-export const ARCH_NODES = [
-  { id: 'define', label: 'Requirements agent', icon: ClipboardList },
-  { id: 'build', label: 'Build agent', icon: Cog },
-  { id: 'test', label: 'Test agent', icon: Workflow },
-  { id: 'docs', label: 'Documentation agent', icon: FileText },
-  { id: 'deploy', label: 'Deployment agent', icon: Rocket },
-] as const;
 
 export const TECH_PILLARS: { title: string; desc: string; icon: LucideIcon }[] = [
   {
