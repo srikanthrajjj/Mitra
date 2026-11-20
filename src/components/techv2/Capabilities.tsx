@@ -120,12 +120,12 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
     <motion.article
       ref={ref}
       initial={false}
-      animate={{ opacity: show ? 1 : 0.35, scale: show ? 1 : 0.95, y: show ? 0 : 18 }}
+      animate={{ opacity: show ? 1 : 0.35, y: show ? 0 : 18 }}
       transition={{ duration: 0.7, ease: EASE }}
-      className="group flex h-[clamp(430px,58vh,540px)] w-[300px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors duration-300 hover:border-brand-green/40 hover:bg-mitra-highlight sm:w-[360px]"
+      className="group flex h-[clamp(470px,60vh,560px)] w-[300px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors duration-300 hover:border-brand-green/40 hover:bg-mitra-highlight sm:w-[360px]"
     >
       {/* Visual: top 40% */}
-      <div className="relative h-[40%] min-h-[170px] border-b border-border">
+      <div className="relative h-[42%] min-h-[200px] border-b border-border">
         <div
           className="absolute inset-0"
           style={{
@@ -136,7 +136,7 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
           }}
           aria-hidden
         />
-        <svg viewBox="0 0 240 120" className="relative h-full w-full p-8" fill="none" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg viewBox="-34 -22 308 164" className="relative h-full w-full p-4" shapeRendering="geometricPrecision" fill="none" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <defs>
             <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
               <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
@@ -222,7 +222,8 @@ export function Capabilities() {
   }, []);
 
   const { scrollYProgress } = useScroll({ target: section, offset: ['start 105px', 'end end'] });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -dist]);
+  const x = useTransform(scrollYProgress, [0, 1], [0, -dist], { ease: (t) => t });
+  const xPx = useTransform(x, (v) => Math.round(v));
   const bar = useTransform(scrollYProgress, [0, 1], ['4%', '100%']);
 
   return (
@@ -246,7 +247,7 @@ export function Capabilities() {
         <div className="py-3">
           <motion.div
             ref={track}
-            style={{ x }}
+            style={{ x: xPx }}
             className="flex w-max gap-6 pl-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] md:gap-10"
           >
             {CAPABILITIES.map((c, i) => (
