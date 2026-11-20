@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { GLOW_BOTTOM, GLOW_TOP } from './techStyles';
 import { ARCH_NODES } from './techData';
 
 const W = 960;
@@ -31,9 +30,7 @@ export function TechArchitecture() {
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section id="architecture" className="dark relative overflow-hidden bg-background py-24 text-foreground md:py-36">
-      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-80', GLOW_TOP)} aria-hidden />
-      <div className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-96 opacity-70', GLOW_BOTTOM)} aria-hidden />
+    <section id="architecture" className="relative py-24 md:py-36">
       <div className="relative mx-auto max-w-6xl px-6">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Architecture</p>
         <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">

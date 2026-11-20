@@ -1,10 +1,9 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion } from 'motion/react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TechProductWindow } from './TechProductWindow';
 import { TechMarquee } from './TechMarquee';
-import { DOT_GRID, GLOW_TOP, GRADIENT_TEXT_ON_LIGHT, ORB } from './techStyles';
+import { DOT_GRID } from './techStyles';
 import { TECH_FEATURES } from './techData';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -14,30 +13,18 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * every screenshot opens in light theme, with a switch to flip it to dark.
  */
 export function TechShowcase() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const orbA = useTransform(scrollYProgress, [0, 1], [-160, 420]);
-  const orbB = useTransform(scrollYProgress, [0, 1], [260, -380]);
-  const orbC = useTransform(scrollYProgress, [0, 1], [0, 220]);
-
   return (
     <section
-      ref={ref}
       id="product"
       className="light relative overflow-hidden bg-background text-foreground"
     >
       <div className={cn('pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]', DOT_GRID)} aria-hidden />
-      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-[40rem]', GLOW_TOP)} aria-hidden />
-      <motion.div style={{ y: orbA }} className={cn('pointer-events-none absolute -left-60 top-[8%] h-[46rem] w-[46rem] rounded-full blur-3xl', ORB)} aria-hidden />
-      <motion.div style={{ y: orbB }} className={cn('pointer-events-none absolute -right-72 top-[40%] h-[52rem] w-[52rem] rounded-full blur-3xl', ORB)} aria-hidden />
-      <motion.div style={{ y: orbC }} className={cn('pointer-events-none absolute -left-40 bottom-[4%] h-[40rem] w-[40rem] rounded-full blur-3xl', ORB)} aria-hidden />
-
       <TechMarquee />
 
       <div className="relative mx-auto max-w-6xl px-6 pt-28 md:pt-40">
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green-deep">Inside the product</p>
         <h2 className="mt-5 max-w-4xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
-          See the work <span className={GRADIENT_TEXT_ON_LIGHT}>before</span> it ships.
+          See the work <span className="text-brand-green-deep">before</span> it ships.
         </h2>
       </div>
 

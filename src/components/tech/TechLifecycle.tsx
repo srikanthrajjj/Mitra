@@ -3,7 +3,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { GLOW_TOP, ORB } from './techStyles';
 import { TECH_STAGES } from './techData';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -45,15 +44,8 @@ export function TechLifecycle() {
     <section
       ref={sectionRef}
       id="lifecycle"
-      className="dark relative flex min-h-screen items-center overflow-hidden bg-background py-24 text-foreground lg:py-0"
+      className="relative flex min-h-screen items-center py-24 lg:py-0"
     >
-      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-[32rem]', GLOW_TOP)} aria-hidden />
-      <motion.div
-        aria-hidden
-        className={cn('pointer-events-none absolute top-1/2 h-[44rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl', ORB)}
-        animate={{ left: `${18 + active * 16}%` }}
-        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-      />
       <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">The delivery lifecycle</p>
@@ -89,7 +81,6 @@ export function TechLifecycle() {
         </div>
 
         <div className="relative min-h-[19rem] overflow-hidden rounded-2xl border border-border bg-card p-8 md:p-10">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-green/10 blur-3xl" />
           <AnimatePresence mode="wait">
             <motion.div
               key={stage.num}

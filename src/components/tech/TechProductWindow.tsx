@@ -40,7 +40,7 @@ export function TechProductWindow({
           'relative overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-500',
           mode === 'dark'
             ? 'shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]'
-            : 'shadow-[0_40px_110px_-30px_color-mix(in_srgb,var(--color-brand-green-deep)_55%,transparent)]',
+            : 'shadow-[0_40px_100px_-40px_rgba(0,0,0,0.35)]',
         )}
       >
         <div className="flex items-center gap-3 border-b border-border bg-mitra-surface px-4 py-3 transition-colors duration-500">
