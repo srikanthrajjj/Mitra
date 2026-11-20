@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
-import { TechHeroEnergy } from './TechHeroEnergy';
 import { TECH_HERO } from './techData';
 import { tint } from './techStyles';
 
@@ -69,23 +68,27 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
       style={{ backgroundColor: tint(4) }}
       className="dark relative flex min-h-[100dvh] items-center justify-center overflow-hidden pb-24 pt-32 text-foreground"
     >
-      <TechHeroEnergy className="absolute inset-0 [mask-image:radial-gradient(ellipse_90%_85%_at_50%_45%,black_45%,transparent_100%)]" />
+      {/* Faint static grid, fading out toward the edges */}
+      <div
+        className="pointer-events-none absolute inset-0 [background-image:linear-gradient(hsl(var(--foreground)/0.05)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground)/0.05)_1px,transparent_1px)] [background-size:80px_80px] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_45%,black_30%,transparent_100%)]"
+        aria-hidden
+      />
 
       <div className="relative mx-auto w-full max-w-[100rem] px-5 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green backdrop-blur"
+          className="mx-auto inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green"
         >
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />
           {TECH_HERO.eyebrow}
         </motion.p>
 
         <motion.h1
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.1 }}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.05 }}
           className="mt-9 font-display text-[clamp(2.7rem,8.2vw,8.5rem)] font-extrabold leading-[1.02] tracking-[-0.05em] [-webkit-text-stroke:0.028em_currentColor]"
         >
           <span className="block">AI agents that</span>
@@ -113,26 +116,13 @@ export function TechHero({ onGetStarted }: TechHeroProps) {
           </Button>
           <a
             href="#demo"
-            className="inline-flex h-14 items-center rounded-full border border-border bg-card/70 px-9 text-base font-semibold backdrop-blur transition-colors hover:bg-accent"
+            className="inline-flex h-14 items-center rounded-full border border-border px-9 text-base font-semibold transition-colors hover:bg-accent"
           >
             Watch it build
           </a>
         </motion.div>
       </div>
 
-      <motion.a
-        href="#demo"
-        aria-label="Scroll to the live demo"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 0.8 }}
-        className="absolute bottom-16 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground transition-colors hover:text-foreground sm:flex"
-      >
-        Scroll
-        <motion.span animate={{ y: [0, 6, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
-          <ChevronDown className="h-4 w-4" />
-        </motion.span>
-      </motion.a>
     </section>
   );
 }
