@@ -1,12 +1,15 @@
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
+  animate,
   motion,
+  motionValue,
   useInView,
   useMotionTemplate,
   useMotionValue,
   useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
 } from 'motion/react';
 import { ArrowRight, ArrowUp } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
@@ -57,6 +60,157 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
       {children}
       <span className="absolute inset-x-0 bottom-0 h-px origin-right scale-x-0 bg-brand-green transition-transform duration-500 ease-out group-hover:origin-left group-hover:scale-x-100" />
     </a>
+  );
+}
+
+const WORD_CLASS =
+  'font-display text-[clamp(3.2rem,15.2vw,17rem)] font-extrabold leading-[0.9] tracking-[-0.05em]';
+const OUTLINE = 'text-transparent [-webkit-text-stroke:1.5px_hsl(var(--foreground)/0.2)]';
+
+interface WordLetterProps {
+  ch: string;
+  index: number;
+  weight: MotionValue<number>;
+  bump: MotionValue<number>;
+  clip: MotionValue<string>;
+}
+
+/** One wordmark letter: layered outline, scroll fill, hover highlight and trailing echoes. */
+function WordLetter({ ch, index, weight, bump, clip }: WordLetterProps) {
+  const spring = useSpring(weight, { stiffness: 260, damping: 18, mass: 0.5 });
+  const kick = useSpring(bump, { stiffness: 300, damping: 14, mass: 0.5 });
+
+  const y = useTransform([spring, kick], ([w, b]: number[]) => `${-(w * 13 + b * 24)}%`);
+  const scale = useTransform([spring, kick], ([w, b]: number[]) => 1 + w * 0.09 + b * 0.06);
+  const rotate = useTransform(kick, (b) => b * (index % 2 ? -5 : 5));
+  const white = useTransform(spring, (w) => Math.min(1, Math.max(0, (w - 0.35) / 0.55)));
+  const echo1 = useTransform(spring, (w) => w * 0.42);
+  const echo2 = useTransform(spring, (w) => w * 0.2);
+  const echo1Y = useTransform(spring, (w) => `${w * 20}%`);
+  const echo2Y = useTransform(spring, (w) => `${w * 38}%`);
+
+  return (
+    <motion.span
+      className="relative inline-block"
+      initial={{ y: '40%', opacity: 0 }}
+      whileInView={{ y: 0, opacity: 1 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.9, ease: EASE, delay: index * 0.05 }}
+    >
+      <motion.span className="relative inline-block" style={{ y, scale, rotate, transformOrigin: '50% 80%' }}>
+        {/* trailing echoes */}
+        <motion.span aria-hidden className={cn('absolute inset-0', OUTLINE)} style={{ opacity: echo2, y: echo2Y }}>
+          {ch}
+        </motion.span>
+        <motion.span aria-hidden className={cn('absolute inset-0', OUTLINE)} style={{ opacity: echo1, y: echo1Y }}>
+          {ch}
+        </motion.span>
+        {/* base outline */}
+        <span className={OUTLINE}>{ch}</span>
+        {/* scroll-driven green fill */}
+        <motion.span aria-hidden className="absolute inset-0 text-brand-green" style={{ clipPath: clip }}>
+          {ch}
+        </motion.span>
+        {/* hover highlight */}
+        <motion.span aria-hidden className="absolute inset-0 text-foreground" style={{ opacity: white }}>
+          {ch}
+        </motion.span>
+      </motion.span>
+    </motion.span>
+  );
+}
+
+/**
+ * Interactive wordmark. Cursor proximity lifts and scales nearby letters like a dock,
+ * the closest letter flips to white with trailing echoes, a click sends a ripple along
+ * the word, and an idle shimmer passes through every few seconds.
+ */
+function Wordmark({ clip }: { clip: MotionValue<string> }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(wrapRef, { amount: 0.4 });
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const weights = useRef(WORDMARK.map(() => 0)).current;
+  const weightMVs = useMemo(() => WORDMARK.map(() => motionValue(0)), []);
+  const bumpMVs = useMemo(() => WORDMARK.map(() => motionValue(0)), []);
+  const hovering = useRef(false);
+  const reduced = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const ripple = (from: number, amp = 1) => {
+    WORDMARK.forEach((_, i) => {
+      const d = Math.abs(i - from);
+      animate(bumpMVs[i], [0, amp, 0], { duration: 0.9, delay: d * 0.075, ease: 'easeInOut' });
+    });
+  };
+
+  // Idle shimmer: a soft wave rolls from left to right while nobody is hovering.
+  useEffect(() => {
+    if (!inView || reduced.current) return;
+    const id = setInterval(() => {
+      if (!hovering.current) ripple(0, 0.5);
+    }, 5200);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView]);
+
+  const apply = () => weightMVs.forEach((mv, i) => mv.set(weights[i]));
+
+  const onMove = (e: React.PointerEvent) => {
+    if (reduced.current) return;
+    hovering.current = true;
+    const cells = letterRefs.current.map((el) => (el ? el.getBoundingClientRect() : null));
+    const sigma = (cells[0]?.width ?? 100) * 1.25;
+    cells.forEach((r, i) => {
+      if (!r) return;
+      const cx = r.left + r.width / 2;
+      const dx = (e.clientX - cx) / sigma;
+      weights[i] = Math.exp(-dx * dx);
+    });
+    apply();
+  };
+  const onLeave = () => {
+    hovering.current = false;
+    weights.fill(0);
+    apply();
+  };
+  const onClick = (e: React.MouseEvent) => {
+    if (reduced.current) return;
+    let best = 0;
+    let bd = Infinity;
+    letterRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const d = Math.abs(e.clientX - (r.left + r.width / 2));
+      if (d < bd) {
+        bd = d;
+        best = i;
+      }
+    });
+    ripple(best, 1);
+  };
+
+  return (
+    <div
+      ref={wrapRef}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      onClick={onClick}
+      className="relative mx-auto max-w-[110rem] cursor-pointer select-none overflow-hidden px-2 pt-16 md:px-6 md:pt-24"
+      aria-hidden
+    >
+      <p className={cn('flex justify-center', WORD_CLASS)}>
+        {WORDMARK.map((ch, i) => (
+          <span
+            key={`${ch}-${i}`}
+            ref={(el) => {
+              letterRefs.current[i] = el;
+            }}
+            className="inline-block"
+          >
+            <WordLetter ch={ch} index={i} weight={weightMVs[i]} bump={bumpMVs[i]} clip={clip} />
+          </span>
+        ))}
+      </p>
+    </div>
   );
 }
 
@@ -135,35 +289,7 @@ export function TechFooter({ onGetStarted }: TechFooterProps) {
       </section>
 
       {/* Wordmark */}
-      <div className="relative select-none px-2 md:px-6" aria-hidden>
-        <div className="relative mx-auto max-w-[110rem]">
-          <p className="flex justify-center font-display text-[clamp(3.2rem,15.2vw,17rem)] font-extrabold leading-[0.9] tracking-[-0.05em] text-transparent [-webkit-text-stroke:1.5px_hsl(var(--foreground)/0.2)]">
-            {WORDMARK.map((ch, i) => (
-              <motion.span
-                key={`o-${i}`}
-                className="inline-block cursor-default"
-                initial={{ y: '40%', opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.9, ease: EASE, delay: i * 0.05 }}
-                whileHover={{ y: '-6%', transition: { duration: 0.25 } }}
-              >
-                {ch}
-              </motion.span>
-            ))}
-          </p>
-          <motion.p
-            style={{ clipPath: clip }}
-            className="pointer-events-none absolute inset-0 flex justify-center font-display text-[clamp(3.2rem,15.2vw,17rem)] font-extrabold leading-[0.9] tracking-[-0.05em] text-brand-green"
-          >
-            {WORDMARK.map((ch, i) => (
-              <span key={`f-${i}`} className="inline-block">
-                {ch}
-              </span>
-            ))}
-          </motion.p>
-        </div>
-      </div>
+      <Wordmark clip={clip} />
 
       {/* Footer bar */}
       <footer className="relative border-t border-border">
