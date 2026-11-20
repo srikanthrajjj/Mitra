@@ -15,6 +15,8 @@ import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
 import { TechLiveDemo } from '../tech/TechLiveDemo';
+import { GridBackdrop } from './GridBackdrop';
+import { UseCases } from './UseCases';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
 
 interface TechPageV2Props {
@@ -24,7 +26,7 @@ interface TechPageV2Props {
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const SWAP_WORDS = ['ServiceNow', 'Flow Designer', 'Service Catalog', 'Scoped apps'];
+const SWAP_WORDS = ['workflows', 'scoped apps', 'catalog items', 'integrations', 'portals'];
 const CAPABILITIES = ['Scoped apps', 'Flow Designer', 'Catalog items', 'ATF testing', 'Update sets', 'CMDB'];
 const STATEMENT = 'Every ServiceNow build starts with an impossible amount of manual work.';
 
@@ -207,7 +209,7 @@ function StageTabs() {
   return (
     <section id="product" className={cn(COLUMN, 'border-b border-border')}>
       <div className="px-6 py-20 md:px-12 md:py-28">
-        <h2 className="max-w-[560px] font-display text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.0225em]">
+        <h2 className="max-w-[560px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
           Your build team, <span className="text-brand-green">on demand</span>
         </h2>
         <p className="mt-5 max-w-[520px] text-lg leading-snug text-muted-foreground">
@@ -320,6 +322,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           <div className="hidden items-center gap-8 text-[15px] text-muted-foreground md:flex">
             <a href="#demo" className="transition-colors hover:text-foreground">Live demo</a>
             <a href="#product" className="transition-colors hover:text-foreground">Product</a>
+            <a href="#usecases" className="transition-colors hover:text-foreground">Use cases</a>
             <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
             <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
           </div>
@@ -346,41 +349,66 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </header>
 
       {/* Hero */}
-      <section className="relative px-6 pb-16 pt-24 text-center md:pb-24 md:pt-32">
+      <section
+        className="relative overflow-hidden px-6 pb-20 pt-24 text-center md:pb-28 md:pt-36"
+        onPointerMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
+        }}
+      >
+        <GridBackdrop className="pointer-events-none absolute inset-0" />
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[560px]"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[620px]"
           style={{
             background:
-              'radial-gradient(ellipse 60% 70% at 50% 0%, hsl(var(--foreground) / 0.07), transparent 70%)',
+              'radial-gradient(ellipse 55% 60% at 50% 0%, color-mix(in srgb, var(--color-brand-green) 14%, transparent), transparent 70%)',
           }}
           aria-hidden
         />
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE }}
-          className="relative mx-auto max-w-[900px] font-display text-[clamp(2.4rem,5.6vw,4.2rem)] font-medium leading-[1.08] tracking-[-0.0225em]"
+          transition={{ duration: 0.6, ease: EASE }}
+          className="relative mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground backdrop-blur"
         >
-          The agentic platform to build<br /><SwapWord />
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-green" aria-hidden />
+          Agentic delivery for ServiceNow
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.05, ease: EASE }}
+          className="relative mx-auto max-w-[1100px] font-display text-[clamp(2.9rem,8vw,7rem)] font-semibold leading-[0.98] tracking-[-0.04em]"
+        >
+          Ship ServiceNow
+          <br />
+          <SwapWord />
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.08, ease: EASE }}
-          className="relative mx-auto mt-6 max-w-[620px] text-lg leading-snug text-muted-foreground md:text-xl"
+          transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
+          className="relative mx-auto mt-8 max-w-[620px] text-lg leading-snug text-muted-foreground md:text-xl"
         >
-          Multiply what your team can ship with specialised AI agents that define, build, test, document and deploy on
-          your instance, with a human checkpoint at every promotion.
+          Describe what you need. Specialised AI agents define, build, test, document and deploy it on your instance,
+          with a human checkpoint at every promotion.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.16, ease: EASE }}
-          className="relative mt-9"
+          transition={{ duration: 0.7, delay: 0.22, ease: EASE }}
+          className="relative mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
             Get a demo
           </Button>
+          <a
+            href="#usecases"
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-background/60 px-5 text-sm text-foreground backdrop-blur transition-colors hover:bg-accent"
+          >
+            See use cases <ArrowRight className="h-4 w-4" aria-hidden />
+          </a>
         </motion.div>
       </section>
 
@@ -422,17 +450,19 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
 
       <StageTabs />
 
+      <UseCases />
+
       {/* Outcomes */}
       <section id="outcomes" className={cn(COLUMN, 'border-b border-border')}>
         <div className="px-6 py-20 md:px-12 md:py-28">
-          <h2 className="max-w-[640px] font-display text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.0225em]">
+          <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Measured where it matters: speed, cost and accuracy
           </h2>
         </div>
         <div className="grid border-t border-border md:grid-cols-3">
           {TECH_STATS.map((s) => (
             <div key={s.label} className="border-b border-border p-8 last:border-b-0 md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
-              <div className="font-display text-6xl font-medium tracking-[-0.04em] text-brand-green md:text-7xl">
+              <div className="font-display text-[clamp(4.5rem,9vw,8rem)] font-semibold leading-none tracking-[-0.05em] text-brand-green">
                 <CountUp target={s.target} suffix={s.suffix} />
               </div>
               <div className="mt-4 text-lg font-medium">{s.label}</div>
@@ -445,7 +475,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       {/* Governance */}
       <section id="trust" className={cn(COLUMN, 'border-b border-border')}>
         <div className="px-6 py-20 md:px-12 md:py-28">
-          <h2 className="max-w-[640px] font-display text-[clamp(2rem,4vw,3rem)] font-medium leading-[1.08] tracking-[-0.0225em]">
+          <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Engineered for teams with higher standards
           </h2>
         </div>
@@ -477,6 +507,11 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           </Button>
         </div>
       </section>
+      <div className="overflow-hidden border-t border-border" aria-hidden>
+        <div className="select-none text-center font-display text-[clamp(3.5rem,17vw,16rem)] font-semibold leading-[0.85] tracking-[-0.05em] text-foreground/[0.05]">
+          IlluminAIte
+        </div>
+      </div>
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-[1056px] flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
           <IlluminaiteLogo className="h-[22px] w-auto" />
