@@ -19,6 +19,7 @@ import { GridBackdrop } from './GridBackdrop';
 import { UseCases } from './UseCases';
 import { Capabilities } from './Capabilities';
 import { AmbientGlow } from './AmbientGlow';
+import { ScrollTheme } from './ScrollTheme';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
 
 interface TechPageV2Props {
@@ -256,7 +257,7 @@ function Statement() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
   const words = useMemo(() => STATEMENT.split(' '), []);
   return (
-    <section ref={ref} className="relative h-[165vh] border-y border-border">
+    <section ref={ref} id="statement" className="relative h-[165vh] border-y border-border">
       <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden px-6">
         <NetworkField />
         <h2 className="relative max-w-[920px] text-center font-display text-[clamp(2.4rem,6.4vw,5.2rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
@@ -381,6 +382,7 @@ function StageTabs() {
 export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) {
   return (
     <div className="dark min-h-screen overflow-x-clip bg-background font-sans text-foreground antialiased selection:bg-brand-green/25">
+      <ScrollTheme />
       {/* Announcement + nav */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <nav className="mx-auto flex h-14 max-w-[1056px] items-center justify-between px-6">
@@ -419,6 +421,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
 
       {/* Hero */}
       <section
+        id="hero"
         className="relative overflow-hidden px-6 pb-20 pt-24 text-center md:pb-28 md:pt-36"
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
@@ -538,7 +541,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
       </section>
 
       {/* Final CTA + footer */}
-      <section className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
+      <section id="start" className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
         <AmbientGlow intensity={0.9} />
         <h2 className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
           See Illumin<span className="font-sans font-bold">AI</span>te build on your instance
