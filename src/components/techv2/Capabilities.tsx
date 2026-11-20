@@ -1,6 +1,5 @@
-import { useCallback, useRef, useState, type RefObject } from 'react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { SKILLS } from '../../data/skills';
 import { cn } from '@/lib/utils';
 
@@ -110,20 +109,23 @@ const CAPABILITIES: Capability[] = [
 const EASE = [0.22, 1, 0.36, 1] as const;
 const GRID = 'color-mix(in srgb, var(--color-foreground) 7%, transparent)';
 
-function CapabilityCard({ item, index, total, root }: { item: Capability; index: number; total: number; root: RefObject<HTMLDivElement | null> }) {
+function CapabilityCard({ item, index, total }: { item: Capability; index: number; total: number }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  const inView = useInView(ref, { root, amount: 0.6 });
+  const inView = useInView(ref, { amount: 0.6 });
   const show = reduce || inView;
   const shapes = VISUALS[item.id] ?? VISUALS.custom;
 
   return (
-    <article
+    <motion.article
       ref={ref}
-      className="group flex h-[560px] w-[320px] shrink-0 snap-start flex-col border-r border-border bg-background transition-colors duration-300 first:border-l hover:bg-mitra-highlight sm:w-[400px]"
+      initial={false}
+      animate={{ opacity: show ? 1 : 0.35, scale: show ? 1 : 0.95, y: show ? 0 : 18 }}
+      transition={{ duration: 0.7, ease: EASE }}
+      className="group flex h-[clamp(430px,58vh,540px)] w-[300px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors duration-300 hover:border-brand-green/40 hover:bg-mitra-highlight sm:w-[360px]"
     >
       {/* Visual: top 40% */}
-      <div className="relative h-[40%] min-h-[224px] border-b border-border">
+      <div className="relative h-[40%] min-h-[170px] border-b border-border">
         <div
           className="absolute inset-0"
           style={{
@@ -159,7 +161,7 @@ function CapabilityCard({ item, index, total, root }: { item: Capability; index:
       </div>
 
       {/* Copy appears once the drawing has started */}
-      <div className="flex flex-1 flex-col px-8 pb-8 pt-10">
+      <div className="flex flex-1 flex-col px-8 pb-7 pt-8">
         <motion.p
           className="font-mono text-[11px] uppercase tracking-[0.2em] text-brand-green"
           initial={false}
@@ -194,93 +196,69 @@ function CapabilityCard({ item, index, total, root }: { item: Capability; index:
           <span>{String(total).padStart(2, '0')}</span>
         </motion.div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
 export function Capabilities() {
-  const scroller = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const drag = useRef({ down: false, startX: 0, startLeft: 0 });
+  const section = useRef<HTMLElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const [dist, setDist] = useState(0);
 
-  const onScroll = useCallback(() => {
-    const el = scroller.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setProgress(max > 0 ? el.scrollLeft / max : 0);
+  // How far the track has to travel sideways. The section is made exactly that much taller, so
+  // vertical scroll drives the horizontal movement one to one while the content stays pinned.
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (track.current) setDist(Math.max(0, track.current.scrollWidth - window.innerWidth));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (track.current) ro.observe(track.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
   }, []);
 
-  const by = (dir: 1 | -1) => scroller.current?.scrollBy({ left: dir * 360, behavior: 'smooth' });
+  const { scrollYProgress } = useScroll({ target: section, offset: ['start 105px', 'end end'] });
+  const x = useTransform(scrollYProgress, [0, 1], [0, -dist]);
+  const bar = useTransform(scrollYProgress, [0, 1], ['4%', '100%']);
 
   return (
-    <section id="capabilities" className="border-b border-border">
-      <div className="mx-auto flex w-full max-w-[1056px] flex-col justify-between gap-8 border-x border-dashed border-border px-6 py-20 md:flex-row md:items-end md:px-12 md:py-28">
-        <div>
+    <section
+      ref={section}
+      id="capabilities"
+      className="relative border-b border-border"
+      style={{ height: `calc(100vh - 105px + ${dist}px)` }}
+    >
+      <div className="sticky top-[105px] flex h-[calc(100vh-105px)] flex-col justify-center overflow-hidden">
+        <div className="mx-auto w-full max-w-[1056px] px-6 pb-8 md:px-12 md:pb-10">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-brand-green">Skills</p>
-          <h2 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.5rem)] font-semibold leading-[0.98] tracking-[-0.04em]">
+          <h2 className="mt-3 font-display text-[clamp(2.2rem,5.4vw,4.4rem)] font-semibold leading-[0.98] tracking-[-0.04em]">
             Capabilities
           </h2>
-          <p className="mt-5 max-w-[520px] text-lg leading-snug text-muted-foreground">
+          <p className="mt-3 max-w-[520px] text-base leading-snug text-muted-foreground md:text-lg">
             Ready-made skills your agents run at every stage, so the documents, designs and tests never slow the build.
           </p>
         </div>
-        <div className="flex gap-2" role="group" aria-label="Scroll capabilities">
-          <button
-            type="button"
-            onClick={() => by(-1)}
-            disabled={progress < 0.01}
-            aria-label="Previous capabilities"
-            className="grid h-11 w-11 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-accent disabled:opacity-30 disabled:hover:bg-transparent"
+
+        <div className="py-3">
+          <motion.div
+            ref={track}
+            style={{ x }}
+            className="flex w-max gap-6 pl-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] md:gap-10"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={() => by(1)}
-            disabled={progress > 0.99}
-            aria-label="Next capabilities"
-            className="grid h-11 w-11 place-items-center rounded-full border border-border text-foreground transition-colors hover:bg-accent disabled:opacity-30 disabled:hover:bg-transparent"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </button>
+            {CAPABILITIES.map((c, i) => (
+              <CapabilityCard key={c.id} item={c} index={i} total={CAPABILITIES.length} />
+            ))}
+          </motion.div>
         </div>
-      </div>
 
-      <div
-        ref={scroller}
-        onScroll={onScroll}
-        onPointerDown={(e) => {
-          if (e.pointerType !== 'mouse' || !scroller.current) return;
-          drag.current = { down: true, startX: e.clientX, startLeft: scroller.current.scrollLeft };
-          setDragging(true);
-        }}
-        onPointerMove={(e) => {
-          if (!drag.current.down || !scroller.current) return;
-          scroller.current.scrollLeft = drag.current.startLeft - (e.clientX - drag.current.startX);
-        }}
-        onPointerUp={() => {
-          drag.current.down = false;
-          setDragging(false);
-        }}
-        onPointerLeave={() => {
-          drag.current.down = false;
-          setDragging(false);
-        }}
-        className={cn(
-          'flex select-none overflow-x-auto border-t border-border pl-[max(0px,calc((100vw-1056px)/2))] pr-[max(0px,calc((100vw-1056px)/2))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-          dragging ? 'cursor-grabbing' : 'cursor-grab snap-x snap-mandatory',
-        )}
-        style={{ scrollPaddingLeft: 'max(0px, calc((100vw - 1056px) / 2))' }}
-      >
-        {CAPABILITIES.map((c, i) => (
-          <CapabilityCard key={c.id} item={c} index={i} total={CAPABILITIES.length} root={scroller} />
-        ))}
-      </div>
-
-      <div className="mx-auto w-full max-w-[1056px] border-x border-dashed border-border px-6 py-12 md:px-12 md:py-16">
-        <div className="h-px bg-border" aria-hidden>
-          <div className="h-px bg-brand-green transition-[width] duration-150" style={{ width: `${Math.max(progress, 0.04) * 100}%` }} />
+        <div className="mx-auto w-full max-w-[1056px] px-6 pt-6 md:px-12 md:pt-8">
+          <div className="h-px bg-border" aria-hidden>
+            <motion.div className="h-px bg-brand-green" style={{ width: bar }} />
+          </div>
         </div>
       </div>
     </section>

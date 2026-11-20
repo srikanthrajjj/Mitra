@@ -4,14 +4,14 @@ import { motion, useMotionTemplate, useScroll, useSpring, useTransform } from 'm
 /** How strongly each section washes the page with brand green (percent). Hero stays untinted. */
 const SECTION_WASH: Record<string, number> = {
   hero: 0,
-  demo: 9,
-  statement: 4,
-  product: 7,
-  capabilities: 5,
-  usecases: 8,
-  outcomes: 7,
-  trust: 10,
-  start: 8,
+  demo: 3,
+  statement: 2,
+  product: 3,
+  capabilities: 2,
+  usecases: 3,
+  outcomes: 3,
+  trust: 4,
+  start: 3,
 };
 
 const SECTION_IDS = Object.keys(SECTION_WASH);
@@ -46,7 +46,7 @@ export function ScrollTheme() {
   const smooth = useSpring(scrollYProgress, { stiffness: 60, damping: 24, restDelta: 0.001 });
   const lightY = useTransform(smooth, [0, 1], [18, 82]);
   const lightX = useTransform(smooth, [0, 0.5, 1], [28, 72, 38]);
-  const light = useMotionTemplate`radial-gradient(ellipse 70% 55% at ${lightX}% ${lightY}%, color-mix(in srgb, var(--color-brand-green) 13%, transparent), transparent 70%)`;
+  const light = useMotionTemplate`radial-gradient(ellipse 70% 55% at ${lightX}% ${lightY}%, color-mix(in srgb, var(--color-brand-green) 5%, transparent), transparent 70%)`;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-40" aria-hidden>
