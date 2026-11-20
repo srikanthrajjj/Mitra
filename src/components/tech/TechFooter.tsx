@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  animate,
   motion,
-  motionValue,
   useInView,
   useMotionTemplate,
   useMotionValue,
+  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
@@ -16,7 +15,6 @@ import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
 import { TechAgentMesh } from './TechAgentMesh';
-import { TechBotScan } from './TechBotScan';
 import { tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -68,153 +66,129 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 const WORD_CLASS =
   'font-display text-[clamp(3.2rem,15.2vw,17rem)] font-extrabold leading-[0.9] tracking-[-0.05em]';
 const OUTLINE = 'text-transparent [-webkit-text-stroke:1.5px_hsl(var(--foreground)/0.2)]';
+/** The "AI" in IlluminAIte: letters at these positions get the assistant animation. */
+const AI_START = WORDMARK.indexOf('A');
 
-interface WordLetterProps {
-  ch: string;
-  index: number;
-  weight: MotionValue<number>;
-  bump: MotionValue<number>;
-  clip: MotionValue<string>;
+/** One wordmark letter: outline plus the scroll-driven green fill. */
+function Letter({ ch, clip }: { ch: string; clip: MotionValue<string> }) {
+  return (
+    <span className="relative inline-block">
+      <span className={OUTLINE}>{ch}</span>
+      <motion.span aria-hidden className="absolute inset-0 text-brand-green" style={{ clipPath: clip }}>
+        {ch}
+      </motion.span>
+    </span>
+  );
 }
 
-/** One wordmark letter: layered outline, scroll fill, hover highlight and trailing echoes. */
-function WordLetter({ ch, index, weight, bump, clip }: WordLetterProps) {
-  const spring = useSpring(weight, { stiffness: 260, damping: 18, mass: 0.5 });
-  const kick = useSpring(bump, { stiffness: 300, damping: 14, mass: 0.5 });
-
-  const y = useTransform([spring, kick], ([w, b]: number[]) => `${-(w * 13 + b * 24)}%`);
-  const scale = useTransform([spring, kick], ([w, b]: number[]) => 1 + w * 0.09 + b * 0.06);
-  const rotate = useTransform(kick, (b) => b * (index % 2 ? -5 : 5));
-  const white = useTransform(spring, (w) => Math.min(1, Math.max(0, (w - 0.35) / 0.55)));
-  const echo1 = useTransform(spring, (w) => w * 0.42);
-  const echo2 = useTransform(spring, (w) => w * 0.2);
-  const echo1Y = useTransform(spring, (w) => `${w * 20}%`);
-  const echo2Y = useTransform(spring, (w) => `${w * 38}%`);
-
+/** Four-point sparkle, the common "AI assistant" glyph. */
+function Sparkle({ className }: { className?: string }) {
   return (
-    <motion.span
-      className="relative inline-block"
-      initial={{ y: '40%', opacity: 0 }}
-      whileInView={{ y: 0, opacity: 1 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.9, ease: EASE, delay: index * 0.05 }}
-    >
-      <motion.span className="relative inline-block" style={{ y, scale, rotate, transformOrigin: '50% 80%' }}>
-        {/* trailing echoes */}
-        <motion.span aria-hidden className={cn('absolute inset-0', OUTLINE)} style={{ opacity: echo2, y: echo2Y }}>
-          {ch}
-        </motion.span>
-        <motion.span aria-hidden className={cn('absolute inset-0', OUTLINE)} style={{ opacity: echo1, y: echo1Y }}>
-          {ch}
-        </motion.span>
-        {/* base outline */}
-        <span className={OUTLINE}>{ch}</span>
-        {/* scroll-driven green fill */}
-        <motion.span aria-hidden className="absolute inset-0 text-brand-green" style={{ clipPath: clip }}>
-          {ch}
-        </motion.span>
-        {/* hover highlight */}
-        <motion.span aria-hidden className="absolute inset-0 text-foreground" style={{ opacity: white }}>
-          {ch}
-        </motion.span>
-      </motion.span>
-    </motion.span>
+    <svg viewBox="0 0 100 100" className={className} aria-hidden>
+      <path d="M50 0C54 30 70 46 100 50C70 54 54 70 50 100C46 70 30 54 0 50C30 46 46 30 50 0Z" />
+    </svg>
   );
 }
 
 /**
- * Interactive wordmark. Cursor proximity lifts and scales nearby letters like a dock,
- * the closest letter flips to white with trailing echoes, a click sends a ripple along
- * the word, and an idle shimmer passes through every few seconds.
+ * The "AI" pair. Every few seconds, and whenever you hover it, the two letters morph into an
+ * assistant sparkle (they shrink and blur away as the sparkle grows in), hold briefly, then
+ * morph back. The rest of the wordmark stays still.
  */
-function Wordmark({ clip }: { clip: MotionValue<string> }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(wrapRef, { amount: 0.4 });
-  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const weights = useRef(WORDMARK.map(() => 0)).current;
-  const weightMVs = useMemo(() => WORDMARK.map(() => motionValue(0)), []);
-  const bumpMVs = useMemo(() => WORDMARK.map(() => motionValue(0)), []);
-  const hovering = useRef(false);
-  const reduced = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+function AssistantPair({ letters, clip }: { letters: string[]; clip: MotionValue<string> }) {
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { amount: 0.5 });
+  const [auto, setAuto] = useState(false);
+  const [hover, setHover] = useState(false);
+  const on = auto || hover;
 
-  const ripple = (from: number, amp = 1) => {
-    WORDMARK.forEach((_, i) => {
-      const d = Math.abs(i - from);
-      animate(bumpMVs[i], [0, amp, 0], { duration: 0.9, delay: d * 0.075, ease: 'easeInOut' });
-    });
-  };
-
-  // Idle shimmer: a soft wave rolls from left to right while nobody is hovering.
   useEffect(() => {
-    if (!inView || reduced.current) return;
-    const id = setInterval(() => {
-      if (!hovering.current) ripple(0, 0.5);
-    }, 5200);
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+    if (!inView || reduced) return;
+    let hide: ReturnType<typeof setTimeout> | undefined;
+    const cycle = () => {
+      setAuto(true);
+      hide = setTimeout(() => setAuto(false), 2200);
+    };
+    const first = setTimeout(cycle, 1600);
+    const every = setInterval(cycle, 7000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(every);
+      if (hide) clearTimeout(hide);
+    };
+  }, [inView, reduced]);
 
-  const apply = () => weightMVs.forEach((mv, i) => mv.set(weights[i]));
-
-  const onMove = (e: React.PointerEvent) => {
-    if (reduced.current) return;
-    hovering.current = true;
-    const cells = letterRefs.current.map((el) => (el ? el.getBoundingClientRect() : null));
-    const sigma = (cells[0]?.width ?? 100) * 1.25;
-    cells.forEach((r, i) => {
-      if (!r) return;
-      const cx = r.left + r.width / 2;
-      const dx = (e.clientX - cx) / sigma;
-      weights[i] = Math.exp(-dx * dx);
-    });
-    apply();
-  };
-  const onLeave = () => {
-    hovering.current = false;
-    weights.fill(0);
-    apply();
-  };
-  const onClick = (e: React.MouseEvent) => {
-    if (reduced.current) return;
-    let best = 0;
-    let bd = Infinity;
-    letterRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const d = Math.abs(e.clientX - (r.left + r.width / 2));
-      if (d < bd) {
-        bd = d;
-        best = i;
-      }
-    });
-    ripple(best, 1);
-  };
+  const t = { duration: reduced ? 0 : 0.65, ease: EASE };
 
   return (
-    <div
-      ref={wrapRef}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-      onClick={onClick}
-      className="relative mx-auto max-w-[110rem] cursor-pointer select-none overflow-hidden px-2 pt-16 md:px-6 md:pt-24"
+    <span
+      ref={ref}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
+      className="relative inline-flex cursor-pointer"
       aria-hidden
     >
-      <div className="relative">
-        <p className={cn('flex justify-center', WORD_CLASS)}>
-          {WORDMARK.map((ch, i) => (
-            <span
-              key={`${ch}-${i}`}
-              ref={(el) => {
-                letterRefs.current[i] = el;
-              }}
-              className="inline-block"
-            >
-              <WordLetter ch={ch} index={i} weight={weightMVs[i]} bump={bumpMVs[i]} clip={clip} />
-            </span>
-          ))}
-        </p>
-        <TechBotScan wordClass={WORD_CLASS} run={inView} hovering={hovering} />
-      </div>
+      <motion.span
+        className="inline-flex"
+        style={{ transformOrigin: '50% 62%' }}
+        animate={on ? { opacity: 0, scale: 0.5, filter: 'blur(12px)' } : { opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={t}
+      >
+        {letters.map((ch, i) => (
+          <Letter key={`${ch}-${i}`} ch={ch} clip={clip} />
+        ))}
+      </motion.span>
+
+      <motion.span
+        className="pointer-events-none absolute inset-0 flex items-center justify-center"
+        style={{ transformOrigin: '50% 62%' }}
+        initial={false}
+        animate={on ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.35, rotate: -70 }}
+        transition={t}
+      >
+        <span className="relative block h-[0.82em] w-[0.82em] tech-spark">
+          <Sparkle className="absolute inset-0 h-full w-full fill-brand-green" />
+          <Sparkle className="tech-twinkle absolute -right-[0.1em] -top-[0.06em] h-[0.26em] w-[0.26em] fill-brand-green" />
+          <Sparkle className="tech-twinkle-2 absolute -bottom-[0.02em] -left-[0.12em] h-[0.2em] w-[0.2em] fill-brand-green" />
+        </span>
+      </motion.span>
+
+      <style>{`
+        .tech-spark { animation: tech-spark 1.6s ease-in-out infinite; }
+        @keyframes tech-spark { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+        .tech-twinkle { animation: tech-twinkle 1.1s ease-in-out infinite; }
+        .tech-twinkle-2 { animation: tech-twinkle 1.1s ease-in-out 0.45s infinite; }
+        @keyframes tech-twinkle { 0%,100% { opacity: 0.2; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
+        @media (prefers-reduced-motion: reduce) { .tech-spark, .tech-twinkle, .tech-twinkle-2 { animation: none; } }
+      `}</style>
+    </span>
+  );
+}
+
+/** Large outlined wordmark that fills with green on scroll; only the "AI" animates. */
+function Wordmark({ clip }: { clip: MotionValue<string> }) {
+  const before = WORDMARK.slice(0, AI_START);
+  const pair = WORDMARK.slice(AI_START, AI_START + 2);
+  const after = WORDMARK.slice(AI_START + 2);
+
+  return (
+    <div className="relative mx-auto max-w-[110rem] select-none overflow-hidden px-2 pt-16 md:px-6 md:pt-24" aria-hidden>
+      <motion.p
+        className={cn('flex justify-center', WORD_CLASS)}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.9, ease: EASE }}
+      >
+        {before.map((ch, i) => (
+          <Letter key={`b-${i}`} ch={ch} clip={clip} />
+        ))}
+        <AssistantPair letters={pair} clip={clip} />
+        {after.map((ch, i) => (
+          <Letter key={`a-${i}`} ch={ch} clip={clip} />
+        ))}
+      </motion.p>
     </div>
   );
 }
