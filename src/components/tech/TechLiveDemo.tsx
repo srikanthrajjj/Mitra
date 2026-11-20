@@ -185,6 +185,7 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
 
   const phase = phaseFor(done, artifacts);
   const typing = typed > 0 && !sent;
+  const overall = Math.round(((done / TODOS.length) * 0.6 + (artifacts / ARTIFACTS.length) * 0.4) * 100);
 
   return (
     <div
@@ -206,7 +207,7 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center gap-3 border-b border-border px-5 py-2.5"
+              className="relative flex items-center gap-3 border-b border-border px-5 py-2.5"
             >
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green opacity-60" />
@@ -216,6 +217,24 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
               <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-brand-green">
                 {artifacts >= ARTIFACTS.length ? 'Ready for review' : 'Building'}
               </span>
+              {bold && (
+                <>
+                  <span className="ml-1 flex h-3.5 items-end gap-[3px]" aria-hidden>
+                    {[0, 1, 2, 3].map((b) => (
+                      <motion.span
+                        key={b}
+                        className="w-[3px] rounded-full bg-brand-green"
+                        animate={artifacts >= ARTIFACTS.length ? { height: '30%' } : { height: ['25%', '100%', '40%', '85%', '25%'] }}
+                        transition={{ duration: 1.1, repeat: Infinity, delay: b * 0.14, ease: 'easeInOut' }}
+                      />
+                    ))}
+                  </span>
+                  <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground">{overall}%</span>
+                  <span className="absolute inset-x-0 bottom-0 h-px bg-border" aria-hidden>
+                    <span className="block h-full bg-brand-green transition-[width] duration-700 ease-out" style={{ width: `${overall}%` }} />
+                  </span>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -271,10 +290,22 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-2 text-[15px] text-muted-foreground"
+                  className={bold ? 'space-y-3 text-[15px] text-muted-foreground' : 'flex items-center gap-2 text-[15px] text-muted-foreground'}
                 >
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-green" />
-                  IlluminAIte is thinking…
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-brand-green" />
+                    {bold ? 'Reading your scope…' : 'IlluminAIte is thinking…'}
+                  </span>
+                  {bold &&
+                    [86, 68, 48].map((w, i) => (
+                      <span key={w} className="relative block h-2.5 overflow-hidden rounded-full bg-muted" style={{ width: `${w}%` }}>
+                        <motion.span
+                          className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-brand-green/30 to-transparent"
+                          animate={{ x: ['-120%', '320%'] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.22, ease: 'linear' }}
+                        />
+                      </span>
+                    ))}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -312,13 +343,25 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
                           {isDone && <Check className="h-2.5 w-2.5" strokeWidth={3.5} />}
                           {isActive && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />}
                         </span>
-                        <span
-                          className={cn(
-                            'transition-colors duration-300',
-                            isDone ? 'text-muted-foreground line-through' : 'text-foreground',
+                        <span className="min-w-0 flex-1">
+                          <span
+                            className={cn(
+                              'transition-colors duration-300',
+                              isDone ? 'text-muted-foreground line-through' : 'text-foreground',
+                            )}
+                          >
+                            {t}
+                          </span>
+                          {bold && isActive && (
+                            <span className="mt-1.5 block h-0.5 overflow-hidden rounded-full bg-border">
+                              <motion.span
+                                className="block h-full bg-brand-green"
+                                initial={{ width: '0%' }}
+                                animate={{ width: '100%' }}
+                                transition={{ duration: 0.85, ease: 'linear' }}
+                              />
+                            </span>
                           )}
-                        >
-                          {t}
                         </span>
                       </motion.li>
                     );
@@ -369,10 +412,20 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
           {TECH_STAGES.map((s, i) => {
             const state = !sent ? 'idle' : i < phase ? 'done' : i === phase ? 'running' : 'idle';
             return (
-              <li key={s.num} className="flex items-start gap-2.5">
+              <li key={s.num} className="relative flex items-start gap-2.5">
+                {bold && i < TECH_STAGES.length - 1 && (
+                  <span className="absolute -bottom-3.5 left-[7.5px] top-5 w-px bg-border" aria-hidden>
+                    <motion.span
+                      className="block w-full origin-top bg-brand-green"
+                      initial={false}
+                      animate={{ height: state === 'done' ? '100%' : '0%' }}
+                      transition={{ duration: 0.7, ease: 'easeOut' }}
+                    />
+                  </span>
+                )}
                 <span
                   className={cn(
-                    'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-300',
+                    'relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-300',
                     state === 'done' && 'border-brand-green bg-brand-green text-background',
                     state === 'running' && 'border-brand-green',
                     state === 'idle' && 'border-border',
@@ -380,6 +433,9 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
                 >
                   {state === 'done' && <Check className="h-2.5 w-2.5" strokeWidth={3.5} />}
                   {state === 'running' && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />}
+                  {bold && state === 'running' && (
+                    <span className="absolute -inset-1 animate-ping rounded-full border border-brand-green/50" aria-hidden />
+                  )}
                 </span>
                 <div className="min-w-0">
                   <div
@@ -398,7 +454,10 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
         </ol>
 
         <div className="border-t border-border pt-4">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Artifacts</p>
+          <p className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            <span>Artifacts</span>
+            {bold && sent && <span className="tabular-nums">{artifacts}/{ARTIFACTS.length}</span>}
+          </p>
           <ul className="mt-3 space-y-1.5">
             <AnimatePresence>
               {ARTIFACTS.slice(0, artifacts).map((a) => (
@@ -407,9 +466,18 @@ export function TechLiveDemo({ variant = 'classic' }: { variant?: 'classic' | 'b
                   initial={{ opacity: 0, x: 12, scale: 0.97 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ duration: 0.35 }}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5"
+                  className="relative flex items-center justify-between gap-2 overflow-hidden rounded-lg border border-border bg-card px-2.5 py-1.5"
                 >
-                  <span className="truncate text-[13px] font-medium">{a.name}</span>
+                  {bold && (
+                    <motion.span
+                      className="pointer-events-none absolute inset-0 bg-brand-green/25"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 0 }}
+                      transition={{ duration: 1.1, ease: 'easeOut' }}
+                      aria-hidden
+                    />
+                  )}
+                  <span className="relative truncate text-[13px] font-medium">{a.name}</span>
                   <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-brand-green">
                     {a.type}
                   </span>

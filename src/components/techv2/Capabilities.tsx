@@ -32,8 +32,7 @@ const box = (x: number, y: number, w: number, h: number, r = 7) =>
 
 /**
  * Line-art for each skill, drawn on a 64 x 64 grid with about 6 units of margin and rendered
- * at exactly 64 x 64 px, so every icon has the same footprint and strokes stay one-to-one with
- * the screen (no scaling, no blur). Accent strokes are a touch brighter.
+ * at exactly 200 x 200 px (a 1:1 square), so every icon has the same footprint. Accent strokes are a touch brighter.
  */
 const VISUALS: Record<string, Shape[]> = {
   'create-user-story': [
@@ -87,6 +86,61 @@ const VISUALS: Record<string, Shape[]> = {
     { d: 'M32 6l22 8v14c0 14-9 22-22 28C19 50 10 42 10 28V14z' },
     { d: 'M32 24v14M32 46v.5', accent: true },
   ],
+  'data-model-design': [
+    { d: box(6, 10, 20, 14, 3) + box(38, 10, 20, 14, 3) },
+    { d: box(22, 42, 20, 14, 3), accent: true },
+    { d: 'M26 17h12M16 24l12 18M48 24L36 42' },
+  ],
+  'integration-mapping': [
+    { d: box(4, 22, 16, 20, 4) + box(44, 22, 16, 20, 4) },
+    { d: 'M20 27h24M38 21l6 6-6 6', accent: true },
+    { d: 'M44 38H20M26 32l-6 6 6 6' },
+  ],
+  'access-control-design': [
+    { d: box(14, 28, 36, 28, 5) },
+    { d: 'M22 28v-6a10 10 0 0 1 20 0v6' },
+    { d: 'M32 39a3 3 0 1 0 .01 0M32 43v6', accent: true },
+  ],
+  'flow-designer-build': [
+    { d: 'M10 32a4 4 0 1 0 .01 0' + box(46, 26, 12, 12, 3) },
+    { d: box(26, 26, 12, 12, 3), accent: true },
+    { d: 'M18 32h8M38 32h8M32 38v10q0 4 4 4h14' },
+  ],
+  'business-rule-scripts': [
+    { d: 'M24 10c-8 0-8 6-8 10s0 8-6 12c6 4 6 8 6 12s0 10 8 10M40 10c8 0 8 6 8 10s0 8 6 12c-6 4-6 8-6 12s0 10-8 10' },
+    { d: 'M28 32h8', accent: true },
+  ],
+  'catalog-item-builder': [
+    { d: box(8, 8, 22, 22, 4) + box(34, 8, 22, 22, 4) + box(8, 34, 22, 22, 4) },
+    { d: box(34, 34, 22, 22, 4), accent: true },
+    { d: 'M40 45h10' },
+  ],
+  'code-review': [
+    { d: 'M10 18h20M10 28h32M10 38h24M10 48h28' },
+    { d: 'M42 46l5 5 11-12', accent: true },
+  ],
+  'training-guide': [
+    { d: 'M32 14c-6-4-16-4-24-2v36c8-2 18-2 24 2 6-4 16-4 24-2V12c-8-2-18-2-24 2z' },
+    { d: 'M32 14v36', accent: true },
+  ],
+  'runbook-writer': [
+    { d: 'M12 13a3 3 0 1 0 .01 0M12 29a3 3 0 1 0 .01 0M12 45a3 3 0 1 0 .01 0' },
+    { d: 'M22 16h32M22 32h26M22 48h30' },
+    { d: 'M12 19v10M12 35v10', accent: true },
+  ],
+  'regression-planner': [
+    { d: 'M50 28a18 18 0 1 0-4 14' },
+    { d: 'M52 14v14H38', accent: true },
+  ],
+  'performance-review': [
+    { d: 'M8 8v48h48' },
+    { d: 'M14 44l10-12 10 8 14-22', accent: true },
+  ],
+  'data-migration-check': [
+    { d: box(6, 14, 16, 10, 4) + box(6, 28, 16, 10, 4) + box(6, 42, 16, 10, 4) },
+    { d: box(42, 14, 16, 10, 4) + box(42, 28, 16, 10, 4) + box(42, 42, 16, 10, 4) },
+    { d: 'M26 32h12M34 26l6 6-6 6', accent: true },
+  ],
   custom: [
     { d: box(10, 10, 44, 44, 8) },
     { d: 'M32 22v20M22 32h20', accent: true },
@@ -100,8 +154,25 @@ interface Capability {
   label: string;
 }
 
+/** Skills that are not in the app's library yet. Shown with a "Soon" tag so the page stays honest. */
+const UPCOMING: Capability[] = [
+  { id: 'data-model-design', title: 'Data Model Design', description: 'Model tables, extensions and relationships before the build starts.', label: 'Design · Soon' },
+  { id: 'integration-mapping', title: 'Integration Mapping', description: 'Map data flows between ServiceNow and the systems around it.', label: 'Design · Soon' },
+  { id: 'access-control-design', title: 'Access Control Design', description: 'Plan roles, ACLs and permissions for every persona.', label: 'Design · Soon' },
+  { id: 'flow-designer-build', title: 'Flow Designer Build', description: 'Draft flows, subflows and actions from a plain description.', label: 'Development · Soon' },
+  { id: 'business-rule-scripts', title: 'Business Rule Scripts', description: 'Generate server-side scripts and business rules with tests.', label: 'Development · Soon' },
+  { id: 'catalog-item-builder', title: 'Catalog Item Builder', description: 'Define catalog items, variables and fulfilment in one pass.', label: 'Development · Soon' },
+  { id: 'code-review', title: 'Code Review', description: 'Review scripts against ServiceNow best practice before promotion.', label: 'Development · Soon' },
+  { id: 'training-guide', title: 'Training Guide', description: 'Turn a finished build into material end users can learn from.', label: 'Documentation · Soon' },
+  { id: 'runbook-writer', title: 'Runbook Writer', description: 'Write operations runbooks and support notes for the new app.', label: 'Documentation · Soon' },
+  { id: 'regression-planner', title: 'Regression Planner', description: 'Plan regression packs so upgrades do not break what works.', label: 'Testing · Soon' },
+  { id: 'performance-review', title: 'Performance Review', description: 'Spot slow queries and heavy scripts before users do.', label: 'Testing · Soon' },
+  { id: 'data-migration-check', title: 'Data Migration Check', description: 'Validate migrated records against the source system.', label: 'Testing · Soon' },
+];
+
 const CAPABILITIES: Capability[] = [
   ...SKILLS.map((s) => ({ id: s.id, title: s.name, description: s.description, label: s.category })),
+  ...UPCOMING,
   {
     id: 'custom',
     title: 'Build your own skill',
@@ -124,12 +195,12 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
     <motion.article
       ref={ref}
       initial={false}
-      animate={{ opacity: show ? 1 : 0.35, y: show ? 0 : 18 }}
+      animate={{ y: show ? 0 : 18 }}
       transition={{ duration: 0.7, ease: EASE }}
-      className="group flex h-[clamp(470px,60vh,560px)] w-[300px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors duration-300 hover:border-brand-green/40 hover:bg-mitra-highlight sm:w-[360px]"
+      className="group flex h-[clamp(500px,60vh,540px)] w-[300px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-mitra-surface transition-colors duration-300 hover:border-brand-green/40 sm:w-[360px]"
     >
       {/* Visual: top 40% */}
-      <div className="relative h-[42%] min-h-[200px] border-b border-border">
+      <div className="relative h-[260px] shrink-0 border-b border-border">
         <div
           className="absolute inset-0"
           style={{
@@ -141,7 +212,7 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
           aria-hidden
         />
         <div className="relative flex h-full items-center justify-center">
-          <svg width="64" height="64" viewBox="0 0 64 64" className="h-16 w-16 shrink-0" shapeRendering="geometricPrecision" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <svg width="200" height="200" viewBox="0 0 64 64" className="h-[200px] w-[200px] shrink-0" shapeRendering="geometricPrecision" fill="none" strokeWidth="0.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <defs>
               <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="64" y2="64">
                 <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
@@ -245,6 +316,8 @@ export function Capabilities() {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const [dist, setDist] = useState(0);
+  // Sideways travel per pixel of page scroll. More than 1 so a long deck doesn't take forever.
+  const SPEED = 1.7;
   const [layout, setLayout] = useState<{ bases: number[]; step: number; pad: number }>({ bases: [], step: 380, pad: 24 });
 
   // How far the track has to travel sideways. The section is made exactly that much taller, so
@@ -279,7 +352,7 @@ export function Capabilities() {
       ref={section}
       id="capabilities"
       className="relative border-b border-border"
-      style={{ height: `calc(100vh - 105px + ${dist}px)` }}
+      style={{ height: `calc(100vh - 105px + ${dist / SPEED}px)` }}
     >
       <div className="sticky top-[105px] flex h-[calc(100vh-105px)] flex-col justify-center overflow-hidden">
         <div className="mx-auto w-full max-w-[1056px] px-6 pb-8 md:px-12 md:pb-10">
@@ -287,7 +360,7 @@ export function Capabilities() {
           <h2 className="mt-3 font-display text-[clamp(2.2rem,5.4vw,4.4rem)] font-semibold leading-[0.98] tracking-[-0.04em]">
             Capabilities
           </h2>
-          <p className="mt-3 max-w-[520px] text-base leading-snug text-muted-foreground md:text-lg">
+          <p className="mt-3 max-w-[520px] text-base leading-snug text-muted-foreground md:text-lg [@media(max-height:820px)]:hidden">
             Ready-made skills your agents run at every stage, so the documents, designs and tests never slow the build.
           </p>
         </div>
@@ -296,7 +369,7 @@ export function Capabilities() {
           <motion.div
             ref={track}
             style={{ x: xPx }}
-            className="flex w-max gap-6 pl-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] md:gap-10"
+            className="flex w-max gap-3 pl-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] md:gap-5"
           >
             {CAPABILITIES.map((c, i) => (
               <StackItem key={c.id} index={i} base={layout.bases[i] ?? i * layout.step} step={layout.step} pad={layout.pad} x={xPx}>
