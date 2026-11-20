@@ -206,7 +206,7 @@ function DemoStage({ children }: { children: ReactNode }) {
           opacity: light,
           scale: bloomScale,
           background:
-            'radial-gradient(ellipse 48% 50% at 50% 40%, color-mix(in srgb, var(--color-brand-green) 38%, transparent), color-mix(in srgb, var(--color-brand-green) 12%, transparent) 42%, transparent 72%)',
+            'radial-gradient(ellipse 48% 50% at 50% 40%, color-mix(in srgb, var(--color-brand-green) 18%, transparent), color-mix(in srgb, var(--color-brand-green) 6%, transparent) 42%, transparent 72%)',
         }}
         aria-hidden
       />
@@ -225,11 +225,11 @@ function DemoStage({ children }: { children: ReactNode }) {
           }}
         />
         <motion.div
-          className="absolute left-[6%] top-[8%] h-[420px] w-[420px] rounded-full bg-brand-green/25 blur-[110px]"
+          className="absolute left-[6%] top-[8%] h-[420px] w-[420px] rounded-full bg-brand-green/12 blur-[110px]"
           {...drift(90, 50, 14)}
         />
         <motion.div
-          className="absolute bottom-[6%] right-[4%] h-[480px] w-[480px] rounded-full bg-brand-green/20 blur-[130px]"
+          className="absolute bottom-[6%] right-[4%] h-[480px] w-[480px] rounded-full bg-brand-green/10 blur-[130px]"
           {...drift(-80, -60, 18)}
         />
       </motion.div>
@@ -499,7 +499,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
 
       {/* Outcomes */}
       <section id="outcomes" className={cn(COLUMN, 'relative border-b border-border')}>
-        <AmbientGlow intensity={0.55} />
+        <AmbientGlow intensity={0.3} />
         <div className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Measured where it matters: speed, cost and accuracy
@@ -520,7 +520,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
 
       {/* Governance */}
       <section id="trust" className={cn(COLUMN, 'relative border-b border-border')}>
-        <AmbientGlow intensity={0.55} />
+        <AmbientGlow intensity={0.3} />
         <div className="px-6 py-20 md:px-12 md:py-28">
           <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
             Engineered for teams with higher standards
@@ -542,7 +542,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
 
       {/* Final CTA + footer */}
       <section id="start" className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
-        <AmbientGlow intensity={0.9} />
+        <AmbientGlow intensity={0.5} />
         <h2 className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
           See Illumin<span className="font-sans font-bold">AI</span>te build on your instance
         </h2>

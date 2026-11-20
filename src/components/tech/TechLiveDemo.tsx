@@ -35,105 +35,52 @@ const START_OPTIONS = [
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Big welcome: each word rises out of a blur, one after another. */
-function KineticWords({ text, className }: { text: string; className?: string }) {
-  return (
-    <span className={className}>
-      {text.split(' ').map((w, i) => (
-        <motion.span
-          key={`${w}-${i}`}
-          className="mr-[0.22em] inline-block"
-          initial={{ opacity: 0, y: 46, filter: 'blur(14px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.9, delay: i * 0.16, ease: EASE }}
-        >
-          {w}
-        </motion.span>
-      ))}
-    </span>
-  );
-}
-
 /**
- * Bold idle state: a welcome in huge type, then the prompt typed straight onto the stage in
- * display type, one character at a time, with a light that tracks along an underline that draws
- * itself. No input box: the text is the interface.
+ * Bold-variant idle state, kept quiet: a short welcome that fades in, then the prompt typed
+ * plainly onto the stage with a thin progress line. No input box, no suggestion cards.
  */
 function BoldIdle({ greeting, typed }: { greeting: boolean; typed: number }) {
   const progress = Math.min(typed / PROMPT.length, 1);
   return (
     <div className="relative z-0 flex flex-1 items-center justify-center overflow-hidden px-6 text-center md:px-14">
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green blur-[120px] transition-opacity duration-700"
-        style={{ opacity: greeting ? 0.18 : 0.08 + progress * 0.22 }}
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green blur-[140px] transition-opacity duration-1000"
+        style={{ opacity: 0.04 + progress * 0.05 }}
         aria-hidden
       />
       <AnimatePresence mode="wait">
         {greeting ? (
           <motion.div
             key="welcome"
-            exit={{ opacity: 0, y: -34, filter: 'blur(12px)' }}
-            transition={{ duration: 0.55, ease: EASE }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: EASE }}
             className="relative"
           >
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="mb-5 font-mono text-xs uppercase tracking-[0.3em] text-brand-green"
-            >
-              Hello
-            </motion.p>
-            <h3 className="font-display text-[clamp(2.6rem,7.4vw,6rem)] font-semibold leading-[0.98] tracking-[-0.045em]">
-              <KineticWords text="Welcome to" />
-              <br />
-              <motion.span
-                className="inline-block text-brand-green"
-                initial={{ opacity: 0, y: 46, filter: 'blur(14px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                transition={{ duration: 0.9, delay: 0.32, ease: EASE }}
-                aria-label="IlluminAIte."
-              >
-                Illumin<span className="font-sans font-bold">AI</span>te.
-              </motion.span>
+            <h3 className="font-display text-[clamp(1.9rem,3.8vw,3rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
+              Welcome to Illumin<span className="font-sans font-bold">AI</span>te
             </h3>
+            <p className="mx-auto mt-3 max-w-md text-base leading-snug text-muted-foreground">
+              Describe what you want to build, and your agents take it from there.
+            </p>
           </motion.div>
         ) : (
           <motion.div
             key="input"
-            initial={{ opacity: 0, y: 26 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -48, filter: 'blur(10px)' }}
-            transition={{ duration: 0.6, ease: EASE }}
-            className="relative w-full max-w-[44rem]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="relative w-full max-w-[40rem]"
           >
-            <p className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              What will you build?
+            <p className="mb-5 text-left text-sm text-muted-foreground">What would you like to build?</p>
+            <p className="min-h-[7rem] text-left font-display text-[clamp(1.25rem,2.3vw,1.85rem)] font-medium leading-[1.3] tracking-[-0.015em] md:min-h-[8rem]">
+              {PROMPT.slice(0, typed)}
+              <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[0.15em] animate-pulse bg-brand-green" />
             </p>
-            <p className="min-h-[9.5rem] text-left font-display text-[clamp(1.7rem,3.3vw,2.75rem)] font-semibold leading-[1.12] tracking-[-0.03em] md:min-h-[11rem]">
-              {PROMPT.slice(0, typed)
-                .split('')
-                .map((ch, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.28 }}
-                  >
-                    {ch}
-                  </motion.span>
-                ))}
-              <span className="ml-1 inline-block h-[0.95em] w-[3px] translate-y-[0.14em] animate-pulse rounded-full bg-brand-green" />
-            </p>
-            <div className="relative mt-5 h-px w-full bg-border" aria-hidden>
-              <motion.div
-                className="absolute inset-y-0 left-0 origin-left bg-brand-green"
-                style={{ width: `${progress * 100}%` }}
-              />
-              <motion.span
-                className="absolute -top-[5px] h-[11px] w-[11px] -translate-x-1/2 rounded-full bg-brand-green blur-[5px]"
-                style={{ left: `${progress * 100}%` }}
-              />
+            <div className="relative mt-4 h-px w-full bg-border" aria-hidden>
+              <div className="absolute inset-y-0 left-0 bg-brand-green/70" style={{ width: `${progress * 100}%` }} />
             </div>
           </motion.div>
         )}
