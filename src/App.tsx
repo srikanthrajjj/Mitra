@@ -26,7 +26,8 @@ import NewSolutionModal from './components/NewSolutionModal';
 import ApiKeyModal from './components/ApiKeyModal';
 import OnboardingTour from './components/OnboardingTour';
 import { TechPage } from './components/tech/TechPage';
-import { isTechPath } from './utils/techRoute';
+import { TechPageV2 } from './components/techv2/TechPageV2';
+import { isTechPath, isTechV2Path } from './utils/techRoute';
 import AlertDialog from './components/AlertDialog';
 import SimulationAlertModal from './components/SimulationAlertModal';
 import { enrichBlueprintStudio } from './utils/studioHelpers';
@@ -2559,6 +2560,15 @@ Pick a step below and I'll continue building — data model, scripts, and update
 
   if (isAuditPath && !guestReviewId) {
     return <UiIssueTracker />;
+  }
+
+  if (isTechV2Path(window.location.pathname) && !showSignup && !guestReviewId) {
+    return (
+      <TechPageV2
+        onGetStarted={openSignup}
+        onSignIn={() => enterWorkspace('signed-in')}
+      />
+    );
   }
 
   if (isTechPath(window.location.pathname) && !showSignup && !guestReviewId) {

@@ -10,3 +10,10 @@ export function isTechPath(pathname: string): boolean {
   if (TECH_SEGMENTS.has(normalized.replace(/^\//, ''))) return true;
   return [...TECH_SEGMENTS].some((segment) => normalized.endsWith(`/${segment}`));
 }
+
+const TECH_V2_SEGMENTS = new Set(['v2', 'tech-v2', 'technology-v2']);
+
+export function isTechV2Path(pathname: string): boolean {
+  const normalized = normalizePathname(pathname).replace(/^\//, '');
+  return TECH_V2_SEGMENTS.has(normalized);
+}
