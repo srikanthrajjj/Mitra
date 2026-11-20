@@ -19,6 +19,7 @@ import { GridBackdrop } from './GridBackdrop';
 import { UseCases } from './UseCases';
 import { Capabilities } from './Capabilities';
 import { AmbientGlow } from './AmbientGlow';
+import { FinalCta, FooterV2, GovernanceFlow } from './Finale';
 import { ScrollTheme } from './ScrollTheme';
 import { useScrollReveal, useSmoothScrollV2 } from './useSmoothScrollV2';
 import { TECH_PILLARS, TECH_STAGES, TECH_STATS } from '../tech/techData';
@@ -199,6 +200,11 @@ function DemoStage({ children }: { children: ReactNode }) {
   const light = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const bloomScale = useTransform(scrollYProgress, [0, 1], [0.55, 1.05]);
   const ambient = useTransform(scrollYProgress, [0, 1], [0.15, 1]);
+  // The window starts tipped back in perspective and levels out as it arrives.
+  const settle = useSpring(scrollYProgress, { stiffness: 90, damping: 26, mass: 0.6 });
+  const tilt = useTransform(settle, [0, 1], reduce ? [0, 0] : [16, 0]);
+  const lift = useTransform(settle, [0, 1], reduce ? [0, 0] : [70, 0]);
+  const shrink = useTransform(settle, [0, 1], reduce ? [1, 1] : [0.92, 1]);
   return (
     <div ref={ref} className="relative mx-auto max-w-[1310px]">
       <motion.div
@@ -207,7 +213,7 @@ function DemoStage({ children }: { children: ReactNode }) {
           opacity: light,
           scale: bloomScale,
           background:
-            'radial-gradient(ellipse 48% 50% at 50% 40%, color-mix(in srgb, var(--color-brand-green) 18%, transparent), color-mix(in srgb, var(--color-brand-green) 6%, transparent) 42%, transparent 72%)',
+            'radial-gradient(ellipse 48% 50% at 50% 40%, color-mix(in srgb, var(--color-brand-green) 26%, transparent), color-mix(in srgb, var(--color-brand-green) 9%, transparent) 42%, transparent 72%)',
         }}
         aria-hidden
       />
@@ -234,21 +240,31 @@ function DemoStage({ children }: { children: ReactNode }) {
           {...drift(-80, -60, 18)}
         />
       </motion.div>
-      <div className="relative overflow-hidden rounded-xl p-px">
-        {!reduce && (
-          <motion.div
-            className="absolute left-1/2 top-1/2 aspect-square w-[220%] -translate-x-1/2 -translate-y-1/2"
-            style={{
-              background:
-                'conic-gradient(from 0deg, transparent 0deg, transparent 300deg, var(--color-brand-green) 340deg, transparent 360deg)',
-            }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
-            aria-hidden
-          />
-        )}
-        <div className="relative overflow-hidden rounded-[11px] border border-border bg-card">{children}</div>
-      </div>
+      <motion.div
+        className="pointer-events-none absolute -bottom-16 left-1/2 h-48 w-[78%] -translate-x-1/2 rounded-full bg-brand-green blur-[90px]"
+        style={{ opacity: useTransform(light, [0, 1], [0, 0.28]) }}
+        aria-hidden
+      />
+      <motion.div
+        className="relative"
+        style={{ rotateX: tilt, y: lift, scale: shrink, transformPerspective: 1500, transformOrigin: '50% 100%' }}
+      >
+        <div className="relative overflow-hidden rounded-xl p-px">
+          {!reduce && (
+            <motion.div
+              className="absolute left-1/2 top-1/2 aspect-square w-[220%] -translate-x-1/2 -translate-y-1/2"
+              style={{
+                background:
+                  'conic-gradient(from 0deg, transparent 0deg, transparent 280deg, var(--color-brand-green) 335deg, transparent 360deg)',
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              aria-hidden
+            />
+          )}
+          <div className="relative overflow-hidden rounded-[11px] border border-mitra-border bg-mitra-surface">{children}</div>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -525,56 +541,11 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
         </div>
       </section>
 
-      {/* Governance */}
-      <section id="trust" className={cn(COLUMN, 'relative border-b border-border')}>
-        <AmbientGlow intensity={0.3} />
-        <div data-reveal className="px-6 py-20 md:px-12 md:py-28">
-          <h2 className="max-w-[640px] font-display text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-[1.04] tracking-[-0.03em]">
-            Engineered for teams with higher standards
-          </h2>
-        </div>
-        <div className="grid border-t border-border md:grid-cols-3">
-          {TECH_PILLARS.map((p, i) => {
-            const PillarIcon = p.icon;
-            return (
-              <div key={p.title} data-reveal style={{ transitionDelay: `${i * 120}ms` }} className="group border-b border-border p-8 transition-colors last:border-b-0 hover:bg-mitra-highlight md:border-b-0 md:border-r md:p-10 md:last:border-r-0">
-                <PillarIcon className="h-5 w-5 text-brand-green" aria-hidden />
-                <div className="mt-6 text-lg font-medium">{p.title}</div>
-                <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{p.desc}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <GovernanceFlow />
 
-      {/* Final CTA + footer */}
-      <section id="start" className={cn(COLUMN, 'relative px-6 py-28 text-center md:py-40')}>
-        <AmbientGlow intensity={0.5} />
-        <h2 data-reveal className="relative mx-auto max-w-[760px] font-display text-[clamp(2.4rem,5.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.035em]">
-          See Illumin<span className="font-sans font-bold">AI</span>te build on your instance
-        </h2>
-        <div data-reveal style={{ transitionDelay: '160ms' }} className="relative mt-10">
-          <Button variant="cta" onClick={onGetStarted} className="rounded-md px-6">
-            Start building
-          </Button>
-        </div>
-      </section>
-      <div className="overflow-hidden border-t border-border" aria-hidden>
-        <div className="select-none text-center font-display text-[clamp(3.5rem,17vw,16rem)] font-semibold leading-[0.85] tracking-[-0.05em] text-foreground/[0.05]">
-          Illumin<span className="font-sans font-bold">AI</span>te
-        </div>
-      </div>
-      <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-[1056px] flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
-          <IlluminaiteLogo className="h-[22px] w-auto" />
-          <div className="flex gap-6">
-            <a href="#demo" className="transition-colors hover:text-foreground">Live demo</a>
-            <a href="#product" className="transition-colors hover:text-foreground">Product</a>
-            <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
-            <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
-          </div>
-        </div>
-      </footer>
+      <FinalCta onGetStarted={onGetStarted} />
+
+      <FooterV2 onGetStarted={onGetStarted} onSignIn={onSignIn} />
     </div>
   );
 }
