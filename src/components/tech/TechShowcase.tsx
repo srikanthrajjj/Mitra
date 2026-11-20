@@ -16,7 +16,7 @@ export function TechShowcase() {
   return (
     <section
       id="product"
-      className="light relative overflow-hidden bg-background text-foreground"
+      className="relative overflow-hidden pt-14 md:pt-20"
     >
       <div className={cn('pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]', DOT_GRID)} aria-hidden />
       <TechMarquee />
