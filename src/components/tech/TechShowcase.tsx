@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TechMarquee } from './TechMarquee';
-import { DOT_GRID, tint } from './techStyles';
+import { BLOB, tint } from './techStyles';
 import { TECH_FEATURES, type TechFeature } from './techData';
 
 type Mode = 'light' | 'dark';
@@ -60,11 +59,11 @@ function ShowcaseFrame({ features, activeIndex }: FrameProps) {
     <div
       className={cn(
         mode,
-        'overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-500',
+        'overflow-hidden rounded-3xl border border-foreground/10 bg-card/60 backdrop-blur-2xl backdrop-saturate-150 transition-shadow duration-500',
         mode === 'dark' ? 'shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]' : 'shadow-[0_40px_100px_-40px_rgba(0,0,0,0.35)]',
       )}
     >
-      <div className="flex items-center gap-3 border-b border-border bg-mitra-surface px-4 py-3 transition-colors duration-500">
+      <div className="flex items-center gap-3 border-b border-foreground/10 bg-card/40 px-4 py-3 transition-colors duration-500">
         <div className="flex gap-1.5" aria-hidden>
           <span className="h-2.5 w-2.5 rounded-full bg-muted" />
           <span className="h-2.5 w-2.5 rounded-full bg-muted" />
@@ -95,7 +94,7 @@ function ShowcaseFrame({ features, activeIndex }: FrameProps) {
         </div>
       </div>
 
-      <div className="relative aspect-[2368/1800] bg-card">
+      <div className="relative aspect-[2368/1800]">
         {features.map((f, i) => {
           const on = i === activeIndex;
           return (
@@ -144,7 +143,7 @@ function FeatureCopy({ f, dim }: { f: TechFeature; dim?: boolean }) {
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">{f.desc}</p>
       <ul className="mt-6 flex flex-wrap gap-2">
         {f.bullets.map((b) => (
-          <li key={b} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[13px] font-medium">
+          <li key={b} className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-card/55 px-3 py-1.5 text-[13px] font-medium backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08)]">
             <Check className="h-3.5 w-3.5 text-brand-green-deep" strokeWidth={3} />
             {b}
           </li>
@@ -179,13 +178,11 @@ export function TechShowcase() {
     <section
       id="product"
       style={{ backgroundColor: tint(FEATURE_TINTS[active] ?? FEATURE_TINTS[0]) }}
-      className="relative pt-14 transition-[background-color] duration-[900ms] ease-out md:pt-20"
+      className="relative pt-20 transition-[background-color] duration-[900ms] ease-out [overflow:clip] md:pt-28"
     >
-      <div
-        className={cn('pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)]', DOT_GRID)}
-        aria-hidden
-      />
-      <TechMarquee />
+      <div className={cn(BLOB, 'left-[-8%] top-[18%] h-[30rem] w-[30rem] opacity-60')} aria-hidden />
+      <div className={cn(BLOB, 'right-[-6%] top-[52%] h-[34rem] w-[34rem] opacity-50')} aria-hidden />
+      <div className={cn(BLOB, 'left-[10%] bottom-[6%] h-[26rem] w-[26rem] opacity-45')} aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-6 pt-24 md:pt-32">
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-brand-green-deep">Inside the product</p>

@@ -16,8 +16,7 @@ import { ArrowRight, ArrowUp } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
-import { TechAgentMesh } from './TechAgentMesh';
-import { tint } from './techStyles';
+import { BLOB, GLASS_CHROME, tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const HEADLINE = ['See', 'IlluminAIte', 'build', 'on', 'your', 'instance.'] as const;
@@ -25,7 +24,6 @@ const WORDMARK = 'IlluminAIte'.split('');
 const LINKS = [
   { label: 'Live demo', href: '#demo' },
   { label: 'Product', href: '#product' },
-  { label: 'Lifecycle', href: '#lifecycle' },
   { label: 'Outcomes', href: '#outcomes' },
   { label: 'Governance', href: '#trust' },
 ] as const;
@@ -239,11 +237,11 @@ export function TechFooter({ onGetStarted }: TechFooterProps) {
     <div
       ref={rootRef}
       style={{ backgroundColor: tint(3) }}
-      className="relative z-10 -mt-10 overflow-hidden rounded-t-[2.5rem] md:-mt-14 md:rounded-t-[3.5rem]"
+      className="dark relative z-10 -mt-10 overflow-hidden rounded-t-[2.5rem] text-foreground md:-mt-14 md:rounded-t-[3.5rem]"
     >
       {/* Finale */}
       <section className="relative">
-        <TechAgentMesh className="absolute inset-0 [mask-image:radial-gradient(ellipse_80%_75%_at_50%_45%,black_35%,transparent_100%)]" />
+        <div className={cn(BLOB, 'left-1/2 top-[30%] h-[26rem] w-[40rem] -translate-x-1/2 opacity-40')} aria-hidden />
         <div className="relative mx-auto max-w-5xl px-6 py-28 text-center md:py-44">
           <motion.p
             initial={{ opacity: 0, y: 10 }}

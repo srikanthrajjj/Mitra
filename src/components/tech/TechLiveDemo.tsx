@@ -123,7 +123,7 @@ export function TechLiveDemo() {
   return (
     <div
       ref={rootRef}
-      className="relative grid h-[clamp(32rem,82dvh,46rem)] grid-cols-1 overflow-hidden bg-background text-foreground lg:grid-cols-[1fr_20rem]"
+      className="relative grid h-[clamp(32rem,82dvh,46rem)] grid-cols-1 overflow-hidden text-foreground lg:grid-cols-[1fr_20rem]"
       aria-label="Animated demo of IlluminAIte building a ServiceNow onboarding app"
       role="img"
     >
@@ -169,7 +169,7 @@ export function TechLiveDemo() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 + i * 0.08, duration: 0.45 }}
-                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-4 py-3.5 text-left backdrop-blur"
+                    className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-card/50 px-4 py-3.5 text-left backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.07)]"
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-brand-green">
                       <Icon className="h-4 w-4" />
@@ -216,7 +216,7 @@ export function TechLiveDemo() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-2xl border border-border bg-card/90 p-5 backdrop-blur"
+                className="rounded-2xl border border-foreground/10 bg-card/55 p-5 backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--foreground)/0.07)]"
               >
                 <p className="text-[15px] leading-snug text-muted-foreground">
                   I&apos;ll build your HR onboarding tracker: HRSD scope, catalog workflows, SLA timers, and
