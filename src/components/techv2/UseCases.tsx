@@ -16,7 +16,7 @@ function Pulse({ children }: { children: ReactNode }) {
   );
 }
 
-const LINE = 'fill-none stroke-border';
+const LINE = 'fill-none stroke-muted-foreground/45';
 const ACCENT = 'fill-brand-green stroke-brand-green';
 
 type V = { on: boolean };
@@ -46,7 +46,7 @@ function Onboarding({ on }: V) {
               animate={{ pathLength: done ? 1 : 0, opacity: done ? 1 : 0 }}
               transition={{ delay: delay + 0.08, duration: 0.3 }}
             />
-            <rect x="48" y={y + 4} width={i === 0 ? 120 : i === 1 ? 92 : 108} height="6" rx="3" className="fill-border" />
+            <rect x="48" y={y + 4} width={i === 0 ? 120 : i === 1 ? 92 : 108} height="6" rx="3" className="fill-muted-foreground/30" />
           </g>
         );
       })}
@@ -67,7 +67,7 @@ function Triage({ on }: V) {
           {r.hot ? (
             <motion.circle cy={r.y + 6} r="2.5" className={ACCENT} initial={false} animate={{ cx: on ? 206 : 36 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
           ) : (
-            <circle cx="36" cy={r.y + 6} r="2.5" className="fill-border stroke-border" />
+            <circle cx="36" cy={r.y + 6} r="2.5" className="fill-muted-foreground/45 stroke-muted-foreground/45" />
           )}
         </g>
       ))}
@@ -123,10 +123,10 @@ function Access({ on }: V) {
         const knobOn = (i === 1) !== on;
         return (
           <g key={y}>
-            <rect x="24" y={y} width="100" height="6" rx="3" className="fill-border" />
+            <rect x="24" y={y} width="100" height="6" rx="3" className="fill-muted-foreground/30" />
             <rect x="176" y={y - 4} width="40" height="14" rx="7" className={LINE} />
             <motion.rect x="176" y={y - 4} width="40" height="14" rx="7" className={GREEN_FILL} initial={false} animate={{ opacity: knobOn ? 1 : 0 }} transition={{ delay: on ? i * 0.15 : 0, duration: 0.25 }} />
-            <motion.circle cy={y + 3} r="4.5" className={knobOn ? ACCENT : 'fill-border stroke-border'} initial={false} animate={{ cx: knobOn ? 209 : 183 }} transition={{ delay: on ? i * 0.15 : 0, duration: 0.3 }} />
+            <motion.circle cy={y + 3} r="4.5" className={knobOn ? ACCENT : 'fill-muted-foreground/45 stroke-muted-foreground/45'} initial={false} animate={{ cx: knobOn ? 209 : 183 }} transition={{ delay: on ? i * 0.15 : 0, duration: 0.3 }} />
           </g>
         );
       })}
@@ -156,27 +156,7 @@ function Workplace({ on }: V) {
   );
 }
 
-function Supply({ on }: V) {
-  return (
-    <>
-      <path d="M52 52C82 18 102 18 120 48S170 78 198 46" className={LINE} strokeDasharray="3 4" />
-      <rect x="24" y="38" width="28" height="28" rx="6" className={LINE} />
-      <circle cx="120" cy="48" r="8" className={LINE} />
-      <circle cx="206" cy="44" r="10" className={GREEN_FILL} />
-      <circle cx="206" cy="44" r="3" className={ACCENT} />
-      <motion.circle
-        r="3"
-        className={ACCENT}
-        initial={false}
-        animate={on ? { cx: [52, 86, 120, 160, 198], cy: [52, 28, 48, 68, 46], opacity: [0, 1, 1, 1, 0] } : { cx: 52, cy: 52, opacity: 0 }}
-        transition={on ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
-      />
-    </>
-  );
-}
-
 const VISUALS: Record<string, (p: V) => ReactNode> = {
-  supply: Supply,
   onboarding: Onboarding,
   triage: Triage,
   vendor: Vendor,
@@ -201,14 +181,6 @@ const USE_CASES: UseCase[] = [
   { team: 'Customer service', title: 'Case routing', after: 'Cases reach the right team before the SLA clock matters.', visual: 'routing' },
   { team: 'Security', title: 'Access reviews', after: 'Reviews run in-platform with a full evidence trail.', visual: 'access' },
   { team: 'Facilities', title: 'Workplace requests', after: 'One portal, tracked end to end.', visual: 'workplace' },
-  {
-    team: 'Humanitarian programs',
-    title: 'Field supply requests',
-    after:
-      'Country offices request vaccines, shelter and supplies in one place. Each request routes to procurement, logistics and approvers, and is tracked until it arrives.',
-    visual: 'supply',
-    wide: true,
-  },
 ];
 
 function Corner({ className }: { className: string }) {
@@ -264,7 +236,7 @@ function UseCaseCard({ u, i }: { u: UseCase; i: number }) {
             <svg
               viewBox="0 0 240 96"
               className={cn(
-                'h-24 w-full opacity-70 transition-opacity duration-300 group-hover:opacity-100',
+                'h-24 w-full opacity-90 transition-opacity duration-300 group-hover:opacity-100',
                 u.wide && 'md:h-32 md:w-[38%] md:shrink-0',
               )}
               fill="none"

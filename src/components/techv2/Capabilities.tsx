@@ -9,32 +9,55 @@ interface Shape {
   accent?: boolean;
 }
 
-/** Line-art for each skill, drawn on a 240 x 120 canvas. Accent strokes are the green ones. */
+/** Closed polygon with rounded corners (quadratic curves), so boxes and diamonds read as soft, not sharp. */
+function rpoly(pts: [number, number][], r = 6): string {
+  const n = pts.length;
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const prev = pts[(i - 1 + n) % n];
+    const cur = pts[i];
+    const next = pts[(i + 1) % n];
+    const v1 = [prev[0] - cur[0], prev[1] - cur[1]];
+    const v2 = [next[0] - cur[0], next[1] - cur[1]];
+    const l1 = Math.hypot(v1[0], v1[1]);
+    const l2 = Math.hypot(v2[0], v2[1]);
+    const k = Math.min(r, l1 / 2, l2 / 2);
+    const a = [cur[0] + (v1[0] / l1) * k, cur[1] + (v1[1] / l1) * k];
+    const c = [cur[0] + (v2[0] / l2) * k, cur[1] + (v2[1] / l2) * k];
+    d += `${i === 0 ? 'M' : 'L'}${a[0]} ${a[1]}Q${cur[0]} ${cur[1]} ${c[0]} ${c[1]}`;
+  }
+  return `${d}Z`;
+}
+const box = (x: number, y: number, w: number, h: number, r = 7) =>
+  rpoly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], r);
+
+/** Line-art for each skill, drawn on a 240 x 120 canvas. Accent strokes are a touch brighter. */
 const VISUALS: Record<string, Shape[]> = {
   'create-user-story': [
-    { d: 'M78 14h70l22 22v70H78z' },
-    { d: 'M148 14v22h22' },
+    { d: rpoly([[78, 14], [148, 14], [170, 36], [170, 106], [78, 106]], 8) },
+    { d: 'M148 14v16q0 6 6 6h16' },
     { d: 'M94 56h52M94 72h64M94 88h40' },
     { d: 'M136 92l8 8 18-20', accent: true },
   ],
   'generate-brd': [
-    { d: 'M52 18h136v88H52z' },
+    { d: box(52, 18, 136, 88, 9) },
     { d: 'M68 36h56', accent: true },
     { d: 'M68 56h104M68 74h104M68 92h104M110 56v36' },
   ],
   'design-workflow': [
-    { d: 'M26 48h38v24H26zM176 48h38v24h-38z' },
-    { d: 'M120 42l24 18-24 18-24-18z', accent: true },
-    { d: 'M64 60h32M144 60h32M120 78v22h56' },
+    { d: box(26, 48, 38, 24, 7) + box(176, 48, 38, 24, 7) },
+    { d: rpoly([[120, 42], [144, 60], [120, 78], [96, 60]], 7), accent: true },
+    { d: 'M64 60h32M144 60h32M120 78v14q0 8 8 8h48' },
   ],
   'solution-architecture': [
-    { d: 'M56 20h128v22H56zM56 50h128v22H56z' },
-    { d: 'M56 80h128v22H56z', accent: true },
+    { d: box(56, 20, 128, 22, 8) + box(56, 50, 128, 22, 8) },
+    { d: box(56, 80, 128, 22, 8), accent: true },
     { d: 'M120 42v8M120 72v8' },
   ],
   'ui-review': [
-    { d: 'M36 18h168v86H36zM36 36h168' },
-    { d: 'M52 52h58v38H52zM124 56h64M124 70h48' },
+    { d: box(36, 18, 168, 86, 10) },
+    { d: 'M36 36h168' },
+    { d: box(52, 52, 58, 38, 6) + 'M124 56h64M124 70h48' },
     { d: 'M186 78a13 13 0 1 0 0.01 0M196 90l14 14', accent: true },
   ],
   'create-test-cases': [
@@ -49,11 +72,11 @@ const VISUALS: Record<string, Shape[]> = {
   'stakeholder-summary': [
     { d: 'M52 36a11 11 0 1 0 0.01 0M52 88a11 11 0 1 0 0.01 0' },
     { d: 'M76 40c26 0 34 10 54 20M76 86c26 0 34-10 54-26' },
-    { d: 'M132 36h64v48h-64z' },
+    { d: box(132, 36, 64, 48, 8) },
     { d: 'M146 54h38M146 68h26', accent: true },
   ],
   'release-notes': [
-    { d: 'M52 26h88l40 34-40 34H52z' },
+    { d: rpoly([[52, 26], [140, 26], [180, 60], [140, 94], [52, 94]], 9) },
     { d: 'M72 60a5 5 0 1 0 0.01 0' },
     { d: 'M96 52h44M96 68h30', accent: true },
   ],
@@ -62,7 +85,7 @@ const VISUALS: Record<string, Shape[]> = {
     { d: 'M120 46v26M120 86v.5', accent: true },
   ],
   custom: [
-    { d: 'M70 22h100v76H70z' },
+    { d: box(70, 22, 100, 76, 10) },
     { d: 'M120 44v32M104 60h32', accent: true },
   ],
 };
@@ -111,15 +134,25 @@ function CapabilityCard({ item, root }: { item: Capability; root: RefObject<HTML
           }}
           aria-hidden
         />
-        <svg viewBox="0 0 240 120" className="relative h-full w-full p-3" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg viewBox="0 0 240 120" className="relative h-full w-full p-3" fill="none" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <defs>
+            <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
+              <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
+              <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.42 }} />
+            </linearGradient>
+            <linearGradient id={`${item.id}-accent`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
+              <stop offset="0" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 0.95 }} />
+              <stop offset="1" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 0.45 }} />
+            </linearGradient>
+          </defs>
           {shapes.map((s, i) => (
             <motion.path
               key={i}
               d={s.d}
-              className={s.accent ? 'stroke-brand-green' : 'stroke-muted-foreground'}
+              stroke={`url(#${item.id}-${s.accent ? 'accent' : 'base'})`}
               initial={false}
               animate={{ pathLength: show ? 1 : 0, opacity: show ? 1 : 0 }}
-              transition={{ delay: show ? i * 0.22 : 0, duration: show ? 0.75 : 0.2, ease: EASE }}
+              transition={{ delay: show ? i * 0.22 : 0, duration: show ? 0.85 : 0.2, ease: EASE }}
             />
           ))}
         </svg>
