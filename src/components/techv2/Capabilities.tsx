@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef, useState } from 'react';
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { motion, useInView, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'motion/react';
 import { SKILLS } from '../../data/skills';
 import { cn } from '@/lib/utils';
 
@@ -30,62 +30,66 @@ function rpoly(pts: [number, number][], r = 6): string {
 const box = (x: number, y: number, w: number, h: number, r = 7) =>
   rpoly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], r);
 
-/** Line-art for each skill, drawn on a 240 x 120 canvas. Accent strokes are a touch brighter. */
+/**
+ * Line-art for each skill, drawn on a 64 x 64 grid with about 6 units of margin and rendered
+ * at exactly 64 x 64 px, so every icon has the same footprint and strokes stay one-to-one with
+ * the screen (no scaling, no blur). Accent strokes are a touch brighter.
+ */
 const VISUALS: Record<string, Shape[]> = {
   'create-user-story': [
-    { d: rpoly([[78, 14], [148, 14], [170, 36], [170, 106], [78, 106]], 8) },
-    { d: 'M148 14v16q0 6 6 6h16' },
-    { d: 'M94 56h52M94 72h64M94 88h40' },
-    { d: 'M136 92l8 8 18-20', accent: true },
+    { d: rpoly([[14, 6], [38, 6], [50, 18], [50, 58], [14, 58]], 5) },
+    { d: 'M38 6v8q0 4 4 4h8' },
+    { d: 'M22 28h20M22 36h24M22 44h12' },
+    { d: 'M38 50l4 4 8-9', accent: true },
   ],
   'generate-brd': [
-    { d: box(52, 18, 136, 88, 9) },
-    { d: 'M68 36h56', accent: true },
-    { d: 'M68 56h104M68 74h104M68 92h104M110 56v36' },
+    { d: box(8, 8, 48, 48, 6) },
+    { d: 'M16 18h20', accent: true },
+    { d: 'M16 30h32M16 40h32M16 50h32M30 30v20' },
   ],
   'design-workflow': [
-    { d: box(26, 48, 38, 24, 7) + box(176, 48, 38, 24, 7) },
-    { d: rpoly([[120, 42], [144, 60], [120, 78], [96, 60]], 7), accent: true },
-    { d: 'M64 60h32M144 60h32M120 78v14q0 8 8 8h48' },
+    { d: box(4, 25, 12, 12, 3) + box(48, 25, 12, 12, 3) },
+    { d: rpoly([[32, 18], [43, 31], [32, 44], [21, 31]], 3), accent: true },
+    { d: 'M16 31h5M43 31h5M32 44v7q0 4 4 4h12' },
   ],
   'solution-architecture': [
-    { d: box(56, 20, 128, 22, 8) + box(56, 50, 128, 22, 8) },
-    { d: box(56, 80, 128, 22, 8), accent: true },
-    { d: 'M120 42v8M120 72v8' },
+    { d: box(10, 8, 44, 13, 4) + box(10, 25, 44, 13, 4) },
+    { d: box(10, 42, 44, 13, 4), accent: true },
+    { d: 'M32 21v4M32 38v4' },
   ],
   'ui-review': [
-    { d: box(36, 18, 168, 86, 10) },
-    { d: 'M36 36h168' },
-    { d: box(52, 52, 58, 38, 6) + 'M124 56h64M124 70h48' },
-    { d: 'M186 78a13 13 0 1 0 0.01 0M196 90l14 14', accent: true },
+    { d: box(6, 10, 52, 44, 6) },
+    { d: 'M6 22h52' },
+    { d: box(12, 28, 18, 18, 3) + 'M36 30h16M36 36h8' },
+    { d: 'M52 46a5 5 0 1 0 .01 0M50 50l6 6', accent: true },
   ],
   'create-test-cases': [
-    { d: 'M52 34l7 7 11-14M52 62l7 7 11-14' },
-    { d: 'M86 36h96M86 64h80M86 92h88' },
-    { d: 'M52 90l7 7 11-14', accent: true },
+    { d: 'M10 16l4 4 7-9M10 32l4 4 7-9' },
+    { d: 'M28 16h26M28 32h22M28 48h26' },
+    { d: 'M10 48l4 4 7-9', accent: true },
   ],
   'api-specification': [
-    { d: 'M88 36L58 60l30 24M152 36l30 24-30 24' },
-    { d: 'M132 28l-24 64', accent: true },
+    { d: 'M24 18L10 32l14 14M40 18l14 14-14 14' },
+    { d: 'M35 14l-6 36', accent: true },
   ],
   'stakeholder-summary': [
-    { d: 'M52 36a11 11 0 1 0 0.01 0M52 88a11 11 0 1 0 0.01 0' },
-    { d: 'M76 40c26 0 34 10 54 20M76 86c26 0 34-10 54-26' },
-    { d: box(132, 36, 64, 48, 8) },
-    { d: 'M146 54h38M146 68h26', accent: true },
+    { d: 'M18 18a6 6 0 1 0 .01 0M18 46a6 6 0 1 0 .01 0' },
+    { d: 'M24 20c10 0 14 6 18 10M24 44c10 0 14-6 18-14' },
+    { d: box(42, 20, 16, 24, 4) },
+    { d: 'M47 28h6M47 34h4', accent: true },
   ],
   'release-notes': [
-    { d: rpoly([[52, 26], [140, 26], [180, 60], [140, 94], [52, 94]], 9) },
-    { d: 'M72 60a5 5 0 1 0 0.01 0' },
-    { d: 'M96 52h44M96 68h30', accent: true },
+    { d: rpoly([[6, 14], [40, 14], [58, 32], [40, 50], [6, 50]], 5) },
+    { d: 'M19 32a3 3 0 1 0 .01 0' },
+    { d: 'M28 28h14M28 36h9', accent: true },
   ],
   'risk-assessment': [
-    { d: 'M120 16l50 18v26c0 24-20 38-50 46-30-8-50-22-50-46V34z' },
-    { d: 'M120 46v26M120 86v.5', accent: true },
+    { d: 'M32 6l22 8v14c0 14-9 22-22 28C19 50 10 42 10 28V14z' },
+    { d: 'M32 24v14M32 46v.5', accent: true },
   ],
   custom: [
-    { d: box(70, 22, 100, 76, 10) },
-    { d: 'M120 44v32M104 60h32', accent: true },
+    { d: box(10, 10, 44, 44, 8) },
+    { d: 'M32 22v20M22 32h20', accent: true },
   ],
 };
 
@@ -136,28 +140,30 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
           }}
           aria-hidden
         />
-        <svg viewBox="-34 -22 308 164" className="relative h-full w-full p-4" shapeRendering="geometricPrecision" fill="none" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <defs>
-            <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
-              <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
-              <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.42 }} />
-            </linearGradient>
-            <linearGradient id={`${item.id}-accent`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="120">
-              <stop offset="0" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 0.95 }} />
-              <stop offset="1" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 0.45 }} />
-            </linearGradient>
-          </defs>
-          {shapes.map((s, i) => (
-            <motion.path
-              key={i}
-              d={s.d}
-              stroke={`url(#${item.id}-${s.accent ? 'accent' : 'base'})`}
-              initial={false}
-              animate={{ pathLength: show ? 1 : 0, opacity: show ? 1 : 0 }}
-              transition={{ delay: show ? i * 0.22 : 0, duration: show ? 0.85 : 0.2, ease: EASE }}
-            />
-          ))}
-        </svg>
+        <div className="relative flex h-full items-center justify-center">
+          <svg width="64" height="64" viewBox="0 0 64 64" className="h-16 w-16 shrink-0" shapeRendering="geometricPrecision" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <defs>
+              <linearGradient id={`${item.id}-base`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.9 }} />
+                <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--color-brand-green) 62%, var(--color-muted-foreground))', stopOpacity: 0.45 }} />
+              </linearGradient>
+              <linearGradient id={`${item.id}-accent`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 1 }} />
+                <stop offset="1" style={{ stopColor: 'var(--color-brand-green)', stopOpacity: 0.55 }} />
+              </linearGradient>
+            </defs>
+            {shapes.map((s, i) => (
+              <motion.path
+                key={i}
+                d={s.d}
+                stroke={`url(#${item.id}-${s.accent ? 'accent' : 'base'})`}
+                initial={false}
+                animate={{ pathLength: show ? 1 : 0, opacity: show ? 1 : 0 }}
+                transition={{ delay: show ? i * 0.22 : 0, duration: show ? 0.85 : 0.2, ease: EASE }}
+              />
+            ))}
+          </svg>
+        </div>
       </div>
 
       {/* Copy appears once the drawing has started */}
@@ -200,16 +206,56 @@ function CapabilityCard({ item, index, total }: { item: Capability; index: numbe
   );
 }
 
+/**
+ * One card in the sideways deck. Once a card reaches the left edge it stays there instead of
+ * scrolling away, and each card that lands on top pushes the older ones back: they dip in
+ * scale, tilt a touch, slip a little further left and dim, like sheets of paper being piled up.
+ */
+function StackItem({
+  index,
+  base,
+  step,
+  pad,
+  x,
+  children,
+}: {
+  index: number;
+  base: number;
+  step: number;
+  pad: number;
+  x: MotionValue<number>;
+  children: ReactNode;
+}) {
+  // How many cards have landed on this one (0 = still sliding in or on top), capped at 3.
+  const buried = useTransform(x, (v) => Math.min(Math.max(-v / step - index, 0), 3));
+  const tx = useTransform([x, buried], ([v, b]: number[]) => Math.round(Math.max(0, pad - (base + v)) - 16 * Math.min(b, 2)));
+  const scale = useTransform(buried, (b) => 1 - 0.035 * b);
+  const rotate = useTransform(buried, (b) => -0.9 * b);
+  const shade = useTransform(buried, (b) => Math.min(b * 0.22, 0.6));
+
+  return (
+    <motion.div style={{ x: tx, scale, rotate, zIndex: index, transformOrigin: '0% 60%' }} className="relative shrink-0">
+      {children}
+      <motion.div style={{ opacity: shade }} className="pointer-events-none absolute inset-0 rounded-2xl bg-background" aria-hidden />
+    </motion.div>
+  );
+}
+
 export function Capabilities() {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const [dist, setDist] = useState(0);
+  const [layout, setLayout] = useState<{ bases: number[]; step: number; pad: number }>({ bases: [], step: 380, pad: 24 });
 
   // How far the track has to travel sideways. The section is made exactly that much taller, so
   // vertical scroll drives the horizontal movement one to one while the content stays pinned.
   useLayoutEffect(() => {
     const measure = () => {
-      if (track.current) setDist(Math.max(0, track.current.scrollWidth - window.innerWidth));
+      const el = track.current;
+      if (!el) return;
+      setDist(Math.max(0, el.scrollWidth - window.innerWidth));
+      const bases = Array.from(el.children).map((c) => (c as HTMLElement).offsetLeft);
+      setLayout({ bases, step: bases.length > 1 ? bases[1] - bases[0] : 380, pad: bases[0] ?? 24 });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -222,7 +268,9 @@ export function Capabilities() {
   }, []);
 
   const { scrollYProgress } = useScroll({ target: section, offset: ['start 105px', 'end end'] });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -dist], { ease: (t) => t });
+  // A light spring on the scroll position makes the deck glide and settle instead of tracking 1:1.
+  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.5 });
+  const x = useTransform(smooth, [0, 1], [0, -dist]);
   const xPx = useTransform(x, (v) => Math.round(v));
   const bar = useTransform(scrollYProgress, [0, 1], ['4%', '100%']);
 
@@ -251,7 +299,9 @@ export function Capabilities() {
             className="flex w-max gap-6 pl-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-1056px)/2+1.5rem))] md:gap-10"
           >
             {CAPABILITIES.map((c, i) => (
-              <CapabilityCard key={c.id} item={c} index={i} total={CAPABILITIES.length} />
+              <StackItem key={c.id} index={i} base={layout.bases[i] ?? i * layout.step} step={layout.step} pad={layout.pad} x={xPx}>
+                <CapabilityCard item={c} index={i} total={CAPABILITIES.length} />
+              </StackItem>
             ))}
           </motion.div>
         </div>
