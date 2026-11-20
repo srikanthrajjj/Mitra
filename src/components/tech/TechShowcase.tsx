@@ -3,11 +3,13 @@ import { motion } from 'motion/react';
 import { Check, Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TechMarquee } from './TechMarquee';
-import { DOT_GRID } from './techStyles';
+import { DOT_GRID, tint } from './techStyles';
 import { TECH_FEATURES, type TechFeature } from './techData';
 
 type Mode = 'light' | 'dark';
 const EASE = [0.22, 1, 0.36, 1] as const;
+/** Background shade per feature: slight green variations that change as you scroll. */
+const FEATURE_TINTS = [6, 10, 7, 12] as const;
 
 const PLACEMENT = {
   right: 'left-4 top-0 -translate-y-1/2',
@@ -174,7 +176,11 @@ export function TechShowcase() {
   }, []);
 
   return (
-    <section id="product" className="relative pt-14 md:pt-20">
+    <section
+      id="product"
+      style={{ backgroundColor: tint(FEATURE_TINTS[active] ?? FEATURE_TINTS[0]) }}
+      className="relative pt-14 transition-[background-color] duration-[900ms] ease-out md:pt-20"
+    >
       <div
         className={cn('pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent,black_8%,black_92%,transparent)]', DOT_GRID)}
         aria-hidden

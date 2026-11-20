@@ -16,6 +16,7 @@ import { Button } from '@/src/components/ui/button';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { cn } from '@/lib/utils';
 import { TechAgentMesh } from './TechAgentMesh';
+import { tint } from './techStyles';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const HEADLINE = ['See', 'IlluminAIte', 'build', 'on', 'your', 'instance.'] as const;
@@ -234,7 +235,11 @@ export function TechFooter({ onGetStarted }: TechFooterProps) {
   const toTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
-    <div ref={rootRef} className="relative overflow-hidden">
+    <div
+      ref={rootRef}
+      style={{ backgroundColor: tint(3) }}
+      className="relative z-10 -mt-10 overflow-hidden rounded-t-[2.5rem] md:-mt-14 md:rounded-t-[3.5rem]"
+    >
       {/* Finale */}
       <section className="relative">
         <TechAgentMesh className="absolute inset-0 [mask-image:radial-gradient(ellipse_80%_75%_at_50%_45%,black_35%,transparent_100%)]" />

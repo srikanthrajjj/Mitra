@@ -6,10 +6,13 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STAGE_VISUALS } from './TechStageVisuals';
 import { TECH_STAGES } from './techData';
+import { tint } from './techStyles';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const N = TECH_STAGES.length;
+/** Background shade per stage: slight green variations that change as you scroll. */
+const STAGE_TINTS = [5, 9, 13, 9, 6] as const;
 
 /**
  * Delivery lifecycle. On desktop the section pins and scroll advances a five-stage rail;
@@ -61,7 +64,12 @@ export function TechLifecycle() {
   const Visual = STAGE_VISUALS[active];
 
   return (
-    <section ref={sectionRef} id="lifecycle" className="relative flex items-center py-24 lg:min-h-screen lg:py-0">
+    <section
+      ref={sectionRef}
+      id="lifecycle"
+      style={{ backgroundColor: tint(STAGE_TINTS[active] ?? STAGE_TINTS[0]) }}
+      className="relative flex items-center pb-24 pt-32 transition-[background-color] duration-[900ms] ease-out lg:min-h-screen lg:py-0"
+    >
       <div className="mx-auto w-full max-w-6xl px-6">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">The delivery lifecycle</p>
         <h2 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] md:text-6xl">

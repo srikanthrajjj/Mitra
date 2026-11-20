@@ -10,6 +10,7 @@ import { TechHero } from './TechHero';
 import { TechFooter } from './TechFooter';
 import { useSmoothScroll } from './useSmoothScroll';
 import { TECH_PILLARS, TECH_STATS } from './techData';
+import { tint } from './techStyles';
 
 interface TechPageProps {
   onGetStarted: () => void;
@@ -137,7 +138,11 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       <TechHero onGetStarted={onGetStarted} />
 
       {/* Live chat: dark panel directly under the hero */}
-      <section id="demo" className="dark relative bg-background px-4 pb-28 pt-4 text-foreground md:px-6 md:pb-44">
+      <section
+        id="demo"
+        style={{ backgroundColor: tint(9) }}
+        className="dark relative z-10 -mt-10 rounded-t-[2.5rem] px-4 pb-28 pt-16 text-foreground md:-mt-14 md:rounded-t-[3.5rem] md:px-6 md:pb-44 md:pt-20"
+      >
         <motion.div
           initial={{ opacity: 0, y: 48 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -150,10 +155,17 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       </section>
 
       {/* Light block: features, outcomes, governance */}
-      <div className="light relative -mt-12 rounded-t-[2.5rem] bg-background pb-28 text-foreground md:-mt-16 md:rounded-t-[3.5rem] md:pb-44">
+      <div
+        style={{ backgroundColor: tint(7) }}
+        className="light relative z-10 -mt-12 rounded-t-[2.5rem] pb-0 text-foreground [overflow:clip] md:-mt-16 md:rounded-t-[3.5rem]"
+      >
         <TechShowcase />
 
-        <section id="outcomes" className="pt-12 md:pt-20">
+        <section
+          id="outcomes"
+          style={{ backgroundColor: tint(13) }}
+          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-28 pt-24 md:-mt-14 md:rounded-t-[3.5rem] md:pb-36 md:pt-32"
+        >
           <div className="mx-auto max-w-6xl px-6">
             <Reveal>
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Outcomes</p>
@@ -175,7 +187,11 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
           </div>
         </section>
 
-        <section id="trust" className="pt-24 md:pt-32">
+        <section
+          id="trust"
+          style={{ backgroundColor: tint(8) }}
+          className="relative z-10 -mt-10 rounded-t-[2.5rem] pb-32 pt-24 md:-mt-14 md:rounded-t-[3.5rem] md:pb-48 md:pt-32"
+        >
           <div className="mx-auto max-w-6xl px-6">
             <Reveal>
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green-deep">Built for enterprise delivery</p>
@@ -210,8 +226,10 @@ export function TechPage({ onGetStarted, onSignIn, onBack }: TechPageProps) {
       </div>
 
       {/* Dark block: lifecycle and footer */}
-      <div className="dark relative -mt-12 rounded-t-[2.5rem] bg-background text-foreground md:-mt-16 md:rounded-t-[3.5rem]">
-        <div className="h-12 md:h-16" aria-hidden />
+      <div
+        style={{ backgroundColor: tint(5) }}
+        className="dark relative z-10 -mt-12 rounded-t-[2.5rem] text-foreground [overflow:clip] md:-mt-16 md:rounded-t-[3.5rem]"
+      >
         <TechLifecycle />
         <TechFooter onGetStarted={onGetStarted} />
       </div>
