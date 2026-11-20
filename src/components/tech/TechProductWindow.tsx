@@ -10,10 +10,12 @@ interface TechProductWindowProps {
   /** Scroll-driven perspective tilt that settles flat as the window reaches centre. */
   tilt?: boolean;
   priority?: boolean;
+  /** Replaces the screenshot with live content. */
+  children?: React.ReactNode;
 }
 
 /** Browser-style frame around a real product screenshot. */
-export function TechProductWindow({ src, alt, url, className, tilt = false, priority = false }: TechProductWindowProps) {
+export function TechProductWindow({ src, alt, url, className, tilt = false, priority = false, children }: TechProductWindowProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] });
   const rotateX = useTransform(scrollYProgress, [0, 1], [tilt ? 16 : 6, 0]);
@@ -37,6 +39,7 @@ export function TechProductWindow({ src, alt, url, className, tilt = false, prio
           </div>
           <span className="w-10" aria-hidden />
         </div>
+        {children ?? (
         <img
           src={src}
           alt={alt}
@@ -46,6 +49,7 @@ export function TechProductWindow({ src, alt, url, className, tilt = false, prio
           decoding="async"
           className="block w-full"
         />
+        )}
         <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-foreground/5" />
       </motion.div>
     </div>

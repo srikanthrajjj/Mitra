@@ -8,6 +8,7 @@ import { TechLifecycle } from './TechLifecycle';
 import { TechArchitecture } from './TechArchitecture';
 import { TechShowcase } from './TechShowcase';
 import { TechMarquee } from './TechMarquee';
+import { TechLiveDemo } from './TechLiveDemo';
 import { TechProductWindow } from './TechProductWindow';
 import { Button } from '@/src/components/ui/button';
 import { useSmoothScroll } from './useSmoothScroll';
@@ -107,17 +108,17 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
 
   return (
     <div className="dark min-h-screen overflow-x-clip bg-background text-foreground antialiased selection:bg-brand-green/25">
-      <header
-        className={cn(
-          'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
-          scrolled ? 'border-b border-border bg-background/80 backdrop-blur-md' : 'border-b border-transparent',
-        )}
-      >
-        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <header className="fixed inset-x-0 top-4 z-50 px-4">
+        <nav
+          className={cn(
+            'mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-5 pr-2 backdrop-blur-xl transition-colors duration-300',
+            scrolled ? 'border-border bg-background/80' : 'border-border/60 bg-background/40',
+          )}
+        >
           <button type="button" onClick={onBack} aria-label="IlluminAIte home">
-            <IlluminaiteLogo className="h-[26px] w-auto" />
+            <IlluminaiteLogo className="h-[24px] w-auto" />
           </button>
-          <div className="hidden items-center gap-8 text-[13px] font-medium text-muted-foreground md:flex">
+          <div className="hidden items-center gap-7 text-[13px] font-medium text-muted-foreground md:flex">
             <a href="#product" className="transition-colors hover:text-foreground">Product</a>
             <a href="#lifecycle" className="transition-colors hover:text-foreground">Lifecycle</a>
             <a href="#architecture" className="transition-colors hover:text-foreground">Architecture</a>
@@ -131,9 +132,10 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
       </header>
 
       <section className="relative overflow-hidden pt-16">
+        <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden />
         <TechHeroField className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-10 pt-24 md:pt-32">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-4 pt-24 md:pt-28">
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -143,20 +145,22 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
             {TECH_HERO.eyebrow}
           </motion.p>
-          <h1 className="mt-8 max-w-5xl font-display text-[3rem] font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[6.5rem]">
+          <h1 className="mt-6 max-w-6xl font-display text-[3rem] font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[4.5rem] lg:text-[4.75rem]">
             <RevealWords text="The" delay={0.15} />
             <RevealWords
               text="agentic engine"
               delay={0.25}
               className="bg-gradient-to-r from-brand-green to-brand-green-hover bg-clip-text text-transparent"
             />
+            <br className="hidden md:block" />
             <RevealWords text="behind every ServiceNow build." delay={0.4} />
           </h1>
+          <div className="mt-7 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE, delay: 1.0 }}
-            className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
+            className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg"
           >
             {TECH_HERO.subtitle}
           </motion.p>
@@ -164,7 +168,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: EASE, delay: 1.15 }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            className="flex flex-wrap items-center gap-4"
           >
             <Button variant="cta" size="lg" onClick={onGetStarted} className="group rounded-full px-7">
               Try IlluminAIte
@@ -177,15 +181,12 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
               See the product
             </a>
           </motion.div>
+          </div>
         </div>
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-12 md:pt-20">
-          <TechProductWindow
-            tilt
-            priority
-            src={TECH_FEATURES[1].image}
-            alt={TECH_FEATURES[1].alt}
-            url={TECH_FEATURES[1].url}
-          />
+        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-8 md:pt-10">
+          <TechProductWindow tilt priority src="" alt="" url="Mitra · New solution">
+            <TechLiveDemo />
+          </TechProductWindow>
         </div>
       </section>
 
