@@ -32,7 +32,7 @@ export function TechArchitecture() {
     <section id="architecture" className="border-t border-border bg-background py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Architecture</p>
-        <h2 className="mt-4 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+        <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
           One orchestrator. Specialised agents. Your ServiceNow instance.
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">

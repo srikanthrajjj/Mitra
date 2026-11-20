@@ -49,7 +49,7 @@ export function TechLifecycle() {
       <div className="mx-auto grid w-full max-w-6xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">The delivery lifecycle</p>
-          <h2 className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+          <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] md:text-6xl">
             From requirements to go-live, one agent per stage.
           </h2>
 

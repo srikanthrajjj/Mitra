@@ -6,8 +6,12 @@ import { cn } from '@/lib/utils';
 import { TechHeroField } from './TechHeroField';
 import { TechLifecycle } from './TechLifecycle';
 import { TechArchitecture } from './TechArchitecture';
+import { TechShowcase } from './TechShowcase';
+import { TechMarquee } from './TechMarquee';
+import { TechProductWindow } from './TechProductWindow';
+import { Button } from '@/src/components/ui/button';
 import { useSmoothScroll } from './useSmoothScroll';
-import { TECH_HERO, TECH_PILLARS, TECH_STATS } from './techData';
+import { TECH_FEATURES, TECH_HERO, TECH_PILLARS, TECH_STATS } from './techData';
 
 interface TechPageProps {
   onGetStarted: () => void;
@@ -114,67 +118,79 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
             <IlluminaiteLogo className="h-[26px] w-auto" />
           </button>
           <div className="hidden items-center gap-8 text-[13px] font-medium text-muted-foreground md:flex">
+            <a href="#product" className="transition-colors hover:text-foreground">Product</a>
             <a href="#lifecycle" className="transition-colors hover:text-foreground">Lifecycle</a>
             <a href="#architecture" className="transition-colors hover:text-foreground">Architecture</a>
             <a href="#outcomes" className="transition-colors hover:text-foreground">Outcomes</a>
             <a href="#trust" className="transition-colors hover:text-foreground">Governance</a>
           </div>
-          <button
-            type="button"
-            onClick={onGetStarted}
-            className="rounded-full bg-brand-green px-4 py-2 text-[13px] font-semibold text-background transition-colors hover:bg-brand-green-hover"
-          >
+          <Button variant="cta" size="sm" onClick={onGetStarted} className="rounded-full">
             Try IlluminAIte
-          </button>
+          </Button>
         </nav>
       </header>
 
-      <section className="relative flex min-h-screen items-center overflow-hidden pt-16">
+      <section className="relative overflow-hidden pt-16">
         <TechHeroField className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-24">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-10 pt-24 md:pt-32">
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-brand-green backdrop-blur"
           >
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
             {TECH_HERO.eyebrow}
           </motion.p>
-          <h1 className="mt-6 max-w-4xl font-display text-[2.6rem] font-extrabold leading-[1.05] tracking-tight md:text-7xl">
-            <RevealWords text={TECH_HERO.title} delay={0.15} />
+          <h1 className="mt-8 max-w-5xl font-display text-[3rem] font-extrabold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[6.5rem]">
+            <RevealWords text="The" delay={0.15} />
+            <RevealWords
+              text="agentic engine"
+              delay={0.25}
+              className="bg-gradient-to-r from-brand-green to-brand-green-hover bg-clip-text text-transparent"
+            />
+            <RevealWords text="behind every ServiceNow build." delay={0.4} />
           </h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.9 }}
-            className="mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
+            transition={{ duration: 0.8, ease: EASE, delay: 1.0 }}
+            className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
             {TECH_HERO.subtitle}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 1.05 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 1.15 }}
             className="mt-10 flex flex-wrap items-center gap-4"
           >
-            <button
-              type="button"
-              onClick={onGetStarted}
-              className="group inline-flex items-center gap-2 rounded-full bg-brand-green px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-brand-green-hover"
-            >
+            <Button variant="cta" size="lg" onClick={onGetStarted} className="group rounded-full px-7">
               Try IlluminAIte
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </button>
+              <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Button>
             <a
-              href="#lifecycle"
-              className="rounded-full border border-border px-6 py-3 text-sm font-semibold transition-colors hover:bg-accent"
+              href="#product"
+              className="rounded-full border border-border bg-background/60 px-7 py-2.5 text-sm font-semibold backdrop-blur transition-colors hover:bg-accent"
             >
-              See how it works
+              See the product
             </a>
           </motion.div>
         </div>
+        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-12 md:pt-20">
+          <TechProductWindow
+            tilt
+            priority
+            src={TECH_FEATURES[1].image}
+            alt={TECH_FEATURES[1].alt}
+            url={TECH_FEATURES[1].url}
+          />
+        </div>
       </section>
+
+      <TechMarquee />
+      <TechShowcase />
 
       <TechLifecycle />
       <TechArchitecture />
@@ -183,14 +199,14 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Outcomes</p>
-            <h2 className="mt-4 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
               Measured where it matters: speed, cost and accuracy.
             </h2>
           </Reveal>
           <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
             {TECH_STATS.map((s) => (
               <div key={s.label} className="bg-background p-8 md:p-10">
-                <div className="font-display text-6xl font-extrabold tracking-tight text-brand-green md:text-7xl">
+                <div className="font-display text-7xl font-extrabold tracking-[-0.05em] text-brand-green md:text-8xl">
                   <CountUp target={s.target} suffix={s.suffix} />
                 </div>
                 <div className="mt-4 font-display text-lg font-semibold">{s.label}</div>
@@ -205,7 +221,7 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
         <div className="mx-auto max-w-6xl px-6">
           <Reveal>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-green">Built for enterprise delivery</p>
-            <h2 className="mt-4 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h2 className="mt-4 max-w-3xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] md:text-7xl">
               Autonomous where it helps. Accountable where it counts.
             </h2>
           </Reveal>
@@ -237,19 +253,15 @@ export function TechPage({ onGetStarted, onBack }: TechPageProps) {
       <section className="relative overflow-hidden border-t border-border py-28 md:py-40">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-green/10 blur-3xl" />
         <Reveal className="relative mx-auto max-w-3xl px-6 text-center">
-          <h2 className="font-display text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
+          <h2 className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] md:text-8xl">
             See Mitra build on your instance.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground md:text-lg">
             Start from a workshop conversation and finish with a go-live ready ServiceNow implementation.
           </p>
-          <button
-            type="button"
-            onClick={onGetStarted}
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-brand-green px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:bg-brand-green-hover"
-          >
-            Try IlluminAIte <ArrowRight className="h-4 w-4" />
-          </button>
+          <Button variant="cta" size="lg" onClick={onGetStarted} className="mt-10 rounded-full px-8">
+            Try IlluminAIte <ArrowRight className="ml-1 h-4 w-4" />
+          </Button>
         </Reveal>
       </section>
 
