@@ -14,7 +14,7 @@ import { ArrowRight, Check, FileText } from 'lucide-react';
 import { IlluminaiteLogo } from '../IlluminaiteLogo';
 import { Button } from '@/src/components/ui/button';
 import { cn } from '@/lib/utils';
-import { TechLiveDemo } from '../tech/TechLiveDemo';
+import { PortalDemo } from './PortalDemo';
 import { GridBackdrop } from './GridBackdrop';
 import { UseCases } from './UseCases';
 import { Capabilities } from './Capabilities';
@@ -507,7 +507,7 @@ export function TechPageV2({ onGetStarted, onSignIn, onBack }: TechPageV2Props) 
           transition={{ duration: 0.9, ease: EASE }}
         >
           <DemoStage>
-            <TechLiveDemo variant="bold" />
+            <PortalDemo />
           </DemoStage>
         </motion.div>
       </section>
